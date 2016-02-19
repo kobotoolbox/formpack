@@ -1,0 +1,39 @@
+{
+    "name": "Dietary needs",
+    "id_string": "dietary_needs",
+    "content": {
+        "survey": [
+            {
+                "required": "true",
+                "type": "text",
+                "label": "Restaurant name"
+            },
+            {
+                "required": "true",
+                "type": {
+                    "select_multiple": {
+                        "choices": [
+                            {
+                                "name": "gluten_free",
+                                "label": "Gluten-free"
+                            },
+                            {
+                                "name": "vegan",
+                                "label": "Vegan"
+                            },
+                            {
+                                "name": "vegetarian",
+                                "label": "Vegetarian"
+                            },
+                            {
+                                "name": "lactose_free",
+                                "label": "Lactose-free"
+                            }
+                        ]
+                    }
+                },
+                "label": "Accommodating of dietary needs"
+            }
+        ]
+    }
+}

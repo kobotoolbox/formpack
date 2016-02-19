@@ -1,0 +1,45 @@
+{
+    "id_string": "customer_satisfaction",
+    "content": {
+        "survey": [
+            {
+                "required": "true",
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "Restaurant name"
+            },
+            {
+                "required": "true",
+                "type": "select_one y_n_unk",
+                "name": "customer_enjoyment",
+                "label": "Did you enjoy your dining experience?"
+            }
+        ],
+        "choices": [
+            {
+                "list name": "y_n_unk",
+                "name": "yes",
+                "label": "Yes"
+            },
+            {
+                "list name": "y_n_unk",
+                "name": "no",
+                "label": "No"
+            }
+        ]
+    },
+    "submissions": [
+        {
+            "customer_enjoyment": "yes",
+            "restaurant_name": "Felipes"
+        },
+        {
+            "customer_enjoyment": "no",
+            "restaurant_name": "Dunkin Donuts"
+        },
+        {
+            "customer_enjoyment": "no",
+            "restaurant_name": "McDonalds"
+        }
+    ]
+}

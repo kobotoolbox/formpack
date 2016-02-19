@@ -35,6 +35,8 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
+cover
+cover/
 htmlcov/
 .tox/
 .coverage
@@ -60,3 +62,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# local env setup script
+env.source
