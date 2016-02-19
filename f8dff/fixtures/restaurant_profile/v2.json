@@ -1,0 +1,27 @@
+{
+    "id_string": "restaurant_profile",
+    "version": "rpV2",
+    "content": {
+        "survey": [
+            {
+                "type": "text",
+                "name": "restaurant_name",
+                "label::english": "Restaurant name",
+                "label::french": "nom du restaurant"
+            },
+            {
+                "required": "true",
+                "type": "geopoint",
+                "name": "location",
+                "label::english": "Location",
+                "label::french": "Location"
+            }
+        ]
+    },
+    "submissions": [
+        {
+            "location": "12.34 -23.45",
+            "restaurant_name": "Felipes"
+        }
+    ]
+}

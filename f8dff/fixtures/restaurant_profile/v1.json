@@ -1,0 +1,25 @@
+{
+    "id_string": "restaurant_profile",
+    "content": {
+        "survey": [
+            {
+                "required": "true",
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "Restaurant name"
+            },
+            {
+                "required": "true",
+                "type": "geopoint",
+                "name": "location",
+                "label": "Location"
+            }
+        ]
+    },
+    "submissions": [
+        {
+            "location": "12.34 -23.45",
+            "restaurant_name": "Felipes"
+        }
+    ]
+}

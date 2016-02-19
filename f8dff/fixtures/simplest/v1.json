@@ -1,0 +1,11 @@
+{
+    "content": {
+        "survey": [
+            {
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "restaurant name"
+            }
+        ]
+    }
+}
