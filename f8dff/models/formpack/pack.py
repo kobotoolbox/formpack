@@ -129,6 +129,9 @@ class FormPack:
         return _gen()
 
     def _to_ss_generator(self, options):
+        '''
+        ss_generator means "spreadsheet" structure with generators instead of lists
+        '''
         if not isinstance(options, dict):
             raise ValueError('options must be provided')
         out = OrderedDict()
@@ -136,12 +139,9 @@ class FormPack:
         headers = latest_version._names
 
         def _generator():
-            i = 0
             for submission in self.submissions_list():
-                i += 1
                 yield [
-                    'row:{n},col:{key},val:{val}'.format(key=xx, n=i, val=submission._s.get(xx))
-                    for xx in headers
+                    submission._s.get(header) for header in headers
                 ]
         out['submissions'] = [headers, _generator()]
         return out
