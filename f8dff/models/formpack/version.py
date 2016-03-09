@@ -1,6 +1,11 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 from collections import OrderedDict
 
-from utils import formversion_pyxform
+from .utils import formversion_pyxform
 from f8dff.models.formpack.submission import FormSubmission
 from f8dff.models.formpack.utils import parse_xml_to_xmljson
 
@@ -18,10 +23,25 @@ class FormVersion:
         self._submissions = []
         self.id_string = version_data.get('id_string')
         self._version_id = version_data.get('version')
+
+        schema = OrderedDict()
+
         content = self._v.get('content', {})
+
         for item in content.get('survey', []):
             if 'name' in item:
-                self._names.append(item['name'])
+                name = item['name']
+                self._names.append(name)
+                schema[name] = {
+                    "type": item['type']
+                }
+
+        self._formatters = OrderedDict()
+        for name, structure in schema.items():
+            # question_type = get_question_type(name, version)
+            # formater_class = formater_registry[question_type]
+            self._formatters[name] = Formatter(name, structure['type'])
+
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
 
@@ -99,9 +119,18 @@ class FormVersion:
             raise ValueError('cannot create xml on a survey '
                              'with no title.')
         survey.update({
-                u'name': self.lookup('root_node_name', 'data'),
-                u'id_string': self.lookup('id_string'),
-                u'title': title,
-                u'version': self._version_id,
+                'name': self.lookup('root_node_name', 'data'),
+                'id_string': self.lookup('id_string'),
+                'title': title,
+                'version': self._version_id,
             })
         return survey.to_xml().encode('utf-8')
+
+
+class Formatter:
+    def __init__(self, data_type, name):
+        self.data_type = data_type
+        self.name = name
+
+    def format(self, val):
+        return "{data_type}:{val}".format(data_type=self.data_type, val=val)

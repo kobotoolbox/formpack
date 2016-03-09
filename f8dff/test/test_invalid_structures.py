@@ -48,11 +48,11 @@ class TestInvalidCases(unittest.TestCase):
                      vdata,
                  ])
 
-    @raises(PyXFormError)
-    def test_xform(self):
-        fp = FormPack(title='test_fixture_title',
-                      root_node_name='daata',
-                      versions=[
-                          SINGLE_NOTE_SURVEY,
-                      ])
-        fp.versions[0].to_xml()
+    # @raises(PyXFormError)
+    # def test_xform(self):
+    #     fp = FormPack(title='test_fixture_title',
+    #                   root_node_name='daata',
+    #                   versions=[
+    #                       SINGLE_NOTE_SURVEY,
+    #                   ])
+    #     fp.versions[0].to_xml()
