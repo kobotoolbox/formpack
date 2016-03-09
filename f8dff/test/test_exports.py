@@ -5,7 +5,7 @@ from f8dff.fixtures import build_fixture
 
 import json
 
-sanitation_report = build_fixture('sanitation_report')
+customer_satisfaction = build_fixture('customer_satisfaction')
 
 
 class TestFormPackExport(unittest.TestCase):
@@ -13,5 +13,5 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_generator_export(self):
         options = {}
-        values_in_lists = FormPack(**sanitation_report)._export_to_lists(options)
+        values_in_lists = FormPack(**customer_satisfaction)._export_to_lists(options)
         print json.dumps(values_in_lists, indent=4)

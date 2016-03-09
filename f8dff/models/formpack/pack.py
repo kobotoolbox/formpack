@@ -128,6 +128,7 @@ class FormPack:
                     yield submission
         return _gen()
 
+
     def _to_ss_generator(self, options):
         '''
         ss_generator means "spreadsheet" structure with generators instead of lists
@@ -136,14 +137,19 @@ class FormPack:
             raise ValueError('options must be provided')
         out = OrderedDict()
         latest_version = self.versions[-1]
-        headers = latest_version._names
+        column_formatters = latest_version._formatters
+
+        header_names = []
+        for (colname, colformatter) in column_formatters.iteritems():
+            header_names.append(colname)
 
         def _generator():
             for submission in self.submissions_list():
-                yield [
-                    submission._s.get(header) for header in headers
-                ]
-        out['submissions'] = [headers, _generator()]
+                out = []
+                for (colname, formatter) in column_formatters.iteritems():
+                    out.append(formatter.format(submission._s.get(colname)))
+                yield out
+        out['submissions'] = [header_names, _generator()]
         return out
 
     def _export_to_lists(self, options):

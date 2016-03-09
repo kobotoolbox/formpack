@@ -22,6 +22,11 @@ class FormVersion:
         for item in content.get('survey', []):
             if 'name' in item:
                 self._names.append(item['name'])
+
+        self._formatters = OrderedDict()
+        for name in self._names:
+            self._formatters[name] = Formatter(item, self)
+
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
 
@@ -105,3 +110,13 @@ class FormVersion:
                 u'version': self._version_id,
             })
         return survey.to_xml().encode('utf-8')
+
+
+class Formatter:
+    def __init__(self, column_details, version):
+        print column_details
+        self.name = column_details.get('name')
+        self.version = version
+
+    def format(self, val):
+        return val
