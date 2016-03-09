@@ -9,6 +9,7 @@ from pyquery import PyQuery
 from b64_attachment import B64Attachment
 from f8dff.models.formpack.utils import parse_xmljson_to_data
 
+
 class FormSubmission:
     def __init__(self, submission_data={}, version=None):
         self._s = OrderedDict()

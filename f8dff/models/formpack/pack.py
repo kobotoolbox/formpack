@@ -117,3 +117,43 @@ class FormPack:
 
     def to_json(self, **kwargs):
         return json.dumps(self.to_dict(), **kwargs)
+
+    def submissions_list(self):
+        return list(self.submissions_gen())
+
+    def submissions_gen(self):
+        def _gen():
+            for version in self.versions:
+                for submission in version._submissions:
+                    yield submission
+        return _gen()
+
+    def _to_ss_generator(self, options):
+        if not isinstance(options, dict):
+            raise ValueError('options must be provided')
+        out = OrderedDict()
+        latest_version = self.versions[-1]
+        headers = latest_version._names
+
+        def _generator():
+            i = 0
+            for submission in self.submissions_list():
+                i += 1
+                yield [
+                    'row:{n},col:{key},val:{val}'.format(key=xx, n=i, val=submission._s.get(xx))
+                    for xx in headers
+                ]
+        out['submissions'] = [headers, _generator()]
+        return out
+
+    def _export_to_lists(self, options):
+        '''
+        this defeats the purpose of using generators, but it's useful for tests
+        '''
+        gens = self._to_ss_generator(options)
+        out = []
+        for key in gens.keys():
+            (headers, _gen) = gens[key]
+            vals = list(_gen)
+            out.append([key, [headers, vals]])
+        return out
