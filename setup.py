@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(name='f8dff',
       version='1.0',
@@ -8,5 +8,5 @@ setup(name='f8dff',
       author='Alex Dorey',
       author_email='alex.dorey@kobotoolbox.org',
       url='https://github.com/kobotoolbox/f8dff/',
-      packages=['f8dff'],
+      packages=find_packages()
       )
