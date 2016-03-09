@@ -122,11 +122,9 @@ class FormPack:
         return list(self.submissions_gen())
 
     def submissions_gen(self):
-        def _gen():
-            for version in self.versions:
-                for submission in version._submissions:
-                    yield submission
-        return _gen()
+        for version in self.versions:
+            for submission in version._submissions:
+                yield submission
 
 
     def _to_ss_generator(self, options):
@@ -135,22 +133,18 @@ class FormPack:
         '''
         if not isinstance(options, dict):
             raise ValueError('options must be provided')
-        out = OrderedDict()
+        sheets = OrderedDict()
         latest_version = self.versions[-1]
         column_formatters = latest_version._formatters
 
-        header_names = []
-        for (colname, colformatter) in column_formatters.iteritems():
-            header_names.append(colname)
-
         def _generator():
-            for submission in self.submissions_list():
-                out = []
+            for submission in self.submissions_gen():
+                row = []
                 for (colname, formatter) in column_formatters.iteritems():
-                    out.append(formatter.format(submission._s.get(colname)))
-                yield out
-        out['submissions'] = [header_names, _generator()]
-        return out
+                    row.append(formatter.format(submission._data.get(colname)))
+                yield row
+        sheets['submissions'] = [column_formatters.keys(), _generator()]
+        return sheets
 
     def _export_to_lists(self, options):
         '''
