@@ -8,7 +8,8 @@ from f8dff.models.formpack.utils import parse_xml_to_xmljson
 class FormVersion:
     def __init__(self, version_data, parent):
         if 'name' in version_data:
-            raise ValueError('version_data should have a title but not a name')
+            raise ValueError('FormVersion should not have a name parameter. '
+                             'consider using "title" or "id_string"')
         self._v = version_data
         self._parent = parent
         self._names = []
@@ -66,10 +67,17 @@ class FormVersion:
     def _submissions_count(self):
         return len(self._submissions)
 
+    def lookup(self, prop, default=None):
+        result = getattr(self, prop, None)
+        if result is None:
+            result = self._parent.lookup(prop, default=default)
+        return result
+
+    def _get_root_node_name(self):
+        return self.lookup('root_node_name', default='data')
+
     def _get_id_string(self):
-        if self.id_string is None:
-            return self._parent.id_string
-        return self.id_string
+        return self.lookup('id_string')
 
     def _get_title(self):
         '''
@@ -84,24 +92,16 @@ class FormVersion:
 
     def to_xml(self):
         survey = formversion_pyxform(self._v)
-        data_root_node_name = self._get_id_string()
+
         title = self._get_title()
+
         if title is None:
             raise ValueError('cannot create xml on a survey '
                              'with no title.')
         survey.update({
-                u'name': self._root_node_name or u'data',
-                u'id_string': data_root_node_name,
+                u'name': self.lookup('root_node_name', 'data'),
+                u'id_string': self.lookup('id_string'),
                 u'title': title,
                 u'version': self._version_id,
             })
         return survey.to_xml().encode('utf-8')
-
-    def _add_blank_submission(self):
-        self.load_submission(self.generate_blank_submission())
-
-    def generate_blank_submission(self):
-        _d = {}
-        for name in self._names:
-            _d[name] = '_____'
-        return _d

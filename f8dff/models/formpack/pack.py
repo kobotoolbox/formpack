@@ -1,5 +1,4 @@
 import json
-import simplejson
 import difflib
 
 from collections import OrderedDict
@@ -13,6 +12,9 @@ class FormPack:
         self.versions = []
         self.id_string = kwargs.get('id_string')
         self._versions_by_id = {}
+        if 'name' in kwargs:
+            raise ValueError('FormPack cannot have name. consider '
+                             'using id_string, title, or description')
         self._x = kwargs
         self.title = kwargs.get('title')
         self.asset_type = kwargs.get('asset_type')
@@ -23,6 +25,13 @@ class FormPack:
 
     def __repr__(self):
         return '<models.formpack.pack.FormPack %s>' % self._stats()
+
+    def lookup(self, prop, default=None):
+        # can't use a one liner because sometimes self.prop is None
+        result = getattr(self, prop, default)
+        if result is None:
+            return default
+        return result
 
     def latest_version(self):
         return self.versions[-1]
@@ -93,10 +102,6 @@ class FormPack:
         for v in self.versions:
             sc += v._submissions_count()
         return sc
-
-    def _add_blank_submission(self):
-        latest = self.versions[-1]
-        latest._add_blank_submission()
 
     def to_dict(self, **kwargs):
         out = {

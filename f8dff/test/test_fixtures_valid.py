@@ -28,8 +28,6 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(v0._names, [u'restaurant_name',
                                      u'restaurant_rating',
                                      u'report_date'])
-        fd._add_blank_submission()
-        self.assertEqual(fd._submissions_count(), 5)
 
     def test_customer_satisfaction(self):
         '''
@@ -46,9 +44,6 @@ class TestFormPackFixtures(unittest.TestCase):
                          sorted(fxt.keys()))
         self.assertEqual(fd.to_dict(), fxt)
         self.assertEqual(fd.to_dict(), customer_satisfaction)
-        fd._add_blank_submission()
-        self.assertEqual(fd._submissions_count(), 4)
-        self.assertEqual(fd.to_dict(), self._reimport(fd).to_dict())
 
     def test_restaurant_profile(self):
         fxt = restaurant_profile
@@ -63,9 +58,6 @@ class TestFormPackFixtures(unittest.TestCase):
                          sorted(fxt.keys()))
 
         self.assertEqual(fd.to_dict(), fxt)
-        fd._add_blank_submission()
-        self.assertEqual(fd._submissions_count(), 3)
-        self.assertEqual(fd.to_dict(), self._reimport(fd).to_dict())
 
         v0.submit([u'Dominos', u'-12.22 12.22'])
         v0.submit(restaurant_name=u'Boston Market', location=u'-13.22 13.22')
