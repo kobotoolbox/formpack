@@ -20,7 +20,6 @@ class TestFormPackExport(unittest.TestCase):
     def test_generator_export(self):
         forms = FormPack(**customer_satisfaction)
         values_exported = forms._export_to_lists()
-        print(json.dumps(values_exported))
         expected = [["submissions", [
                         ["restaurant_name", "customer_enjoyment"],
                         [
@@ -31,8 +30,7 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(expected, values_exported)
 
-
-    def test_generator_export_language_headers(self):
+    def test_generator_export_translation_headers(self):
         fp = FormPack(**restaurant_profile)
         self.assertEqual(len(fp.versions), 2)
         self.assertEqual(len(fp[1].translations), 2)
@@ -41,8 +39,8 @@ class TestFormPackExport(unittest.TestCase):
         headers = fp._export_to_lists()[0][1][0]
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
-        # the first language in the list is the language that appears first
-        # in the column list. in this case, 'label::english'
+        # the first translation in the list is the translation that
+        # appears first in the column list. in this case, 'label::english'
         translations = fp[1].translations
         headers = fp._export_to_lists(header_lang=translations[0])[0][1][0]
         self.assertEquals(headers, ['Restaurant name', 'Location'])

@@ -16,9 +16,9 @@ class TestInternalMethods(unittest.TestCase):
 
 
 class TestSurveyParsers(unittest.TestCase):
-    def test_fixture_has_languages(self):
+    def test_fixture_has_translations(self):
         '''
-        restauraunt_profile@v2 has two languages
+        restauraunt_profile@v2 has two translations
         '''
 
         fp = FormPack(**restaurant_profile)
