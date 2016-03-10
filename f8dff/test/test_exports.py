@@ -32,25 +32,28 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_generator_export_translation_headers(self):
         fp = FormPack(**restaurant_profile)
-        self.assertEqual(len(fp.versions), 2)
+        self.assertEqual(len(fp.versions), 3)
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
-        headers = fp._export_to_lists()[0][1][0]
+        headers = fp._export_to_lists(version=0)[0][1][0]
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
         # the first translation in the list is the translation that
         # appears first in the column list. in this case, 'label::english'
         translations = fp[1].translations
-        headers = fp._export_to_lists(header_lang=translations[0])[0][1][0]
-        self.assertEquals(headers, ['Restaurant name', 'Location'])
+        headers = fp._export_to_lists(header_lang=translations[0],
+                                      version=1)[0][1][0]
+        self.assertEquals(headers, ['restaurant name', 'location'])
 
-        formpack = FormPack(**restaurant_profile)
-        headers = formpack._export_to_lists(header_lang=translations[1])
-        self.assertEquals(headers[0][1][0], ['nom du restaurant', 'Location'])
+        headers = fp._export_to_lists(header_lang=translations[1],
+                                      version=1)[0][1][0]
+        # TODO: location is "lieu" in french, or just "adresse"
+        self.assertEquals(headers, ['nom du restaurant', 'location'])
 
         # "default" use the "Label" field
+        # TODO: make a separate test to test to test __getitem__
         formpack = FormPack(**restaurant_profile)
         headers = formpack._export_to_lists(header_lang="default",
-                                            form_version='rpv1')
+                                            version='rpv1')
         self.assertEquals(headers[0][1][0], ['restaurant name', 'location'])

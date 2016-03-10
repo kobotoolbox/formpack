@@ -38,7 +38,13 @@ class FormPack:
         return result
 
     def __getitem__(self, index):
-        return tuple(self.versions.values())[index]
+        try:
+            if isinstance(index, int):
+                return tuple(self.versions.values())[index]
+            else:
+                return self.versions[index]
+        except IndexError:
+            raise IndexError('formpack with version [%s] not found' % str(index))
 
     def _stats(self):
         _stats = OrderedDict()
@@ -130,17 +136,29 @@ class FormPack:
             for submission in version._submissions:
                 yield submission
 
-    def _to_ss_generator(self, header_lang=None, form_version=None):
+
+    def _to_ss_generator(self, header_lang=None,
+                            version=None):
         '''
-        ss_generator means "spreadsheet" structure with generators instead of lists
+        ss_generator means "spreadsheet" structure with generators
+        instead of lists.
+
+        for simplicity's sake, it will initially export a single version
+        of the form (specified by ID)
         '''
 
         sheets = OrderedDict()
-        form = self.versions[form_version] if form_version else self[-1]
-        column_formatters = form._formatters
+
+        # default to the latest version
+        if version is None:
+            version = -1
+
+        export_version = self[version]
+
+        column_formatters = export_version._formatters
 
         if header_lang is not None:
-            names_and_labels = form.get_colum_names_for_lang(header_lang)
+            names_and_labels = export_version.get_column_names_for_lang(header_lang)
             labels = [label for name, label in names_and_labels]
         else:
             labels = column_formatters.keys()
@@ -154,11 +172,11 @@ class FormPack:
         sheets['submissions'] = [labels, _generator()]
         return sheets
 
-    def _export_to_lists(self, header_lang=None, form_version=None):
+    def _export_to_lists(self, **kwargs):
         '''
         this defeats the purpose of using generators, but it's useful for tests
         '''
-        gens = self._to_ss_generator(header_lang, form_version)
+        gens = self._to_ss_generator(**kwargs)
         out = []
         for key in gens.keys():
             (headers, _gen) = gens[key]

@@ -58,7 +58,7 @@ class FormVersion:
                     "type": data_definition['type']
                 }
 
-                # Get the labels and associated languages for this data
+                # Get the labels and associated translations for this data
                 labels = field['labels'] = {'default': name}
                 if "label" in data_definition:
                     labels['default'] = data_definition['label']
@@ -147,7 +147,7 @@ class FormVersion:
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
 
-    def get_colum_names_for_lang(self, lang="default"):
+    def get_column_names_for_lang(self, lang="default"):
         for field, infos in self.schema.items():
             yield field, infos['labels'].get(lang)
 
