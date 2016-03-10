@@ -1,3 +1,7 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
 import re
 import json
 
@@ -6,13 +10,13 @@ from lxml import etree
 from cStringIO import StringIO
 from pyquery import PyQuery
 
-from b64_attachment import B64Attachment
+from .b64_attachment import B64Attachment
 from f8dff.models.formpack.utils import parse_xmljson_to_data
 
 
 class FormSubmission:
     def __init__(self, submission_data={}, version=None):
-        self._data = OrderedDict()
+        self._data = dict()
         self._version = version
 
         for (key, val) in submission_data.iteritems():
