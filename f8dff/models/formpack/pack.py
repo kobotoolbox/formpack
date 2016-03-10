@@ -131,11 +131,19 @@ class FormPack:
         '''
         ss_generator means "spreadsheet" structure with generators instead of lists
         '''
+
+        # QUESTION FOR ALEX
+        # Since Python has **, shouldn't we be using regular params ? This
+        # is more a JS pattern.
         if not isinstance(options, dict):
             raise ValueError('options must be provided')
         sheets = OrderedDict()
         latest_version = self.versions[-1]
         column_formatters = latest_version._formatters
+
+        header_lang = options.get('header_language', 'default')
+        names_and_labels = latest_version.get_colum_names_for_lang(header_lang)
+        labels = [label for name, label in names_and_labels]
 
         def _generator():
             for submission in self.submissions_gen():
@@ -143,7 +151,7 @@ class FormPack:
                 for (colname, formatter) in column_formatters.iteritems():
                     row.append(formatter.format(submission._data.get(colname)))
                 yield row
-        sheets['submissions'] = [column_formatters.keys(), _generator()]
+        sheets['submissions'] = [labels, _generator()]
         return sheets
 
     def _export_to_lists(self, options):

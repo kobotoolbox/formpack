@@ -23,21 +23,47 @@ class FormVersion:
         self._submissions = []
         self.id_string = version_data.get('id_string')
         self._version_id = version_data.get('version')
+        # This will be converted down the line to a list. We use an OrderedDict
+        # to maintain order and remove duplicates, but will need indexing later.
+        self.languages = OrderedDict()
 
-        schema = OrderedDict()
+        self.schema = OrderedDict()
 
         content = self._v.get('content', {})
 
-        for item in content.get('survey', []):
-            if 'name' in item:
-                name = item['name']
+        # TODO: put that part in a separate method
+        survey = content.get('survey', [])
+
+        # Analize the survey schema and extract the informations we need
+        # to build the export
+        for data_definition in survey:
+
+            # Get the the data name and type
+            if 'name' in data_definition:
+                name = data_definition['name']
                 self._names.append(name)
-                schema[name] = {
-                    "type": item['type']
+
+                field = self.schema[name] = {
+                    "type": data_definition['type']
                 }
 
+                # Get the labels and associated languages for this data
+                labels = field['labels'] = {'default': name}
+                if "label" in data_definition:
+                    labels['default'] = data_definition['label']
+                else:
+                    for key, val in data_definition.items():
+                        if key.startswith('label::'):
+                            _, lang = key.split('::')
+                            labels[lang] = val
+                            self.languages[lang] = None
+
+        # Convert it back to a list to get numerical indexing
+        self.languages = list(self.languages)
+
         self._formatters = OrderedDict()
-        for name, structure in schema.items():
+
+        for name, structure in self.schema.items():
             # question_type = get_question_type(name, version)
             # formater_class = formater_registry[question_type]
             self._formatters[name] = Formatter(name, structure['type'])
@@ -109,6 +135,10 @@ class FormVersion:
 
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
+
+    def get_colum_names_for_lang(self, lang="default"):
+        for field, infos in self.schema.items():
+            yield field, infos['labels'].get(lang)
 
     def to_xml(self):
         survey = formversion_pyxform(self._v)

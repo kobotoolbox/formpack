@@ -31,6 +31,9 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(len(fp.versions[1].languages), 2)
 
         # by default, exports use the question 'name' attribute
+
+        # QUESTION FOR ALEX
+        # Are we sure it works like that ? What about the lone "Label" field ?
         headers = fp._export_to_lists({})[0][1][0]
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
