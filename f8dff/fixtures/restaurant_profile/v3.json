@@ -6,9 +6,35 @@
             {
                 "type": "text",
                 "name": "restaurant_name",
-                "label": "restaurant name"
+                "label::english": "Restaurant name",
+                "label::french": "nom du restaurant"
+            },
+            {
+                "required": "true",
+                "type": "geopoint",
+                "name": "location",
+                "label::english": "Location",
+                "label::french": "Location"
+            },
+            {
+                "type": "select_one eatery_types",
+                "name": "eatery_type",
+                "label::english": "type of eatery",
+                "label::french": ""
+            }
+        ],
+        "choices": [
+            {
+                "list_name": "eatery_types",
+                "name": "sit_down",
+                "label::english": "sit down",
+                "label::french": "traditionnel"
+            },
+            {
+                "list_name": "eatery_types",
+                "name": "takeaway",
+                "label::french": "avec vente à emporter"
             }
         ]
-    },
-    "submissions": []
+    }
 }
