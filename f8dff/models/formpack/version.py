@@ -25,7 +25,7 @@ class FormVersion:
         self.version_id = version_data.get('version')
         # This will be converted down the line to a list. We use an OrderedDict
         # to maintain order and remove duplicates, but will need indexing later.
-        self.languages = OrderedDict()
+        self.translations = OrderedDict()
 
         self.schema = OrderedDict()
 
@@ -47,7 +47,7 @@ class FormVersion:
                     "type": data_definition['type']
                 }
 
-                # Get the labels and associated languages for this data
+                # Get the labels and associated translations for this data
                 labels = field['labels'] = {'default': name}
                 if "label" in data_definition:
                     labels['default'] = data_definition['label']
@@ -56,10 +56,10 @@ class FormVersion:
                         if key.startswith('label::'):
                             _, lang = key.split('::')
                             labels[lang] = val
-                            self.languages[lang] = None
+                            self.translations[lang] = None
 
         # Convert it back to a list to get numerical indexing
-        self.languages = list(self.languages)
+        self.translations = list(self.translations)
 
         self._formatters = OrderedDict()
 
@@ -163,4 +163,4 @@ class Formatter:
         self.name = name
 
     def format(self, val):
-        return "{data_type}:{val}".format(data_type=self.data_type, val=val)
+        return val

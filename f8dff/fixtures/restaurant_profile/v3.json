@@ -6,21 +6,21 @@
             {
                 "type": "text",
                 "name": "restaurant_name",
-                "label::english": "Restaurant name",
+                "label::english": "restaurant name",
                 "label::french": "nom du restaurant"
             },
             {
                 "required": "true",
                 "type": "geopoint",
                 "name": "location",
-                "label::english": "Location",
-                "label::french": "Location"
+                "label::english": "location",
+                "label::french": "location"
             },
             {
                 "type": "select_one eatery_types",
                 "name": "eatery_type",
                 "label::english": "type of eatery",
-                "label::french": ""
+                "label::french": "type de restaurant"
             }
         ],
         "choices": [
