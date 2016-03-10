@@ -4,7 +4,6 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
-import json
 
 from f8dff.models.formpack.pack import FormPack
 from f8dff.fixtures import build_fixture
@@ -28,7 +27,6 @@ class TestFormPackExport(unittest.TestCase):
                      ]]
         self.assertEqual(expected, values_exported)
 
-
     def test_generator_export_translation_headers(self):
         fp = FormPack(**restaurant_profile)
         self.assertEqual(len(fp.versions), 2)
@@ -38,8 +36,8 @@ class TestFormPackExport(unittest.TestCase):
         headers = fp._export_to_lists()[0][1][0]
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
-        # the first translation in the list is the translation that appears first
-        # in the column list. in this case, 'label::english'
+        # the first translation in the list is the translation that
+        # appears first in the column list. in this case, 'label::english'
         translations = fp[1].translations
         self.assertEqual(len(translations), 2)
 
