@@ -22,7 +22,7 @@ class FormVersion:
         self.version_title = version_data.get('title')
         self._submissions = []
         self.id_string = version_data.get('id_string')
-        self._version_id = version_data.get('version')
+        self.version_id = version_data.get('version')
         # This will be converted down the line to a list. We use an OrderedDict
         # to maintain order and remove duplicates, but will need indexing later.
         self.languages = OrderedDict()
@@ -77,7 +77,7 @@ class FormVersion:
     def _stats(self):
         _stats = OrderedDict()
         _stats['id_string'] = self._get_id_string()
-        _stats['version'] = '' if not self._version_id else self._version_id
+        _stats['version'] = '' if not self.version_id else self.version_id
         _stats['row_count'] = len(self._v.get('content', {})
                                          .get('survey', []))
         _stats['submission_count'] = len(self._submissions)
@@ -105,9 +105,9 @@ class FormVersion:
         if _id_string != self._get_id_string():
             raise ValueError('submission id_string does not match: %s != %s' %
                              (self._get_id_string(), _id_string))
-        if _version_id != self._version_id:
+        if _version_id != self.version_id:
             raise ValueError('mismatching version id %s != %s' %
-                             (self._version_id, _version_id))
+                             (self.version_id, _version_id))
         self._submissions.append(FormSubmission.from_xml(_xmljson, self))
 
     def _submissions_count(self):
@@ -152,7 +152,7 @@ class FormVersion:
                 'name': self.lookup('root_node_name', 'data'),
                 'id_string': self.lookup('id_string'),
                 'title': title,
-                'version': self._version_id,
+                'version': self.version_id,
             })
         return survey.to_xml().encode('utf-8')
 

@@ -1,17 +1,21 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 import json
 import difflib
 
 from collections import OrderedDict
 
-from version import FormVersion
+from .version import FormVersion
 from f8dff.models.formpack.utils import get_version_identifiers
 
 
 class FormPack:
     def __init__(self, *args, **kwargs):
-        self.versions = []
+        self.versions = OrderedDict()
         self.id_string = kwargs.get('id_string')
-        self._versions_by_id = {}
         if 'name' in kwargs:
             raise ValueError('FormPack cannot have name. consider '
                              'using id_string, title, or description')
@@ -33,8 +37,8 @@ class FormPack:
             return default
         return result
 
-    def latest_version(self):
-        return self.versions[-1]
+    def __getitem__(self, index):
+        return tuple(self.versions.values())[index]
 
     def _stats(self):
         _stats = OrderedDict()
@@ -50,34 +54,34 @@ class FormPack:
     def _load_submissions_xml(self, submissions):
         for submission_xml in submissions:
             (id_string, version_id) = get_version_identifiers(submission_xml)
-            if version_id not in self._versions_by_id:
+            if version_id not in self.versions:
                 raise KeyError('version [%s] is not available' % version_id)
-            cur_ver = self._versions_by_id[version_id]
+            cur_ver = self.versions[version_id]
             cur_ver._load_submission_xml(submission_xml)
 
-    def load_version(self, v):
-        _v = FormVersion(v, self)
-        version_id = _v._version_id
-        if version_id in self._versions_by_id:
+    def load_version(self, form_version_data):
+        form_version = FormVersion(form_version_data, self)
+        version_id = form_version.version_id
+        if version_id in self.versions:
             if version_id is None:
                 raise ValueError('cannot have two versions without '
                                  'a "version" id specified')
             else:
                 raise ValueError('cannot have duplicate version id: %s'
                                  % version_id)
-        self._versions_by_id[version_id] = _v
-        if _v.id_string:
-            if self.id_string and self.id_string != _v.id_string:
+
+        if form_version.id_string:
+            if self.id_string and self.id_string != form_version.id_string:
                 raise ValueError('Versions must of the same form must '
                                  'share an id_string: %s != %s' % (
                                     self.id_string,
-                                    _v.id_string,
+                                    form_version.id_string,
                                  ))
 
-            self.id_string = _v.id_string
-        if (self.title is None) and _v.version_title:
-            self.title = _v.version_title
-        self.versions.append(_v)
+            self.id_string = form_version.id_string
+        if (self.title is None) and form_version.version_title:
+            self.title = form_version.version_title
+        self.versions[version_id] = form_version
 
     def version_diff(self, vn1, vn2):
         v1 = self.versions[vn1]
@@ -99,13 +103,13 @@ class FormPack:
 
     def _submissions_count(self):
         sc = 0
-        for v in self.versions:
+        for v in self.versions.values():
             sc += v._submissions_count()
         return sc
 
     def to_dict(self, **kwargs):
         out = {
-            u'versions': [v.to_dict() for v in self.versions],
+            u'versions': [v.to_dict() for v in self.versions.values()],
         }
         if self.title is not None:
             out[u'title'] = self.title
@@ -122,28 +126,25 @@ class FormPack:
         return list(self.submissions_gen())
 
     def submissions_gen(self):
-        for version in self.versions:
+        for version in self.versions.values():
             for submission in version._submissions:
                 yield submission
 
 
-    def _to_ss_generator(self, options):
+    def _to_ss_generator(self, header_lang=None):
         '''
         ss_generator means "spreadsheet" structure with generators instead of lists
         '''
 
-        # QUESTION FOR ALEX
-        # Since Python has **, shouldn't we be using regular params ? This
-        # is more a JS pattern.
-        if not isinstance(options, dict):
-            raise ValueError('options must be provided')
         sheets = OrderedDict()
-        latest_version = self.versions[-1]
+        latest_version = self[-1]
         column_formatters = latest_version._formatters
 
-        header_lang = options.get('header_language', 'default')
-        names_and_labels = latest_version.get_colum_names_for_lang(header_lang)
-        labels = [label for name, label in names_and_labels]
+        if header_lang is not None:
+            names_and_labels = latest_version.get_colum_names_for_lang(header_lang)
+            labels = [label for name, label in names_and_labels]
+        else:
+            labels = column_formatters.keys()
 
         def _generator():
             for submission in self.submissions_gen():
@@ -154,11 +155,11 @@ class FormPack:
         sheets['submissions'] = [labels, _generator()]
         return sheets
 
-    def _export_to_lists(self, options):
+    def _export_to_lists(self, header_lang=None):
         '''
         this defeats the purpose of using generators, but it's useful for tests
         '''
-        gens = self._to_ss_generator(options)
+        gens = self._to_ss_generator(header_lang)
         out = []
         for key in gens.keys():
             (headers, _gen) = gens[key]

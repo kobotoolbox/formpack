@@ -22,4 +22,4 @@ class TestSurveyParsers(unittest.TestCase):
         '''
 
         fp = FormPack(**restaurant_profile)
-        self.assertEqual(len(fp.versions[1].languages), 2)
+        self.assertEqual(len(fp[1].languages), 2)

@@ -1,3 +1,8 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 import unittest
 
 from f8dff.models.formpack.pack import FormPack
@@ -24,7 +29,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fd = FormPack(**sanitation_report)
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 4)
-        v0 = fd.versions[0]
+        v0 = fd[0]
         self.assertEqual(v0._names, [u'restaurant_name',
                                      u'restaurant_rating',
                                      u'report_date'])
@@ -35,7 +40,7 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         fxt = customer_satisfaction
         fd = FormPack(**customer_satisfaction)
-        v0 = fd.versions[0]
+        v0 = fd[0]
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 3)
         self.assertEqual(v0._names, [u'restaurant_name',
@@ -50,7 +55,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fd = FormPack(**fxt)
         self.assertEqual(len(fd.versions), 2)
         self.assertEqual(fd._submissions_count(), 2)
-        v0 = fd.versions[0]
+        v0 = fd[0]
         self.assertEqual(v0._names, [u'restaurant_name',
                                      u'location'])
 
