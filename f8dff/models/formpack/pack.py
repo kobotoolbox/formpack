@@ -45,7 +45,7 @@ class FormPack:
         _stats['id_string'] = self.id_string
         _stats['versions'] = len(self.versions)
         _stats['submissions'] = self._submissions_count()
-        _stats['row_count'] = len(self.versions[-1]._v.get('content', {})
+        _stats['row_count'] = len(self[-1]._v.get('content', {})
                                                       .get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join(map(lambda key: '%s="%s"' % (
@@ -130,18 +130,17 @@ class FormPack:
             for submission in version._submissions:
                 yield submission
 
-
-    def _to_ss_generator(self, header_lang=None):
+    def _to_ss_generator(self, header_lang=None, form_version=None):
         '''
         ss_generator means "spreadsheet" structure with generators instead of lists
         '''
 
         sheets = OrderedDict()
-        latest_version = self[-1]
-        column_formatters = latest_version._formatters
+        form = self.versions[form_version] if form_version else self[-1]
+        column_formatters = form._formatters
 
         if header_lang is not None:
-            names_and_labels = latest_version.get_colum_names_for_lang(header_lang)
+            names_and_labels = form.get_colum_names_for_lang(header_lang)
             labels = [label for name, label in names_and_labels]
         else:
             labels = column_formatters.keys()
@@ -155,11 +154,11 @@ class FormPack:
         sheets['submissions'] = [labels, _generator()]
         return sheets
 
-    def _export_to_lists(self, header_lang=None):
+    def _export_to_lists(self, header_lang=None, form_version=None):
         '''
         this defeats the purpose of using generators, but it's useful for tests
         '''
-        gens = self._to_ss_generator(header_lang)
+        gens = self._to_ss_generator(header_lang, form_version)
         out = []
         for key in gens.keys():
             (headers, _gen) = gens[key]

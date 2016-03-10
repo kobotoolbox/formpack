@@ -6,15 +6,26 @@ from __future__ import (unicode_literals, print_function,
 from collections import OrderedDict
 
 from .utils import formversion_pyxform
+
+# QUESTION FOR ALEX:
+# should we turn that into relative imports ? Such as:
+# from .models.formpack.submission import FormSubmission
+# from .models.formpack.utils import parse_xml_to_xmljson
+# Since d8dff will probably be renammed, this make it easy to merge it
 from f8dff.models.formpack.submission import FormSubmission
 from f8dff.models.formpack.utils import parse_xml_to_xmljson
 
+
+# TODO: move submission, pack.py and version.py into a forms module with
+#       __init__ their content
+# TODO: put formatters in their own module
 
 class FormVersion:
     def __init__(self, version_data, parent):
         if 'name' in version_data:
             raise ValueError('FormVersion should not have a name parameter. '
                              'consider using "title" or "id_string"')
+        # TODO: # rename _v to something meaningful
         self._v = version_data
         self._parent = parent
         self._names = []
@@ -25,7 +36,7 @@ class FormVersion:
         self.version_id = version_data.get('version')
         # This will be converted down the line to a list. We use an OrderedDict
         # to maintain order and remove duplicates, but will need indexing later.
-        self.languages = OrderedDict()
+        self.translations = OrderedDict()
 
         self.schema = OrderedDict()
 
@@ -56,10 +67,10 @@ class FormVersion:
                         if key.startswith('label::'):
                             _, lang = key.split('::')
                             labels[lang] = val
-                            self.languages[lang] = None
+                            self.translations[lang] = None
 
         # Convert it back to a list to get numerical indexing
-        self.languages = list(self.languages)
+        self.translations = list(self.translations)
 
         self._formatters = OrderedDict()
 
@@ -72,7 +83,7 @@ class FormVersion:
             self.load_submission(submission)
 
     def __repr__(self):
-        return '<models.formpack.version.FormVersion %s>' % self._stats()
+        return '<FormVersion %s>' % self._stats()
 
     def _stats(self):
         _stats = OrderedDict()
@@ -158,9 +169,13 @@ class FormVersion:
 
 
 class Formatter:
-    def __init__(self, data_type, name):
+    def __init__(self, name, data_type):
         self.data_type = data_type
         self.name = name
 
     def format(self, val):
-        return "{data_type}:{val}".format(data_type=self.data_type, val=val)
+        return "{val}".format(val=val)
+
+    def __repr__(self):
+        return "<Formatter type='%s' name='%s'>" % (self.data_type, self.name)
+
