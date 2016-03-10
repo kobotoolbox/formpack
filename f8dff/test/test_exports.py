@@ -57,3 +57,14 @@ class TestFormPackExport(unittest.TestCase):
         headers = formpack._export_to_lists(header_lang="default",
                                             version='rpv1')
         self.assertEquals(headers[0][1][0], ['restaurant name', 'location'])
+
+    def test_export_with_choice_lists(self):
+        fp = FormPack(**restaurant_profile)
+        self.assertEqual(len(fp[1].translations), 2)
+
+        # by default, exports use the question 'name' attribute
+        _as_lists = fp._export_to_lists(version='rpV3')[0][1]
+        (headers, submissions) = _as_lists
+        self.assertEquals(headers, ['restaurant_name', 'location', 'eatery_type'])
+        self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'takeaway'],
+                                        ['Harvest', '12.43 -24.53', 'sit_down']])

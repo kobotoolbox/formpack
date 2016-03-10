@@ -136,9 +136,8 @@ class FormPack:
             for submission in version._submissions:
                 yield submission
 
-
     def _to_ss_generator(self, header_lang=None,
-                            version=None):
+                         version=None):
         '''
         ss_generator means "spreadsheet" structure with generators
         instead of lists.
@@ -164,7 +163,7 @@ class FormPack:
             labels = column_formatters.keys()
 
         def _generator():
-            for submission in self.submissions_gen():
+            for submission in export_version._submissions:
                 row = []
                 for (colname, formatter) in column_formatters.iteritems():
                     row.append(formatter.format(submission._data.get(colname)))
