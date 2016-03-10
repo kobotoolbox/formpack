@@ -17,7 +17,8 @@ class TestFormPackExport(unittest.TestCase):
     maxDiff = None
 
     def test_generator_export(self):
-        values_exported = FormPack(**customer_satisfaction)._export_to_lists()
+        values_exported = FormPack(**customer_satisfaction
+                                   )._export_to_lists()
         expected = [["submissions", [
                         ["restaurant_name", "customer_enjoyment"],
                         [
@@ -29,11 +30,10 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_generator_export_translation_headers(self):
         fp = FormPack(**restaurant_profile)
-        self.assertEqual(len(fp.versions), 2)
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
-        headers = fp._export_to_lists()[0][1][0]
+        headers = fp._export_to_lists(version=1)[0][1][0]
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
         # the first translation in the list is the translation that
@@ -41,9 +41,11 @@ class TestFormPackExport(unittest.TestCase):
         translations = fp[1].translations
         self.assertEqual(len(translations), 2)
 
-        headers = fp._export_to_lists(header_lang=translations[0])[0][1][0]
+        headers = fp._export_to_lists(header_lang=translations[0],
+                                      version=1)[0][1][0]
         self.assertEquals(headers, ['restaurant name', 'location'])
 
         formpack = FormPack(**restaurant_profile)
-        headers = formpack._export_to_lists(header_lang=translations[1])
+        headers = formpack._export_to_lists(header_lang=translations[1],
+                                            version=1)
         self.assertEquals(headers[0][1][0], ['nom du restaurant', 'location'])
