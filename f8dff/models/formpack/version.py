@@ -136,7 +136,7 @@ class FormVersion:
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
 
-    def get_colum_names_for_lang(self, lang="default"):
+    def get_column_names_for_lang(self, lang="default"):
         for field, infos in self.schema.items():
             yield field, infos['labels'].get(lang)
 

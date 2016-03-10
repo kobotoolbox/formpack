@@ -141,7 +141,7 @@ class FormPack:
         column_formatters = latest_version._formatters
 
         if header_lang is not None:
-            names_and_labels = latest_version.get_colum_names_for_lang(header_lang)
+            names_and_labels = latest_version.get_column_names_for_lang(header_lang)
             labels = [label for name, label in names_and_labels]
         else:
             labels = column_formatters.keys()
