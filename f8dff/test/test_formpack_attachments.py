@@ -1,7 +1,7 @@
 import unittest
-from f8dff.models.formpack.b64_attachment import B64Attachment
+from ..models.formpack.b64_attachment import B64Attachment
 
-from f8dff.fixtures.load_fixture_json import load_fixture_json
+from ..fixtures.load_fixture_json import load_fixture_json
 
 
 class TestB64Attachment(unittest.TestCase):

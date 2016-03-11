@@ -1,8 +1,7 @@
 import unittest
-from f8dff.models.formpack.pack import FormPack
+from ..models.formpack.pack import FormPack
 from copy import copy
 from nose.tools import raises
-from pyxform.errors import PyXFormError
 
 SINGLE_NOTE_SURVEY = {'content': {
         'survey': [

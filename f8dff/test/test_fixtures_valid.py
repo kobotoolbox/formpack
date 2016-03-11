@@ -5,8 +5,8 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 
-from f8dff.models.formpack.pack import FormPack
-from f8dff.fixtures import build_fixture
+from ..models.formpack.pack import FormPack
+from ..fixtures import build_fixture
 
 
 sanitation_report = build_fixture('sanitation_report')
@@ -30,9 +30,10 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 4)
         v0 = fd[0]
-        self.assertEqual(v0._names, [u'restaurant_name',
-                                     u'restaurant_rating',
-                                     u'report_date'])
+        self.assertEqual(list(v0.fields.keys()),
+                         [u'restaurant_name',
+                          u'restaurant_rating',
+                          u'report_date'])
 
     def test_grouped_questions(self):
         '''
@@ -52,8 +53,8 @@ class TestFormPackFixtures(unittest.TestCase):
         v0 = fd[0]
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 3)
-        self.assertEqual(v0._names, [u'restaurant_name',
-                                     u'customer_enjoyment'])
+        self.assertEqual(list(v0.fields.keys()),
+                         [u'restaurant_name', u'customer_enjoyment'])
         self.assertEqual(sorted(fd.to_dict().keys()),
                          sorted(fxt.keys()))
         self.assertEqual(fd.to_dict(), fxt)
@@ -64,8 +65,8 @@ class TestFormPackFixtures(unittest.TestCase):
         fd = FormPack(**fxt)
         self.assertEqual(len(fd.versions), 3)
         v0 = fd[0]
-        self.assertEqual(v0._names, [u'restaurant_name',
-                                     u'location'])
+        self.assertEqual(list(v0.fields.keys()),
+                         [u'restaurant_name', u'location'])
 
         self.assertEqual(sorted(fd.to_dict().keys()),
                          sorted(fxt.keys()))
