@@ -61,14 +61,37 @@ class FormVersion:
                         labels[lang] = val
                         self.translations[lang] = None
 
-
         # Extract fields data
+        group = None
         for data_definition in survey:
 
+            if data_definition['type'] == 'begin group':
+                name = data_definition['name']
+                group = {'name': name}
+
+                # Get the labels and associated translations for this data
+                labels = group['labels'] = {'default': name}
+                if "label" in data_definition:
+                    labels['default'] = data_definition['label']
+                else:
+                    for key, val in data_definition.items():
+                        if key.startswith('label::'):
+                            _, lang = key.split('::')
+                            labels[lang] = val
+                            self.translations[lang] = None
+                continue
+
+            if data_definition['type'] == 'end group':
+                group = None
+                continue
+
+            # QUESTION FOR ALEX: is there a case where 'name' is not in there ?
+            # if yes, what do we do with it ?
             # Get the the data name and type
             if 'name' in data_definition:
                 name = data_definition['name']
-                field = self.fields[name] = {}
+                field = self.fields[name] = {'choices': None}
+                field['group'] = group
 
                 # Get the data type. If it has a foreign key, map the
                 # label translations
@@ -94,11 +117,13 @@ class FormVersion:
 
         self._formatters = OrderedDict()
 
-        for name, structure in self.fields.items():
+        for name, field in self.fields.items():
             # question_type = get_question_type(name, version)
             # formater_class = formater_registry[question_type]
-            self._formatters[name] = Formatter(name, structure['type'],
-                                               structure.get('choices'))
+            self._formatters[name] = Formatter(name,
+                                               field['type'],
+                                               field.get('choices'),
+                                               field['group'])
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
@@ -168,9 +193,23 @@ class FormVersion:
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
 
-    def get_column_names_for_lang(self, lang="default"):
-        for field, infos in self.fields.items():
-            yield field, infos['labels'].get(lang)
+    def get_column_names_for_lang(self, lang="default", group_sep=None):
+
+        if group_sep:
+            for field, infos in self.fields.items():
+                name = infos['labels'].get(lang) or field
+                group = infos['group']
+                if group:
+                    group = group['labels'].get(lang) or group['name']
+                    yield field, group + group_sep + name
+                else:
+                    yield field, name
+
+        else:
+            for field, infos in self.fields.items():
+                yield field, (infos['labels'].get(lang) or field)
+                if (infos['labels'].get(lang) or field) is None:
+                    import pdb; pdb.set_trace()
 
     def to_xml(self):
         survey = formversion_pyxform(self._v)
@@ -190,14 +229,19 @@ class FormVersion:
 
 
 class Formatter:
-    def __init__(self, name, data_type, choices=None):
+    def __init__(self, name, data_type, choices=None, group=None):
         self.data_type = data_type
         self.name = name
         self.choices = choices
+        self.group = group
 
     def format(self, val, translation='default'):
         if self.choices and translation:
-            return self.choices[val]['labels'][translation]
+            # TODO: we may want to @memoize this method
+            try:
+                return self.choices[val]['labels'][translation]
+            except KeyError:
+                return val
         return val
 
     def __repr__(self):

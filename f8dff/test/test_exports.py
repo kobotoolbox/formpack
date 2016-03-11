@@ -90,16 +90,11 @@ class TestFormPackExport(unittest.TestCase):
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
 
-        # verifying false value of groups_in_header gives same result
-        options['groups_in_header'] = False
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
 
     def test_submissions_of_group_exports(self):
         grouped_questions = build_fixture('grouped_questions')
         fp = FormPack(**grouped_questions)
-        options = {'version': 'gqs',
-                   'groups_in_header': False}
+        options = {'version': 'gqs'}
 
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
@@ -112,7 +107,7 @@ class TestFormPackExport(unittest.TestCase):
                                          'respondent2\'s r3',
                                          'respondent2\'s r4']])
 
-        options['groups_in_header'] = True
+        options['group_sep'] = '/'
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(headers, ['q1', 'g1/g1q1', 'g2/g2q1', 'qz'])
         self.assertEquals(submissions, [['respondent1\'s r1',

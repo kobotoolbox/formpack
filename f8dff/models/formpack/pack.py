@@ -140,7 +140,7 @@ class FormPack:
 
     def _to_ss_generator(self, header_lang=None,
                          translation=None,
-                         include_groups_in_header=False,
+                         group_sep=None,
                          version=None):
         '''
         ss_generator means "spreadsheet" structure with generators
@@ -160,16 +160,15 @@ class FormPack:
 
         column_formatters = export_version._formatters
 
-        if header_lang is not None:
-            names_and_labels = export_version.get_column_names_for_lang(header_lang)
-            labels = [label for name, label in names_and_labels]
-        else:
-            labels = column_formatters.keys()
+        names_and_labels = export_version.get_column_names_for_lang(header_lang, group_sep)
+        labels = [label for name, label in names_and_labels]
 
         def _generator():
             for submission in export_version._submissions:
                 row = []
                 for (colname, formatter) in column_formatters.iteritems():
+                    if formatter.group:
+                        colname = formatter.group['name'] + '/' + colname
                     row.append(formatter.format(submission._data.get(colname),
                                                 translation))
                 yield row

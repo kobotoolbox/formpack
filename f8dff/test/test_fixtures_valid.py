@@ -42,7 +42,8 @@ class TestFormPackFixtures(unittest.TestCase):
         fd = FormPack(**build_fixture('grouped_questions'))
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 2)
-        self.assertEqual(fd[0]._names, ['q1', 'g1', 'g1q1', 'g2', 'g2q1', 'qz'])
+        self.assertEqual(list(fd[0].fields.keys()),
+                         ['q1', 'g1q1', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
         '''
