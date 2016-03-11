@@ -14,7 +14,7 @@
                 "type": "geopoint",
                 "name": "location",
                 "label::english": "location",
-                "label::french": "location"
+                "label::french": "lieu"
             }
         ]
     },

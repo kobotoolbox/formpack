@@ -14,7 +14,7 @@
                 "type": "geopoint",
                 "name": "location",
                 "label::english": "location",
-                "label::french": "location"
+                "label::french": "lieu"
             },
             {
                 "type": "select_one eatery_types",
@@ -33,6 +33,7 @@
             {
                 "list_name": "eatery_types",
                 "name": "takeaway",
+                "label::english": "take-away",
                 "label::french": "avec vente à emporter"
             }
         ]
