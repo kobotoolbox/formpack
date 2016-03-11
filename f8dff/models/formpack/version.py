@@ -3,17 +3,12 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from .utils import formversion_pyxform
 
-# QUESTION FOR ALEX:
-# should we turn that into relative imports ? Such as:
-# from .models.formpack.submission import FormSubmission
-# from .models.formpack.utils import parse_xml_to_xmljson
-# Since d8dff will probably be renammed, this make it easy to merge it
-from f8dff.models.formpack.submission import FormSubmission
-from f8dff.models.formpack.utils import parse_xml_to_xmljson
+from ...models.formpack.submission import FormSubmission
+from ...models.formpack.utils import parse_xml_to_xmljson
 
 
 # TODO: move submission, pack.py and version.py into a forms module with
@@ -28,7 +23,6 @@ class FormVersion:
         # TODO: # rename _v to something meaningful
         self._v = version_data
         self._parent = parent
-        self._names = []
         self._root_node_name = version_data.get('root_node_name')
         self.version_title = version_data.get('title')
         self._submissions = []
@@ -38,25 +32,55 @@ class FormVersion:
         # to maintain order and remove duplicates, but will need indexing later.
         self.translations = OrderedDict()
 
-        self.schema = OrderedDict()
+        self.fields = OrderedDict()
 
         content = self._v.get('content', {})
 
-        # TODO: put that part in a separate method
+        # TODO: put those parts in a separate method and unit test it
         survey = content.get('survey', [])
 
         # Analize the survey schema and extract the informations we need
         # to build the export
+
+        # Extract choices data
+        field_choices = defaultdict(OrderedDict)
+        for choice_definition in content.get('choices', ()):
+            try:
+                choices = field_choices[choice_definition['list_name']]
+            except Exception as e:
+                import pdb; pdb.set_trace()
+
+            name = choice_definition['name']
+            choice = choices[name] = {}
+
+            # TODO: make that a separate method for DRY and test it.
+            # Extract label translations
+            labels = choice['labels'] = {'default': name}
+            if "label" in choice_definition:
+                labels['default'] = choice_definition['label']
+            else:
+                for key, val in choice_definition.items():
+                    if key.startswith('label::'):
+                        _, lang = key.split('::')
+                        labels[lang] = val
+                        self.translations[lang] = None
+
+
+        # Extract fields data
         for data_definition in survey:
 
             # Get the the data name and type
             if 'name' in data_definition:
                 name = data_definition['name']
-                self._names.append(name)
+                field = self.fields[name] = {}
 
-                field = self.schema[name] = {
-                    "type": data_definition['type']
-                }
+                # Get the data type. If it has a foreign key, map the
+                # label translations
+                field_type = data_definition['type']
+                if " " in field_type:
+                    field_type, choice_id = field_type.split(' ')
+                    field['choices'] = field_choices[choice_id]
+                field['type'] = field_type
 
                 # Get the labels and associated translations for this data
                 labels = field['labels'] = {'default': name}
@@ -74,10 +98,11 @@ class FormVersion:
 
         self._formatters = OrderedDict()
 
-        for name, structure in self.schema.items():
+        for name, structure in self.fields.items():
             # question_type = get_question_type(name, version)
             # formater_class = formater_registry[question_type]
-            self._formatters[name] = Formatter(name, structure['type'])
+            self._formatters[name] = Formatter(name, structure['type'],
+                                               structure.get('choices'))
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
@@ -148,7 +173,7 @@ class FormVersion:
         self.load_submission(kwargs)
 
     def get_column_names_for_lang(self, lang="default"):
-        for field, infos in self.schema.items():
+        for field, infos in self.fields.items():
             yield field, infos['labels'].get(lang)
 
     def to_xml(self):
@@ -169,12 +194,15 @@ class FormVersion:
 
 
 class Formatter:
-    def __init__(self, name, data_type):
+    def __init__(self, name, data_type, choices=None):
         self.data_type = data_type
         self.name = name
+        self.choices = choices
 
-    def format(self, val):
-        return "{val}".format(val=val)
+    def format(self, val, translation='default'):
+        if self.choices and translation:
+            return self.choices[val]['labels'][translation]
+        return val
 
     def __repr__(self):
         return "<Formatter type='%s' name='%s'>" % (self.data_type, self.name)

@@ -4,10 +4,9 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
-import json
 
-from f8dff.models.formpack.pack import FormPack
-from f8dff.fixtures import build_fixture
+from ..models.formpack.pack import FormPack
+from ..fixtures import build_fixture
 
 
 customer_satisfaction = build_fixture('customer_satisfaction')
@@ -70,6 +69,8 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'takeaway'],
                                         ['Harvest', '12.43 -24.53', 'sit_down']])
 
+        # if a language is passed, fields with available translations
+        # are translated into that language
         options['translation'] = fp[1].translations[0]
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'take-away'],

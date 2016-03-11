@@ -9,7 +9,7 @@ import difflib
 from collections import OrderedDict
 
 from .version import FormVersion
-from f8dff.models.formpack.utils import get_version_identifiers
+from ...models.formpack.utils import get_version_identifiers
 
 
 class FormPack:
@@ -169,7 +169,8 @@ class FormPack:
             for submission in export_version._submissions:
                 row = []
                 for (colname, formatter) in column_formatters.iteritems():
-                    row.append(formatter.format(submission._data.get(colname)))
+                    row.append(formatter.format(submission._data.get(colname),
+                                                translation))
                 yield row
         sheets['submissions'] = [labels, _generator()]
         return sheets
