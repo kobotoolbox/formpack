@@ -88,30 +88,38 @@ class TestFormPackExport(unittest.TestCase):
 
         # by default, groups are stripped. (Sound good?)
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1', 'g2', 'qz'])
+        self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
 
-        # verifying false value of include_groups_in_header gives same result
-        options['include_groups_in_header'] = False
+        # verifying false value of groups_in_header gives same result
+        options['groups_in_header'] = False
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1', 'g2', 'qz'])
-
-        # include_groups_in_header=True means the groups are counted as columns
-        options['include_groups_in_header'] = True
-        self.assertEquals(headers, ['q1', 'g1', 'g1q1', 'g2', 'g2q1', 'qz'])
+        self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
 
     def test_submissions_of_group_exports(self):
         grouped_questions = build_fixture('grouped_questions')
         fp = FormPack(**grouped_questions)
         options = {'version': 'gqs',
-                   'include_groups_in_header': False}
+                   'groups_in_header': False}
 
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
-        self.assertEquals(submissions, [['correct values need to be here for respondent 1'],
-                                        ['correct values need to be here for respondent 2']])
+        self.assertEquals(submissions, [['respondent1\'s r1',
+                                         'respondent1\'s r2',
+                                         'respondent1\'s r3',
+                                         'respondent1\'s r4'],
+                                        ['respondent2\'s r1',
+                                         'respondent2\'s r2',
+                                         'respondent2\'s r3',
+                                         'respondent2\'s r4']])
 
-        options['include_groups_in_header'] = True
+        options['groups_in_header'] = True
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1', 'g1q1', 'g2', 'g2q1', 'qz'])
-        self.assertEquals(submissions, [['correct values need to be here for respondent 1'],
-                                        ['correct values need to be here for respondent 2']])
+        self.assertEquals(headers, ['q1', 'g1/g1q1', 'g2/g2q1', 'qz'])
+        self.assertEquals(submissions, [['respondent1\'s r1',
+                                         'respondent1\'s r2',
+                                         'respondent1\'s r3',
+                                         'respondent1\'s r4'],
+                                        ['respondent2\'s r1',
+                                         'respondent2\'s r2',
+                                         'respondent2\'s r3',
+                                         'respondent2\'s r4']])
