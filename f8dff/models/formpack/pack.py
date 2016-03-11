@@ -140,6 +140,7 @@ class FormPack:
 
     def _to_ss_generator(self, header_lang=None,
                          translation=None,
+                         include_groups_in_header=False,
                          version=None):
         '''
         ss_generator means "spreadsheet" structure with generators

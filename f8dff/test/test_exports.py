@@ -79,3 +79,38 @@ class TestFormPackExport(unittest.TestCase):
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'avec vente à emporter'],
                                         ['Harvest', '12.43 -24.53', 'traditionnel']])
+
+    def test_headers_of_group_exports(self):
+        grouped_questions = build_fixture('grouped_questions')
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'gqs'}
+
+        # by default, groups are stripped. (Sound good?)
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        self.assertEquals(headers, ['q1', 'g1', 'g2', 'qz'])
+
+        # verifying false value of include_groups_in_header gives same result
+        options['include_groups_in_header'] = False
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        self.assertEquals(headers, ['q1', 'g1', 'g2', 'qz'])
+
+        # include_groups_in_header=True means the groups are counted as columns
+        options['include_groups_in_header'] = True
+        self.assertEquals(headers, ['q1', 'g1', 'g1q1', 'g2', 'g2q1', 'qz'])
+
+    def test_submissions_of_group_exports(self):
+        grouped_questions = build_fixture('grouped_questions')
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'gqs',
+                   'include_groups_in_header': False}
+
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
+        self.assertEquals(submissions, [['correct values need to be here for respondent 1'],
+                                        ['correct values need to be here for respondent 2']])
+
+        options['include_groups_in_header'] = True
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        self.assertEquals(headers, ['q1', 'g1', 'g1q1', 'g2', 'g2q1', 'qz'])
+        self.assertEquals(submissions, [['correct values need to be here for respondent 1'],
+                                        ['correct values need to be here for respondent 2']])
