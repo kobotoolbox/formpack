@@ -43,8 +43,10 @@ class FormPack:
                 return tuple(self.versions.values())[index]
             else:
                 return self.versions[index]
+        except KeyError:
+            raise KeyError('formpack with version [%s] not found' % str(index))
         except IndexError:
-            raise IndexError('formpack with version [%s] not found' % str(index))
+            raise IndexError('version at index %d is not available' % index)
 
     def _stats(self):
         _stats = OrderedDict()
@@ -137,6 +139,7 @@ class FormPack:
                 yield submission
 
     def _to_ss_generator(self, header_lang=None,
+                         translation=None,
                          version=None):
         '''
         ss_generator means "spreadsheet" structure with generators

@@ -48,12 +48,14 @@ class TestFormPackExport(unittest.TestCase):
 
         headers = fp._export_to_lists(header_lang=translations[1],
                                       version=1)[0][1][0]
-        # TODO: location is "lieu" in french, or just "adresse"
-        self.assertEquals(headers, ['nom du restaurant', 'location'])
+        self.assertEquals(headers, ['nom du restaurant', 'lieu'])
 
         # "default" use the "Label" field
         # TODO: make a separate test to test to test __getitem__
         formpack = FormPack(**restaurant_profile)
+
+        # we should discuss how to do this a bit better. "default" could
+        # be the name of a language
         headers = formpack._export_to_lists(header_lang="default",
                                             version='rpv1')
         self.assertEquals(headers[0][1][0], ['restaurant name', 'location'])
@@ -61,10 +63,19 @@ class TestFormPackExport(unittest.TestCase):
     def test_export_with_choice_lists(self):
         fp = FormPack(**restaurant_profile)
         self.assertEqual(len(fp[1].translations), 2)
-
         # by default, exports use the question 'name' attribute
-        _as_lists = fp._export_to_lists(version='rpV3')[0][1]
-        (headers, submissions) = _as_lists
+        options = {'version': 'rpV3'}
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(headers, ['restaurant_name', 'location', 'eatery_type'])
         self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'takeaway'],
                                         ['Harvest', '12.43 -24.53', 'sit_down']])
+
+        options['translation'] = fp[1].translations[0]
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'take-away'],
+                                        ['Harvest', '12.43 -24.53', 'sit down']])
+
+        options['translation'] = fp[1].translations[1]
+        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'avec vente à emporter'],
+                                        ['Harvest', '12.43 -24.53', 'traditionnel']])
