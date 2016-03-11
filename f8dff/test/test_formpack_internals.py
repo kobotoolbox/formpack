@@ -1,6 +1,6 @@
 import unittest
-from f8dff.models.formpack.pack import FormPack
-from f8dff.fixtures import build_fixture
+from ..models.formpack.pack import FormPack
+from ..fixtures import build_fixture
 
 restaurant_profile = build_fixture('restaurant_profile')
 

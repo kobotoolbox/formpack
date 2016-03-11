@@ -45,11 +45,7 @@ class FormVersion:
         # Extract choices data
         field_choices = defaultdict(OrderedDict)
         for choice_definition in content.get('choices', ()):
-            try:
-                choices = field_choices[choice_definition['list_name']]
-            except Exception as e:
-                import pdb; pdb.set_trace()
-
+            choices = field_choices[choice_definition['list_name']]
             name = choice_definition['name']
             choice = choices[name] = {}
 

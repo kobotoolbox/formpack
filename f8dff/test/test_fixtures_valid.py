@@ -5,8 +5,8 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 
-from f8dff.models.formpack.pack import FormPack
-from f8dff.fixtures import build_fixture
+from ..models.formpack.pack import FormPack
+from ..fixtures import build_fixture
 
 
 sanitation_report = build_fixture('sanitation_report')
