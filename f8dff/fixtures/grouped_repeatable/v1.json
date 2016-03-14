@@ -10,8 +10,8 @@
             {
                 "required": "true",
                 "type": "text",
-                "name": "household_address",
-                "label": "household address"
+                "name": "household_location",
+                "label": "household location"
             },
             {
                 "type": "begin repeat",
@@ -42,7 +42,7 @@
     },
     "submissions": [
         {
-            "household_visit/household_address": "montreal",
+            "household_visit/household_location": "montreal",
             "household_visit/houshold_member_name": [
                 {
                     "household_visit/houshold_member_name/household_member_name": "peter"
@@ -55,7 +55,7 @@
             "meta/formUID": "9677d34e6ad14302afed5aa2951c28ac"
         },
         {
-            "household_visit/household_address": "marseille",
+            "household_visit/household_location": "marseille",
             "household_visit/houshold_member_name": [
                 {
                     "household_visit/houshold_member_name/household_member_name": "kyle"
@@ -71,7 +71,7 @@
             "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab"
         },
         {
-            "household_visit/household_address": "rocky mountains",
+            "household_visit/household_location": "rocky mountains",
             "household_visit/houshold_member_name": [
                 {
                     "household_visit/houshold_member_name/household_member_name": "morty"
@@ -84,7 +84,7 @@
             "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab"
         },
         {
-            "household_visit/household_address": "toronto",
+            "household_visit/household_location": "toronto",
             "household_visit/houshold_member_name": [
                 {
                     "household_visit/houshold_member_name/household_member_name": "tony"
@@ -100,7 +100,7 @@
             "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab"
         },
         {
-            "household_visit/household_address": "new york",
+            "household_visit/household_location": "new york",
             "household_visit/houshold_member_name": [
                 {
                     "household_visit/houshold_member_name/household_member_name": "emma"
@@ -116,7 +116,7 @@
             "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab"
         },
         {
-            "household_visit/household_address": "boston",
+            "household_visit/household_location": "boston",
             "household_visit/houshold_member_name": [
                 {
                     "household_visit/houshold_member_name/household_member_name": "amadou"
