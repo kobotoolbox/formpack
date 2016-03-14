@@ -88,7 +88,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # by default, groups are stripped. (Sound good?)
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
+        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1', 'g2q1', 'qz'])
 
 
     def test_submissions_of_group_exports(self):
@@ -100,10 +100,12 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
         self.assertEquals(submissions, [['respondent1\'s r1',
                                          'respondent1\'s r2',
+                                         'respondent1\'s r2.5',
                                          'respondent1\'s r3',
                                          'respondent1\'s r4'],
                                         ['respondent2\'s r1',
                                          'respondent2\'s r2',
+                                         'respondent1\'s r2.5',
                                          'respondent2\'s r3',
                                          'respondent2\'s r4']])
 
@@ -112,9 +114,11 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEquals(headers, ['q1', 'g1/g1q1', 'g2/g2q1', 'qz'])
         self.assertEquals(submissions, [['respondent1\'s r1',
                                          'respondent1\'s r2',
+                                         'respondent1\'s r2.5',
                                          'respondent1\'s r3',
                                          'respondent1\'s r4'],
                                         ['respondent2\'s r1',
                                          'respondent2\'s r2',
+                                         'respondent2\'s r2.5',
                                          'respondent2\'s r3',
                                          'respondent2\'s r4']])
