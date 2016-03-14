@@ -55,7 +55,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # we should discuss how to do this a bit better. "default" could
         # be the name of a language
-        headers = formpack._export_to_lists(header_lang="default",
+        headers = formpack._export_to_lists(header_lang="_default",
                                             version='rpv1')
         self.assertEquals(headers[0][1][0], ['restaurant name', 'location'])
 
@@ -65,21 +65,35 @@ class TestFormPackExport(unittest.TestCase):
         # by default, exports use the question 'name' attribute
         options = {'version': 'rpV3'}
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['restaurant_name', 'location', 'eatery_type'])
-        self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'takeaway'],
-                                        ['Harvest', '12.43 -24.53', 'sit_down']])
+        self.assertEquals(headers, ['restaurant_name',
+                                    'location',
+                                    'eatery_type'])
+        self.assertEquals(submissions, [['Taco Truck',
+                                         '13.42 -25.43',
+                                         'takeaway'],
+                                        ['Harvest',
+                                         '12.43 -24.53',
+                                         'sit_down']])
 
         # if a language is passed, fields with available translations
         # are translated into that language
         options['translation'] = fp[1].translations[0]
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'take-away'],
-                                        ['Harvest', '12.43 -24.53', 'sit down']])
+        self.assertEquals(submissions, [['Taco Truck',
+                                         '13.42 -25.43',
+                                         'take-away'],
+                                        ['Harvest',
+                                         '12.43 -24.53',
+                                         'sit down']])
 
         options['translation'] = fp[1].translations[1]
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(submissions, [['Taco Truck', '13.42 -25.43', 'avec vente à emporter'],
-                                        ['Harvest', '12.43 -24.53', 'traditionnel']])
+        self.assertEquals(submissions, [['Taco Truck',
+                                         '13.42 -25.43',
+                                         'avec vente à emporter'],
+                                        ['Harvest',
+                                         '12.43 -24.53',
+                                         'traditionnel']])
 
     def test_headers_of_group_exports(self):
         grouped_questions = build_fixture('grouped_questions')
@@ -89,7 +103,6 @@ class TestFormPackExport(unittest.TestCase):
         # by default, groups are stripped. (Sound good?)
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
         self.assertEquals(headers, ['q1', 'g1q1', 'g2q1', 'qz'])
-
 
     def test_submissions_of_group_exports(self):
         grouped_questions = build_fixture('grouped_questions')
