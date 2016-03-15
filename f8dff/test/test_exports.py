@@ -122,3 +122,16 @@ class TestFormPackExport(unittest.TestCase):
                                          'respondent2\'s r2.5',
                                          'respondent2\'s r3',
                                          'respondent2\'s r4']])
+
+    def test_repeats(self):
+        grouped_repeatable = build_fixture('grouped_repeatable')
+        fp = FormPack(**grouped_repeatable)
+        options = {'version': 'rgv1'}
+        (sheet1_name, sheet1_contents) = fp._export_to_lists(**options)[0]
+        _names = []
+        _xported = fp._export_to_lists(**options)
+        for (sheet_name, data) in _xported:
+            _names.append(sheet_name)
+        self.assertEqual(_names, ['submissions', 'houshold_member_repeat'])
+        (headers, repeat_sht_contents) = _xported[1][1]
+        self.assertEqual(len(repeat_sht_contents), 13)
