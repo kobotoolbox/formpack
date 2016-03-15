@@ -72,8 +72,7 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(sorted(fd.to_dict().keys()),
                          sorted(fxt.keys()))
 
-        # TODO: why does this break?
-        # self.assertEqual(fd.to_dict(), fxt)
+        self.assertEqual(fd.to_dict(), fxt)
 
         v0.submit([u'Dominos', u'-12.22 12.22'])
         v0.submit(restaurant_name=u'Boston Market', location=u'-13.22 13.22')

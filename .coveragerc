@@ -1,5 +1,10 @@
 [run]
-include =
-    */f8dff/models/*
-    */f8dff/models/formpack/*
-    */f8dff/utils/*
+branch = true
+source = f8dff
+
+[report]
+fail_under = 80
+exclude_lines =
+    pragma: no cover
+    pass
+    noqa;

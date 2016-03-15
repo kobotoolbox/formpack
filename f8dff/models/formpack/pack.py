@@ -54,7 +54,7 @@ class FormPack:
         _stats['versions'] = len(self.versions)
         _stats['submissions'] = self._submissions_count()
         _stats['row_count'] = len(self[-1]._v.get('content', {})
-                                                      .get('survey', []))
+                                             .get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join(map(lambda key: '%s="%s"' % (
                             key, str(_stats[key])), _stats.keys()))
@@ -160,7 +160,8 @@ class FormPack:
 
         column_formatters = export_version._formatters
 
-        names_and_labels = export_version.get_column_names_for_lang(header_lang, group_sep)
+        args = header_lang, group_sep  # just splitting a long line
+        names_and_labels = export_version.get_column_names_for_lang(*args)
         labels = [label for name, label in names_and_labels]
 
         def _generator():

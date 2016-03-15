@@ -29,7 +29,7 @@ class FormVersion:
         self.id_string = version_data.get('id_string')
         self.version_id = version_data.get('version')
         # This will be converted down the line to a list. We use an OrderedDict
-        # to maintain order and remove duplicates, but will need indexing later.
+        # to maintain order and remove duplicates, but will need indexing later
         self.translations = OrderedDict()
 
         self.fields = OrderedDict()
@@ -39,7 +39,7 @@ class FormVersion:
         # TODO: put those parts in a separate method and unit test it
         survey = content.get('survey', [])
 
-        # Analize the survey schema and extract the informations we need
+        # Analyze the survey schema and extract the informations we need
         # to build the export
 
         # Extract choices data
@@ -49,17 +49,9 @@ class FormVersion:
             name = choice_definition['name']
             choice = choices[name] = {}
 
-            # TODO: make that a separate method for DRY and test it.
-            # Extract label translations
-            labels = choice['labels'] = {'default': name}
-            if "label" in choice_definition:
-                labels['default'] = choice_definition['label']
-            else:
-                for key, val in choice_definition.items():
-                    if key.startswith('label::'):
-                        _, lang = key.split('::')
-                        labels[lang] = val
-                        self.translations[lang] = None
+            # Get the labels and associated translations for this data
+            choice['labels'] = self._extract_labels(choice_definition)
+            self.translations.update(OrderedDict.fromkeys(choice['labels']))
 
         # Extract fields data
         group = None
@@ -69,16 +61,9 @@ class FormVersion:
                 name = data_definition['name']
                 group = {'name': name}
 
-                # Get the labels and associated translations for this data
-                labels = group['labels'] = {'default': name}
-                if "label" in data_definition:
-                    labels['default'] = data_definition['label']
-                else:
-                    for key, val in data_definition.items():
-                        if key.startswith('label::'):
-                            _, lang = key.split('::')
-                            labels[lang] = val
-                            self.translations[lang] = None
+                # Get the labels and associated translations for this group
+                group['labels'] = self._extract_labels(data_definition)
+                self.translations.update(OrderedDict.fromkeys(group['labels']))
                 continue
 
             if data_definition['type'] == 'end group':
@@ -101,18 +86,12 @@ class FormVersion:
                     field['choices'] = field_choices[choice_id]
                 field['type'] = field_type
 
-                # Get the labels and associated translations for this data
-                labels = field['labels'] = {'default': name}
-                if "label" in data_definition:
-                    labels['default'] = data_definition['label']
-                else:
-                    for key, val in data_definition.items():
-                        if key.startswith('label::'):
-                            _, lang = key.split('::')
-                            labels[lang] = val
-                            self.translations[lang] = None
+                # Get the labels and associated translations for this choice
+                field['labels'] = self._extract_labels(data_definition)
+                self.translations.update(OrderedDict.fromkeys(field['labels']))
 
         # Convert it back to a list to get numerical indexing
+        self.translations.pop('_default')
         self.translations = list(self.translations)
 
         self._formatters = OrderedDict()
@@ -127,6 +106,18 @@ class FormVersion:
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
+
+    def _extract_labels(self, data_definition):
+        """ Extract translation labels from the JSON data definition """
+        labels = OrderedDict({'_default': data_definition['name']})
+        if "label" in data_definition:
+            labels['_default'] = data_definition['label']
+        else:
+            for key, val in data_definition.items():
+                if key.startswith('label::'):
+                    _, lang = key.split('::')
+                    labels[lang] = val
+        return labels
 
     def __repr__(self):
         return '<FormVersion %s>' % self._stats()
@@ -193,7 +184,7 @@ class FormVersion:
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
 
-    def get_column_names_for_lang(self, lang="default", group_sep=None):
+    def get_column_names_for_lang(self, lang="_default", group_sep=None):
 
         if group_sep:
             for field, infos in self.fields.items():
@@ -208,7 +199,6 @@ class FormVersion:
         else:
             for field, infos in self.fields.items():
                 yield field, (infos['labels'].get(lang) or field)
-
 
     def to_xml(self):
         survey = formversion_pyxform(self._v)
@@ -234,7 +224,7 @@ class Formatter:
         self.choices = choices
         self.group = group
 
-    def format(self, val, translation='default'):
+    def format(self, val, translation='_default'):
         if self.choices and translation:
             # TODO: we may want to @memoize this method
             try:
@@ -245,4 +235,3 @@ class Formatter:
 
     def __repr__(self):
         return "<Formatter type='%s' name='%s'>" % (self.data_type, self.name)
-
