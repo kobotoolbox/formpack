@@ -235,3 +235,4 @@ class Formatter:
 
     def __repr__(self):
         return "<Formatter type='%s' name='%s'>" % (self.data_type, self.name)
+

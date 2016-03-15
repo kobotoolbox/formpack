@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
 
 import re
 from setuptools import setup, find_packages
