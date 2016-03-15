@@ -31,9 +31,9 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(fd._submissions_count(), 4)
         v0 = fd[0]
         self.assertEqual(list(v0.fields.keys()),
-                         [u'restaurant_name',
-                          u'restaurant_rating',
-                          u'report_date'])
+                         ['restaurant_name',
+                          'restaurant_rating',
+                          'report_date'])
 
     def test_grouped_questions(self):
         '''
@@ -43,7 +43,7 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 2)
         self.assertEqual(list(fd[0].fields.keys()),
-                         ['q1', 'g1q1', 'g2q1', 'qz'])
+                         ['q1', 'g1q1', 'g1sg1q1', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
         '''
