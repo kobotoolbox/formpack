@@ -1,3 +1,8 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 from pyxform.xls2json import workbook_to_json
 from pyxform.builder import create_survey_element_from_dict
 

@@ -208,8 +208,7 @@ class FormVersion:
         else:
             for field, infos in self.fields.items():
                 yield field, (infos['labels'].get(lang) or field)
-                if (infos['labels'].get(lang) or field) is None:
-                    import pdb; pdb.set_trace()
+
 
     def to_xml(self):
         survey = formversion_pyxform(self._v)

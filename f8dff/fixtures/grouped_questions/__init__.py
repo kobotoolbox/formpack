@@ -1,3 +1,8 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 '''
 grouped questions:
 
@@ -31,12 +36,12 @@ DATA = {
                     {
                         'type': 'begin group',
                         'name': 'sg1',
-                        'label': 'Group 1',
+                        'label': 'Sub Group 1',
                     },
                     {
                         'type': 'text',
                         'name': 'g1sg1q1',
-                        'label': 'G1Q1'
+                        'label': 'G1SG1Q1'
                     },
                     {
                         'type': 'end group',
@@ -71,14 +76,14 @@ DATA = {
                 {
                     'q1': 'respondent1\'s r1',
                     'g1/g1q1': 'respondent1\'s r2',
-                    'g1/sg1/g1sg1q1': 'respondent1\'s r2.5',
+                    'sg1/g1sg1q1': 'respondent1\'s r2.5',
                     'g2/g2q1': 'respondent1\'s r3',
                     'qz': 'respondent1\'s r4',
                 },
                 {
                     'q1': 'respondent2\'s r1',
                     'g1/g1q1': 'respondent2\'s r2',
-                    'g1/sg1/g1sg1q1': 'respondent2\'s r2.5',
+                    'sg1/g1sg1q1': 'respondent2\'s r2.5',
                     'g2/g2q1': 'respondent2\'s r3',
                     'qz': 'respondent2\'s r4',
                 }
