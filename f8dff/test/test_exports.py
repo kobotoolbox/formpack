@@ -124,7 +124,11 @@ class TestFormPackExport(unittest.TestCase):
 
         options['group_sep'] = '/'
         (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1/g1q1', 'sg1/g1sg1q1', 'g2/g2q1', 'qz'])
+        self.assertEquals(headers, ['q1',
+                                    'g1/g1q1',
+                                    'sg1/g1sg1q1',
+                                    'g2/g2q1',
+                                    'qz'])
         self.assertEquals(submissions, [['respondent1\'s r1',
                                          'respondent1\'s r2',
                                          'respondent1\'s r2.5',
