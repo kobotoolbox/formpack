@@ -55,10 +55,14 @@ class FormVersion:
 
         # Extract fields data
         group = None
+        previous_groups = []
         for data_definition in survey:
 
             if data_definition['type'] == 'begin group':
                 name = data_definition['name']
+                # We go down in one level on nesting, so save the parent group.
+                # Parent maybe None, in that case we are at the top level.
+                previous_groups.append(group)
                 group = {'name': name}
 
                 # Get the labels and associated translations for this group
@@ -67,7 +71,9 @@ class FormVersion:
                 continue
 
             if data_definition['type'] == 'end group':
-                group = None
+                # We go up in one level of nesting, so we set the current group
+                # to be what used to be the parent group
+                group = previous_groups.pop()
                 continue
 
             # QUESTION FOR ALEX: is there a case where 'name' is not in there ?
@@ -89,6 +95,7 @@ class FormVersion:
                 # Get the labels and associated translations for this choice
                 field['labels'] = self._extract_labels(data_definition)
                 self.translations.update(OrderedDict.fromkeys(field['labels']))
+
 
         # Convert it back to a list to get numerical indexing
         self.translations.pop('_default')

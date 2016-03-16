@@ -180,10 +180,7 @@ class FormPack:
         '''
         this defeats the purpose of using generators, but it's useful for tests
         '''
-        gens = self._to_ss_generator(**kwargs)
-        out = []
-        for key in gens.keys():
-            (headers, _gen) = gens[key]
-            vals = list(_gen)
-            out.append([key, [headers, vals]])
-        return out
+        sheets = self._to_ss_generator(**kwargs)
+        for sheet_name, rows in list(sheets.items()):
+            sheets[sheet_name] = [rows[0], list(rows[1])]
+        return sheets

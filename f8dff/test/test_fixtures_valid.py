@@ -43,7 +43,7 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(len(fd.versions), 1)
         self.assertEqual(fd._submissions_count(), 2)
         self.assertEqual(list(fd[0].fields.keys()),
-                         ['q1', 'g1q1', 'g1sg1q1', 'g2q1', 'qz'])
+                         ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
         '''

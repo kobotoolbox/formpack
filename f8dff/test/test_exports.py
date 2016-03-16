@@ -5,6 +5,8 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 
+from collections import OrderedDict
+
 from ..models.formpack.pack import FormPack
 from ..fixtures import build_fixture
 
@@ -19,13 +21,16 @@ class TestFormPackExport(unittest.TestCase):
     def test_generator_export(self):
         forms = FormPack(**customer_satisfaction)
         values_exported = forms._export_to_lists()
-        expected = [["submissions", [
-                        ["restaurant_name", "customer_enjoyment"],
-                        [
-                            ["Felipes", "yes"],
-                            ["Dunkin Donuts", "no"],
-                            ["McDonalds", "no"]]]
-                     ]]
+        expected = OrderedDict({
+                    "submissions": [
+                            ["restaurant_name", "customer_enjoyment"],
+                            [
+                                ["Felipes", "yes"],
+                                ["Dunkin Donuts", "no"],
+                                ["McDonalds", "no"]
+                            ]
+                        ]
+                   })
 
         self.assertEqual(expected, values_exported)
 
@@ -35,36 +40,34 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
-        headers = fp._export_to_lists(version=0)[0][1][0]
+        headers = fp._export_to_lists(version=0)['submissions'][0]
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
         # the first translation in the list is the translation that
         # appears first in the column list. in this case, 'label::english'
         translations = fp[1].translations
         headers = fp._export_to_lists(header_lang=translations[0],
-                                      version=1)[0][1][0]
+                                      version=1)['submissions'][0]
         self.assertEquals(headers, ['restaurant name', 'location'])
 
         headers = fp._export_to_lists(header_lang=translations[1],
-                                      version=1)[0][1][0]
+                                      version=1)['submissions'][0]
         self.assertEquals(headers, ['nom du restaurant', 'lieu'])
 
         # "default" use the "Label" field
         # TODO: make a separate test to test to test __getitem__
         formpack = FormPack(**restaurant_profile)
 
-        # we should discuss how to do this a bit better. "default" could
-        # be the name of a language
         headers = formpack._export_to_lists(header_lang="_default",
-                                            version='rpv1')
-        self.assertEquals(headers[0][1][0], ['restaurant name', 'location'])
+                                            version='rpv1')['submissions'][0]
+        self.assertEquals(headers, ['restaurant name', 'location'])
 
     def test_export_with_choice_lists(self):
         fp = FormPack(**restaurant_profile)
         self.assertEqual(len(fp[1].translations), 2)
         # by default, exports use the question 'name' attribute
         options = {'version': 'rpV3'}
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        headers, submissions = fp._export_to_lists(**options)['submissions']
         self.assertEquals(headers, ['restaurant_name',
                                     'location',
                                     'eatery_type'])
@@ -78,7 +81,7 @@ class TestFormPackExport(unittest.TestCase):
         # if a language is passed, fields with available translations
         # are translated into that language
         options['translation'] = fp[1].translations[0]
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        (headers, submissions) = fp._export_to_lists(**options)['submissions']
         self.assertEquals(submissions, [['Taco Truck',
                                          '13.42 -25.43',
                                          'take-away'],
@@ -87,7 +90,7 @@ class TestFormPackExport(unittest.TestCase):
                                          'sit down']])
 
         options['translation'] = fp[1].translations[1]
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        (headers, submissions) = fp._export_to_lists(**options)['submissions']
         self.assertEquals(submissions, [['Taco Truck',
                                          '13.42 -25.43',
                                          'avec vente à emporter'],
@@ -101,54 +104,61 @@ class TestFormPackExport(unittest.TestCase):
         options = {'version': 'gqs'}
 
         # by default, groups are stripped.
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1', 'g2q1', 'qz'])
+        (headers, submissions) = fp._export_to_lists(**options)['submissions']
+        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
+                                    'g1q2', 'g2q1', 'qz'])
 
     def test_submissions_of_group_exports(self):
         grouped_questions = build_fixture('grouped_questions')
         fp = FormPack(**grouped_questions)
         options = {'version': 'gqs'}
 
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
-        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1', 'g2q1', 'qz'])
+        (headers, submissions) = fp._export_to_lists(**options)['submissions']
+        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
+                                    'g1q2', 'g2q1', 'qz'])
         self.assertEquals(submissions, [['respondent1\'s r1',
                                          'respondent1\'s r2',
                                          'respondent1\'s r2.5',
+                                         'respondent1\'s r2.75 :)',
                                          'respondent1\'s r3',
                                          'respondent1\'s r4'],
                                         ['respondent2\'s r1',
                                          'respondent2\'s r2',
                                          'respondent2\'s r2.5',
+                                         'respondent2\'s r2.75 :)',
                                          'respondent2\'s r3',
                                          'respondent2\'s r4']])
 
         options['group_sep'] = '/'
-        (headers, submissions) = fp._export_to_lists(**options)[0][1]
+        (headers, submissions) = fp._export_to_lists(**options)['submissions']
         self.assertEquals(headers, ['q1',
                                     'g1/g1q1',
                                     'sg1/g1sg1q1',
+                                    'g1/g1q2',
                                     'g2/g2q1',
                                     'qz'])
         self.assertEquals(submissions, [['respondent1\'s r1',
                                          'respondent1\'s r2',
                                          'respondent1\'s r2.5',
+                                         'respondent1\'s r2.75 :)',
                                          'respondent1\'s r3',
                                          'respondent1\'s r4'],
                                         ['respondent2\'s r1',
                                          'respondent2\'s r2',
                                          'respondent2\'s r2.5',
+                                         'respondent2\'s r2.75 :)',
                                          'respondent2\'s r3',
                                          'respondent2\'s r4']])
 
-    def test_repeats(self):
-        grouped_repeatable = build_fixture('grouped_repeatable')
-        fp = FormPack(**grouped_repeatable)
-        options = {'version': 'rgv1'}
-        (sheet1_name, sheet1_contents) = fp._export_to_lists(**options)[0]
-        _names = []
-        _xported = fp._export_to_lists(**options)
-        for (sheet_name, data) in _xported:
-            _names.append(sheet_name)
-        self.assertEqual(_names, ['submissions', 'houshold_member_repeat'])
-        (headers, repeat_sht_contents) = _xported[1][1]
-        self.assertEqual(len(repeat_sht_contents), 13)
+    # def test_repeats(self):
+    #     grouped_repeatable = build_fixture('grouped_repeatable')
+    #     fp = FormPack(**grouped_repeatable)
+    #     options = {'version': 'rgv1'}
+    #     (sheet1_name, sheet1_contents) = fp._export_to_lists(**options)[0]
+    #     _names = []
+    #     _xported = fp._export_to_lists(**options)
+    #     for (sheet_name, data) in _xported:
+    #         _names.append(sheet_name)
+    #     self.assertEqual(_names, ['submissions', 'houshold_member_repeat'])
+    #     (headers, repeat_sht_contents) = _xported[1][1]
+    #     self.assertEqual(len(repeat_sht_contents), 13)
