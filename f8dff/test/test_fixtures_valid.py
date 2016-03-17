@@ -28,9 +28,9 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         fp = FormPack(**sanitation_report)
         self.assertEqual(len(fp.versions), 1)
-        self.assertEqual(fp._submissions_count(), 4)
+        self.assertEqual(fp.submissions_count(), 4)
         v0 = fp[0]
-        self.assertEqual(list(v0.fields.keys()),
+        self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
                          ['restaurant_name',
                           'restaurant_rating',
                           'report_date'])
@@ -42,7 +42,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(**build_fixture('grouped_questions'))
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(fp.submissions_count(), 2)
-        self.assertEqual(list(fp[0].fields.keys()),
+        self.assertEqual(list(fp[0].sections['submissions']['fields'].keys()),
                          ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
@@ -53,7 +53,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(**customer_satisfaction)
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
-        self.assertEqual(fp._submissions_count(), 3)
+        self.assertEqual(fp.submissions_count(), 3)
         self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
                          [u'restaurant_name', u'customer_enjoyment'])
         self.assertEqual(sorted(fp.to_dict().keys()),
@@ -85,5 +85,5 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         fp = FormPack(**favcolor)
         self.assertEqual(len(fp.versions), 2)
-        self.assertGreater(fp._submissions_count(), 0,
+        self.assertGreater(fp.submissions_count(), 0,
                            'submission count should be > 0')
