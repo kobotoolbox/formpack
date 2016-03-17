@@ -52,7 +52,7 @@ class FormPack:
         _stats = OrderedDict()
         _stats['id_string'] = self.id_string
         _stats['versions'] = len(self.versions)
-        _stats['submissions'] = self._submissions_count()
+        _stats['submissions'] = self.submissions_count()
         _stats['row_count'] = len(self[-1]._v.get('content', {})
                                              .get('survey', []))
         # returns stats in the format [ key="value" ]
@@ -109,10 +109,10 @@ class FormPack:
             out.append(line)
         return ''.join(out)
 
-    def _submissions_count(self):
+    def submissions_count(self):
         sc = 0
         for v in self.versions.values():
-            sc += v._submissions_count()
+            sc += v.submissions_count()
         return sc
 
     def to_dict(self, **kwargs):
@@ -135,13 +135,11 @@ class FormPack:
 
     def submissions_gen(self):
         for version in self.versions.values():
-            for submission in version._submissions:
+            for submission in version.submissions:
                 yield submission
 
-    def _to_ss_generator(self, header_lang=None,
-                         translation=None,
-                         group_sep=None,
-                         version=None):
+    def export(self, header_lang=None, translation=None,
+               group_sep=None, version=-1):
         '''
         ss_generator means "spreadsheet" structure with generators
         instead of lists.
@@ -149,38 +147,147 @@ class FormPack:
         for simplicity's sake, it will initially export a single version
         of the form (specified by ID)
         '''
+        return Export(self[version], header_lang=header_lang,
+                      translation=translation, group_sep=group_sep,
+                      dataset_name='submissions')
 
-        sheets = OrderedDict()
 
-        # default to the latest version
-        if version is None:
-            version = -1
+class Export(object):
 
-        export_version = self[version]
+    def __init__(self, form_version, translation="_default",
+                 header_lang=None, group_sep="/",
+                 dataset_name="submissions"):
 
-        column_formatters = export_version._formatters
+        self.submissions = form_version.submissions
+        self.sections = form_version.sections
+        self.formatters = form_version.formatters
+        self.translation = translation
+        self.group_sep = group_sep
+        self.dataset_name = dataset_name
 
-        args = header_lang, group_sep  # just splitting a long line
-        names_and_labels = export_version.get_column_names_for_lang(*args)
-        labels = [label for name, label in names_and_labels]
+        header_lang = header_lang or translation
+        self.labels = form_version.get_labels(header_lang, group_sep)
 
-        def _generator():
-            for submission in export_version._submissions:
-                row = []
-                for (colname, formatter) in column_formatters.iteritems():
-                    if formatter.group:
-                        colname = formatter.group['name'] + '/' + colname
-                    row.append(formatter.format(submission._data.get(colname),
-                                                translation))
-                yield row
-        sheets['submissions'] = [labels, _generator()]
-        return sheets
+        self.reset()
 
-    def _export_to_lists(self, **kwargs):
+    def __iter__(self):
+        return self.get_all_formated_submissions()
+
+    def reset(self):
+        """ Reset sections and indexes to initial values """
+
+        # Current section and indexes in the process of generating the export
+        # Those values are state used in format_one_submission to know
+        # where we are in the submission tree. This mean this class is NOT
+        # thread safe.
+        self._indexes = {n: dict(current=1, parent=None) for n in self.sections}
+
+    def get_all_formated_submissions(self):
+        """ Return the a generators yielding formatted chunks of the data set"""
+        self.reset()
+        for submission in self.submissions:
+            yield self.format_one_submission([submission.data],
+                                             self.dataset_name)
+
+    def format_one_submission(self, submission, current_section):
+
+        # 'section' is the name of what will become sheets in xls.
+        # If you don't have repeat groups, there is only one section
+        # containing all the formatted data.
+        # If you have repeat groups, you will have one section per repeat
+        # group.
+        section = self.sections[current_section]
+
+        # 'chunks' is a mapping of section names with associated formatted data
+        # for one submission. It's used to handle repeat groups.
+        # Without repeat groups, chunks has only one section mapping to a
+        # list of one row.
+        #
+        # However, if you have repeat groups, chunks will looks like this:
+        #
+        # {'first_section': [[A, B, C, index=i]],
+        #  'second_section': [
+        #       [D, E, F, index=x, parent_index=i],
+        #       [D, E, F, index=y, parent_index=i],
+        #       [D, E, F, index=z, parent_index=i],
+        #  'third_section': [
+        #       [G, H, parent_index=x],
+        #       [G, H, parent_index=x],
+        #       [G, H, parent_index=y],
+        #       [G, H, parent_index=y],
+        #       [G, H, parent_index=z],
+        #       [G, H, parent_index=z],
+        #  ]}
+        #
+        chunks = OrderedDict()
+
+        # 'rows' will contain all the formatted entries for the current
+        # section. If you don't have repeat-group, there is only one section
+        # with a row of size one.
+        # But if you have repeat groups, then rows will contain one row for
+        # each entry the user submitted. Of course, for the first section,
+        # this will always contains only one row.
+        rows = chunks[current_section] = []
+
+        # Link between the parent and its children in a sub-section.
+        # Indeed, with repeat groups, entries are nested. Since we flatten
+        # them out, we need a way to tell the end user which entries was
+        # previously part of a bigger entry. The index is like an auto-increment
+        # id that we generate on the fly on the parent, and add it to
+        # the children like a foreign key.
+        indexes = self._indexes[current_section]
+
+        # Deal with only one level of nesting of the submission, since
+        # this method is later called recursively for each repeat group.
+        # Each level correspond to one section, so eventually one sheet
+        # in an xls doc. Althougt the first level will have only one entries,
+        # when repeat groups are involved, deeper levels can have an
+        # arbitrary number of entries depending of the user input.
+        for entry in submission:
+
+            # Format one entry and add it to the rows for this section
+            row = []
+            formatters = self.formatters[current_section].items()
+            for field_name, formatter in formatters:
+                if formatter.group:
+                    field_name = formatter.group['name'] + '/' + field_name
+                cell = formatter.format(entry.get(field_name), self.translation)
+                row.append(cell)
+            rows.append(row)
+
+            # Process all repeat groups of this level
+            for child_section in section['children']:
+                # Because submissions are nested, we flatten them out by reading
+                # the whole submission tree recursively, formatting the entries,
+                # and adding the results to the list of rows for this section.
+                chunk = self.format_one_submission(submission[child_section],
+                                                   child_section)
+                chunks.update(chunk)
+
+            # Set links between sections
+            if section['children']:
+                row.append(indexes['current'])
+
+            if section['parent']:
+                row.append(section.parent['name'])
+                row.append(indexes['parent'])
+
+            indexes['current'] += 1
+
+        return chunks
+
+    def to_dict(self):
         '''
-        this defeats the purpose of using generators, but it's useful for tests
+            This defeats the purpose of using generators, but it's useful for tests
         '''
-        sheets = self._to_ss_generator(**kwargs)
-        for sheet_name, rows in list(sheets.items()):
-            sheets[sheet_name] = [rows[0], list(rows[1])]
-        return sheets
+
+        d = OrderedDict()
+
+        for section, fields in self.labels.items():
+            d[section] = {'fields': list(fields), 'data': []}
+
+        for chunk in self:
+            for section_name, rows in chunk.items():
+                d[section_name]['data'].extend(rows)
+
+        return d

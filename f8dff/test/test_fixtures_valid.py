@@ -26,10 +26,10 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         sanitation_report
         '''
-        fd = FormPack(**sanitation_report)
-        self.assertEqual(len(fd.versions), 1)
-        self.assertEqual(fd._submissions_count(), 4)
-        v0 = fd[0]
+        fp = FormPack(**sanitation_report)
+        self.assertEqual(len(fp.versions), 1)
+        self.assertEqual(fp._submissions_count(), 4)
+        v0 = fp[0]
         self.assertEqual(list(v0.fields.keys()),
                          ['restaurant_name',
                           'restaurant_rating',
@@ -39,10 +39,10 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         questions groups
         '''
-        fd = FormPack(**build_fixture('grouped_questions'))
-        self.assertEqual(len(fd.versions), 1)
-        self.assertEqual(fd._submissions_count(), 2)
-        self.assertEqual(list(fd[0].fields.keys()),
+        fp = FormPack(**build_fixture('grouped_questions'))
+        self.assertEqual(len(fp.versions), 1)
+        self.assertEqual(fp.submissions_count(), 2)
+        self.assertEqual(list(fp[0].fields.keys()),
                          ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
@@ -50,40 +50,40 @@ class TestFormPackFixtures(unittest.TestCase):
         customer_satisfaction
         '''
         fxt = customer_satisfaction
-        fd = FormPack(**customer_satisfaction)
-        v0 = fd[0]
-        self.assertEqual(len(fd.versions), 1)
-        self.assertEqual(fd._submissions_count(), 3)
-        self.assertEqual(list(v0.fields.keys()),
+        fp = FormPack(**customer_satisfaction)
+        v0 = fp[0]
+        self.assertEqual(len(fp.versions), 1)
+        self.assertEqual(fp._submissions_count(), 3)
+        self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
                          [u'restaurant_name', u'customer_enjoyment'])
-        self.assertEqual(sorted(fd.to_dict().keys()),
+        self.assertEqual(sorted(fp.to_dict().keys()),
                          sorted(fxt.keys()))
-        self.assertEqual(fd.to_dict(), fxt)
-        self.assertEqual(fd.to_dict(), customer_satisfaction)
+        self.assertEqual(fp.to_dict(), fxt)
+        self.assertEqual(fp.to_dict(), customer_satisfaction)
 
     def test_restaurant_profile(self):
         fxt = restaurant_profile
-        fd = FormPack(**fxt)
-        self.assertEqual(len(fd.versions), 3)
-        v0 = fd[0]
-        self.assertEqual(list(v0.fields.keys()),
+        fp = FormPack(**fxt)
+        self.assertEqual(len(fp.versions), 3)
+        v0 = fp[0]
+        self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
                          [u'restaurant_name', u'location'])
 
-        self.assertEqual(sorted(fd.to_dict().keys()),
+        self.assertEqual(sorted(fp.to_dict().keys()),
                          sorted(fxt.keys()))
 
-        self.assertEqual(fd.to_dict(), fxt)
+        self.assertEqual(fp.to_dict(), fxt)
 
         v0.submit([u'Dominos', u'-12.22 12.22'])
         v0.submit(restaurant_name=u'Boston Market', location=u'-13.22 13.22')
         v0.submit({u'restaurant_name': u'Starbx', u'location': u'-11.2 11.2'})
-        self.assertEqual(fd.to_dict(), self._reimport(fd).to_dict())
+        self.assertEqual(fp.to_dict(), self._reimport(fp).to_dict())
 
     def test_xml_instances_loaded(self):
         '''
         favcolor has submissions_xml specified
         '''
-        fd = FormPack(**favcolor)
-        self.assertEqual(len(fd.versions), 2)
-        self.assertGreater(fd._submissions_count(), 0,
+        fp = FormPack(**favcolor)
+        self.assertEqual(len(fp.versions), 2)
+        self.assertGreater(fp._submissions_count(), 0,
                            'submission count should be > 0')

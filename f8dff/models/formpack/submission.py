@@ -22,16 +22,16 @@ from ...models.formpack.utils import parse_xmljson_to_data
 
 class FormSubmission:
     def __init__(self, submission_data={}, version=None):
-        self._data = OrderedDict()
+        self.data = OrderedDict()
         self._version = version
 
         for (key, val) in submission_data.iteritems():
             if B64Attachment._is_attachment(val):
                 val = B64Attachment(val)
-            self._data[key] = val
+            self.data[key] = val
 
     def to_dict(self):
-        return self._data
+        return self.data
 
     def to_xml_struct(self, files=False):
         def _item_to_struct(item):
@@ -51,7 +51,7 @@ class FormSubmission:
                 'version': self._version._version_id,
             },
             'children': [_item_to_struct(item)
-                         for item in self._data.iteritems()],
+                         for item in self.data.iteritems()],
         }
 
     def to_xml(self, files=False):

@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
+from __future__ import (unicode_literals, print_function, absolute_import,
+                        division)
 
 from collections import OrderedDict, defaultdict
 
@@ -10,29 +10,42 @@ from .utils import formversion_pyxform
 from ...models.formpack.submission import FormSubmission
 from ...models.formpack.utils import parse_xml_to_xmljson
 
-
 # TODO: move submission, pack.py and version.py into a forms module with
 #       __init__ their content
 # TODO: put formatters in their own module
 
+
 class FormVersion:
     def __init__(self, version_data, parent):
+
+        # QUESTION FOR ALEX: why this check ?
         if 'name' in version_data:
             raise ValueError('FormVersion should not have a name parameter. '
                              'consider using "title" or "id_string"')
         # TODO: # rename _v to something meaningful
         self._v = version_data
+        # QUESTION FOR ALEX: what is parent ?
         self._parent = parent
         self._root_node_name = version_data.get('root_node_name')
         self.version_title = version_data.get('title')
-        self._submissions = []
+        self.submissions = []
         self.id_string = version_data.get('id_string')
         self.version_id = version_data.get('version')
+
+        # List of available language for translation. One translation does
+        # not mean all labels are translated, but at least one.
+        # One special translation not listed here is "_default", which
+        # use either the only label available, or the field name.
         # This will be converted down the line to a list. We use an OrderedDict
         # to maintain order and remove duplicates, but will need indexing later
         self.translations = OrderedDict()
 
-        self.fields = OrderedDict()
+        # Sections separates fields from various level of nesting in case
+        # we have repeat group. If you don't have repeat group, you have
+        # only one section, if you have repeat groups, you will have one
+        # section per repeat group. Sections eventually become sheets in
+        # xls export.
+        self.sections = OrderedDict()
 
         content = self._v.get('content', {})
 
@@ -40,9 +53,12 @@ class FormVersion:
         survey = content.get('survey', [])
 
         # Analyze the survey schema and extract the informations we need
-        # to build the export
+        # to build the export: the sections, the choices, the fields
+        # and translations for each of them.
 
-        # Extract choices data
+        # Extract choices data.
+        # Choices are the list of values you can choose from to answer a
+        # specific question. They can have translatable labels.
         field_choices = defaultdict(OrderedDict)
         for choice_definition in content.get('choices', ()):
             choices = field_choices[choice_definition['list_name']]
@@ -56,6 +72,18 @@ class FormVersion:
         # Extract fields data
         group = None
         previous_groups = []
+
+        fields = OrderedDict()
+        section = {
+            'parent': None,
+            'children': [],
+            "fields": fields,
+            'name': 'submissions',
+            'labels': {'_default': 'submissions'}
+        }
+        self.sections["submissions"] = section
+        previous_sections = []
+
         for data_definition in survey:
 
             if data_definition['type'] == 'begin group':
@@ -76,13 +104,42 @@ class FormVersion:
                 group = previous_groups.pop()
                 continue
 
+            if data_definition['type'] == 'begin repeat':
+                # We go down in one level on nesting, so save the parent section.
+                # Parent maybe None, in that case we are at the top level.
+                parent_section = section
+                fields = OrderedDict()
+                section = {
+                    "parent": parent_section,
+                    "children": [],
+                    "fields": fields,
+                    "name": name
+                }
+
+                self.sections[name] = section
+                previous_sections.append(parent_section)
+                parent_section['children'].append(section)
+
+                section['labels'] = self._extract_labels(data_definition)
+                translations = OrderedDict.fromkeys(section['labels'])
+                self.translations.update(translations)
+                continue
+
+            if data_definition['type'] == 'end repeat':
+                # We go up in one level of nesting, so we set the current section
+                # to be what used to be the parent section
+                section = previous_sections.pop()
+                fields = section['fields']
+                continue
+
             # QUESTION FOR ALEX: is there a case where 'name' is not in there ?
             # if yes, what do we do with it ?
             # Get the the data name and type
             if 'name' in data_definition:
                 name = data_definition['name']
-                field = self.fields[name] = {'choices': None}
+                field = fields[name] = {'choices': None}
                 field['group'] = group
+                field['section'] = section
 
                 # Get the data type. If it has a foreign key, map the
                 # label translations
@@ -96,20 +153,29 @@ class FormVersion:
                 field['labels'] = self._extract_labels(data_definition)
                 self.translations.update(OrderedDict.fromkeys(field['labels']))
 
-
         # Convert it back to a list to get numerical indexing
         self.translations.pop('_default')
         self.translations = list(self.translations)
 
-        self._formatters = OrderedDict()
+        self.formatters = OrderedDict()
 
-        for name, field in self.fields.items():
-            # question_type = get_question_type(name, version)
-            # formater_class = formater_registry[question_type]
-            self._formatters[name] = Formatter(name,
-                                               field['type'],
-                                               field.get('choices'),
-                                               field['group'])
+        # Set formatters and meta fields (such as indexes)
+        for section_name, section in self.sections.items():
+
+            # Add formatters for each field
+            formatters = self.formatters.setdefault(section_name, OrderedDict())
+            fields = section['fields']
+            for field_name, field in fields.items():
+                formatters[field_name] = Formatter(
+                    name, field['type'], field.get('choices'), field['group'])
+
+            # Add meta fields
+            if section['children']:
+                fields['_index'] = {'name': '_index'}
+
+            if section['parent']:
+                fields['_parent_table_name'] = {'name': '_parent_table_name'}
+                fields['_parent_index'] = {'name': '_parent_index'}
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
@@ -133,16 +199,15 @@ class FormVersion:
         _stats = OrderedDict()
         _stats['id_string'] = self._get_id_string()
         _stats['version'] = '' if not self.version_id else self.version_id
-        _stats['row_count'] = len(self._v.get('content', {})
-                                         .get('survey', []))
-        _stats['submission_count'] = len(self._submissions)
+        _stats['row_count'] = len(self._v.get('content', {}).get('survey', []))
+        _stats['submission_count'] = len(self.submissions)
         # returns stats in the format [ key="value" ]
-        return '\n\t'.join(map(lambda key: '%s="%s"' % (
-                            key, str(_stats[key])), _stats.keys()))
+        return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
+                               _stats.keys()))
 
     def to_dict(self):
         _ss = []
-        for _s in self._submissions:
+        for _s in self.submissions:
             _ss.append(_s.to_dict())
         out = {}
         out.update(self._v)
@@ -150,7 +215,7 @@ class FormVersion:
         return out
 
     def load_submission(self, v):
-        self._submissions.append(FormSubmission(v, self))
+        self.submissions.append(FormSubmission(v, self))
 
     def _load_submission_xml(self, xml):
         _xmljson = parse_xml_to_xmljson(xml)
@@ -163,10 +228,10 @@ class FormVersion:
         if _version_id != self.version_id:
             raise ValueError('mismatching version id %s != %s' %
                              (self.version_id, _version_id))
-        self._submissions.append(FormSubmission.from_xml(_xmljson, self))
+        self.submissions.append(FormSubmission.from_xml(_xmljson, self))
 
-    def _submissions_count(self):
-        return len(self._submissions)
+    def submissions_count(self):
+        return len(self.submissions)
 
     def lookup(self, prop, default=None):
         result = getattr(self, prop, None)
@@ -191,21 +256,34 @@ class FormVersion:
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
 
-    def get_column_names_for_lang(self, lang="_default", group_sep=None):
+    def get_labels(self, lang="_default", group_sep=None):
+        """ Returns a mapping of labels for {section: [field, field]...}
 
-        if group_sep:
-            for field, infos in self.fields.items():
-                name = infos['labels'].get(lang) or field
-                group = infos['group']
-                if group:
-                    group = group['labels'].get(lang) or group['name']
-                    yield field, group + group_sep + name
-                else:
-                    yield field, name
+            Sections and fields labels can be set to use their slug name,
+            their lone label, or one of the translated labels.
 
-        else:
-            for field, infos in self.fields.items():
-                yield field, (infos['labels'].get(lang) or field)
+            If a field is part of a group and a group separator is passed,
+            the group label is retrieved, possibly translated, and
+            prepended to the field label itself.
+        """
+
+        all_labels = OrderedDict()
+        for section_name, section in self.sections.items():
+
+            section_label = section['labels'].get(lang) or section_name
+            section_labels = all_labels[section_label] = []
+
+            for field_name, field in section['fields'].items():
+
+                    field_label = field['labels'].get(lang) or field_name
+                    group = field.get('group')
+                    if group_sep and group:
+                        group = group['labels'].get(lang) or group['name']
+                        section_labels.append(group + group_sep + field_label)
+                    else:
+                        section_labels.append(field_label)
+
+        return all_labels
 
     def to_xml(self):
         survey = formversion_pyxform(self._v)
@@ -213,14 +291,13 @@ class FormVersion:
         title = self._get_title()
 
         if title is None:
-            raise ValueError('cannot create xml on a survey '
-                             'with no title.')
+            raise ValueError('cannot create xml on a survey ' 'with no title.')
         survey.update({
-                'name': self.lookup('root_node_name', 'data'),
-                'id_string': self.lookup('id_string'),
-                'title': title,
-                'version': self.version_id,
-            })
+            'name': self.lookup('root_node_name', 'data'),
+            'id_string': self.lookup('id_string'),
+            'title': title,
+            'version': self.version_id,
+        })
         return survey.to_xml().encode('utf-8')
 
 
