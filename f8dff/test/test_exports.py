@@ -67,6 +67,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(len(fp[1].translations), 2)
         # by default, exports use the question 'name' attribute
         options = {'version': 'rpV3'}
+
         export = fp.export(**options).to_dict()['submissions']
         self.assertEquals(export['fields'], ['restaurant_name',
                                               'location',
@@ -134,7 +135,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(**options).to_dict()['submissions']
         self.assertEquals(export['fields'], ['q1',
                                              'g1/g1q1',
-                                             'sg1/g1sg1q1',
+                                             'g1/sg1/g1sg1q1',
                                              'g1/g1q2',
                                              'g2/g2q1',
                                              'qz'])

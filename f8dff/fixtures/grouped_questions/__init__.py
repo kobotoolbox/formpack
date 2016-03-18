@@ -81,7 +81,7 @@ DATA = {
                 {
                     'q1': 'respondent1\'s r1',
                     'g1/g1q1': 'respondent1\'s r2',
-                    'sg1/g1sg1q1': 'respondent1\'s r2.5',
+                    'g1/sg1/g1sg1q1': 'respondent1\'s r2.5',
                     'g1/g1q2': 'respondent1\'s r2.75 :)',
                     'g2/g2q1': 'respondent1\'s r3',
                     'qz': 'respondent1\'s r4',
@@ -89,7 +89,7 @@ DATA = {
                 {
                     'q1': 'respondent2\'s r1',
                     'g1/g1q1': 'respondent2\'s r2',
-                    'sg1/g1sg1q1': 'respondent2\'s r2.5',
+                    'g1/sg1/g1sg1q1': 'respondent2\'s r2.5',
                     'g1/g1q2': 'respondent2\'s r2.75 :)',
                     'g2/g2q1': 'respondent2\'s r3',
                     'qz': 'respondent2\'s r4',

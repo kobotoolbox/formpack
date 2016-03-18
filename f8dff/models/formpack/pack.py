@@ -140,13 +140,7 @@ class FormPack:
 
     def export(self, header_lang=None, translation=None,
                group_sep=None, version=-1):
-        '''
-        ss_generator means "spreadsheet" structure with generators
-        instead of lists.
-
-        for simplicity's sake, it will initially export a single version
-        of the form (specified by ID)
-        '''
+        '''Create an export for a given version of the form '''
         return Export(self[version], header_lang=header_lang,
                       translation=translation, group_sep=group_sep,
                       dataset_name='submissions')
@@ -160,7 +154,6 @@ class Export(object):
 
         self.submissions = form_version.submissions
         self.sections = form_version.sections
-        self.formatters = form_version.formatters
         self.translation = translation
         self.group_sep = group_sep
         self.dataset_name = dataset_name
@@ -247,16 +240,13 @@ class Export(object):
 
             # Format one entry and add it to the rows for this section
             row = []
-            formatters = self.formatters[current_section].items()
-            for field_name, formatter in formatters:
-                if formatter.group:
-                    field_name = formatter.group['name'] + '/' + field_name
-                cell = formatter.format(entry.get(field_name), self.translation)
+            for field in section.fields.values():
+                cell = field.format(entry.get(field.path), self.translation)
                 row.append(cell)
             rows.append(row)
 
             # Process all repeat groups of this level
-            for child_section in section['children']:
+            for child_section in section.children:
                 # Because submissions are nested, we flatten them out by reading
                 # the whole submission tree recursively, formatting the entries,
                 # and adding the results to the list of rows for this section.
@@ -265,11 +255,11 @@ class Export(object):
                 chunks.update(chunk)
 
             # Set links between sections
-            if section['children']:
+            if section.children:
                 row.append(indexes['current'])
 
-            if section['parent']:
-                row.append(section.parent['name'])
+            if section.children:
+                row.append(section.parent.name)
                 row.append(indexes['parent'])
 
             indexes['current'] += 1

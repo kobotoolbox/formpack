@@ -3,7 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 
 from .utils import formversion_pyxform
 
@@ -12,7 +12,6 @@ from ...models.formpack.utils import parse_xml_to_xmljson
 
 # TODO: move submission, pack.py and version.py into a forms module with
 #       __init__ their content
-# TODO: put formatters in their own module
 
 
 class FormVersion:
@@ -59,69 +58,55 @@ class FormVersion:
         # Extract choices data.
         # Choices are the list of values you can choose from to answer a
         # specific question. They can have translatable labels.
-        field_choices = defaultdict(OrderedDict)
-        for choice_definition in content.get('choices', ()):
-            choices = field_choices[choice_definition['list_name']]
-            name = choice_definition['name']
-            choice = choices[name] = {}
-
-            # Get the labels and associated translations for this data
-            choice['labels'] = self._extract_labels(choice_definition)
-            self.translations.update(OrderedDict.fromkeys(choice['labels']))
+        choices_definition = content.get('choices', ())
+        field_choices = FormChoice.all_from_json_definition(choices_definition)
+        for choice in field_choices.values():
+            self.translations.update(OrderedDict.fromkeys(choice.translations))
 
         # Extract fields data
         group = None
         previous_groups = []
 
-        fields = OrderedDict()
-        section = {
-            'parent': None,
-            'children': [],
-            "fields": fields,
-            'name': 'submissions',
-            'labels': {'_default': 'submissions'}
-        }
+        section = FormSection()
+        fields = section.fields
         self.sections["submissions"] = section
         previous_sections = []
+        path = []
 
         for data_definition in survey:
 
             if data_definition['type'] == 'begin group':
-                name = data_definition['name']
+
+                group = FormGroup.from_json_definition(data_definition)
                 # We go down in one level on nesting, so save the parent group.
                 # Parent maybe None, in that case we are at the top level.
                 previous_groups.append(group)
-                group = {'name': name}
+                path.append(group)
 
                 # Get the labels and associated translations for this group
-                group['labels'] = self._extract_labels(data_definition)
-                self.translations.update(OrderedDict.fromkeys(group['labels']))
+                self.translations.update(OrderedDict.fromkeys(group.labels))
                 continue
 
             if data_definition['type'] == 'end group':
                 # We go up in one level of nesting, so we set the current group
                 # to be what used to be the parent group
                 group = previous_groups.pop()
+                path.pop()
                 continue
 
             if data_definition['type'] == 'begin repeat':
                 # We go down in one level on nesting, so save the parent section.
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
-                fields = OrderedDict()
-                section = {
-                    "parent": parent_section,
-                    "children": [],
-                    "fields": fields,
-                    "name": name
-                }
 
-                self.sections[name] = section
+                section = FormSection.from_json_definition(data_definition)
+                self.sections[section.name] = section
+                path.append(section)
+
                 previous_sections.append(parent_section)
-                parent_section['children'].append(section)
+                parent_section.children.append(section)
 
-                section['labels'] = self._extract_labels(data_definition)
-                translations = OrderedDict.fromkeys(section['labels'])
+                translations = OrderedDict.fromkeys(section.labels)
                 self.translations.update(translations)
                 continue
 
@@ -129,68 +114,39 @@ class FormVersion:
                 # We go up in one level of nesting, so we set the current section
                 # to be what used to be the parent section
                 section = previous_sections.pop()
-                fields = section['fields']
+                path.pop()
+                fields = section.fields
                 continue
 
-            # QUESTION FOR ALEX: is there a case where 'name' is not in there ?
-            # if yes, what do we do with it ?
             # Get the the data name and type
             if 'name' in data_definition:
-                name = data_definition['name']
-                field = fields[name] = {'choices': None}
-                field['group'] = group
-                field['section'] = section
+                field = FormField.from_json_definition(data_definition,
+                                                       list(path), section,
+                                                       field_choices)
+                fields[field.name] = field
 
-                # Get the data type. If it has a foreign key, map the
-                # label translations
-                field_type = data_definition['type']
-                if " " in field_type:
-                    field_type, choice_id = field_type.split(' ')
-                    field['choices'] = field_choices[choice_id]
-                field['type'] = field_type
-
-                # Get the labels and associated translations for this choice
-                field['labels'] = self._extract_labels(data_definition)
-                self.translations.update(OrderedDict.fromkeys(field['labels']))
+                self.translations.update(OrderedDict.fromkeys(field.labels))
 
         # Convert it back to a list to get numerical indexing
         self.translations.pop('_default')
         self.translations = list(self.translations)
 
-        self.formatters = OrderedDict()
-
-        # Set formatters and meta fields (such as indexes)
+        # Set meta fields (such as indexes)
         for section_name, section in self.sections.items():
 
-            # Add formatters for each field
-            formatters = self.formatters.setdefault(section_name, OrderedDict())
-            fields = section['fields']
-            for field_name, field in fields.items():
-                formatters[field_name] = Formatter(
-                    name, field['type'], field.get('choices'), field['group'])
-
             # Add meta fields
-            if section['children']:
-                fields['_index'] = {'name': '_index'}
+            if section.children:
+                fields['_index'] = FormField('_index', {}, 'meta')
 
-            if section['parent']:
-                fields['_parent_table_name'] = {'name': '_parent_table_name'}
-                fields['_parent_index'] = {'name': '_parent_index'}
+            if section.parent:
+                fields['_parent_table_name'] = FormField('_parent_table_name',
+                                                         {}, 'meta')
+
+                fields['_parent_index'] = FormField('_parent_index',
+                                                    {}, 'meta')
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
-
-    def _extract_labels(self, data_definition):
-        """ Extract translation labels from the JSON data definition """
-        labels = OrderedDict({'_default': data_definition['name']})
-        if "label" in data_definition:
-            labels['_default'] = data_definition['label']
-        else:
-            for key, val in data_definition.items():
-                if key.startswith('label::'):
-                    _, lang = key.split('::')
-                    labels[lang] = val
-        return labels
 
     def __repr__(self):
         return '<FormVersion %s>' % self._stats()
@@ -270,18 +226,11 @@ class FormVersion:
         all_labels = OrderedDict()
         for section_name, section in self.sections.items():
 
-            section_label = section['labels'].get(lang) or section_name
+            section_label = section.labels.get(lang) or section_name
             section_labels = all_labels[section_label] = []
 
-            for field_name, field in section['fields'].items():
-
-                    field_label = field['labels'].get(lang) or field_name
-                    group = field.get('group')
-                    if group_sep and group:
-                        group = group['labels'].get(lang) or group['name']
-                        section_labels.append(group + group_sep + field_label)
-                    else:
-                        section_labels.append(field_label)
+            for field_name, field in section.fields.items():
+                    section_labels.append(field.get_label(lang, group_sep))
 
         return all_labels
 
@@ -301,21 +250,143 @@ class FormVersion:
         return survey.to_xml().encode('utf-8')
 
 
-class Formatter:
-    def __init__(self, name, data_type, choices=None, group=None):
-        self.data_type = data_type
+class FormInfo(object):
+
+    def __init__(self, name, labels):
         self.name = name
-        self.choices = choices
-        self.group = group
+        self.labels = labels
+
+    @classmethod
+    def from_json_definition(cls, definition):
+        labels = cls._extract_json_labels(definition)
+        return cls(definition['name'], labels)
+
+    @classmethod
+    def _extract_json_labels(cls, definition):
+        """ Extract translation labels from the JSON data definition """
+        labels = OrderedDict({'_default': definition['name']})
+        if "label" in definition:
+            labels['_default'] = definition['label']
+        else:
+            for key, val in definition.items():
+                if key.startswith('label::'):
+                    _, lang = key.split('::')
+                    labels[lang] = val
+        return labels
+
+
+class FormField(FormInfo):
+
+    def __init__(self, name, labels, data_type, hierarchy=[],
+                 section=None,):
+        super(FormField, self).__init__(name, labels)
+        self.data_type = data_type
+        self.section = section
+        self.hierarchy = hierarchy + [self]
+        self.path = '/'.join(info.name for info in self.hierarchy)
+
+    def get_label(self, lang="_default", group_sep=None):
+        if group_sep:
+            hierarchy = []
+            for level in self.hierarchy:
+                hierarchy.append(level.labels.get(lang) or level.name)
+            return group_sep.join(hierarchy)
+        return self.labels.get(lang) or self.name
+
+    def __repr__(self):
+        return "<FormField name='%s' type='%s'>" % (self.name, self.data_type)
+
+    @classmethod
+    def from_json_definition(cls, definition, group=None,
+                             section=None, field_choices={}):
+
+        name = definition['name']
+        labels = cls._extract_json_labels(definition)
+        data_type = definition['type']
+
+        # Get the data type. If it has a foreign key, instanciate a subclass
+        # dedicated to handle choices and pass it the choices matching this fk
+        if " " in data_type:
+            data_type, choice_id = data_type.split(' ')
+            choices = field_choices[choice_id]
+
+            return FormChoiceField(name, labels, data_type,
+                                   group, section, choices)
+
+        return cls(name, labels, data_type, group, section)
 
     def format(self, val, translation='_default'):
-        if self.choices and translation:
+        return val
+
+
+class FormChoiceField(FormField):
+
+    def __init__(self, name, labels, data_type, path=None,
+                 section=None, choice=None):
+        super(FormChoiceField, self).__init__(name, labels, data_type,
+                                              path, section)
+        self.choice = choice or {}
+
+    def __repr__(self):
+        data = (self.name, self.data_type)
+        return "<FormChoiceField name='%s' type='%s'>" % data
+
+    def format(self, val, translation='_default'):
+        if translation:
             # TODO: we may want to @memoize this method
             try:
-                return self.choices[val]['labels'][translation]
+                return self.choice.options[val]['labels'][translation]
             except KeyError:
                 return val
         return val
 
-    def __repr__(self):
-        return "<Formatter type='%s' name='%s'>" % (self.data_type, self.name)
+
+class FormGroup(FormInfo):
+    pass
+
+
+class FormSection(FormInfo):
+
+    def __init__(self, name="submissions", labels=None, fields=None,
+                 parent=None, children=()):
+
+        if labels is None:
+            labels = {'_default': 'submissions'}
+
+        super(FormSection, self).__init__(name, labels)
+        self.fields = fields or OrderedDict()
+        self.parent = parent
+        self.children = list(children)
+
+
+class FormChoice(FormInfo):
+
+    def __init__(self, name):
+        self.name = name
+        self.options = {}
+
+    @classmethod
+    def from_json_definition(cls, definition):
+        raise NotImplemented('Use all_from_json_definition() or __init__()')
+
+    @classmethod
+    def all_from_json_definition(cls, definition):
+
+        all_choices = {}
+        for choice_definition in definition:
+            choice_name = choice_definition['list_name']
+            try:
+                choices = all_choices[choice_name]
+            except KeyError:
+                choices = all_choices[choice_name] = cls(choice_name)
+
+            option = choices.options[choice_definition['name']] = {}
+            option['labels'] = cls._extract_json_labels(choice_definition)
+
+        return all_choices
+
+    @property
+    def translations(self):
+        for option in self.options.values():
+            for translation in option['labels'].keys():
+                yield translation

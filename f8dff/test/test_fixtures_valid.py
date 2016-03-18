@@ -30,7 +30,7 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(fp.submissions_count(), 4)
         v0 = fp[0]
-        self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
+        self.assertEqual(list(v0.sections['submissions'].fields.keys()),
                          ['restaurant_name',
                           'restaurant_rating',
                           'report_date'])
@@ -42,7 +42,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(**build_fixture('grouped_questions'))
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(fp.submissions_count(), 2)
-        self.assertEqual(list(fp[0].sections['submissions']['fields'].keys()),
+        self.assertEqual(list(fp[0].sections['submissions'].fields.keys()),
                          ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
@@ -54,7 +54,7 @@ class TestFormPackFixtures(unittest.TestCase):
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(fp.submissions_count(), 3)
-        self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
+        self.assertEqual(list(v0.sections['submissions'].fields.keys()),
                          [u'restaurant_name', u'customer_enjoyment'])
         self.assertEqual(sorted(fp.to_dict().keys()),
                          sorted(fxt.keys()))
@@ -66,7 +66,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(**fxt)
         self.assertEqual(len(fp.versions), 3)
         v0 = fp[0]
-        self.assertEqual(list(v0.sections['submissions']['fields'].keys()),
+        self.assertEqual(list(v0.sections['submissions'].fields.keys()),
                          [u'restaurant_name', u'location'])
 
         self.assertEqual(sorted(fp.to_dict().keys()),
