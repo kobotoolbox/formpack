@@ -152,15 +152,135 @@ class TestFormPackExport(unittest.TestCase):
                                             'respondent2\'s r3',
                                             'respondent2\'s r4']])
 
-    # def test_repeats(self):
-    #     grouped_repeatable = build_fixture('grouped_repeatable')
-    #     fp = FormPack(**grouped_repeatable)
-    #     options = {'version': 'rgv1'}
-    #     (sheet1_name, sheet1_contents) = fp._export_to_dict(**options)[0]
-    #     _names = []
-    #     _xported = fp._export_to_dict(**options)
-    #     for (sheet_name, data) in _xported:
-    #         _names.append(sheet_name)
-    #     self.assertEqual(_names, ['submissions', 'houshold_member_repeat'])
-    #     (headers, repeat_sht_contents) = _xported[1][1]
-    #     self.assertEqual(len(repeat_sht_contents), 13)
+    def test_repeats(self):
+        grouped_repeatable = build_fixture('grouped_repeatable')
+        fp = FormPack(**grouped_repeatable)
+        options = {'version': 'rgv1'}
+        export = fp.export(**options).to_dict()
+
+
+        self.assertEqual(export, OrderedDict ([
+                            (u'submissions',
+                                {
+                                    u'fields': [
+                                        u'household_location',
+                                        u'start',
+                                        u'end',
+                                        u'_index'
+                                    ],
+                                    u'data': [
+                                        [
+                                            u'montreal',
+                                            u'2016-03-14T14:15:48.000-04:00',
+                                            u'2016-03-14T14:18:35.000-04:00',
+                                            1
+                                        ],
+                                        [
+                                            u'marseille',
+                                            u'2016-03-14T14:14:10.000-04:00',
+                                            u'2016-03-14T14:15:48.000-04:00',
+                                            2
+                                        ],
+                                        [
+                                            u'rocky mountains',
+                                            u'2016-03-14T14:13:53.000-04:00',
+                                            u'2016-03-14T14:14:10.000-04:00',
+                                            3
+                                        ],
+                                        [
+                                            u'toronto',
+                                            u'2016-03-14T14:12:54.000-04:00',
+                                            u'2016-03-14T14:13:53.000-04:00',
+                                            4
+                                        ],
+                                        [
+                                            u'new york',
+                                            u'2016-03-14T14:18:35.000-04:00',
+                                            u'2016-03-14T15:19:20.000-04:00',
+                                            5
+                                        ],
+                                        [
+                                            u'boston',
+                                            u'2016-03-14T14:11:25.000-04:00',
+                                            u'2016-03-14T14:12:03.000-04:00',
+                                            6
+                                        ]
+                                    ]
+                                }),
+                            (u'houshold_member_repeat',
+                                {
+                                    u'fields': [
+                                        u'household_member_name',
+                                        u'_parent_table_name',
+                                        u'_parent_index'
+                                    ],
+                                    u'data': [
+                                        [
+                                            u'peter',
+                                            u'submissions',
+                                            1
+                                        ],
+                                        [
+                                            u'kyle',
+                                            u'submissions',
+                                            2
+                                        ],
+                                        [
+                                            u'linda',
+                                            u'submissions',
+                                            2
+                                        ],
+                                        [
+                                            u'morty',
+                                            u'submissions',
+                                            3
+                                        ],
+                                        [
+                                            u'tony',
+                                            u'submissions',
+                                            4
+                                        ],
+                                        [
+                                            u'mary',
+                                            u'submissions',
+                                            4
+                                        ],
+                                        [
+                                            u'emma',
+                                            u'submissions',
+                                            5
+                                        ],
+                                        [
+                                            u'parker',
+                                            u'submissions',
+                                            5
+                                        ],
+                                        [
+                                            u'amadou',
+                                            u'submissions',
+                                            6
+                                        ],
+                                        [
+                                            u'esteban',
+                                            u'submissions',
+                                            6
+                                        ],
+                                        [
+                                            u'suzie',
+                                            u'submissions',
+                                            6
+                                        ],
+                                        [
+                                            u'fiona',
+                                            u'submissions',
+                                            6
+                                        ],
+                                        [
+                                            u'phillip',
+                                            u'submissions',
+                                            6
+                                        ]
+                                    ]
+                                })
+                            ])
+        )

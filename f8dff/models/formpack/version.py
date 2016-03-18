@@ -65,23 +65,26 @@ class FormVersion:
 
         # Extract fields data
         group = None
-        previous_groups = []
-
         section = FormSection()
-        fields = section.fields
         self.sections["submissions"] = section
-        previous_sections = []
-        path = []
+
+        # Those will keep track of were we are while traversing the
+        # schema.
+        # Hierarchy contains all the levels, mixing groups and sections,
+        # including the first and last ones while stacks are just an history of
+        # previous levels, and for either groups or sections.
+        hierarchy = [section]
+        group_stack = []
+        section_stack = []
 
         for data_definition in survey:
 
             if data_definition['type'] == 'begin group':
-
+                group_stack.append(group)
                 group = FormGroup.from_json_definition(data_definition)
                 # We go down in one level on nesting, so save the parent group.
                 # Parent maybe None, in that case we are at the top level.
-                previous_groups.append(group)
-                path.append(group)
+                hierarchy.append(group)
 
                 # Get the labels and associated translations for this group
                 self.translations.update(OrderedDict.fromkeys(group.labels))
@@ -89,9 +92,10 @@ class FormVersion:
 
             if data_definition['type'] == 'end group':
                 # We go up in one level of nesting, so we set the current group
-                # to be what used to be the parent group
-                group = previous_groups.pop()
-                path.pop()
+                # to be what used to be the parent group. We also remote one
+                # level in the hierarchy.
+                hierarchy.pop()
+                group = group_stack.pop()
                 continue
 
             if data_definition['type'] == 'begin repeat':
@@ -99,11 +103,12 @@ class FormVersion:
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
 
-                section = FormSection.from_json_definition(data_definition)
+                section = FormSection.from_json_definition(data_definition,
+                                                           hierarchy,
+                                                           parent=parent_section)
                 self.sections[section.name] = section
-                path.append(section)
-
-                previous_sections.append(parent_section)
+                hierarchy.append(section)
+                section_stack.append(parent_section)
                 parent_section.children.append(section)
 
                 translations = OrderedDict.fromkeys(section.labels)
@@ -113,17 +118,16 @@ class FormVersion:
             if data_definition['type'] == 'end repeat':
                 # We go up in one level of nesting, so we set the current section
                 # to be what used to be the parent section
-                section = previous_sections.pop()
-                path.pop()
-                fields = section.fields
+                hierarchy.pop()
+                section = section_stack.pop()
                 continue
 
             # Get the the data name and type
             if 'name' in data_definition:
                 field = FormField.from_json_definition(data_definition,
-                                                       list(path), section,
+                                                       hierarchy, section,
                                                        field_choices)
-                fields[field.name] = field
+                section.fields[field.name] = field
 
                 self.translations.update(OrderedDict.fromkeys(field.labels))
 
@@ -136,14 +140,17 @@ class FormVersion:
 
             # Add meta fields
             if section.children:
-                fields['_index'] = FormField('_index', {}, 'meta')
+                section.fields['_index'] = FormField('_index', {}, 'meta',
+                                                     can_format=False)
 
             if section.parent:
-                fields['_parent_table_name'] = FormField('_parent_table_name',
-                                                         {}, 'meta')
+                field = FormField('_parent_table_name', {},
+                                  'meta', can_format=False)
+                section.fields['_parent_table_name'] = field
 
-                fields['_parent_index'] = FormField('_parent_index',
-                                                    {}, 'meta')
+                section.fields['_parent_index'] = FormField('_parent_index',
+                                                            {}, 'meta',
+                                                            can_format=False)
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
@@ -256,6 +263,9 @@ class FormInfo(object):
         self.name = name
         self.labels = labels
 
+    def __repr__(self):
+        return "<%s name='%s'>" % (self.__class__.__name__, self.name)
+
     @classmethod
     def from_json_definition(cls, definition):
         labels = cls._extract_json_labels(definition)
@@ -277,20 +287,22 @@ class FormInfo(object):
 
 class FormField(FormInfo):
 
-    def __init__(self, name, labels, data_type, hierarchy=[],
-                 section=None,):
+    def __init__(self, name, labels, data_type, hierarchy=(None,),
+                 section=None, can_format=True):
         super(FormField, self).__init__(name, labels)
         self.data_type = data_type
         self.section = section
-        self.hierarchy = hierarchy + [self]
-        self.path = '/'.join(info.name for info in self.hierarchy)
+        self.can_format = can_format
+        self.hierarchy = list(hierarchy) + [self]
+        # do not include the root section in the path
+        self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     def get_label(self, lang="_default", group_sep=None):
         if group_sep:
-            hierarchy = []
-            for level in self.hierarchy:
-                hierarchy.append(level.labels.get(lang) or level.name)
-            return group_sep.join(hierarchy)
+            path = []
+            for level in self.hierarchy[1:]:
+                path.append(level.labels.get(lang) or level.name)
+            return group_sep.join(path)
         return self.labels.get(lang) or self.name
 
     def __repr__(self):
@@ -341,14 +353,14 @@ class FormChoiceField(FormField):
         return val
 
 
-class FormGroup(FormInfo):
+class FormGroup(FormInfo):  # useful to get __repr__
     pass
 
 
 class FormSection(FormInfo):
 
     def __init__(self, name="submissions", labels=None, fields=None,
-                 parent=None, children=()):
+                 parent=None, children=(), hierarchy=(None,)):
 
         if labels is None:
             labels = {'_default': 'submissions'}
@@ -357,6 +369,20 @@ class FormSection(FormInfo):
         self.fields = fields or OrderedDict()
         self.parent = parent
         self.children = list(children)
+
+        self.hierarchy = list(hierarchy) + [self]
+        # do not include the root section in the path
+        self.path = '/'.join(info.name for info in self.hierarchy[1:])
+
+    @classmethod
+    def from_json_definition(cls, definition, hierarchy=(None,), parent=None):
+        labels = cls._extract_json_labels(definition)
+        return cls(definition['name'], labels, hierarchy=hierarchy,
+                   parent=parent)
+
+    def __repr__(self):
+        parent_name = getattr(self.parent, 'name', None)
+        return "<FormSection name='%s' parent='%s'>" % (self.name, parent_name)
 
 
 class FormChoice(FormInfo):
