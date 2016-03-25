@@ -1,0 +1,58 @@
+{
+    "id_string": "restaurant_profile",
+    "version": "rpV4",
+    "content": {
+        "survey": [
+            {
+                "type": "text",
+                "name": "restaurant_name",
+                "label::english": "restaurant name",
+                "label::french": "nom du restaurant"
+            },
+            {
+                "required": "true",
+                "type": "geopoint",
+                "name": "location",
+                "label::english": "location",
+                "label::french": "lieu"
+            },
+            {
+                "type": "select_many eatery_types",
+                "name": "eatery_type",
+                "label::english": "type of eatery",
+                "label::french": "type de restaurant"
+            }
+        ],
+        "choices": [
+            {
+                "list_name": "eatery_types",
+                "name": "sit_down",
+                "label::english": "sit down",
+                "label::french": "traditionnel"
+            },
+            {
+                "list_name": "eatery_types",
+                "name": "takeaway",
+                "label::english": "take-away",
+                "label::french": "avec vente à emporter"
+            }
+        ]
+    },
+    "submissions": [
+        {
+            "restaurant_name": "Taco Truck",
+            "location": "13.42 -25.43",
+            "eatery_type": "takeaway sit_down"
+        },
+        {
+            "restaurant_name": "Harvest",
+            "location": "12.43 -24.53",
+            "eatery_type": "sit_down"
+        },
+        {
+            "restaurant_name": "Wololo",
+            "location": "12.43 -24.54",
+            "eatery_type": ""
+        }
+    ]
+}

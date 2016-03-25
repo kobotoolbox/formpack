@@ -64,7 +64,7 @@ class TestFormPackFixtures(unittest.TestCase):
     def test_restaurant_profile(self):
         fxt = restaurant_profile
         fp = FormPack(**fxt)
-        self.assertEqual(len(fp.versions), 3)
+        self.assertEqual(len(fp.versions), 4)
         v0 = fp[0]
         self.assertEqual(list(v0.sections['submissions'].fields.keys()),
                          [u'restaurant_name', u'location'])

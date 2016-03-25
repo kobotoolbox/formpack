@@ -220,7 +220,7 @@ class FormVersion:
         self.load_submission(kwargs)
 
     def get_labels(self, lang="_default", group_sep=None):
-        """ Returns a mapping of labels for {section: [field, field]...}
+        """ Returns a mapping of labels for {section: [field_label, ...]...}
 
             Sections and fields labels can be set to use their slug name,
             their lone label, or one of the translated labels.
@@ -237,7 +237,7 @@ class FormVersion:
             section_labels = all_labels[section_label] = []
 
             for field_name, field in section.fields.items():
-                    section_labels.append(field.get_label(lang, group_sep))
+                    section_labels.extend(field.get_labels(lang, group_sep))
 
         return all_labels
 
@@ -258,9 +258,11 @@ class FormVersion:
 
 
 class FormInfo(object):
+    """ Any object composing a form. It's only used with a subclass. """
 
     def __init__(self, name, labels):
         self.name = name
+        self.value_names = [self.name]
         self.labels = labels
 
     def __repr__(self):
@@ -286,6 +288,7 @@ class FormInfo(object):
 
 
 class FormField(FormInfo):
+    """ A form field definition knowing how to find and format data """
 
     def __init__(self, name, labels, data_type, hierarchy=(None,),
                  section=None, can_format=True):
@@ -297,16 +300,26 @@ class FormField(FormInfo):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
-    def get_label(self, lang="_default", group_sep=None):
+    def get_labels(self, lang="_default", group_sep=None, multiple_select="both"):
+        """ Return a list of labels for this field.
+
+            Most fields have only one label, so the list contains only one item,
+            but some fields can multiple values, and one label for each
+            value.
+        """
         if group_sep:
             path = []
             for level in self.hierarchy[1:]:
                 path.append(level.labels.get(lang) or level.name)
-            return group_sep.join(path)
-        return self.labels.get(lang) or self.name
+            return [group_sep.join(path)]
+        return [self.labels.get(lang) or self.name]
+
+    def get_names(self, multiple_select="both"):
+        return [self.name]
 
     def __repr__(self):
-        return "<FormField name='%s' type='%s'>" % (self.name, self.data_type)
+        args = (self.__class__.__name__, self.name, self.data_type)
+        return "<%s name='%s' type='%s'>" % args
 
     @classmethod
     def from_json_definition(cls, definition, group=None,
@@ -322,16 +335,22 @@ class FormField(FormInfo):
             data_type, choice_id = data_type.split(' ')
             choices = field_choices[choice_id]
 
-            return FormChoiceField(name, labels, data_type,
-                                   group, section, choices)
+            if data_type == "select_one":
+                return FormChoiceField(name, labels, data_type,
+                                       group, section, choices)
+
+            if data_type == "select_many":
+                args = (name, labels, data_type, group, section, choices)
+                return FormChoiceFieldWithMultipleSelect(*args)
 
         return cls(name, labels, data_type, group, section)
 
     def format(self, val, translation='_default'):
-        return val
+        return {self.name: val}
 
 
 class FormChoiceField(FormField):
+    """  Same as FormField, but link the data to a FormChoice """
 
     def __init__(self, name, labels, data_type, path=None,
                  section=None, choice=None):
@@ -339,18 +358,86 @@ class FormChoiceField(FormField):
                                               path, section)
         self.choice = choice or {}
 
+    # TODO: memoize this
+    def format(self, val, translation='_default', multiple_select="both"):
+        if translation:
+            try:
+                val = self.choice.options[val]['labels'][translation]
+            except KeyError:
+                pass
+        return {self.name: val}
+
+
+class FormChoiceFieldWithMultipleSelect(FormChoiceField):
+    """  Same as FormChoiceField, but you can select several answer """
+
+    def __init__(self, name, labels, data_type, path=None,
+                 section=None, choice=None):
+        super(FormChoiceField, self).__init__(name, labels, data_type,
+                                              path, section)
+        self.choice = choice or {}
+        self.value_names = self.get_value_names()
+
+    def _get_label(self, lang="_default", group_sep=None):
+        """ Return the label for this field, with no options """
+        if group_sep:
+            path = []
+            for level in self.hierarchy[1:]:
+                path.append(level.labels.get(lang) or level.name)
+            return group_sep.join(path)
+
+        return self.labels.get(lang) or self.name
+
+    def _get_option_label(self, lang="_default", group_sep=None, option=None):
+        """ Return the label for this field and this option in particular """
+
+        label = self._get_label(lang, group_sep)
+        option_label = option['labels'].get(lang, option['name'])
+        group_sep = group_sep or "/"
+        return label + group_sep + option_label
+
+    def get_labels(self, lang="_default", group_sep=None, multiple_select="both"):
+        """ Return a list of labels for this field.
+
+            Most fields have only one label, so the list contains only one item,
+            but some fields can multiple values, and one label for each
+            value.
+        """
+        labels = []
+        if multiple_select in ("both", "summary"):
+            labels.append(self._get_label(lang, group_sep))
+
+        if multiple_select in ("both", "details"):
+            for option in self.choice.options.values():
+                labels.append(self._get_option_label(lang, group_sep, option))
+
+        return labels
+
+    def get_value_names(self, multiple_select="both"):
+        names = []
+        if multiple_select in ("both", "summary"):
+            names.append(self.name)
+
+        if multiple_select in ("both", "details"):
+            for option_name in self.choice.options.keys():
+                names.append(self.name + "/" + option_name)
+        return names
+
     def __repr__(self):
         data = (self.name, self.data_type)
         return "<FormChoiceField name='%s' type='%s'>" % data
 
-    def format(self, val, translation='_default'):
-        if translation:
-            # TODO: we may want to @memoize this method
-            try:
-                return self.choice.options[val]['labels'][translation]
-            except KeyError:
-                return val
-        return val
+    # TODO: memoize this
+    def format(self, val, translation='_default', multiple_select="both"):
+
+        cells = dict.fromkeys(self.value_names, "0")
+        if multiple_select in ("both", "summary"):
+            cells[self.name] = val
+
+        if multiple_select in ("both", "details"):
+            for choice in val.split():
+                cells[self.name + "/" + choice] = "1"
+        return cells
 
 
 class FormGroup(FormInfo):  # useful to get __repr__
@@ -358,6 +445,7 @@ class FormGroup(FormInfo):  # useful to get __repr__
 
 
 class FormSection(FormInfo):
+    """ The tabular representation of a repeatable group of fields """
 
     def __init__(self, name="submissions", labels=None, fields=None,
                  parent=None, children=(), hierarchy=(None,)):
@@ -408,6 +496,7 @@ class FormChoice(FormInfo):
 
             option = choices.options[choice_definition['name']] = {}
             option['labels'] = cls._extract_json_labels(choice_definition)
+            option['name'] = choice_definition['name']
 
         return all_choices
 

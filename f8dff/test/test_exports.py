@@ -5,7 +5,11 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 
+from textwrap import dedent
+
 from collections import OrderedDict
+
+from nose.tools import raises
 
 from ..models.formpack.pack import FormPack
 from ..fixtures import build_fixture
@@ -17,6 +21,9 @@ restaurant_profile = build_fixture('restaurant_profile')
 
 class TestFormPackExport(unittest.TestCase):
     maxDiff = None
+
+    def assertTextEqual(self, text1, text2):
+        self.assertEquals(dedent(text1).strip(), dedent(text2).strip())
 
     def test_generator_export(self):
         forms = FormPack(**customer_satisfaction)
@@ -37,7 +44,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_generator_export_translation_headers(self):
         fp = FormPack(**restaurant_profile)
-        self.assertEqual(len(fp.versions), 3)
+        self.assertEqual(len(fp.versions), 4)
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
@@ -158,129 +165,269 @@ class TestFormPackExport(unittest.TestCase):
         options = {'version': 'rgv1'}
         export = fp.export(**options).to_dict()
 
-
         self.assertEqual(export, OrderedDict ([
-                            (u'submissions',
+                            ('submissions',
                                 {
-                                    u'fields': [
-                                        u'household_location',
-                                        u'start',
-                                        u'end',
-                                        u'_index'
+                                    'fields': [
+                                        'household_location',
+                                        'start',
+                                        'end',
+                                        '_index'
                                     ],
-                                    u'data': [
+                                    'data': [
                                         [
-                                            u'montreal',
-                                            u'2016-03-14T14:15:48.000-04:00',
-                                            u'2016-03-14T14:18:35.000-04:00',
+                                            'montreal',
+                                            '2016-03-14T14:15:48.000-04:00',
+                                            '2016-03-14T14:18:35.000-04:00',
                                             1
                                         ],
                                         [
-                                            u'marseille',
-                                            u'2016-03-14T14:14:10.000-04:00',
-                                            u'2016-03-14T14:15:48.000-04:00',
+                                            'marseille',
+                                            '2016-03-14T14:14:10.000-04:00',
+                                            '2016-03-14T14:15:48.000-04:00',
                                             2
                                         ],
                                         [
-                                            u'rocky mountains',
-                                            u'2016-03-14T14:13:53.000-04:00',
-                                            u'2016-03-14T14:14:10.000-04:00',
+                                            'rocky mountains',
+                                            '2016-03-14T14:13:53.000-04:00',
+                                            '2016-03-14T14:14:10.000-04:00',
                                             3
                                         ],
                                         [
-                                            u'toronto',
-                                            u'2016-03-14T14:12:54.000-04:00',
-                                            u'2016-03-14T14:13:53.000-04:00',
+                                            'toronto',
+                                            '2016-03-14T14:12:54.000-04:00',
+                                            '2016-03-14T14:13:53.000-04:00',
                                             4
                                         ],
                                         [
-                                            u'new york',
-                                            u'2016-03-14T14:18:35.000-04:00',
-                                            u'2016-03-14T15:19:20.000-04:00',
+                                            'new york',
+                                            '2016-03-14T14:18:35.000-04:00',
+                                            '2016-03-14T15:19:20.000-04:00',
                                             5
                                         ],
                                         [
-                                            u'boston',
-                                            u'2016-03-14T14:11:25.000-04:00',
-                                            u'2016-03-14T14:12:03.000-04:00',
+                                            'boston',
+                                            '2016-03-14T14:11:25.000-04:00',
+                                            '2016-03-14T14:12:03.000-04:00',
                                             6
                                         ]
                                     ]
                                 }),
-                            (u'houshold_member_repeat',
+                            ('houshold_member_repeat',
                                 {
-                                    u'fields': [
-                                        u'household_member_name',
-                                        u'_parent_table_name',
-                                        u'_parent_index'
+                                    'fields': [
+                                        'household_member_name',
+                                        '_parent_table_name',
+                                        '_parent_index'
                                     ],
-                                    u'data': [
+                                    'data': [
                                         [
-                                            u'peter',
-                                            u'submissions',
+                                            'peter',
+                                            'submissions',
                                             1
                                         ],
                                         [
-                                            u'kyle',
-                                            u'submissions',
+                                            'kyle',
+                                            'submissions',
                                             2
                                         ],
                                         [
-                                            u'linda',
-                                            u'submissions',
+                                            'linda',
+                                            'submissions',
                                             2
                                         ],
                                         [
-                                            u'morty',
-                                            u'submissions',
+                                            'morty',
+                                            'submissions',
                                             3
                                         ],
                                         [
-                                            u'tony',
-                                            u'submissions',
+                                            'tony',
+                                            'submissions',
                                             4
                                         ],
                                         [
-                                            u'mary',
-                                            u'submissions',
+                                            'mary',
+                                            'submissions',
                                             4
                                         ],
                                         [
-                                            u'emma',
-                                            u'submissions',
+                                            'emma',
+                                            'submissions',
                                             5
                                         ],
                                         [
-                                            u'parker',
-                                            u'submissions',
+                                            'parker',
+                                            'submissions',
                                             5
                                         ],
                                         [
-                                            u'amadou',
-                                            u'submissions',
+                                            'amadou',
+                                            'submissions',
                                             6
                                         ],
                                         [
-                                            u'esteban',
-                                            u'submissions',
+                                            'esteban',
+                                            'submissions',
                                             6
                                         ],
                                         [
-                                            u'suzie',
-                                            u'submissions',
+                                            'suzie',
+                                            'submissions',
                                             6
                                         ],
                                         [
-                                            u'fiona',
-                                            u'submissions',
+                                            'fiona',
+                                            'submissions',
                                             6
                                         ],
                                         [
-                                            u'phillip',
-                                            u'submissions',
+                                            'phillip',
+                                            'submissions',
                                             6
                                         ]
                                     ]
                                 })
                             ])
         )
+
+    def test_csv(self):
+        grouped_questions = build_fixture('grouped_questions')
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'gqs'}
+        csv_data = "\n".join(fp.export(**options).to_csv())
+
+        expected = """
+        "q1";"g1q1";"g1sg1q1";"g1q2";"g2q1";"qz"
+        "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
+        "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
+        """
+
+        self.assertTextEqual(csv_data, expected)
+
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'gqs', 'group_sep': '/'}
+        csv_data = "\n".join(fp.export(**options).to_csv())
+
+        expected = """
+        "q1";"g1/g1q1";"g1/sg1/g1sg1q1";"g1/g1q2";"g2/g2q1";"qz"
+        "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
+        "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
+        """
+
+        self.assertTextEqual(csv_data, expected)
+
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'gqs', 'group_sep': '/',
+                   'header_lang': "_default"}
+        csv_data = "\n".join(fp.export(**options).to_csv())
+
+        expected = """
+        "Q1";"Group 1/G1Q1";"Group 1/Sub Group 1/G1SG1Q1";"Group 1/G1Q2";"g2/G2Q1";"QZed"
+        "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
+        "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
+        """
+        self.assertTextEqual(csv_data, expected)
+
+        fp = FormPack(**restaurant_profile)
+        options = {'version': 'rpV3', 'translation': fp[1].translations[1]}
+        csv_data = "\n".join(fp.export(**options).to_csv())
+
+        expected = """
+        "nom du restaurant";"lieu";"type de restaurant"
+        "Taco Truck";"13.42 -25.43";"avec vente à emporter"
+        "Harvest";"12.43 -24.53";"traditionnel"
+        """
+        self.assertTextEqual(csv_data, expected)
+
+    @raises(RuntimeError)
+    def test_csv_on_repeatable_groups(self):
+        grouped_repeatable = build_fixture('grouped_repeatable')
+        fp = FormPack(**grouped_repeatable)
+        options = {'version': 'rgv1'}
+        list(fp.export(**options).to_csv())
+
+    def test_export_with_multiple_select(self):
+        fp = FormPack(**restaurant_profile)
+        options = {'version': 'rpV4'}
+        export = fp.export(**options).to_dict()['submissions']
+        expected = {
+            'fields': [
+                'restaurant_name',
+                'location',
+                'eatery_type',
+                'eatery_type/sit_down',
+                'eatery_type/takeaway'
+            ],
+            'data': [
+                [
+                    'Taco Truck',
+                    '13.42 -25.43',
+                    'takeaway sit_down',
+                    '1',
+                    '1'
+                ],
+                [
+                    'Harvest',
+                    '12.43 -24.53',
+                    'sit_down',
+                    '1',
+                    '0'
+                ],
+                [
+                    'Wololo',
+                    '12.43 -24.54',
+                    '',
+                    '0',
+                    '0'
+                ]
+            ]
+        }
+
+        self.assertEqual(export, expected)
+
+        options = {'version': 'rpV4', "group_sep": "::",
+                   "header_lang": fp[-1].translations[1]}
+        export = fp.export(**options).to_dict()['submissions']
+
+        expected = {
+            'fields': [
+                'nom du restaurant',
+                'lieu',
+                'type de restaurant',
+                'type de restaurant::traditionnel',
+                'type de restaurant::avec vente à emporter'
+            ],
+            'data': [
+                [
+                    'Taco Truck',
+                    '13.42 -25.43',
+                    'takeaway sit_down',
+                    '1',
+                    '1'
+                ],
+                [
+                    'Harvest',
+                    '12.43 -24.53',
+                    'sit_down',
+                    '1',
+                    '0'
+                ],
+                [
+                    'Wololo',
+                    '12.43 -24.54',
+                    '',
+                    '0',
+                    '0'
+                ]
+            ]
+        }
+
+        self.assertEqual(export, expected)
+
+    def test_xlsx(self):
+        grouped_questions = build_fixture('grouped_repeatable')
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'rgv1'}
+        fp.export(**options).to_xlsx('/tmp/foo.xlsx')
+
