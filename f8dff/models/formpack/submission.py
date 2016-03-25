@@ -1,13 +1,23 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 import re
 import json
 
 from collections import OrderedDict
 from lxml import etree
-from cStringIO import StringIO
+
+try:
+    from cStringIO import StringIO
+except ImportError:  # we are on Python 3
+    from io import StringIO
+
 from pyquery import PyQuery
 
-from b64_attachment import B64Attachment
-from f8dff.models.formpack.utils import parse_xmljson_to_data
+from .b64_attachment import B64Attachment
+from ...models.formpack.utils import parse_xmljson_to_data
 
 
 class FormSubmission:

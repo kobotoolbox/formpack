@@ -1,5 +1,13 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 import unittest
-from f8dff.models.formpack.pack import FormPack
+from ..models.formpack.pack import FormPack
+from ..fixtures import build_fixture
+
+restaurant_profile = build_fixture('restaurant_profile')
 
 
 class TestInternalMethods(unittest.TestCase):
@@ -10,3 +18,13 @@ class TestInternalMethods(unittest.TestCase):
     def test_lookup_none_val(self):
         fp = FormPack(title=None)
         self.assertEqual(fp.lookup('title', 'notnone'), 'notnone')
+
+
+class TestSurveyParsers(unittest.TestCase):
+    def test_fixture_has_translations(self):
+        '''
+        restauraunt_profile@v2 has two translations
+        '''
+
+        fp = FormPack(**restaurant_profile)
+        self.assertEqual(len(fp[1].translations), 2)

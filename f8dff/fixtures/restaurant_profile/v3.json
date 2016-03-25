@@ -6,9 +6,48 @@
             {
                 "type": "text",
                 "name": "restaurant_name",
-                "label": "restaurant name"
+                "label::english": "restaurant name",
+                "label::french": "nom du restaurant"
+            },
+            {
+                "required": "true",
+                "type": "geopoint",
+                "name": "location",
+                "label::english": "location",
+                "label::french": "lieu"
+            },
+            {
+                "type": "select_one eatery_types",
+                "name": "eatery_type",
+                "label::english": "type of eatery",
+                "label::french": "type de restaurant"
+            }
+        ],
+        "choices": [
+            {
+                "list_name": "eatery_types",
+                "name": "sit_down",
+                "label::english": "sit down",
+                "label::french": "traditionnel"
+            },
+            {
+                "list_name": "eatery_types",
+                "name": "takeaway",
+                "label::english": "take-away",
+                "label::french": "avec vente à emporter"
             }
         ]
     },
-    "submissions": []
+    "submissions": [
+        {
+            "restaurant_name": "Taco Truck",
+            "location": "13.42 -25.43",
+            "eatery_type": "takeaway"
+        },
+        {
+            "restaurant_name": "Harvest",
+            "location": "12.43 -24.53",
+            "eatery_type": "sit_down"
+        }
+    ]
 }

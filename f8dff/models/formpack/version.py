@@ -3,55 +3,129 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from .utils import formversion_pyxform
-from f8dff.models.formpack.submission import FormSubmission
-from f8dff.models.formpack.utils import parse_xml_to_xmljson
 
+from ...models.formpack.submission import FormSubmission
+from ...models.formpack.utils import parse_xml_to_xmljson
+
+
+# TODO: move submission, pack.py and version.py into a forms module with
+#       __init__ their content
+# TODO: put formatters in their own module
 
 class FormVersion:
     def __init__(self, version_data, parent):
         if 'name' in version_data:
             raise ValueError('FormVersion should not have a name parameter. '
                              'consider using "title" or "id_string"')
+        # TODO: # rename _v to something meaningful
         self._v = version_data
         self._parent = parent
-        self._names = []
         self._root_node_name = version_data.get('root_node_name')
         self.version_title = version_data.get('title')
         self._submissions = []
         self.id_string = version_data.get('id_string')
-        self._version_id = version_data.get('version')
+        self.version_id = version_data.get('version')
+        # This will be converted down the line to a list. We use an OrderedDict
+        # to maintain order and remove duplicates, but will need indexing later
+        self.translations = OrderedDict()
 
-        schema = OrderedDict()
+        self.fields = OrderedDict()
 
         content = self._v.get('content', {})
 
-        for item in content.get('survey', []):
-            if 'name' in item:
-                name = item['name']
-                self._names.append(name)
-                schema[name] = {
-                    "type": item['type']
-                }
+        # TODO: put those parts in a separate method and unit test it
+        survey = content.get('survey', [])
+
+        # Analyze the survey schema and extract the informations we need
+        # to build the export
+
+        # Extract choices data
+        field_choices = defaultdict(OrderedDict)
+        for choice_definition in content.get('choices', ()):
+            choices = field_choices[choice_definition['list_name']]
+            name = choice_definition['name']
+            choice = choices[name] = {}
+
+            # Get the labels and associated translations for this data
+            choice['labels'] = self._extract_labels(choice_definition)
+            self.translations.update(OrderedDict.fromkeys(choice['labels']))
+
+        # Extract fields data
+        group = None
+        for data_definition in survey:
+
+            if data_definition['type'] == 'begin group':
+                name = data_definition['name']
+                group = {'name': name}
+
+                # Get the labels and associated translations for this group
+                group['labels'] = self._extract_labels(data_definition)
+                self.translations.update(OrderedDict.fromkeys(group['labels']))
+                continue
+
+            if data_definition['type'] == 'end group':
+                group = None
+                continue
+
+            # QUESTION FOR ALEX: is there a case where 'name' is not in there ?
+            # if yes, what do we do with it ?
+            # Get the the data name and type
+            if 'name' in data_definition:
+                name = data_definition['name']
+                field = self.fields[name] = {'choices': None}
+                field['group'] = group
+
+                # Get the data type. If it has a foreign key, map the
+                # label translations
+                field_type = data_definition['type']
+                if " " in field_type:
+                    field_type, choice_id = field_type.split(' ')
+                    field['choices'] = field_choices[choice_id]
+                field['type'] = field_type
+
+                # Get the labels and associated translations for this choice
+                field['labels'] = self._extract_labels(data_definition)
+                self.translations.update(OrderedDict.fromkeys(field['labels']))
+
+        # Convert it back to a list to get numerical indexing
+        self.translations.pop('_default')
+        self.translations = list(self.translations)
 
         self._formatters = OrderedDict()
-        for name, structure in schema.items():
+
+        for name, field in self.fields.items():
             # question_type = get_question_type(name, version)
             # formater_class = formater_registry[question_type]
-            self._formatters[name] = Formatter(name, structure['type'])
+            self._formatters[name] = Formatter(name,
+                                               field['type'],
+                                               field.get('choices'),
+                                               field['group'])
 
         for submission in version_data.get('submissions', []):
             self.load_submission(submission)
 
+    def _extract_labels(self, data_definition):
+        """ Extract translation labels from the JSON data definition """
+        labels = OrderedDict({'_default': data_definition['name']})
+        if "label" in data_definition:
+            labels['_default'] = data_definition['label']
+        else:
+            for key, val in data_definition.items():
+                if key.startswith('label::'):
+                    _, lang = key.split('::')
+                    labels[lang] = val
+        return labels
+
     def __repr__(self):
-        return '<models.formpack.version.FormVersion %s>' % self._stats()
+        return '<FormVersion %s>' % self._stats()
 
     def _stats(self):
         _stats = OrderedDict()
         _stats['id_string'] = self._get_id_string()
-        _stats['version'] = '' if not self._version_id else self._version_id
+        _stats['version'] = '' if not self.version_id else self.version_id
         _stats['row_count'] = len(self._v.get('content', {})
                                          .get('survey', []))
         _stats['submission_count'] = len(self._submissions)
@@ -79,9 +153,9 @@ class FormVersion:
         if _id_string != self._get_id_string():
             raise ValueError('submission id_string does not match: %s != %s' %
                              (self._get_id_string(), _id_string))
-        if _version_id != self._version_id:
+        if _version_id != self.version_id:
             raise ValueError('mismatching version id %s != %s' %
-                             (self._version_id, _version_id))
+                             (self.version_id, _version_id))
         self._submissions.append(FormSubmission.from_xml(_xmljson, self))
 
     def _submissions_count(self):
@@ -110,6 +184,22 @@ class FormVersion:
     def submit(self, *args, **kwargs):
         self.load_submission(kwargs)
 
+    def get_column_names_for_lang(self, lang="_default", group_sep=None):
+
+        if group_sep:
+            for field, infos in self.fields.items():
+                name = infos['labels'].get(lang) or field
+                group = infos['group']
+                if group:
+                    group = group['labels'].get(lang) or group['name']
+                    yield field, group + group_sep + name
+                else:
+                    yield field, name
+
+        else:
+            for field, infos in self.fields.items():
+                yield field, (infos['labels'].get(lang) or field)
+
     def to_xml(self):
         survey = formversion_pyxform(self._v)
 
@@ -122,15 +212,26 @@ class FormVersion:
                 'name': self.lookup('root_node_name', 'data'),
                 'id_string': self.lookup('id_string'),
                 'title': title,
-                'version': self._version_id,
+                'version': self.version_id,
             })
         return survey.to_xml().encode('utf-8')
 
 
 class Formatter:
-    def __init__(self, data_type, name):
+    def __init__(self, name, data_type, choices=None, group=None):
         self.data_type = data_type
         self.name = name
+        self.choices = choices
+        self.group = group
 
-    def format(self, val):
-        return "{data_type}:{val}".format(data_type=self.data_type, val=val)
+    def format(self, val, translation='_default'):
+        if self.choices and translation:
+            # TODO: we may want to @memoize this method
+            try:
+                return self.choices[val]['labels'][translation]
+            except KeyError:
+                return val
+        return val
+
+    def __repr__(self):
+        return "<Formatter type='%s' name='%s'>" % (self.data_type, self.name)

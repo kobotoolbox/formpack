@@ -4,7 +4,8 @@ import requests
 from f8dff.fixtures import build_fixture
 from f8dff.models.formpack.pack import FormPack
 
-import os, glob
+import os
+import glob
 
 projects = {}
 for dirname in glob.glob('f8dff/fixtures/simplest'):

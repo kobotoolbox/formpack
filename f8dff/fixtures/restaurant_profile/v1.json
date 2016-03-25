@@ -1,18 +1,19 @@
 {
     "id_string": "restaurant_profile",
+    "version": "rpv1",
     "content": {
         "survey": [
             {
                 "required": "true",
                 "type": "text",
                 "name": "restaurant_name",
-                "label": "Restaurant name"
+                "label": "restaurant name"
             },
             {
                 "required": "true",
                 "type": "geopoint",
                 "name": "location",
-                "label": "Location"
+                "label": "location"
             }
         ]
     },
