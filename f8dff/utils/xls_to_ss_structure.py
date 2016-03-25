@@ -2,13 +2,16 @@
 
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
+
+from collections import OrderedDict
+
 import pyxform
 import xlrd
 import re
 
-def convert_xls_to_ss_structure(xls_file_object, strip_empty_rows=True):
+def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
-    The goal: Convert an XLS file object to a CSV string.
+    The goal: Convert an XLS file object to a python object.
 
     This draws on code from `pyxform.xls2json_backends` and `convert_file_to_csv_string`, however
     this works as it is expected (does not add extra sheets or perform misc conversions which are
@@ -72,9 +75,39 @@ def convert_xls_to_ss_structure(xls_file_object, strip_empty_rows=True):
         return result
 
     workbook = xlrd.open_workbook(file_contents=xls_file_object.read())
-    ss_structure = {}
+    ss_structure = OrderedDict()
     for sheet in workbook.sheets():
         sheet_name = sheet.name
         sheet_contents = _sheet_to_lists(sheet)
         ss_structure[sheet_name] = sheet_contents
     return ss_structure
+
+def _parsed_sheet(sheet_lists):
+    '''
+    take a sheet with 2+ rows and parse the first row as the column headers
+    and the subsequent rows as the values.
+
+    outputs a list of ordered dicts
+    '''
+    columns = sheet_lists[0]
+    rows = sheet_lists[1:]
+    out_list = []
+    for row in rows:
+        out_row = OrderedDict()
+        for ii in range(0, len(columns)):
+            if row[ii] is not None:
+                out_row[columns[ii]] = row[ii]
+        out_list.append(out_row)
+    return out_list
+
+def xls_to_dicts(xls_file_object, strip_empty_rows=True):
+    '''
+    outputs an ordered dict of (sheetname, sheet_contents)
+
+    where sheet_contents is a list of ordered_dicts
+    '''
+    lists = xls_to_lists(xls_file_object)
+    out = OrderedDict()
+    for key, sheet in lists.items():
+        out[key] = _parsed_sheet(sheet)
+    return out
