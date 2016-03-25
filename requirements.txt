@@ -1,4 +1,5 @@
 lxml == 2.3.4
 pyquery == 1.2.11
 pyxform == 0.9.22
-XlsxWriter==0.8.4
+cyordereddict==1.0.0
+PyExcelerate==0.6.6

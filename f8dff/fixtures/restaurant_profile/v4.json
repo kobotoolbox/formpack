@@ -25,13 +25,13 @@
         ],
         "choices": [
             {
-                "list_name": "eatery_types",
+                "list name": "eatery_types",
                 "name": "sit_down",
                 "label::english": "sit down",
                 "label::french": "traditionnel"
             },
             {
-                "list_name": "eatery_types",
+                "list name": "eatery_types",
                 "name": "takeaway",
                 "label::english": "take-away",
                 "label::french": "avec vente à emporter"

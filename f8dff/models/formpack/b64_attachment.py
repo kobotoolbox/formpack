@@ -12,8 +12,7 @@ class B64Attachment(str):
 
     @classmethod
     def _is_attachment(kls, data_uri):
-        return isinstance(data_uri, basestring) and \
-            bool(re.search(DATA_URI_RE, data_uri))
+        return hasattr(data_uri, "startswith") and data_uri.startswith('data:')
 
     @classmethod
     def _attachment_split(kls, data_uri):

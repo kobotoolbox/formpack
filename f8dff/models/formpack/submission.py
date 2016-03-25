@@ -22,13 +22,13 @@ from ...models.formpack.utils import parse_xmljson_to_data
 
 class FormSubmission:
     def __init__(self, submission_data={}, version=None):
-        self.data = OrderedDict()
+        self.data = submission_data
         self._version = version
 
-        for (key, val) in submission_data.iteritems():
+        for key in submission_data:
+            val = submission_data[key]
             if B64Attachment._is_attachment(val):
-                val = B64Attachment(val)
-            self.data[key] = val
+                submission_data[key] = val
 
     def to_dict(self):
         return self.data

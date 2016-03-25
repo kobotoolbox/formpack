@@ -3,7 +3,10 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
-from collections import OrderedDict
+try:
+    from cyordereddict import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 
 from .utils import formversion_pyxform
 
@@ -358,7 +361,6 @@ class FormChoiceField(FormField):
                                               path, section)
         self.choice = choice or {}
 
-    # TODO: memoize this
     def format(self, val, translation='_default', multiple_select="both"):
         if translation:
             try:
@@ -427,7 +429,6 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         data = (self.name, self.data_type)
         return "<FormChoiceField name='%s' type='%s'>" % data
 
-    # TODO: memoize this
     def format(self, val, translation='_default', multiple_select="both"):
 
         cells = dict.fromkeys(self.value_names, "0")
@@ -468,6 +469,9 @@ class FormSection(FormInfo):
         return cls(definition['name'], labels, hierarchy=hierarchy,
                    parent=parent)
 
+    def get_label(self, lang="_default"):
+        return [self.labels.get(lang) or self.name]
+
     def __repr__(self):
         parent_name = getattr(self.parent, 'name', None)
         return "<FormSection name='%s' parent='%s'>" % (self.name, parent_name)
@@ -488,7 +492,7 @@ class FormChoice(FormInfo):
 
         all_choices = {}
         for choice_definition in definition:
-            choice_name = choice_definition['list_name']
+            choice_name = choice_definition['list name']
             try:
                 choices = all_choices[choice_name]
             except KeyError:

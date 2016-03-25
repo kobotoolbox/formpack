@@ -6,9 +6,12 @@ from __future__ import (unicode_literals, print_function,
 import json
 import difflib
 
-from collections import OrderedDict
+try:
+    from cyordereddict import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 
-import xlsxwriter
+from pyexcelerate import Workbook
 
 from .version import FormVersion
 from ...models.formpack.utils import get_version_identifiers
@@ -168,6 +171,14 @@ class Export(object):
         self.sections, self.labels = res
 
         self.reset()
+
+        # Some cache to improve perfs on large datasets
+        self._row_cache = {}
+        self._empty_row = {}
+
+        for section_name, fields in self.sections.items():
+            self._row_cache[section_name] = OrderedDict.fromkeys(fields, '')
+            self._empty_row[section_name] = dict(self._row_cache[section_name])
 
     def __iter__(self):
         return self.get_all_formated_submissions()
@@ -342,13 +353,21 @@ class Export(object):
         #
         chunks = OrderedDict()
 
+        # Some local aliases to get better perfs
+        _section_name = current_section.name
+        _translation = self.translation
+        _empty_row = self._empty_row[_section_name]
+        _indexes = self._indexes
+        row = self._row_cache[_section_name]
+        _fields = tuple(current_section.fields.values())
+
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section
         # with a row of size one.
         # But if you have repeat groups, then rows will contain one row for
         # each entry the user submitted. Of course, for the first section,
         # this will always contains only one row.
-        rows = chunks[current_section.name] = []
+        rows = chunks[_section_name] = []
 
         # Deal with only one level of nesting of the submission, since
         # this method is later called recursively for each repeat group.
@@ -356,6 +375,7 @@ class Export(object):
         # in an xls doc. Althougt the first level will have only one entries,
         # when repeat groups are involved, deeper levels can have an
         # arbitrary number of entries depending of the user input.
+
         for entry in submission:
 
             # Format one entry and add it to the rows for this section
@@ -363,15 +383,18 @@ class Export(object):
             # Create an empty canvas with column names and empty values
             # This is done to handle mulitple form versions in parallel which
             # may more or less columns than each others.
-            row = OrderedDict.fromkeys(self.sections[current_section.name],
-                                       self.not_applicable_marker)
-            for field in current_section.fields.values():
+
+            # We don't build a new dict everytime, instead, we reuse the
+            # previous one, but we reset it, to gain some perfs.
+            row.update(_empty_row)
+
+            for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
                     # get submission value for this field
-                    val = entry.get(field.path)
+                    val = entry.get(field.path, '')
                     # get a mapping of {"col_name": "val", ...}
-                    cells = field.format(val, self.translation)
+                    cells = field.format(val, _translation)
                     # fill in the canvas
                     row.update(cells)
 
@@ -383,11 +406,11 @@ class Export(object):
             # the children like a foreign key.
             # TODO: remove that for HTML export
             if current_section.children:
-                row['_index'] = self._indexes[current_section.name]
+                row['_index'] = _indexes[_section_name]
 
             if current_section.parent:
                 row['_parent_table_name'] = current_section.parent.name
-                row['_parent_index'] = self._indexes[current_section.parent.name]
+                row['_parent_index'] = _indexes[row['_parent_table_name']]
 
             rows.append(list(row.values()))
 
@@ -400,7 +423,7 @@ class Export(object):
                                                    child_section)
                 chunks.update(chunk)
 
-            self._indexes[current_section.name] += 1
+            _indexes[_section_name] += 1
 
         return chunks
 
@@ -444,9 +467,22 @@ class Export(object):
                 for row in rows:
                     yield format_line(row, sep, quote)
 
+    def to_table(self):
+
+        table = OrderedDict(((s, [list(l)]) for s, l in self.labels.items()))
+
+        # build the table
+        for chunk in self:
+            for section_name, rows in chunk.items():
+                section = table[section_name]
+                for row in rows:
+                    section.append(row)
+
+        return table
+
     def to_xlsx(self, filename):
 
-        workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
+        workbook = Workbook()
 
         sheets = {}
 
@@ -457,20 +493,21 @@ class Export(object):
                     cursor = sheets[section_name]
                     current_sheet = cursor['sheet']
                 except KeyError:
-                    current_sheet = workbook.add_worksheet(section_name)
+                    current_sheet = workbook.new_sheet(section_name)
                     cursor = sheets[section_name] = {
                         "sheet": current_sheet,
                         "row": 0,
                     }
 
                     for i, label in enumerate(self.labels[section_name]):
-                        current_sheet.write(0, i, label)
+                        current_sheet.set_cell_value(0, i, label)
                     cursor["row"] = 1
 
                 for row in rows:
                     y = cursor["row"]
                     for i, cell in enumerate(row):
-                        current_sheet.write(y, i, cell)
+                        current_sheet.set_cell_value(y, i, cell)
                     cursor["row"] += 1
 
-        workbook.close()
+        workbook.save(filename)
+

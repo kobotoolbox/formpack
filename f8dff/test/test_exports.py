@@ -425,9 +425,39 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(export, expected)
 
-    def test_xlsx(self):
-        grouped_questions = build_fixture('grouped_repeatable')
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'rgv1'}
-        fp.export(**options).to_xlsx('/tmp/foo.xlsx')
+    # def test_xlsx(self):
+    #     grouped_questions = build_fixture('grouped_repeatable')
+    #     fp = FormPack(**grouped_questions)
+    #     options = {'version': 'rgv1'}
+    #     fp.export(**options).to_xlsx('/tmp/foo.xlsx')
 
+    # def test_big_xlsx(self):
+
+    #     import time
+
+    #     a = time.time()
+
+    #     print('Loading fixtures')
+    #     grouped_questions = build_fixture('uga_14_v6')
+
+    #     b = time.time()
+    #     print(b - a, 's')
+
+    #     print('Loading schema')
+    #     fp = FormPack(**grouped_questions)
+
+    #     a = time.time()
+    #     print(a - b, 's')
+
+    #     options = {'version': 'v1'}
+
+    #     print('Python export')
+    #     export = fp.export(**options)
+
+    #     b = time.time()
+    #     print(b - a, 's')
+
+    #     print('xls export')
+
+
+    #     export.to_csv('/tmp/foo.xlsx')
