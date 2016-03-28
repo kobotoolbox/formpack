@@ -1,0 +1,10 @@
+{
+  "version": "v1_textq",
+  "survey": [
+    {
+      "type": "text", 
+      "name": "q1", 
+      "label": "Question 1"
+    }
+  ]
+}
