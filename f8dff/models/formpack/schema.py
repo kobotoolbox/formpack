@@ -242,7 +242,7 @@ class FormChoice(FormInfo):
 
         all_choices = {}
         for choice_definition in definition:
-            choice_name = choice_definition['list name']
+            choice_name = choice_definition['list_name']
             try:
                 choices = all_choices[choice_name]
             except KeyError:
