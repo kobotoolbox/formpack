@@ -2,4 +2,3 @@ begins==0.9
 lxml == 2.3.4
 pyquery == 1.2.11
 pyxform == 0.9.22
-XlsxWriter==0.8.4
