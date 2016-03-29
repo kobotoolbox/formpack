@@ -3,3 +3,4 @@ pyquery == 1.2.11
 pyxform == 0.9.22
 cyordereddict==1.0.0
 PyExcelerate==0.6.6
+path.py==8.1.2

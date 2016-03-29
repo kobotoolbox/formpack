@@ -28,7 +28,7 @@ class FormSubmission:
         for key in submission_data:
             val = submission_data[key]
             if B64Attachment._is_attachment(val):
-                submission_data[key] = val
+                submission_data[key] = B64Attachment(val)
 
     def to_dict(self):
         return self.data

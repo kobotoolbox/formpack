@@ -510,4 +510,3 @@ class Export(object):
                     cursor["row"] += 1
 
         workbook.save(filename)
-

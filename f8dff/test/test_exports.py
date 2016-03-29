@@ -11,6 +11,8 @@ from collections import OrderedDict
 
 from nose.tools import raises
 
+from path import tempdir
+
 from ..models.formpack.pack import FormPack
 from ..fixtures import build_fixture
 
@@ -425,39 +427,24 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(export, expected)
 
-    # def test_xlsx(self):
-    #     grouped_questions = build_fixture('grouped_repeatable')
-    #     fp = FormPack(**grouped_questions)
-    #     options = {'version': 'rgv1'}
-    #     fp.export(**options).to_xlsx('/tmp/foo.xlsx')
+    def test_xlsx(self):
+        grouped_questions = build_fixture('grouped_repeatable')
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'rgv1'}
 
-    # def test_big_xlsx(self):
+        with tempdir() as d:
+            xls = d / 'foo.xlsx'
+            fp.export(**options).to_xlsx('/tmp/foo.xlsx')
+            assert xls.isfile()
 
-    #     import time
+    def test_big_xlsx(self):
+        grouped_questions = build_fixture('uga_14_v6')
+        fp = FormPack(**grouped_questions)
+        options = {'version': 'v1'}
+        export = fp.export(**options)
 
-    #     a = time.time()
+        with tempdir() as d:
+            xls = d / 'foo.xlsx'
+            export.to_xlsx(xls)
+            assert xls.isfile()
 
-    #     print('Loading fixtures')
-    #     grouped_questions = build_fixture('uga_14_v6')
-
-    #     b = time.time()
-    #     print(b - a, 's')
-
-    #     print('Loading schema')
-    #     fp = FormPack(**grouped_questions)
-
-    #     a = time.time()
-    #     print(a - b, 's')
-
-    #     options = {'version': 'v1'}
-
-    #     print('Python export')
-    #     export = fp.export(**options)
-
-    #     b = time.time()
-    #     print(b - a, 's')
-
-    #     print('xls export')
-
-
-    #     export.to_csv('/tmp/foo.xlsx')
