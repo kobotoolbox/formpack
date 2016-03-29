@@ -16,11 +16,6 @@ SINGLE_NOTE_SURVEY = {'content': {
 
 
 class TestInvalidCases(unittest.TestCase):
-    def test_single_version_form(self):
-        fp = FormPack(**{
-                u'content': {}
-            })
-        self.assertEqual(len(fp.versions), 0)
 
     def test_single_version_doesnt_require_version(self):
         FormPack(id_string="idstring", versions=[
@@ -34,7 +29,7 @@ class TestInvalidCases(unittest.TestCase):
                 copy(SINGLE_NOTE_SURVEY),
             ])
 
-    @raises(ValueError)
+    @raises(TypeError)
     def test_formpack_cannot_have_name(self):
         vdata = copy(SINGLE_NOTE_SURVEY)
         FormPack(id_string="idstring",
@@ -52,6 +47,7 @@ class TestInvalidCases(unittest.TestCase):
                      vdata,
                  ])
 
+    # TODO: remove this test of fix it
     # @raises(PyXFormError)
     # def test_xform(self):
     #     fp = FormPack(title='test_fixture_title',

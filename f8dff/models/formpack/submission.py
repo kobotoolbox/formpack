@@ -21,8 +21,8 @@ from ...models.formpack.utils import parse_xmljson_to_data
 
 
 class FormSubmission:
-    def __init__(self, submission_data={}, version=None):
-        self.data = submission_data
+    def __init__(self, submission_data=None, version=None):
+        self.data = submission_data or {}
         self._version = version
 
         for key in submission_data:
