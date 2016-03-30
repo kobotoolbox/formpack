@@ -363,12 +363,11 @@ class Export(object):
                     current_sheet = workbook.new_sheet(section_name)
                     cursor = sheets[section_name] = {
                         "sheet": current_sheet,
-                        "row": 0,
+                        "row": 2,
                     }
 
                     for i, label in enumerate(self.labels[section_name]):
-                        current_sheet.set_cell_value(0, i, label)
-                    cursor["row"] = 1
+                        current_sheet.set_cell_value(1, i, label)
 
                 for row in rows:
                     y = cursor["row"]
