@@ -17,12 +17,12 @@
         ],
         "choices": [
             {
-                "list name": "y_n_unk",
+                "list_name": "y_n_unk",
                 "name": "yes",
                 "label": "Yes"
             },
             {
-                "list name": "y_n_unk",
+                "list_name": "y_n_unk",
                 "name": "no",
                 "label": "No"
             }

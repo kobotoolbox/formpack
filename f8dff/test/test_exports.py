@@ -446,17 +446,3 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-
-    # TODO: fix headers
-    # TODO: check against a matrix of data to compare
-    def test_big_xlsx(self):
-        title, schemas, submissions = build_fixture('uga_14_v6')
-        fp = FormPack(schemas, title)
-        options = {'versions': 'v1'}
-        export = fp.export(**options)
-
-        with tempdir() as d:
-            xls = d / 'foo.xlsx'
-            export.to_xlsx(xls, submissions)
-            assert xls.isfile()
-

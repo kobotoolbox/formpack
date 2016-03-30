@@ -23,27 +23,27 @@
         ],
         "choices": [
             {
-                "list name": "xy3qc67",
+                "list_name": "xy3qc67",
                 "name": "a",
                 "label": "A"
             },
             {
-                "list name": "xy3qc67",
+                "list_name": "xy3qc67",
                 "name": "b",
                 "label": "B"
             },
             {
-                "list name": "xy3qc67",
+                "list_name": "xy3qc67",
                 "name": "c",
                 "label": "C"
             },
             {
-                "list name": "xy3qc67",
+                "list_name": "xy3qc67",
                 "name": "d",
                 "label": "D"
             },
             {
-                "list name": "xy3qc67",
+                "list_name": "xy3qc67",
                 "name": "f",
                 "label": "F"
             }
