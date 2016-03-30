@@ -143,7 +143,7 @@ class FormVersion(object):
                 self.translations.update(OrderedDict.fromkeys(field.labels))
 
         # Convert it back to a list to get numerical indexing
-        self.translations.pop('_default')
+        self.translations.pop('_default', None)
         self.translations = list(self.translations)
 
         # Set meta fields (such as indexes)
@@ -197,7 +197,7 @@ class FormVersion(object):
     def lookup(self, prop, default=None):
         result = getattr(self, prop, None)
         if result is None:
-            result = self._parent.lookup(prop, default=default)
+            result = self.form_pack.lookup(prop, default=default)
         return result
 
     def _get_root_node_name(self):
@@ -211,7 +211,7 @@ class FormVersion(object):
         if formversion has no name, uses form's name
         '''
         if self.version_title is None:
-            return self._parent.title
+            return self.form_pack.title
         return self.version_title
 
     def get_labels(self, lang="_default", group_sep=None):

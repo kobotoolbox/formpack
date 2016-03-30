@@ -85,7 +85,7 @@ class FormField(FormInfo):
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
-            data_type, choice_id = data_type.split(' ')
+            data_type, choice_id = data_type.split(' ')[:2] # ignore optional or_other
             choices = field_choices[choice_id]
 
             if data_type == "select_one":
