@@ -273,11 +273,11 @@ class Export(object):
             # the children like a foreign key.
             # TODO: remove that for HTML export
             if current_section.children:
-                row['_index'] = _indexes[_section_name]
+                row['_index'] = str(_indexes[_section_name])
 
             if current_section.parent:
-                row['_parent_table_name'] = current_section.parent.name
-                row['_parent_index'] = _indexes[row['_parent_table_name']]
+                row['_parent_table_name'] = str(current_section.parent.name)
+                row['_parent_index'] = str(_indexes[row['_parent_table_name']])
 
             rows.append(list(row.values()))
 
@@ -376,3 +376,35 @@ class Export(object):
                     cursor["row"] += 1
 
         workbook.save(filename)
+
+    def to_html(self, submissions):
+        '''
+            Yield lines of and HTML table strings.
+        '''
+
+        yield "<table>"
+
+        sections = list(self.labels.items())
+
+        def format_line(line):
+            return "<tr><th>" + "</th><th>".join(line) + "</th><tr>"
+
+        yield "<thead>"
+
+        section, labels = sections[0]
+        yield format_line(labels)
+
+        yield "</thead>"
+
+        yield "<tbody>"
+
+        for chunk in self.parse_submissions(submissions):
+            for section_name, rows in chunk.items():
+                if section == section_name:
+                    for row in rows:
+                        yield format_line(row)
+
+        yield "</tbody>"
+
+        yield "</table>"
+
