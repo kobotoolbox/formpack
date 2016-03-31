@@ -386,13 +386,10 @@ class Export(object):
 
         sections = list(self.labels.items())
 
-        def format_line(line):
-            return "<tr><th>" + "</th><th>".join(line) + "</th><tr>"
-
         yield "<thead>"
 
         section, labels = sections[0]
-        yield format_line(labels)
+        yield "<tr><th>" + "</th><th>".join(labels) + "</th></tr>"
 
         yield "</thead>"
 
@@ -402,7 +399,7 @@ class Export(object):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
-                        yield format_line(row)
+                        yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
 
         yield "</tbody>"
 
