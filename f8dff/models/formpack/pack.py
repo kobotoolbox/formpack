@@ -44,6 +44,13 @@ class FormPack(object):
     def __repr__(self):
         return '<FormPack %s>' % self._stats()
 
+    @property
+    def available_translations(self):
+        translations = set()
+        for version in self.versions.values():
+            translations.update(version.translations)
+        return translations
+
     def lookup(self, prop, default=None):
         # can't use a one liner because sometimes self.prop is None
         result = getattr(self, prop, default)
