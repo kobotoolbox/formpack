@@ -18,9 +18,6 @@ def get_requirements(path):
 
     dep_links = []
     install_requires = []
-    import os
-    print(os.getcwd())
-    print(path)
     with open(path) as f:
         for line in f:
 

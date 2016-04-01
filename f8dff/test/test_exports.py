@@ -11,6 +11,8 @@ from collections import OrderedDict
 
 from nose.tools import raises
 
+from path import tempdir
+
 from ..models.formpack.pack import FormPack
 from ..fixtures import build_fixture
 
@@ -26,9 +28,11 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEquals(dedent(text1).strip(), dedent(text2).strip())
 
     def test_generator_export(self):
-        forms = FormPack(**customer_satisfaction)
-        export = forms.export()
-        export = forms.export().to_dict()
+
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export().to_dict(submissions)
         expected = OrderedDict({
                     "submissions": {
                         'fields': ["restaurant_name", "customer_enjoyment"],
@@ -43,39 +47,47 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export, expected)
 
     def test_generator_export_translation_headers(self):
-        fp = FormPack(**restaurant_profile)
+
+        title, schemas, submissions = restaurant_profile
+        fp = FormPack(schemas, title)
+
         self.assertEqual(len(fp.versions), 4)
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
-        headers = fp.export(version=0).to_dict()['submissions']['fields']
+        headers = fp.export(versions=0).to_dict(submissions)['submissions']['fields']
         self.assertEquals(headers, ['restaurant_name', 'location'])
 
         # the first translation in the list is the translation that
         # appears first in the column list. in this case, 'label::english'
         translations = fp[1].translations
-        export = fp.export(header_lang=translations[0], version=1).to_dict()
-        headers = export['submissions']['fields']
+        export = fp.export(header_lang=translations[0], versions=1)
+        data = export.to_dict(submissions)
+        headers = data['submissions']['fields']
         self.assertEquals(headers, ['restaurant name', 'location'])
 
-        export = fp.export(header_lang=translations[1], version=1).to_dict()
-        headers = export['submissions']['fields']
+        export = fp.export(header_lang=translations[1], versions=1)
+        data = export.to_dict(submissions)
+        headers = data['submissions']['fields']
         self.assertEquals(headers, ['nom du restaurant', 'lieu'])
 
         # "_default" use the "Label" field
         # TODO: make a separate test to test to test __getitem__
-        fp = FormPack(**restaurant_profile)
-        export = fp.export(header_lang="_default", version='rpv1').to_dict()
-        headers = export['submissions']['fields']
+        export = fp.export(header_lang="_default", versions='rpv1')
+        data = export.to_dict(submissions)
+        headers = data['submissions']['fields']
         self.assertEquals(headers, ['restaurant name', 'location'])
 
     def test_export_with_choice_lists(self):
-        fp = FormPack(**restaurant_profile)
+
+        title, schemas, submissions = restaurant_profile
+
+        fp = FormPack(schemas, title)
         self.assertEqual(len(fp[1].translations), 2)
         # by default, exports use the question 'name' attribute
-        options = {'version': 'rpV3'}
+        options = {'versions': 'rpV3'}
 
-        export = fp.export(**options).to_dict()['submissions']
+        export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['fields'], ['restaurant_name',
                                               'location',
                                               'eatery_type'])
@@ -89,7 +101,7 @@ class TestFormPackExport(unittest.TestCase):
         # if a language is passed, fields with available translations
         # are translated into that language
         options['translation'] = fp[1].translations[0]
-        export = fp.export(**options).to_dict()['submissions']
+        export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['data'], [['Taco Truck',
                                             '13.42 -25.43',
                                             'take-away'],
@@ -98,7 +110,7 @@ class TestFormPackExport(unittest.TestCase):
                                             'sit down']])
 
         options['translation'] = fp[1].translations[1]
-        export = fp.export(**options).to_dict()['submissions']
+        export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['data'], [['Taco Truck',
                                             '13.42 -25.43',
                                             'avec vente à emporter'],
@@ -107,22 +119,22 @@ class TestFormPackExport(unittest.TestCase):
                                             'traditionnel']])
 
     def test_headers_of_group_exports(self):
-        grouped_questions = build_fixture('grouped_questions')
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'gqs'}
+        title, schemas, submissions = build_fixture('grouped_questions')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'gqs'}
 
         # by default, groups are stripped.
-        export = fp.export(**options).to_dict()
+        export = fp.export(**options).to_dict(submissions)
         headers = export['submissions']['fields']
         self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
                                     'g1q2', 'g2q1', 'qz'])
 
     def test_submissions_of_group_exports(self):
-        grouped_questions = build_fixture('grouped_questions')
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'gqs'}
+        title, schemas, submissions = build_fixture('grouped_questions')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'gqs'}
 
-        export = fp.export(**options).to_dict()['submissions']
+        export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['fields'], ['q1', 'g1q1', 'g1sg1q1',
                                              'g1q2', 'g2q1', 'qz'])
         self.assertEquals(export['data'], [['respondent1\'s r1',
@@ -139,7 +151,7 @@ class TestFormPackExport(unittest.TestCase):
                                             'respondent2\'s r4']])
 
         options['group_sep'] = '/'
-        export = fp.export(**options).to_dict()['submissions']
+        export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['fields'], ['q1',
                                              'g1/g1q1',
                                              'g1/sg1/g1sg1q1',
@@ -160,10 +172,10 @@ class TestFormPackExport(unittest.TestCase):
                                             'respondent2\'s r4']])
 
     def test_repeats(self):
-        grouped_repeatable = build_fixture('grouped_repeatable')
-        fp = FormPack(**grouped_repeatable)
-        options = {'version': 'rgv1'}
-        export = fp.export(**options).to_dict()
+        title, schemas, submissions = build_fixture('grouped_repeatable')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'rgv1'}
+        export = fp.export(**options).to_dict(submissions)
 
         self.assertEqual(export, OrderedDict ([
                             ('submissions',
@@ -292,10 +304,10 @@ class TestFormPackExport(unittest.TestCase):
         )
 
     def test_csv(self):
-        grouped_questions = build_fixture('grouped_questions')
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'gqs'}
-        csv_data = "\n".join(fp.export(**options).to_csv())
+        title, schemas, submissions = build_fixture('grouped_questions')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'gqs'}
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "q1";"g1q1";"g1sg1q1";"g1q2";"g2q1";"qz"
@@ -305,9 +317,8 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertTextEqual(csv_data, expected)
 
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'gqs', 'group_sep': '/'}
-        csv_data = "\n".join(fp.export(**options).to_csv())
+        options = {'versions': 'gqs', 'group_sep': '/'}
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "q1";"g1/g1q1";"g1/sg1/g1sg1q1";"g1/g1q2";"g2/g2q1";"qz"
@@ -317,10 +328,9 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertTextEqual(csv_data, expected)
 
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'gqs', 'group_sep': '/',
+        options = {'versions': 'gqs', 'group_sep': '/',
                    'header_lang': "_default"}
-        csv_data = "\n".join(fp.export(**options).to_csv())
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "Q1";"Group 1/G1Q1";"Group 1/Sub Group 1/G1SG1Q1";"Group 1/G1Q2";"g2/G2Q1";"QZed"
@@ -329,9 +339,10 @@ class TestFormPackExport(unittest.TestCase):
         """
         self.assertTextEqual(csv_data, expected)
 
-        fp = FormPack(**restaurant_profile)
-        options = {'version': 'rpV3', 'translation': fp[1].translations[1]}
-        csv_data = "\n".join(fp.export(**options).to_csv())
+        title, schemas, submissions = restaurant_profile
+        fp = FormPack(schemas, title)
+        options = {'versions': 'rpV3', 'translation': fp[1].translations[1]}
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "nom du restaurant";"lieu";"type de restaurant"
@@ -342,15 +353,16 @@ class TestFormPackExport(unittest.TestCase):
 
     @raises(RuntimeError)
     def test_csv_on_repeatable_groups(self):
-        grouped_repeatable = build_fixture('grouped_repeatable')
-        fp = FormPack(**grouped_repeatable)
-        options = {'version': 'rgv1'}
-        list(fp.export(**options).to_csv())
+        title, schemas, submissions = build_fixture('grouped_repeatable')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'rgv1'}
+        list(fp.export(**options).to_csv(submissions))
 
     def test_export_with_multiple_select(self):
-        fp = FormPack(**restaurant_profile)
-        options = {'version': 'rpV4'}
-        export = fp.export(**options).to_dict()['submissions']
+        title, schemas, submissions = restaurant_profile
+        fp = FormPack(schemas, title)
+        options = {'versions': 'rpV4'}
+        export = fp.export(**options).to_dict(submissions)['submissions']
         expected = {
             'fields': [
                 'restaurant_name',
@@ -386,9 +398,9 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(export, expected)
 
-        options = {'version': 'rpV4', "group_sep": "::",
+        options = {'versions': 'rpV4', "group_sep": "::",
                    "header_lang": fp[-1].translations[1]}
-        export = fp.export(**options).to_dict()['submissions']
+        export = fp.export(**options).to_dict(submissions)['submissions']
 
         expected = {
             'fields': [
@@ -426,8 +438,108 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export, expected)
 
     def test_xlsx(self):
-        grouped_questions = build_fixture('grouped_repeatable')
-        fp = FormPack(**grouped_questions)
-        options = {'version': 'rgv1'}
-        fp.export(**options).to_xlsx('/tmp/foo.xlsx')
+        title, schemas, submissions = build_fixture('grouped_repeatable')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'rgv1'}
 
+        with tempdir() as d:
+            xls = d / 'foo.xlsx'
+            fp.export(**options).to_xlsx(xls, submissions)
+            assert xls.isfile()
+
+    def test_force_index(self):
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export(force_index=True).to_dict(submissions)
+        expected = OrderedDict({
+                    "submissions": {
+                        'fields': ["restaurant_name", "customer_enjoyment",
+                                   "_index"],
+                        'data': [
+                            ["Felipes", "yes", 1],
+                            ["Dunkin Donuts", "no", 2],
+                            ["McDonalds", "no", 3]
+                        ]
+                    }
+               })
+
+        self.assertEqual(export, expected)
+
+    def test_copy_fields(self):
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export(copy_fields=('_uuid', '_submission_time'))
+        exported = export.to_dict(submissions)
+        expected = OrderedDict({
+                    "submissions": {
+                        'fields': ["restaurant_name", "customer_enjoyment",
+                                   "_uuid", "_submission_time"],
+                        'data': [
+                            [
+                                "Felipes",
+                                "yes",
+                                "90dd7750f83011e590707c7a9125d07d",
+                                "2016-04-01 19:57:45.306805"
+                            ],
+
+                            [
+                                "Dunkin Donuts",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d08d",
+                                "2016-04-02 19:57:45.306805"
+                            ],
+
+                            [
+                                "McDonalds",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d09d",
+                                "2016-04-03 19:57:45.306805"
+                            ]
+                        ]
+                    }
+               })
+
+        self.assertEqual(exported, expected)
+
+    def test_copy_fields_and_force_index(self):
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export(copy_fields=('_uuid', '_submission_time'),
+                              force_index=True)
+        exported = export.to_dict(submissions)
+        expected = OrderedDict({
+                    "submissions": {
+                        'fields': ["restaurant_name", "customer_enjoyment",
+                                   "_uuid", "_submission_time", "_index"],
+                        'data': [
+                            [
+                                "Felipes",
+                                "yes",
+                                "90dd7750f83011e590707c7a9125d07d",
+                                "2016-04-01 19:57:45.306805",
+                                1
+                            ],
+
+                            [
+                                "Dunkin Donuts",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d08d",
+                                "2016-04-02 19:57:45.306805",
+                                2
+                            ],
+
+                            [
+                                "McDonalds",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d09d",
+                                "2016-04-03 19:57:45.306805",
+                                3
+                            ]
+                        ]
+                    }
+               })
+
+        self.assertEqual(exported, expected)

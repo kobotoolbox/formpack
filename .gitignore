@@ -65,3 +65,8 @@ target/
 
 # local env setup script
 env.source
+
+*.xls*
+*.gz
+*.zip
+*.bz2
