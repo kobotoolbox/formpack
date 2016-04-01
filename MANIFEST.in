@@ -1,2 +1,2 @@
-recursive-include f8dff *.html *.json
+recursive-include src *.html *.json
 include *requirements.txt

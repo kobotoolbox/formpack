@@ -4,8 +4,8 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
-from ..models.formpack.pack import FormPack
-from ..fixtures import build_fixture
+from formpack import FormPack
+from formpack.fixtures import build_fixture
 
 restaurant_profile = build_fixture('restaurant_profile')
 

@@ -1,9 +1,15 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function, absolute_import,
+                        division)
+
+
 import begin
 
-import os
 import sys
 import json
 from utils.xls_to_ss_structure import xls_to_dicts
+
 
 @begin.subcommand
 def xls(filename):
@@ -18,6 +24,7 @@ def xls(filename):
     except EnvironmentError, e:
         sys.exit('error trying to read input as xls file? {}: {}'.format(
                  filename, e))
+
 
 @begin.start
 def run():

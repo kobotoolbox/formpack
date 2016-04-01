@@ -35,15 +35,18 @@ def get_requirements(path):
 requirements, dep_links = get_requirements('requirements.txt')
 dev_requirements, dev_dep_links = get_requirements('dev-requirements.txt')
 
-setup(name='f8dff',
-      version='1.0',
-      description='fixtures for kobo xlsform tools',
+setup(name='formpack',
+      version='1.1',
+      description='Manipulation tools for kobocat forms',
       author='Alex Dorey',
       author_email='alex.dorey@kobotoolbox.org',
       url='https://github.com/kobotoolbox/f8dff/',
-      packages=find_packages(),
+      packages=find_packages('src'),
+      package_dir={'': b'src'},
       install_requires=requirements,
       extras_require={
           'dev': dev_requirements
-      }
+      },
+      include_package_data=True,
+      zip_safe=False,
       )

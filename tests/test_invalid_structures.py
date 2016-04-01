@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
-from ..models.formpack.pack import FormPack
+from formpack import FormPack
 from copy import copy
 from nose.tools import raises
 
