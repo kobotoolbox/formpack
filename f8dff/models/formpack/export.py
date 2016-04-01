@@ -12,20 +12,31 @@ except ImportError:
 from pyexcelerate import Workbook
 
 from .submission import FormSubmission
+from .schema import CopyField
 
 
 class Export(object):
 
     def __init__(self, form_versions, translation="_default", header_lang=None,
                  group_sep="/", multiple_select="both",
-                 not_applicable_marker="<N/A>",
+                 copy_fields=(), force_index=False,
                  title="submissions"):
 
         self.translation = translation
         self.group_sep = group_sep
         self.title = title
         self.versions = form_versions
-        self.not_applicable_marker = not_applicable_marker
+        self.copy_fields = copy_fields
+        self.force_index = force_index
+
+        # If some fields need to be arbitrarly copied, add them
+        # to the first section
+        if copy_fields:
+            first_version = next(iter(form_versions.values()))
+            first_section = next(iter(first_version.sections.values()))
+            for name in copy_fields:
+                dumb_field = CopyField(name, section=first_section)
+                first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
         header_lang = header_lang or translation
@@ -88,6 +99,10 @@ class Export(object):
 
         versions = list(self.versions.values())
 
+        # List of fields we generate ourself to add at the very ends
+        # of the field list
+        auto_fields = OrderedDict()
+
         # Create the initial field mappings from the first form version
         for section_name, section in versions[0].sections.items():
 
@@ -103,6 +118,15 @@ class Export(object):
             # Set of processed field names for fast lookup
             field_names = section_fields[section_name]
             processed_fields[section_name] = set(field_names)
+
+            # Append optional additional fields
+            auto_field_names = auto_fields[section_name] = []
+            if section.children or self.force_index:
+                auto_field_names.append('_index')
+
+            if section.parent:
+                auto_field_names.append('_parent_table_name')
+                auto_field_names.append('_parent_index')
 
         # Process any new field added in the next versions
         # The hard part is to insert it at a position that makes sense
@@ -178,11 +202,19 @@ class Export(object):
         for section, fields in list(section_fields.items()):
             name_lists = (field.value_names for field_name, field in fields)
             names = [name for name_list in name_lists for name in name_list]
+
+            # add auto fields:
+            names.extend(auto_fields[section])
+
             section_fields[section] = names
 
         # Flatten all the labels for all the headers of all the fields
         for section, labels in list(section_labels.items()):
             labels = [label for label_group in labels for label in label_group]
+
+            # add auto fields (names and labels are the same)
+            labels.extend(auto_fields[section])
+
             section_labels[section] = labels
 
         return section_fields, section_labels
@@ -272,12 +304,12 @@ class Export(object):
             # id that we generate on the fly on the parent, and add it to
             # the children like a foreign key.
             # TODO: remove that for HTML export
-            if current_section.children:
-                row['_index'] = str(_indexes[_section_name])
+            if '_index' in row:
+                row['_index'] = _indexes[_section_name]
 
-            if current_section.parent:
+            if '_parent_table_name' in row:
                 row['_parent_table_name'] = str(current_section.parent.name)
-                row['_parent_index'] = str(_indexes[row['_parent_table_name']])
+                row['_parent_index'] = _indexes[row['_parent_table_name']]
 
             rows.append(list(row.values()))
 

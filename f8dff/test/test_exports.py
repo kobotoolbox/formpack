@@ -446,3 +446,100 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
+
+    def test_force_index(self):
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export(force_index=True).to_dict(submissions)
+        expected = OrderedDict({
+                    "submissions": {
+                        'fields': ["restaurant_name", "customer_enjoyment",
+                                   "_index"],
+                        'data': [
+                            ["Felipes", "yes", 1],
+                            ["Dunkin Donuts", "no", 2],
+                            ["McDonalds", "no", 3]
+                        ]
+                    }
+               })
+
+        self.assertEqual(export, expected)
+
+    def test_copy_fields(self):
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export(copy_fields=('_uuid', '_submission_time'))
+        exported = export.to_dict(submissions)
+        expected = OrderedDict({
+                    "submissions": {
+                        'fields': ["restaurant_name", "customer_enjoyment",
+                                   "_uuid", "_submission_time"],
+                        'data': [
+                            [
+                                "Felipes",
+                                "yes",
+                                "90dd7750f83011e590707c7a9125d07d",
+                                "2016-04-01 19:57:45.306805"
+                            ],
+
+                            [
+                                "Dunkin Donuts",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d08d",
+                                "2016-04-02 19:57:45.306805"
+                            ],
+
+                            [
+                                "McDonalds",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d09d",
+                                "2016-04-03 19:57:45.306805"
+                            ]
+                        ]
+                    }
+               })
+
+        self.assertEqual(exported, expected)
+
+    def test_copy_fields_and_force_index(self):
+        title, schemas, submissions = customer_satisfaction
+
+        forms = FormPack(schemas, title)
+        export = forms.export(copy_fields=('_uuid', '_submission_time'),
+                              force_index=True)
+        exported = export.to_dict(submissions)
+        expected = OrderedDict({
+                    "submissions": {
+                        'fields': ["restaurant_name", "customer_enjoyment",
+                                   "_uuid", "_submission_time", "_index"],
+                        'data': [
+                            [
+                                "Felipes",
+                                "yes",
+                                "90dd7750f83011e590707c7a9125d07d",
+                                "2016-04-01 19:57:45.306805",
+                                1
+                            ],
+
+                            [
+                                "Dunkin Donuts",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d08d",
+                                "2016-04-02 19:57:45.306805",
+                                2
+                            ],
+
+                            [
+                                "McDonalds",
+                                "no",
+                                "90dd7750f83011e590707c7a9125d09d",
+                                "2016-04-03 19:57:45.306805",
+                                3
+                            ]
+                        ]
+                    }
+               })
+
+        self.assertEqual(exported, expected)

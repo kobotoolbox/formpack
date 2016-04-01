@@ -146,23 +146,6 @@ class FormVersion(object):
         self.translations.pop('_default', None)
         self.translations = list(self.translations)
 
-        # Set meta fields (such as indexes)
-        for section_name, section in self.sections.items():
-
-            # Add meta fields
-            if section.children:
-                section.fields['_index'] = FormField('_index', {}, 'meta',
-                                                     can_format=False)
-
-            if section.parent:
-                field = FormField('_parent_table_name', {},
-                                  'meta', can_format=False)
-                section.fields['_parent_table_name'] = field
-
-                section.fields['_parent_index'] = FormField('_parent_index',
-                                                            {}, 'meta',
-                                                            can_format=False)
-
     def __repr__(self):
         return '<FormVersion %s>' % self._stats()
 

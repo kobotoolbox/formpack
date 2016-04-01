@@ -85,7 +85,7 @@ class FormField(FormInfo):
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
-            data_type, choice_id = data_type.split(' ')[:2] # ignore optional or_other
+            data_type, choice_id = data_type.split(' ')[:2]  # ignore optional or_other
             choices = field_choices[choice_id]
 
             if data_type == "select_one":
@@ -98,8 +98,22 @@ class FormField(FormInfo):
 
         return cls(name, labels, data_type, group, section)
 
-    def format(self, val, translation='_default'):
+    def format(self, val, translation='_default', context=None):
         return {self.name: val}
+
+
+class CopyField(FormField):
+    """ Just copy the data over. No translation. No manipulation """
+    def __init__(self, name, hierarchy=(None,), section=None):
+        super(CopyField, self).__init__(name, labels=None,
+                                        data_type=name,
+                                        hierarchy=(None,),
+                                        section=section,
+                                        can_format=True)
+
+    def get_labels(self, *args, **kwargs):
+        """ Labels are the just the value name. Groups are ignored """
+        return [self.name]
 
 
 class FormChoiceField(FormField):
@@ -179,8 +193,15 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         data = (self.name, self.data_type)
         return "<FormChoiceField name='%s' type='%s'>" % data
 
-    def format(self, val, translation='_default', multiple_select="both"):
+    def format(self, val, translation='_default', multiple_select="both",
+               context=None):
+        """ Same than other format(), with an option for multiple_select layout
 
+                multiple_select:
+                "both": add the summary column and a colum for each value
+                "summary": only the summary column
+                "details": only the details column
+        """
         cells = dict.fromkeys(self.value_names, "0")
         if multiple_select in ("both", "summary"):
             cells[self.name] = val

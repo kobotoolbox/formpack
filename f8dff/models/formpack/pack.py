@@ -179,8 +179,9 @@ class FormPack(object):
         return json.dumps(self.to_dict(), **kwargs)
 
     def export(self, header_lang=None, translation=None,
-               group_sep=None, versions=-1):
-        '''Create an export for a given version of the form '''
+               group_sep=None, versions=-1, multiple_select="both",
+               force_index=False, copy_fields=()):
+        '''Create an export for a given version of the form'''
 
         if isinstance(versions, str_types + (int,)):
             versions = [versions]
@@ -189,5 +190,6 @@ class FormPack(object):
         versions = OrderedDict((v.id, v) for v in versions)
         return Export(versions, header_lang=header_lang,
                       translation=translation, group_sep=group_sep,
-                      title='submissions')
+                      title='submissions', multiple_select=multiple_select,
+                      force_index=force_index, copy_fields=copy_fields)
 

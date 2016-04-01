@@ -31,15 +31,21 @@
     "submissions": [
         {
             "customer_enjoyment": "yes",
-            "restaurant_name": "Felipes"
+            "restaurant_name": "Felipes",
+            "_uuid": "90dd7750f83011e590707c7a9125d07d",
+            "_submission_time": "2016-04-01 19:57:45.306805"
         },
         {
             "customer_enjoyment": "no",
-            "restaurant_name": "Dunkin Donuts"
+            "restaurant_name": "Dunkin Donuts",
+            "_uuid": "90dd7750f83011e590707c7a9125d08d",
+            "_submission_time": "2016-04-02 19:57:45.306805"
         },
         {
             "customer_enjoyment": "no",
-            "restaurant_name": "McDonalds"
+            "restaurant_name": "McDonalds",
+            "_uuid": "90dd7750f83011e590707c7a9125d09d",
+            "_submission_time": "2016-04-03 19:57:45.306805"
         }
     ]
 }
