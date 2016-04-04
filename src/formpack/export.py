@@ -355,8 +355,8 @@ class Export(object):
 
         sections = list(self.labels.items())
 
-        if len(sections) > 1:
-            raise RuntimeError("CSV export does not support repeatable groups")
+        # if len(sections) > 1:
+        #     raise RuntimeError("CSV export does not support repeatable groups")
 
         def format_line(line, sep, quote):
             return quote + (quote + sep + quote).join(line) + quote
