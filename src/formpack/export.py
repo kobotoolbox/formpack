@@ -19,8 +19,8 @@ from .utils.string import unicode
 class Export(object):
 
     def __init__(self, form_versions, translation="_default", header_lang=None,
-                 group_sep="/", multiple_select="both",
-                 copy_fields=(), force_index=False,
+                 group_sep="/", hierarchy_in_labels=False,
+                 multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
         self.translation = translation
@@ -29,6 +29,7 @@ class Export(object):
         self.versions = form_versions
         self.copy_fields = copy_fields
         self.force_index = force_index
+        self.herarchy_in_labels = hierarchy_in_labels
 
         # If some fields need to be arbitrarly copied, add them
         # to the first section
@@ -41,7 +42,7 @@ class Export(object):
 
         # this deals with merging all form versions headers and labels
         header_lang = header_lang or translation
-        params = (header_lang, group_sep, multiple_select)
+        params = (header_lang, group_sep, hierarchy_in_labels, multiple_select)
         res = self.get_fields_and_labels_for_all_versions(*params)
         self.sections, self.labels = res
 
@@ -80,6 +81,7 @@ class Export(object):
         # N.B: indexes are not affected by form versions
 
     def get_fields_and_labels_for_all_versions(self, lang, group_sep,
+                                                hierarchy_in_labels=False,
                                                 multiple_select="both"):
         """ Return 2 mappings containing field and labels by section
 
@@ -113,7 +115,9 @@ class Export(object):
             # Field labels list mapping to the section containing them
             one_section_labels = section_labels[section_name] = []
             for field in section.fields.values():
-                labels = field.get_labels(lang, group_sep, multiple_select)
+                labels = field.get_labels(lang, group_sep,
+                                          hierarchy_in_labels,
+                                          multiple_select)
                 one_section_labels.append(labels)
 
             # Set of processed field names for fast lookup
@@ -149,7 +153,9 @@ class Export(object):
 
                     # Extract the labels for this field, language, group
                     # separator and muliple_select policy
-                    labels = field.get_labels(lang, group_sep, multiple_select)
+                    labels = field.get_labels(lang, group_sep,
+                                              hierarchy_in_labels,
+                                              multiple_select)
                     # WARNING, labels is a list of labels for this field
                     # since multiple select answers can span on several columns
 
@@ -359,6 +365,7 @@ class Export(object):
         #     raise RuntimeError("CSV export does not support repeatable groups")
 
         def format_line(line, sep, quote):
+            line = [unicode(x) for x in line]
             return quote + (quote + sep + quote).join(line) + quote
 
         section, labels = sections[0]

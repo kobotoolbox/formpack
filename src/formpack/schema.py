@@ -53,14 +53,15 @@ class FormField(FormInfo):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
-    def get_labels(self, lang="_default", group_sep=None, multiple_select="both"):
+    def get_labels(self, lang="_default", group_sep="/",
+                   hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.
 
             Most fields have only one label, so the list contains only one item,
             but some fields can multiple values, and one label for each
             value.
         """
-        if group_sep:
+        if hierarchy_in_labels:
             path = []
             for level in self.hierarchy[1:]:
                 path.append(level.labels.get(lang) or level.name)
@@ -133,6 +134,81 @@ class FormChoiceField(FormField):
                 pass
         return {self.name: val}
 
+'''
+class FormGPSField(FormField):
+
+
+    def get_labels(self, lang="_default", group_sep='/',
+                   hierarchy_in_labels=False, multiple_select="both"):
+        """ Return a list of labels for this field.
+
+            Most fields have only one label, so the list contains only one item,
+            but some fields can multiple values, and one label for each
+            value.
+        """
+        labels.append(self._get_label(lang, group_sep, hierarchy_in_labels))
+
+        if multiple_select in ("both", "details"):
+            for option in self.choice.options.values():
+                args = (lang, group_sep, hierarchy_in_labels, option)
+                labels.append(self._get_option_label(*args))
+
+        return labels
+
+    def get_labels(self, lang="_default", group_sep='/',
+                   hierarchy_in_labels=False, multiple_select="both"):
+        """ Return a list of labels for this field.
+
+            Most fields have only one label, so the list contains only one item,
+            but some fields can multiple values, and one label for each
+            value.
+        """
+        labels = []
+        if multiple_select in ("both", "summary"):
+            labels.append(self._get_label(lang, group_sep, hierarchy_in_labels))
+
+        if multiple_select in ("both", "details"):
+            for option in self.choice.options.values():
+                args = (lang, group_sep, hierarchy_in_labels, option)
+                labels.append(self._get_option_label(*args))
+
+        return labels
+
+    def get_value_names(self, multiple_select="both"):
+        """ Return the list of field identifiers used by this field"""
+        names = []
+        if multiple_select in ("both", "summary"):
+            names.append(self.name)
+
+        if multiple_select in ("both", "details"):
+            for option_name in self.choice.options.keys():
+                names.append(self.name + "/" + option_name)
+        return names
+
+   def format(self, val, translation='_default', group_sep='/',
+              hierarchy_in_labels=False, multiple_select="both"):
+        """ Same than other format(), with an option for multiple_select layout
+
+                multiple_select:
+                "both": add the summary column and a colum for each value
+                "summary": only the summary column
+                "details": only the details column
+        """
+        cells = dict.fromkeys(self.value_names, "0")
+        if multiple_select in ("both", "summary"):
+            res = []
+            for v in val.split():
+                try:
+                    res.append(self.choice.options[v]['labels'][translation])
+                except:
+                    res.append(v)
+            cells[self.name] = " ".join(res)
+
+        if multiple_select in ("both", "details"):
+            for choice in val.split():
+                cells[self.name + "/" + choice] = "1"
+        return cells
+'''
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
@@ -144,9 +220,10 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         self.choice = choice or {}
         self.value_names = self.get_value_names()
 
-    def _get_label(self, lang="_default", group_sep=None):
+    def _get_label(self, lang="_default", group_sep='/',
+                   hierarchy_in_labels=False):
         """ Return the label for this field, with no options """
-        if group_sep:
+        if hierarchy_in_labels:
             path = []
             for level in self.hierarchy[1:]:
                 path.append(level.labels.get(lang) or level.name)
@@ -154,15 +231,17 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
         return self.labels.get(lang) or self.name
 
-    def _get_option_label(self, lang="_default", group_sep=None, option=None):
+    def _get_option_label(self, lang="_default", group_sep='/',
+                          hierarchy_in_labels=False, option=None):
         """ Return the label for this field and this option in particular """
 
-        label = self._get_label(lang, group_sep)
+        label = self._get_label(lang, group_sep, hierarchy_in_labels)
         option_label = option['labels'].get(lang, option['name'])
         group_sep = group_sep or "/"
         return label + group_sep + option_label
 
-    def get_labels(self, lang="_default", group_sep=None, multiple_select="both"):
+    def get_labels(self, lang="_default", group_sep='/',
+                   hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.
 
             Most fields have only one label, so the list contains only one item,
@@ -171,22 +250,24 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """
         labels = []
         if multiple_select in ("both", "summary"):
-            labels.append(self._get_label(lang, group_sep))
+            labels.append(self._get_label(lang, group_sep, hierarchy_in_labels))
 
         if multiple_select in ("both", "details"):
             for option in self.choice.options.values():
-                labels.append(self._get_option_label(lang, group_sep, option))
+                args = (lang, group_sep, hierarchy_in_labels, option)
+                labels.append(self._get_option_label(*args))
 
         return labels
 
     def get_value_names(self, multiple_select="both"):
+        """ Return the list of field identifiers used by this field"""
         names = []
         if multiple_select in ("both", "summary"):
             names.append(self.name)
 
         if multiple_select in ("both", "details"):
             for option_name in self.choice.options.keys():
-                names.append(self.name + "/" + option_name)
+                names.append(self.name + '/' + option_name)
         return names
 
     def __repr__(self):
@@ -194,8 +275,9 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         return "<FormChoiceField name='%s' type='%s'>" % data
 
     # maybe try to cache those
-    def format(self, val, translation='_default', multiple_select="both",
-               context=None):
+    def format(self, val, translation='_default',
+               group_sep="/", hierarchy_in_labels=False,
+               multiple_select="both"):
         """ Same than other format(), with an option for multiple_select layout
 
                 multiple_select:

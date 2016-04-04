@@ -90,7 +90,9 @@ class FormVersion(object):
 
         for data_definition in survey:
 
-            if data_definition['type'] == 'begin group':
+            data_type = data_definition.get('type')
+
+            if data_type == 'begin group':
                 group_stack.append(group)
                 group = FormGroup.from_json_definition(data_definition)
                 # We go down in one level on nesting, so save the parent group.
@@ -101,7 +103,7 @@ class FormVersion(object):
                 self.translations.update(OrderedDict.fromkeys(group.labels))
                 continue
 
-            if data_definition['type'] == 'end group':
+            if data_type == 'end group':
                 # We go up in one level of nesting, so we set the current group
                 # to be what used to be the parent group. We also remote one
                 # level in the hierarchy.
@@ -109,7 +111,7 @@ class FormVersion(object):
                 group = group_stack.pop()
                 continue
 
-            if data_definition['type'] == 'begin repeat':
+            if data_type == 'begin repeat':
                 # We go down in one level on nesting, so save the parent section.
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
@@ -126,7 +128,7 @@ class FormVersion(object):
                 self.translations.update(translations)
                 continue
 
-            if data_definition['type'] == 'end repeat':
+            if data_type == 'end repeat':
                 # We go up in one level of nesting, so we set the current section
                 # to be what used to be the parent section
                 hierarchy.pop()
@@ -134,7 +136,7 @@ class FormVersion(object):
                 continue
 
             # Get the the data name and type
-            if 'name' in data_definition:
+            if 'name' in data_definition and data_type:
                 field = FormField.from_json_definition(data_definition,
                                                        hierarchy, section,
                                                        field_choices)
