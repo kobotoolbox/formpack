@@ -66,8 +66,8 @@ class Export(object):
                     # TODO: do we really need FormSubmission ?
                     submission = FormSubmission(entry)
                     yield self.format_one_submission([submission.data], section)
-            except KeyError:  # this versions is requested in the export
-                raise
+            except KeyError:  # this versions is NOT requested in the export
+                pass
 
     def reset(self):
         """ Reset sections and indexes to initial values """
@@ -275,6 +275,7 @@ class Export(object):
         # in an xls doc. Althougt the first level will have only one entries,
         # when repeat groups are involved, deeper levels can have an
         # arbitrary number of entries depending of the user input.
+
         for entry in submission:
 
             # Format one entry and add it to the rows for this section

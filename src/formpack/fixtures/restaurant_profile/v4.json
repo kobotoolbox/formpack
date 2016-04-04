@@ -17,7 +17,7 @@
                 "label::french": "lieu"
             },
             {
-                "type": "select_many eatery_types",
+                "type": "select_multiple eatery_types",
                 "name": "eatery_type",
                 "label::english": "type of eatery",
                 "label::french": "type de restaurant"

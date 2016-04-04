@@ -25,7 +25,12 @@ class FormPack(object):
         if not versions:
             raise ValueError('A FormPack must contain at least one FormVersion')
 
+        # accept a single version, but normalize it to an iterable
+        if "content" in versions:
+            versions = [versions]
+
         self.versions = OrderedDict()
+
         self.id_string = id_string
 
         self.title = title

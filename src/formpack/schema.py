@@ -205,13 +205,13 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """
         cells = dict.fromkeys(self.value_names, "0")
         if multiple_select in ("both", "summary"):
-            res = ''
+            res = []
             for v in val.split():
                 try:
-                    res += self.choice.options[v]['labels'][translation]
+                    res.append(self.choice.options[v]['labels'][translation])
                 except:
-                    res += v
-            cells[self.name] = res
+                    res.append(v)
+            cells[self.name] = " ".join(res)
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
