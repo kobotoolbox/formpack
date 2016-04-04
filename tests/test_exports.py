@@ -13,8 +13,8 @@ from nose.tools import raises
 
 from path import tempdir
 
-from ..models.formpack.pack import FormPack
-from ..fixtures import build_fixture
+from formpack import FormPack
+from formpack.fixtures import build_fixture
 
 
 customer_satisfaction = build_fixture('customer_satisfaction')

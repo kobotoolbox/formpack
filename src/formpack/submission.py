@@ -17,7 +17,7 @@ except ImportError:  # we are on Python 3
 from pyquery import PyQuery
 
 from .b64_attachment import B64Attachment
-from ...models.formpack.utils import parse_xmljson_to_data
+from .utils import parse_xmljson_to_data
 
 
 class FormSubmission:

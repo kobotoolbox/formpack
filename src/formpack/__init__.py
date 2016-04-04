@@ -1,3 +1,8 @@
+# coding: utf-8
+
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 '''
 formpack.pack.FormPack
 
@@ -13,3 +18,5 @@ of the ODK-flavored XForms including:
  * media attachments
  * complex data types
 '''
+
+from .pack import FormPack
