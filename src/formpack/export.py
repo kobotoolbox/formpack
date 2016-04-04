@@ -13,6 +13,7 @@ from pyexcelerate import Workbook
 
 from .submission import FormSubmission
 from .schema import CopyField
+from .utils.string import unicode
 
 
 class Export(object):
@@ -66,7 +67,7 @@ class Export(object):
                     submission = FormSubmission(entry)
                     yield self.format_one_submission([submission.data], section)
             except KeyError:  # this versions is requested in the export
-                pass
+                raise
 
     def reset(self):
         """ Reset sections and indexes to initial values """
@@ -274,7 +275,6 @@ class Export(object):
         # in an xls doc. Althougt the first level will have only one entries,
         # when repeat groups are involved, deeper levels can have an
         # arbitrary number of entries depending of the user input.
-
         for entry in submission:
 
             # Format one entry and add it to the rows for this section
@@ -318,9 +318,11 @@ class Export(object):
                 # Because submissions are nested, we flatten them out by reading
                 # the whole submission tree recursively, formatting the entries,
                 # and adding the results to the list of rows for this section.
-                chunk = self.format_one_submission(entry[child_section.path],
-                                                   child_section)
-                chunks.update(chunk)
+                nested_data = entry.get(child_section.path)
+                if nested_data:
+                    chunk = self.format_one_submission(entry[child_section.path],
+                                                       child_section)
+                    chunks.update(chunk)
 
             _indexes[_section_name] += 1
 
@@ -431,6 +433,7 @@ class Export(object):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
+                        row = [unicode(x) for x in row]
                         yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
 
         yield "</tbody>"

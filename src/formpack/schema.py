@@ -32,11 +32,11 @@ class FormInfo(object):
         labels = OrderedDict({'_default': definition['name']})
         if "label" in definition:
             labels['_default'] = definition['label']
-        else:
-            for key, val in definition.items():
-                if key.startswith('label::'):
-                    _, lang = key.split('::')
-                    labels[lang] = val
+
+        for key, val in definition.items():
+            if key.startswith('label::'):
+                _, lang = key.split('::')
+                labels[lang] = val
         return labels
 
 
@@ -92,7 +92,7 @@ class FormField(FormInfo):
                 return FormChoiceField(name, labels, data_type,
                                        group, section, choices)
 
-            if data_type == "select_many":
+            if data_type == "select_multiple":
                 args = (name, labels, data_type, group, section, choices)
                 return FormChoiceFieldWithMultipleSelect(*args)
 
@@ -193,6 +193,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         data = (self.name, self.data_type)
         return "<FormChoiceField name='%s' type='%s'>" % data
 
+    # maybe try to cache those
     def format(self, val, translation='_default', multiple_select="both",
                context=None):
         """ Same than other format(), with an option for multiple_select layout
@@ -204,7 +205,13 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """
         cells = dict.fromkeys(self.value_names, "0")
         if multiple_select in ("both", "summary"):
-            cells[self.name] = val
+            res = ''
+            for v in val.split():
+                try:
+                    res += self.choice.options[v]['labels'][translation]
+                except:
+                    res += v
+            cells[self.name] = res
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
