@@ -1,5 +1,5 @@
-f8DFF: machinery to build and export reports for kobocat data
-==============================================================
+formpack: machinery to build and export reports for kobocat data
+================================================================
 
 Setup
 -----

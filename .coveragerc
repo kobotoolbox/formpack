@@ -1,6 +1,6 @@
 [run]
 branch = true
-source = f8dff
+source = formpack
 
 [report]
 fail_under = 80
