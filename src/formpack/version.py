@@ -136,6 +136,7 @@ class FormVersion(object):
                 continue
 
             # Get the the data name and type
+
             if 'name' in data_definition and data_type:
                 field = FormField.from_json_definition(data_definition,
                                                        hierarchy, section,

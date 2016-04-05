@@ -56,7 +56,12 @@ class TestFormPackExport(unittest.TestCase):
 
         # by default, exports use the question 'name' attribute
         headers = fp.export(versions=0).to_dict(submissions)['submissions']['fields']
-        self.assertEquals(headers, ['restaurant_name', 'location'])
+        self.assertEquals(headers, ['restaurant_name',
+                                     'location',
+                                     '_location_latitude',
+                                     '_location_longitude',
+                                     '_location_altitude',
+                                     '_location_precision'])
 
         # the first translation in the list is the translation that
         # appears first in the column list. in this case, 'label::english'
@@ -64,19 +69,34 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(header_lang=translations[0], versions=1)
         data = export.to_dict(submissions)
         headers = data['submissions']['fields']
-        self.assertEquals(headers, ['restaurant name', 'location'])
+        self.assertEquals(headers, ['restaurant name',
+                                    'location',
+                                    '_location_latitude',
+                                    '_location_longitude',
+                                    '_location_altitude',
+                                    '_location_precision'])
 
         export = fp.export(header_lang=translations[1], versions=1)
         data = export.to_dict(submissions)
         headers = data['submissions']['fields']
-        self.assertEquals(headers, ['nom du restaurant', 'lieu'])
+        self.assertEquals(headers, ['nom du restaurant',
+                                    'lieu',
+                                    '_lieu_latitude',
+                                    '_lieu_longitude',
+                                    '_lieu_altitude',
+                                    '_lieu_precision'])
 
         # "_default" use the "Label" field
         # TODO: make a separate test to test to test __getitem__
         export = fp.export(header_lang="_default", versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['submissions']['fields']
-        self.assertEquals(headers, ['restaurant name', 'location'])
+        self.assertEquals(headers, ['restaurant name',
+                                    'location',
+                                    '_location_latitude',
+                                    '_location_longitude',
+                                    '_location_altitude',
+                                    '_location_precision'])
 
     def test_export_with_choice_lists(self):
 
@@ -89,13 +109,25 @@ class TestFormPackExport(unittest.TestCase):
 
         export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['fields'], ['restaurant_name',
-                                              'location',
-                                              'eatery_type'])
+                                             'location',
+                                             '_location_latitude',
+                                             '_location_longitude',
+                                             '_location_altitude',
+                                             '_location_precision',
+                                             'eatery_type'])
         self.assertEquals(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
+                                             '13.42',
+                                             '-25.43',
+                                             '',
+                                             '',
                                              'takeaway'],
                                             ['Harvest',
                                              '12.43 -24.53',
+                                             '12.43',
+                                             '-24.53',
+                                             '',
+                                             '',
                                              'sit_down']])
 
         # if a language is passed, fields with available translations
@@ -103,20 +135,37 @@ class TestFormPackExport(unittest.TestCase):
         options['translation'] = fp[1].translations[0]
         export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['data'], [['Taco Truck',
-                                            '13.42 -25.43',
-                                            'take-away'],
-                                           ['Harvest',
-                                            '12.43 -24.53',
-                                            'sit down']])
+                                             '13.42 -25.43',
+                                             '13.42',
+                                             '-25.43',
+                                             '',
+                                             '',
+                                             'take-away'],
+                                            ['Harvest',
+                                             '12.43 -24.53',
+                                             '12.43',
+                                             '-24.53',
+                                             '',
+                                             '',
+                                             'sit down']])
 
         options['translation'] = fp[1].translations[1]
         export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['data'], [['Taco Truck',
-                                            '13.42 -25.43',
-                                            'avec vente à emporter'],
-                                           ['Harvest',
-                                            '12.43 -24.53',
-                                            'traditionnel']])
+                                             '13.42 -25.43',
+                                             '13.42',
+                                             '-25.43',
+                                             '',
+                                             '',
+                                             'avec vente à emporter'],
+                                            ['Harvest',
+                                             '12.43 -24.53',
+                                             '12.43',
+                                             '-24.53',
+                                             '',
+                                             '',
+                                             'traditionnel']])
+
 
     def test_headers_of_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_questions')
@@ -345,10 +394,11 @@ class TestFormPackExport(unittest.TestCase):
         csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
-        "nom du restaurant";"lieu";"type de restaurant"
-        "Taco Truck";"13.42 -25.43";"avec vente à emporter"
-        "Harvest";"12.43 -24.53";"traditionnel"
+        "nom du restaurant";"lieu";"_lieu_latitude";"_lieu_longitude";"_lieu_altitude";"_lieu_precision";"type de restaurant"
+        "Taco Truck";"13.42 -25.43";"13.42";"-25.43";"";"";"avec vente à emporter"
+        "Harvest";"12.43 -24.53";"12.43";"-24.53";"";"";"traditionnel"
         """
+
         self.assertTextEqual(csv_data, expected)
 
     # disabled for now
@@ -359,7 +409,7 @@ class TestFormPackExport(unittest.TestCase):
     #     options = {'versions': 'rgv1'}
     #     list(fp.export(**options).to_csv(submissions))
 
-    def test_export_with_multiple_select(self):
+    def test_export_with_split_fields(self):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
         options = {'versions': 'rpV4'}
@@ -368,14 +418,22 @@ class TestFormPackExport(unittest.TestCase):
             'fields': [
                 'restaurant_name',
                 'location',
+                '_location_latitude',
+                '_location_longitude',
+                '_location_altitude',
+                '_location_precision',
                 'eatery_type',
                 'eatery_type/sit_down',
-                'eatery_type/takeaway'
+                'eatery_type/takeaway',
             ],
             'data': [
                 [
                     'Taco Truck',
                     '13.42 -25.43',
+                    '13.42',
+                    '-25.43',
+                    '',
+                    '',
                     'takeaway sit_down',
                     '1',
                     '1'
@@ -383,13 +441,21 @@ class TestFormPackExport(unittest.TestCase):
                 [
                     'Harvest',
                     '12.43 -24.53',
+                    '12.43',
+                    '-24.53',
+                    '',
+                    '',
                     'sit_down',
                     '1',
                     '0'
                 ],
                 [
                     'Wololo',
-                    '12.43 -24.54',
+                    '12.43 -24.54 1 0',
+                    '12.43',
+                    '-24.54',
+                    '1',
+                    '0',
                     '',
                     '0',
                     '0'
@@ -408,14 +474,22 @@ class TestFormPackExport(unittest.TestCase):
             'fields': [
                 'nom du restaurant',
                 'lieu',
+                '_lieu_latitude',
+                '_lieu_longitude',
+                '_lieu_altitude',
+                '_lieu_precision',
                 'type de restaurant',
                 'type de restaurant::traditionnel',
-                'type de restaurant::avec vente à emporter'
+                'type de restaurant::avec vente à emporter',
             ],
             'data': [
                 [
                     'Taco Truck',
                     '13.42 -25.43',
+                    '13.42',
+                    '-25.43',
+                    '',
+                    '',
                     'takeaway sit_down',
                     '1',
                     '1'
@@ -423,13 +497,21 @@ class TestFormPackExport(unittest.TestCase):
                 [
                     'Harvest',
                     '12.43 -24.53',
+                    '12.43',
+                    '-24.53',
+                    '',
+                    '',
                     'sit_down',
                     '1',
                     '0'
                 ],
                 [
                     'Wololo',
-                    '12.43 -24.54',
+                    '12.43 -24.54 1 0',
+                    '12.43',
+                    '-24.54',
+                    '1',
+                    '0',
                     '',
                     '0',
                     '0'
