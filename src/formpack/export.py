@@ -373,8 +373,9 @@ class Export(object):
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
-                for row in rows:
-                    yield format_line(row, sep, quote)
+                if section == section_name:
+                    for row in rows:
+                        yield format_line(row, sep, quote)
 
     def to_table(self, submissions):
 
