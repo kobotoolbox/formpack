@@ -409,12 +409,12 @@ class Export(object):
                         "row": 2,
                     }
 
-                    for i, label in enumerate(self.labels[section_name]):
+                    for i, label in enumerate(self.labels[section_name], 1):
                         current_sheet.set_cell_value(1, i, label)
 
                 for row in rows:
                     y = cursor["row"]
-                    for i, cell in enumerate(row):
+                    for i, cell in enumerate(row, 1):
                         current_sheet.set_cell_value(y, i, cell)
                     cursor["row"] += 1
 
