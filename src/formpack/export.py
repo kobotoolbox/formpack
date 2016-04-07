@@ -297,10 +297,15 @@ class Export(object):
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
-                    # get submission value for this field
-                    val = entry.get(field.path, '')
-                    # get a mapping of {"col_name": "val", ...}
-                    cells = field.format(val, _translation)
+
+                    try:
+                        # get submission value for this field
+                        val = entry[field.path]
+                        # get a mapping of {"col_name": "val", ...}
+                        cells = field.format(val, _translation)
+                    except KeyError:
+                        cells = field.empty_result
+
                     # fill in the canvas
                     row.update(cells)
 

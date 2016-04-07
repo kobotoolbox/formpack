@@ -54,7 +54,10 @@ class FormField(FormInfo):
         self.can_format = can_format
         self.hierarchy = list(hierarchy) + [self]
 
+        # warning: the order of the super() call matters
         super(FormField, self).__init__(name, labels)
+
+        self.empty_result = self.format('', translation=None)
 
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
@@ -148,6 +151,7 @@ class FormField(FormInfo):
         except KeyError:
             return cls(name, labels, data_type, group, section)
 
+    # TODO: rename it all to "lang" or all to translation
     def format(self, val, translation='_default', context=None):
         return {self.name: val}
 
@@ -267,6 +271,11 @@ class FormChoiceField(FormField):
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
 
+    def __init__(self, *args, **kwargs):
+        super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
+        # reset empty result so it doesn't contain '0'
+        self.empty_result = dict.fromkeys(self.empty_result, '')
+
     def _get_option_label(self, lang="_default", group_sep='/',
                           hierarchy_in_labels=False, option=None):
         """ Return the label for this field and this option in particular """
@@ -321,7 +330,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 "summary": only the summary column
                 "details": only the details column
         """
-        cells = dict.fromkeys(self.value_names, "")
+        cells = dict.fromkeys(self.value_names, "0")
         if multiple_select in ("both", "summary"):
             res = []
             for v in val.split():

@@ -447,7 +447,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'sit_down',
                     '1',
-                    ''
+                    '0'
                 ],
                 [
                     'Wololo',
@@ -456,6 +456,17 @@ class TestFormPackExport(unittest.TestCase):
                     '-24.54',
                     '1',
                     '0',
+                    '',
+                    '0',
+                    '0'
+                ],
+                [
+                    'Los pollos hermanos',
+                    '12.43 -24.54 1',
+                    '12.43',
+                    '-24.54',
+                    '1',
+                    '',
                     '',
                     '',
                     ''
@@ -503,7 +514,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'sit_down',
                     '1',
-                    ''
+                    '0'
                 ],
                 [
                     'Wololo',
@@ -512,6 +523,17 @@ class TestFormPackExport(unittest.TestCase):
                     '-24.54',
                     '1',
                     '0',
+                    '',
+                    '0',
+                    '0'
+                ],
+                [
+                    'Los pollos hermanos',
+                    '12.43 -24.54 1',
+                    '12.43',
+                    '-24.54',
+                    '1',
+                    '',
                     '',
                     '',
                     ''
