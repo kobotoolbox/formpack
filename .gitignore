@@ -70,3 +70,10 @@ env.source
 *.gz
 *.zip
 *.bz2
+
+# temp files
+*~*
+*.tmp
+*.temp
+*.bak
+*.old

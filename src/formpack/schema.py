@@ -319,7 +319,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 "summary": only the summary column
                 "details": only the details column
         """
-        cells = dict.fromkeys(self.value_names, "0")
+        cells = dict.fromkeys(self.value_names, "")
         if multiple_select in ("both", "summary"):
             res = []
             for v in val.split():

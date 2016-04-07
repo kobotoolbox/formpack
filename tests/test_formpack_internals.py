@@ -5,7 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 from formpack import FormPack
-from formpack.fixtures import build_fixture
+from .fixtures import build_fixture
 
 restaurant_profile = build_fixture('restaurant_profile')
 

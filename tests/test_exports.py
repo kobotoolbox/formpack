@@ -14,7 +14,7 @@ from nose.tools import raises
 from path import tempdir
 
 from formpack import FormPack
-from formpack.fixtures import build_fixture
+from .fixtures import build_fixture
 
 
 customer_satisfaction = build_fixture('customer_satisfaction')
@@ -447,7 +447,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'sit_down',
                     '1',
-                    '0'
+                    ''
                 ],
                 [
                     'Wololo',
@@ -457,8 +457,8 @@ class TestFormPackExport(unittest.TestCase):
                     '1',
                     '0',
                     '',
-                    '0',
-                    '0'
+                    '',
+                    ''
                 ]
             ]
         }
@@ -503,7 +503,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'sit_down',
                     '1',
-                    '0'
+                    ''
                 ],
                 [
                     'Wololo',
@@ -513,8 +513,8 @@ class TestFormPackExport(unittest.TestCase):
                     '1',
                     '0',
                     '',
-                    '0',
-                    '0'
+                    '',
+                    ''
                 ]
             ]
         }
