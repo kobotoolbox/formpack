@@ -182,8 +182,10 @@ class FormGPSField(FormField):
         value.
 
         """
-        label = self._get_label(lang, group_sep, hierarchy_in_labels)
-        labels = [self._get_label(lang, group_sep, hierarchy_in_labels)]
+
+        label = self._get_label(lang, group_sep, hierarchy_in_labels=False)
+
+        labels = [label]
 
         components = {'suffix': label}
         pattern = '_{suffix}_{data_type}'
