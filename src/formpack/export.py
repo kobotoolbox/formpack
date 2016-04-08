@@ -13,13 +13,14 @@ from pyexcelerate import Workbook
 
 from .submission import FormSubmission
 from .schema import CopyField
+from .utils.string import unicode
 
 
 class Export(object):
 
     def __init__(self, form_versions, translation="_default", header_lang=None,
-                 group_sep="/", multiple_select="both",
-                 copy_fields=(), force_index=False,
+                 group_sep="/", hierarchy_in_labels=False,
+                 multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
         self.translation = translation
@@ -28,6 +29,7 @@ class Export(object):
         self.versions = form_versions
         self.copy_fields = copy_fields
         self.force_index = force_index
+        self.herarchy_in_labels = hierarchy_in_labels
 
         # If some fields need to be arbitrarly copied, add them
         # to the first section
@@ -40,7 +42,7 @@ class Export(object):
 
         # this deals with merging all form versions headers and labels
         header_lang = header_lang or translation
-        params = (header_lang, group_sep, multiple_select)
+        params = (header_lang, group_sep, hierarchy_in_labels, multiple_select)
         res = self.get_fields_and_labels_for_all_versions(*params)
         self.sections, self.labels = res
 
@@ -65,7 +67,7 @@ class Export(object):
                     # TODO: do we really need FormSubmission ?
                     submission = FormSubmission(entry)
                     yield self.format_one_submission([submission.data], section)
-            except KeyError:  # this versions is requested in the export
+            except KeyError:  # this versions is NOT requested in the export
                 pass
 
     def reset(self):
@@ -79,6 +81,7 @@ class Export(object):
         # N.B: indexes are not affected by form versions
 
     def get_fields_and_labels_for_all_versions(self, lang, group_sep,
+                                                hierarchy_in_labels=False,
                                                 multiple_select="both"):
         """ Return 2 mappings containing field and labels by section
 
@@ -112,7 +115,9 @@ class Export(object):
             # Field labels list mapping to the section containing them
             one_section_labels = section_labels[section_name] = []
             for field in section.fields.values():
-                labels = field.get_labels(lang, group_sep, multiple_select)
+                labels = field.get_labels(lang, group_sep,
+                                          hierarchy_in_labels,
+                                          multiple_select)
                 one_section_labels.append(labels)
 
             # Set of processed field names for fast lookup
@@ -148,7 +153,9 @@ class Export(object):
 
                     # Extract the labels for this field, language, group
                     # separator and muliple_select policy
-                    labels = field.get_labels(lang, group_sep, multiple_select)
+                    labels = field.get_labels(lang, group_sep,
+                                              hierarchy_in_labels,
+                                              multiple_select)
                     # WARNING, labels is a list of labels for this field
                     # since multiple select answers can span on several columns
 
@@ -290,10 +297,15 @@ class Export(object):
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
-                    # get submission value for this field
-                    val = entry.get(field.path, '')
-                    # get a mapping of {"col_name": "val", ...}
-                    cells = field.format(val, _translation)
+
+                    try:
+                        # get submission value for this field
+                        val = entry[field.path]
+                        # get a mapping of {"col_name": "val", ...}
+                        cells = field.format(val, _translation)
+                    except KeyError:
+                        cells = field.empty_result
+
                     # fill in the canvas
                     row.update(cells)
 
@@ -318,9 +330,11 @@ class Export(object):
                 # Because submissions are nested, we flatten them out by reading
                 # the whole submission tree recursively, formatting the entries,
                 # and adding the results to the list of rows for this section.
-                chunk = self.format_one_submission(entry[child_section.path],
-                                                   child_section)
-                chunks.update(chunk)
+                nested_data = entry.get(child_section.path)
+                if nested_data:
+                    chunk = self.format_one_submission(entry[child_section.path],
+                                                       child_section)
+                    chunks.update(chunk)
 
             _indexes[_section_name] += 1
 
@@ -352,10 +366,11 @@ class Export(object):
 
         sections = list(self.labels.items())
 
-        if len(sections) > 1:
-            raise RuntimeError("CSV export does not support repeatable groups")
+        # if len(sections) > 1:
+        #     raise RuntimeError("CSV export does not support repeatable groups")
 
         def format_line(line, sep, quote):
+            line = [unicode(x) for x in line]
             return quote + (quote + sep + quote).join(line) + quote
 
         section, labels = sections[0]
@@ -363,8 +378,9 @@ class Export(object):
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
-                for row in rows:
-                    yield format_line(row, sep, quote)
+                if section == section_name:
+                    for row in rows:
+                        yield format_line(row, sep, quote)
 
     def to_table(self, submissions):
 
@@ -398,12 +414,12 @@ class Export(object):
                         "row": 2,
                     }
 
-                    for i, label in enumerate(self.labels[section_name]):
+                    for i, label in enumerate(self.labels[section_name], 1):
                         current_sheet.set_cell_value(1, i, label)
 
                 for row in rows:
                     y = cursor["row"]
-                    for i, cell in enumerate(row):
+                    for i, cell in enumerate(row, 1):
                         current_sheet.set_cell_value(y, i, cell)
                     cursor["row"] += 1
 
@@ -431,6 +447,7 @@ class Export(object):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
+                        row = [unicode(x) for x in row]
                         yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
 
         yield "</tbody>"

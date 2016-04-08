@@ -25,7 +25,12 @@ class FormPack(object):
         if not versions:
             raise ValueError('A FormPack must contain at least one FormVersion')
 
+        # accept a single version, but normalize it to an iterable
+        if "content" in versions:
+            versions = [versions]
+
         self.versions = OrderedDict()
+
         self.id_string = id_string
 
         self.title = title
@@ -144,7 +149,6 @@ class FormPack(object):
 
         self.versions[form_version.id] = form_version
 
-
     def version_diff(self, vn1, vn2):
         v1 = self.versions[vn1]
         v2 = self.versions[vn2]
@@ -179,7 +183,8 @@ class FormPack(object):
         return json.dumps(self.to_dict(), **kwargs)
 
     def export(self, header_lang=None, translation=None,
-               group_sep=None, versions=-1, multiple_select="both",
+               group_sep='/', hierarchy_in_labels=False,
+               versions=-1, multiple_select="both",
                force_index=False, copy_fields=()):
         '''Create an export for a given version of the form'''
 
@@ -190,6 +195,7 @@ class FormPack(object):
         versions = OrderedDict((v.id, v) for v in versions)
         return Export(versions, header_lang=header_lang,
                       translation=translation, group_sep=group_sep,
+                      hierarchy_in_labels=hierarchy_in_labels,
                       title='submissions', multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields)
 
