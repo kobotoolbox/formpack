@@ -13,7 +13,7 @@ except ImportError:
 
 from .version import FormVersion
 from .utils import get_version_identifiers, str_types
-from .export import Export
+from .reporting import Export
 
 
 class FormPack(object):

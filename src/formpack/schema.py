@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+import re
 
 try:
     from cyordereddict import OrderedDict
@@ -37,8 +38,8 @@ class FormInfo(object):
             labels['_default'] = definition['label']
 
         for key, val in definition.items():
-            if key.startswith('label::'):
-                _, lang = key.split('::')
+            if key.startswith('label:'):
+                _, lang = re.split(r'::?', key, maxsplit=1, flags=re.U)
                 labels[lang] = val
         return labels
 
@@ -133,8 +134,10 @@ class FormField(FormInfo):
         data_type = definition['type']
         choices = None
 
-        # This fix up some old schemas with "select one" instead of "select_one"
+        # Normalize some common aliases
         data_type = data_type.replace('select one', 'select_one')
+        data_type = data_type.replace('select multiple', 'select_multiple')
+        data_type = data_type.replace('location', 'geopoint')
 
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
