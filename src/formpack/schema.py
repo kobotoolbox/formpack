@@ -133,6 +133,9 @@ class FormField(FormInfo):
         data_type = definition['type']
         choices = None
 
+        # This fix up some old schemas with "select one" instead of "select_one"
+        data_type = data_type.replace('select one', 'select_one')
+
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
