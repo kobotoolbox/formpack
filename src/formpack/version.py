@@ -146,7 +146,6 @@ class FormVersion(object):
                 self.translations.update(OrderedDict.fromkeys(field.labels))
 
         # Convert it back to a list to get numerical indexing
-        self.translations.pop('_default', None)
         self.translations = list(self.translations)
 
     def __repr__(self):

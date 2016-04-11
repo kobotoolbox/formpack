@@ -18,7 +18,7 @@ from ..utils.string import unicode
 
 class Export(object):
 
-    def __init__(self, form_versions, translation="_default", header_lang=None,
+    def __init__(self, form_versions, translation=None, header_lang=None,
                  group_sep="/", hierarchy_in_labels=False,
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):

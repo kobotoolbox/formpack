@@ -33,7 +33,7 @@ class FormInfo(object):
     @classmethod
     def _extract_json_labels(cls, definition):
         """ Extract translation labels from the JSON data definition """
-        labels = OrderedDict({'_default': definition['name']})
+        labels = OrderedDict()
         if "label" in definition:
             labels['_default'] = definition['label']
 
