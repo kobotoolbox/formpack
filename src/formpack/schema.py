@@ -5,19 +5,29 @@ from __future__ import (unicode_literals, print_function, absolute_import,
 
 import re
 
+from operator import itemgetter
+
+try:
+    xrange = xrange
+except NameError:  # python 3
+    xrange = range
+
 try:
     from cyordereddict import OrderedDict
 except ImportError:
     from collections import OrderedDict
 
+import statistics
+
 
 class FormInfo(object):
     """ Any object composing a form. It's only used with a subclass. """
 
-    def __init__(self, name, labels=None):
+    def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
         self.labels = labels or {}
         self.value_names = self.get_value_names()
+        self.has_stats = has_stats
 
     def __repr__(self):
         return "<%s name='%s'>" % (self.__class__.__name__, self.name)
@@ -47,16 +57,24 @@ class FormInfo(object):
 class FormField(FormInfo):
     """ A form field definition knowing how to find and format data """
 
-    def __init__(self, name, labels, data_type, hierarchy=(None,),
-                 section=None, can_format=True):
+    def __init__(self, name, labels, data_type, hierarchy=None,
+                 section=None, can_format=True, has_stats=None,
+                 *args, **kwargs):
 
         self.data_type = data_type
         self.section = section
         self.can_format = can_format
-        self.hierarchy = list(hierarchy) + [self]
+
+        hierarchy = list(hierarchy) if hierarchy is not None else [None]
+        self.hierarchy = hierarchy + [self]
 
         # warning: the order of the super() call matters
-        super(FormField, self).__init__(name, labels)
+        super(FormField, self).__init__(name, labels, *args, **kwargs)
+
+        if has_stats is not None:
+            self.has_stats = has_stats
+        else:
+            self.has_stats = data_type != "note"
 
         self.empty_result = self.format('', translation=None)
 
@@ -109,7 +127,7 @@ class FormField(FormInfo):
         return "<%s name='%s' type='%s'>" % args
 
     @classmethod
-    def from_json_definition(cls, definition, group=None,
+    def from_json_definition(cls, definition, hierarchy=None,
                              section=None, field_choices={}):
         """Return an instance of a Field class matching this JSON field def
 
@@ -132,7 +150,7 @@ class FormField(FormInfo):
         name = definition['name']
         labels = cls._extract_json_labels(definition)
         data_type = definition['type']
-        choices = None
+        choice = None
 
         # Normalize some common aliases
         data_type = data_type.replace('select one', 'select_one')
@@ -143,33 +161,158 @@ class FormField(FormInfo):
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
             data_type, choice_id = data_type.split(' ')[:2]  # ignore optional or_other
-            choices = field_choices[choice_id]
+            choice = field_choices[choice_id]
 
         data_type_classes = {
             "select_one": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
+            "date": DateField,
+            "text": TextField,
+            "barcode": TextField,
+            # calculate is usually not text but for our purpose it's good
+            # enough
+            "calculate": TextField,
+            "acknowledge": TextField,
+            "integer": NumField,
+            'decimal': NumField
         }
 
-        try:
-            args = (name, labels, data_type, group, section, choices)
-            return data_type_classes[data_type](*args)
-        except KeyError:
-            return cls(name, labels, data_type, group, section)
+        args = {
+            'name': name,
+            'labels': labels,
+            'data_type': data_type,
+            'hierarchy': hierarchy,
+            'section': section,
+            'choice': choice
+        }
+        return data_type_classes.get(data_type, cls)(**args)
 
     # TODO: rename it all to "lang" or all to translation
     def format(self, val, translation='_default', context=None):
         return {self.name: val}
 
+    def get_stats(self, metrics):
+
+        total = sum(metrics.values())
+        not_provided = metrics.pop(None, 0)
+        provided = total - not_provided
+
+        return {
+            'total_count': total,
+            'not_provided': not_provided,
+            'provided': provided,
+            'show_graph': False
+        }
+
+
+class TextField(FormField):
+
+    def get_stats(self, metrics, limit=100):
+
+        total = sum(metrics.values())
+        not_provided = metrics.pop(None, 0)
+        provided = total - not_provided
+
+        top = metrics.most_common(limit)
+        pourcentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        show_graph = self.data_type in {'date', 'select_one', 'select_multiple'}
+
+        return {
+            'total_count': total,
+            'not_provided': not_provided,
+            'provided': provided,
+            'frequency': top,
+            'pourcentage': pourcentage,
+            'show_graph': show_graph
+        }
+
+
+class DateField(FormField):
+    def get_stats(self, metrics, limit=100):
+        """ Return total count for all, and freq and % for 'date' date types
+
+            Dates are sorted from old to new.
+        """
+
+        if self.data_type != "date":
+            return {
+                'total_count': sum(metrics.values()),
+                'show_graph': False
+            }
+
+        total = sum(metrics.values())
+        not_provided = metrics.pop(None, 0)
+        provided = total - not_provided
+
+        top = sorted(metrics.items(), key=itemgetter(0))[:limit]
+
+        pourcentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+
+        return {
+            'total_count': total,
+            'not_provided': not_provided,
+            'provided': provided,
+            'frequency': top,
+            'pourcentage': pourcentage,
+            'show_graph': True
+        }
+
+
+class NumField(FormField):
+
+    def flatten_dataset(self, dataset):
+        """ Generate sorted numbers as listed in the given metrics counter"""
+
+        for value, freq in sorted(dataset.items()):
+            for x in xrange(freq):
+                yield value
+
+    def get_stats(self, metrics, limit=100):
+
+        total = sum(metrics.values())
+        not_provided = metrics.pop(None, 0)
+        provided = total - not_provided
+
+        stats = {
+            'total': total,
+            'show_graph': False,
+            'provided': provided,
+            'not_provided': not_provided,
+            'median': '<N/A>',
+            'mean': '<N/A>',
+            'mode': '<N/A>',
+            'stdev': '<N/A>'
+        }
+
+        try:
+            # require a non empty dataset
+            stats['mean'] = statistics.mean(self.flatten_dataset(metrics))
+
+            stats['median'] = statistics.median(self.flatten_dataset(metrics))
+
+            # requires at least 2 values in the dataset
+            stats['stdev'] = statistics.stdev(self.flatten_dataset(metrics),
+                                              xbar=stats['mean'])
+
+            # requires a non empty dataset and a unique mode
+            stats['mode'] = statistics.mode(self.flatten_dataset(metrics))
+        except statistics.StatisticsError:
+            pass
+
+        return stats
+
 
 class CopyField(FormField):
     """ Just copy the data over. No translation. No manipulation """
-    def __init__(self, name, hierarchy=(None,), section=None):
+    def __init__(self, name, hierarchy=(None,), section=None, *args, **kwargs):
         super(CopyField, self).__init__(name, labels=None,
                                         data_type=name,
                                         hierarchy=(None,),
                                         section=section,
-                                        can_format=True)
+                                        can_format=True,
+                                        has_stats=False,
+                                        *args, **kwargs)
 
     def get_labels(self, *args, **kwargs):
         """ Labels are the just the value name. Groups are ignored """
@@ -178,10 +321,10 @@ class CopyField(FormField):
 
 class FormGPSField(FormField):
 
-    def __init__(self, name, labels, data_type, path=None,
-                 section=None, choice=None):
+    def __init__(self, name, labels, data_type, hierarchy=None,
+                 section=None, choice=None, *args, **kwargs):
         super(FormGPSField, self).__init__(name, labels, data_type,
-                                           path, section)
+                                           hierarchy, section, *args, **kwargs)
 
     def get_labels(self, lang="_default", group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
@@ -259,11 +402,12 @@ class FormGPSField(FormField):
 class FormChoiceField(FormField):
     """  Same as FormField, but link the data to a FormChoice """
 
-    def __init__(self, name, labels, data_type, path=None,
-                 section=None, choice=None):
-        self.choice = choice or {}
+    def __init__(self, name, labels, data_type, hierarchy=None,
+                 section=None, choice=None, *args, **kwargs):
+        self.choice = choice or FormChoice(name)
         super(FormChoiceField, self).__init__(name, labels, data_type,
-                                              path, section)
+                                              hierarchy, section,
+                                              *args, **kwargs)
 
     def format(self, val, translation='_default', multiple_select="both"):
         if translation:
@@ -323,7 +467,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
     def __repr__(self):
         data = (self.name, self.data_type)
-        return "<FormChoiceField name='%s' type='%s'>" % data
+        return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
 
     # maybe try to cache those
     def format(self, val, translation='_default',
@@ -360,12 +504,13 @@ class FormSection(FormInfo):
     """ The tabular representation of a repeatable group of fields """
 
     def __init__(self, name="submissions", labels=None, fields=None,
-                 parent=None, children=(), hierarchy=(None,)):
+                 parent=None, children=(), hierarchy=(None,),
+                 *args, **kwargs):
 
         if labels is None:
             labels = {'_default': 'submissions'}
 
-        super(FormSection, self).__init__(name, labels)
+        super(FormSection, self).__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
         self.parent = parent
         self.children = list(children)
@@ -390,8 +535,8 @@ class FormSection(FormInfo):
 
 class FormChoice(FormInfo):
 
-    def __init__(self, name):
-        super(FormChoice, self).__init__(name)
+    def __init__(self, name, *args, **kwargs):
+        super(FormChoice, self).__init__(name, *args, **kwargs)
         self.name = name
         self.options = {}
 
@@ -408,7 +553,11 @@ class FormChoice(FormInfo):
             if 'list name' in choice_definition:
                 raise ValueError('use list_name instead of "list name"')
 
-            choice_name = choice_definition['list_name']
+            choice_name = choice_definition.get('list_name')
+
+            # Handle an alias
+            choice_name = choice_name or choice_definition.get('list name')
+
             try:
                 choices = all_choices[choice_name]
             except KeyError:

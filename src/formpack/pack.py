@@ -13,7 +13,7 @@ except ImportError:
 
 from .version import FormVersion
 from .utils import get_version_identifiers, str_types
-from .reporting import Export
+from .reporting import Export, AutoReport
 
 
 class FormPack(object):
@@ -186,7 +186,7 @@ class FormPack(object):
                group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
                force_index=False, copy_fields=()):
-        '''Create an export for a given version of the form'''
+        '''Create an export for a given versions of the form'''
 
         if isinstance(versions, str_types + (int,)):
             versions = [versions]
@@ -199,3 +199,12 @@ class FormPack(object):
                       title='submissions', multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields)
 
+    def autoreport(self, versions=-1):
+        '''Create an automatic report for a given versions of the form'''
+
+        if isinstance(versions, str_types + (int,)):
+            versions = [versions]
+        versions = [self[key] for key in versions]
+
+        versions = OrderedDict((v.id, v) for v in versions)
+        return AutoReport(versions)

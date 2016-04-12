@@ -80,15 +80,15 @@ class Export(object):
         self._indexes = {n: 1 for n in self.sections}
         # N.B: indexes are not affected by form versions
 
-    def get_fields_and_labels_for_all_versions(self, lang, group_sep,
+    def get_fields_and_labels_for_all_versions(self, lang=None, group_sep="/",
                                                 hierarchy_in_labels=False,
                                                 multiple_select="both"):
         """ Return 2 mappings containing field and labels by section
 
             This is needed because when making an export for several
             versions of the same form, fields get added, removed, and
-            edited. Hence we pre-generate mappings conteaining labels
-            and field for all version so we can use them later as a
+            edited. Hence we pre-generate mappings containing labels
+            and fields for all versions so we can use them later as a
             canvas to keep the export coherent.
 
             Labels are used as column headers.
