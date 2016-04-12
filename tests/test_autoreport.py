@@ -13,14 +13,12 @@ class TestAutoReport(unittest.TestCase):
 
     maxDiff = None
 
-    def test_list_fields(self):
+    def test_list_fields_on_packs(self):
 
         title, schemas, submissions = build_fixture('restaurant_profile')
         fp = FormPack(schemas, title)
 
-        report = fp.autoreport()
-
-        fields = report.get_fields_for_all_versions()
+        fields = fp.get_fields_for_versions()
 
         field_names = [field.name for field in fields]
         assert field_names == ['restaurant_name', 'location', 'eatery_type']
@@ -28,7 +26,6 @@ class TestAutoReport(unittest.TestCase):
         field_types = [field.__class__.__name__ for field in fields]
         assert field_types == ['TextField', 'FormGPSField',
                                'FormChoiceFieldWithMultipleSelect']
-
 
     def test_simple_report(self):
 
