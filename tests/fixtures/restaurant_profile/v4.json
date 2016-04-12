@@ -17,7 +17,7 @@
                 "label::french": "lieu"
             },
             {
-                "type": "select_many eatery_types",
+                "type": "select_multiple eatery_types",
                 "name": "eatery_type",
                 "label::english": "type of eatery",
                 "label::french": "type de restaurant"
@@ -51,8 +51,12 @@
         },
         {
             "restaurant_name": "Wololo",
-            "location": "12.43 -24.54",
+            "location": "12.43 -24.54 1 0",
             "eatery_type": ""
+        },
+        {
+            "restaurant_name": "Los pollos hermanos",
+            "location": "12.43 -24.54 1"
         }
     ]
 }

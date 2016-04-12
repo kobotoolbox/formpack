@@ -6,7 +6,7 @@ from __future__ import (unicode_literals, print_function,
 import unittest
 
 from formpack import FormPack
-from formpack.fixtures import build_fixture
+from .fixtures import build_fixture
 
 
 sanitation_report = build_fixture('sanitation_report')

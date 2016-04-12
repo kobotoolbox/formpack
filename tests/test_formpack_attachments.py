@@ -6,7 +6,7 @@ from __future__ import (unicode_literals, print_function,
 import unittest
 from formpack.b64_attachment import B64Attachment
 
-from formpack.fixtures.load_fixture_json import load_fixture_json
+from .fixtures.load_fixture_json import load_fixture_json
 
 
 class TestB64Attachment(unittest.TestCase):
