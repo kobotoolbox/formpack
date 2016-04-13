@@ -96,6 +96,8 @@ class Export(object):
             Field are used to create rows of data from submission.
         """
 
+        # TODO: refactor this to use FormPack.get_fields_for_versions
+
         section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
         section_labels = OrderedDict()  # {section: [field_label, field_label]}
         processed_fields = {}  # Used to avoid expensive lookups

@@ -120,7 +120,7 @@ class FormField(FormInfo):
                 path.append(level.labels.get(lang) or level.name)
             return group_sep.join(path)
 
-        return self.labels.get(lang) or self.name
+        return self.labels.get(lang, self.name)
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
@@ -275,7 +275,7 @@ class NumField(FormField):
         provided = total - not_provided
 
         stats = {
-            'total': total,
+            'total_count': total,
             'show_graph': False,
             'provided': provided,
             'not_provided': not_provided,
