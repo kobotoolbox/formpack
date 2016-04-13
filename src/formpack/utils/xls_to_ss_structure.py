@@ -89,6 +89,10 @@ def _parsed_sheet(sheet_lists):
 
     outputs a list of ordered dicts
     '''
+    # Treat sheets without at least two rows, i.e. without a header row
+    # and at least one data row, as empty
+    if len(sheet_lists) < 2:
+        return []
     columns = sheet_lists[0]
     rows = sheet_lists[1:]
     out_list = []
@@ -109,10 +113,5 @@ def xls_to_dicts(xls_file_object, strip_empty_rows=True):
     lists = xls_to_lists(xls_file_object)
     out = OrderedDict()
     for key, sheet in lists.items():
-        if len(sheet) >= 2:
-            out[key] = _parsed_sheet(sheet)
-        else:
-            # Treat sheets without at least two rows, i.e. without a header row
-            # and at least one data row, as empty
-            out[key] = []
+        out[key] = _parsed_sheet(sheet)
     return out
