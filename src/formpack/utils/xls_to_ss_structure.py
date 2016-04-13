@@ -109,5 +109,10 @@ def xls_to_dicts(xls_file_object, strip_empty_rows=True):
     lists = xls_to_lists(xls_file_object)
     out = OrderedDict()
     for key, sheet in lists.items():
-        out[key] = _parsed_sheet(sheet)
+        if len(sheet) >= 2:
+            out[key] = _parsed_sheet(sheet)
+        else:
+            # Treat sheets without at least two rows, i.e. without a header row
+            # and at least one data row, as empty
+            out[key] = []
     return out
