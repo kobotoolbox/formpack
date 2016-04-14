@@ -8,7 +8,7 @@ import begin
 
 import sys
 import json
-from utils.xls_to_ss_structure import xls_to_dicts
+from .utils.xls_to_ss_structure import xls_to_dicts
 
 
 @begin.subcommand
