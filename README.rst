@@ -12,4 +12,6 @@ Test::
 
     tox
 
+Command line methods::
 
+    python -m formpack xls example.xlsx # convert xlsx file to json
