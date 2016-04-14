@@ -215,7 +215,7 @@ class TextField(FormField):
         provided = total - not_provided
 
         top = metrics.most_common(limit)
-        pourcentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
         show_graph = self.data_type in {'date', 'select_one', 'select_multiple'}
 
         return {
@@ -223,7 +223,7 @@ class TextField(FormField):
             'not_provided': not_provided,
             'provided': provided,
             'frequency': top,
-            'pourcentage': pourcentage,
+            'percentage': percentage,
             'show_graph': show_graph
         }
 
@@ -247,14 +247,14 @@ class DateField(FormField):
 
         top = sorted(metrics.items(), key=itemgetter(0))[:limit]
 
-        pourcentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
 
         return {
             'total_count': total,
             'not_provided': not_provided,
             'provided': provided,
             'frequency': top,
-            'pourcentage': pourcentage,
+            'percentage': percentage,
             'show_graph': True
         }
 
@@ -506,6 +506,25 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             for choice in val.split():
                 cells[self.name + "/" + choice] = "1"
         return cells
+
+    def get_stats(self, metrics, limit=100):
+
+        total = sum(metrics.values())
+        not_provided = metrics.pop(None, 0)
+        provided = total - not_provided
+
+        top = metrics.most_common(limit)
+        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        show_graph = self.data_type in {'date', 'select_one', 'select_multiple'}
+
+        return {
+            'total_count': total,
+            'not_provided': not_provided,
+            'provided': provided,
+            'frequency': top,
+            'percentage': percentage,
+            'show_graph': show_graph
+        }
 
 
 class FormGroup(FormInfo):  # useful to get __repr__
