@@ -51,5 +51,5 @@ class AutoReport(object):
                         counter[entry.get(field.path)] += 1
 
         for field in fields:
-            yield (field.get_labels(lang),
+            yield (field.get_labels(lang)[0],
                    field.get_stats(metrics[field.name]))
