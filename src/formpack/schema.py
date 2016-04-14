@@ -262,11 +262,23 @@ class DateField(FormField):
 class NumField(FormField):
 
     def flatten_dataset(self, dataset):
-        """ Generate sorted numbers as listed in the given metrics counter"""
+        """ Generate sorted numbers as listed in the given metrics counter
 
-        for value, freq in sorted(dataset.items()):
-            for x in xrange(freq):
-                yield value
+            Cast the value to the propoer datatype in caste it's been provided
+            as text.
+
+        """
+
+        if self.data_type == "integer":
+            for value, freq in sorted(dataset.items()):
+                value = int(value)
+                for x in xrange(freq):
+                    yield value
+        else:
+            for value, freq in sorted(dataset.items()):
+                value = float(value)
+                for x in xrange(freq):
+                    yield value
 
     def get_stats(self, metrics, limit=100):
 
