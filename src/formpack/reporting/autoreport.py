@@ -20,7 +20,7 @@ class AutoReport(object):
         self.formpack = formpack
         self.versions = form_versions
 
-    def get_stats(self, submissions, fields=()):
+    def get_stats(self, submissions, fields=(), lang=None):
 
         versions = self.versions
 
@@ -51,4 +51,5 @@ class AutoReport(object):
                         counter[entry.get(field.path)] += 1
 
         for field in fields:
-            yield (field.name, field.get_stats(metrics[field.name]))
+            yield (field.get_labels(lang),
+                   field.get_stats(metrics[field.name]))
