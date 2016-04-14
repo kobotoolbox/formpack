@@ -33,32 +33,37 @@ class TestAutoReport(unittest.TestCase):
         fp = FormPack(schemas, title)
 
         report = fp.autoreport()
-        stats = report.get_stats(submissions)
+        stats = report.get_stats(submissions, lang='french')
 
         assert list(stats) == [
-                    ('restaurant_name',
+                    ('nom du restaurant',
                           {'frequency': [('Taco Truck', 1),
                                           ('Wololo', 1),
                                           ('Harvest', 1),
                                           ('Los pollos hermanos', 1)],
                            'not_provided': 0,
-                           'pourcentage': [('Taco Truck', '25.00'),
+                           'percentage': [('Taco Truck', '25.00'),
                                             ('Wololo', '25.00'),
                                             ('Harvest', '25.00'),
                                             ('Los pollos hermanos', '25.00')],
                            'provided': 4,
                            'show_graph': False,
                            'total_count': 4}),
-                    ('location',
+                    ('lieu',
                           {'not_provided': 0,
                            'provided': 4,
                            'show_graph': False,
                            'total_count': 4}),
-                    ('eatery_type',
-                          {'not_provided': 1,
+                    ('type de restaurant',
+                          {'frequency': [('traditionnel', 2),
+                                         ('avec vente \xe0 emporter', 1)],
+                           'percentage': [('traditionnel', '50.00'),
+                                          ('avec vente \xe0 emporter', '25.00')],
+                           'not_provided': 1,
                            'provided': 3,
-                           'show_graph': False,
-                           'total_count': 4})
+                           'show_graph': True,
+                           'total_count': 4}
+                    )
                 ]
 
     def test_rich_report(self):
@@ -75,7 +80,7 @@ class TestAutoReport(unittest.TestCase):
                                  ('The other one', 2),
                                    ('That one', 1)],
                    'not_provided': 1,
-                   'pourcentage': [('Felipes', '33.33'),
+                   'percentage': [('Felipes', '33.33'),
                                    ('The other one', '33.33'),
                                    ('That one', '16.67')],
                    'provided': 5,
@@ -91,7 +96,7 @@ class TestAutoReport(unittest.TestCase):
                                   ('2002-01-01', 2),
                                   ('2003-01-01', 1)],
                    'not_provided': 1,
-                   'pourcentage': [('2001-01-01', '33.33'),
+                   'percentage': [('2001-01-01', '33.33'),
                                     ('2002-01-01', '33.33'),
                                     ('2003-01-01', '16.67')],
 
@@ -106,5 +111,5 @@ class TestAutoReport(unittest.TestCase):
                    'provided': 5,
                    'show_graph': False,
                    'stdev': 0.5477225575051661,
-                   'total': 6})
+                   'total_count': 6})
         ]

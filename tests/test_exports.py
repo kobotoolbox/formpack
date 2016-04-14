@@ -66,7 +66,7 @@ class TestFormPackExport(unittest.TestCase):
         # the first translation in the list is the translation that
         # appears first in the column list. in this case, 'label::english'
         translations = fp[1].translations
-        export = fp.export(header_lang=translations[0], versions=1)
+        export = fp.export(lang=translations[0], versions=1)
         data = export.to_dict(submissions)
         headers = data['submissions']['fields']
         self.assertEquals(headers, ['restaurant name',
@@ -76,7 +76,7 @@ class TestFormPackExport(unittest.TestCase):
                                     '_location_altitude',
                                     '_location_precision'])
 
-        export = fp.export(header_lang=translations[1], versions=1)
+        export = fp.export(lang=translations[1], versions=1)
         data = export.to_dict(submissions)
         headers = data['submissions']['fields']
         self.assertEquals(headers, ['nom du restaurant',
@@ -88,7 +88,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # "_default" use the "Label" field
         # TODO: make a separate test to test to test __getitem__
-        export = fp.export(header_lang="_default", versions='rpv1')
+        export = fp.export(lang="_default", versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['submissions']['fields']
         self.assertEquals(headers, ['restaurant name',
@@ -132,7 +132,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # if a language is passed, fields with available translations
         # are translated into that language
-        options['translation'] = fp[1].translations[0]
+        options['lang'] = fp[1].translations[0]
         export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
@@ -149,7 +149,7 @@ class TestFormPackExport(unittest.TestCase):
                                              '',
                                              'sit down']])
 
-        options['translation'] = fp[1].translations[1]
+        options['lang'] = fp[1].translations[1]
         export = fp.export(**options).to_dict(submissions)['submissions']
         self.assertEquals(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
@@ -378,7 +378,7 @@ class TestFormPackExport(unittest.TestCase):
         # self.assertTextEqual(csv_data, expected)
 
         # options = {'versions': 'gqs', 'hierarchy_in_labels': True,
-        #            'header_lang': "_default"}
+        #            'lang': "_default"}
         # csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         # expected = """
@@ -390,7 +390,7 @@ class TestFormPackExport(unittest.TestCase):
 
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
-        options = {'versions': 'rpV3', 'translation': fp[1].translations[1]}
+        options = {'versions': 'rpV3', 'lang': fp[1].translations[1]}
         csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
@@ -478,7 +478,7 @@ class TestFormPackExport(unittest.TestCase):
 
         options = {'versions': 'rpV4', "group_sep": "::",
                     'hierarchy_in_labels': True,
-                   "header_lang": fp[-1].translations[1]}
+                   "lang": fp[-1].translations[1]}
         export = fp.export(**options).to_dict(submissions)['submissions']
 
         expected = {
@@ -501,7 +501,7 @@ class TestFormPackExport(unittest.TestCase):
                     '-25.43',
                     '',
                     '',
-                    'takeaway sit_down',
+                    'avec vente à emporter traditionnel',
                     '1',
                     '1'
                 ],
@@ -512,7 +512,7 @@ class TestFormPackExport(unittest.TestCase):
                     '-24.53',
                     '',
                     '',
-                    'sit_down',
+                    'traditionnel',
                     '1',
                     '0'
                 ],

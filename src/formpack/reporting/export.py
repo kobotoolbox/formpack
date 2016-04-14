@@ -18,12 +18,12 @@ from ..utils.string import unicode
 
 class Export(object):
 
-    def __init__(self, form_versions, translation=None, header_lang=None,
+    def __init__(self, form_versions, lang=None,
                  group_sep="/", hierarchy_in_labels=False,
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
-        self.translation = translation
+        self.lang = lang
         self.group_sep = group_sep
         self.title = title
         self.versions = form_versions
@@ -41,8 +41,7 @@ class Export(object):
                 first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
-        header_lang = header_lang or translation
-        params = (header_lang, group_sep, hierarchy_in_labels, multiple_select)
+        params = (lang, group_sep, hierarchy_in_labels, multiple_select)
         res = self.get_fields_and_labels_for_all_versions(*params)
         self.sections, self.labels = res
 
@@ -263,7 +262,7 @@ class Export(object):
 
         # Some local aliases to get better perfs
         _section_name = current_section.name
-        _translation = self.translation
+        _lang = self.lang
         _empty_row = self._empty_row[_section_name]
         _indexes = self._indexes
         row = self._row_cache[_section_name]
@@ -304,7 +303,7 @@ class Export(object):
                         # get submission value for this field
                         val = entry[field.path]
                         # get a mapping of {"col_name": "val", ...}
-                        cells = field.format(val, _translation)
+                        cells = field.format(val, _lang)
                     except KeyError:
                         cells = field.empty_result
 

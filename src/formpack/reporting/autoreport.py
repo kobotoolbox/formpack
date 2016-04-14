@@ -48,8 +48,13 @@ class AutoReport(object):
                 for field in fields:
                     if field.has_stats:
                         counter = metrics[field.name]
-                        counter[entry.get(field.path)] += 1
+                        raw_value = entry.get(field.path)
+                        if raw_value is not None:
+                            values = field.parse_values(entry.get(field.path))
+                            counter.update(values)
+                        else:
+                            counter[None] += 1
 
         for field in fields:
             yield (field.get_labels(lang)[0],
-                   field.get_stats(metrics[field.name]))
+                   field.get_stats(metrics[field.name], lang=lang))
