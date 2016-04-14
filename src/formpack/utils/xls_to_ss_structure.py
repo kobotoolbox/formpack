@@ -8,6 +8,7 @@ from collections import OrderedDict
 import pyxform
 import xlrd
 import re
+import datetime
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
