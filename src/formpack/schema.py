@@ -411,7 +411,7 @@ class FormGPSField(FormField):
         return dict(zip(self.value_names, values))
 
 
-class FormChoiceField(FormField):
+class FormChoiceField(TextField):
     """  Same as FormField, but link the data to a FormChoice """
 
     def __init__(self, name, labels, data_type, hierarchy=None,
