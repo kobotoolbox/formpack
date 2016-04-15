@@ -37,6 +37,7 @@ class AutoReport(object):
         metrics = OrderedDict((field.name, Counter()) for field in fields)
 
         for version_id, entries in submissions:
+
             # Skip unrequested versions
             if version_id not in versions:
                 continue
@@ -52,6 +53,7 @@ class AutoReport(object):
                         if raw_value is not None:
                             values = field.parse_values(entry.get(field.path))
                             counter.update(values)
+                            counter['__submissions__'] += 1
                         else:
                             counter[None] += 1
 

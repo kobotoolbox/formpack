@@ -35,36 +35,34 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions, lang='french')
 
-        assert list(stats) == [
-                    ('nom du restaurant',
-                          {'frequency': [('Taco Truck', 1),
-                                          ('Wololo', 1),
-                                          ('Harvest', 1),
-                                          ('Los pollos hermanos', 1)],
-                           'not_provided': 0,
-                           'percentage': [('Taco Truck', '25.00'),
-                                            ('Wololo', '25.00'),
-                                            ('Harvest', '25.00'),
-                                            ('Los pollos hermanos', '25.00')],
-                           'provided': 4,
-                           'show_graph': False,
-                           'total_count': 4}),
-                    ('lieu',
-                          {'not_provided': 0,
-                           'provided': 4,
-                           'show_graph': False,
-                           'total_count': 4}),
-                    ('type de restaurant',
-                          {'frequency': [('traditionnel', 2),
-                                         ('avec vente \xe0 emporter', 1)],
-                           'percentage': [('traditionnel', '50.00'),
-                                          ('avec vente \xe0 emporter', '25.00')],
-                           'not_provided': 1,
-                           'provided': 3,
-                           'show_graph': True,
-                           'total_count': 4}
-                    )
-                ]
+        assert list(stats) ==  [
+            ('nom du restaurant',
+                  {'frequency': [('Taco Truck', 1),
+                                    ('Harvest', 1),
+                                    ('Los pollos hermanos', 1),
+                                    ('Wololo', 1)],
+                  'not_provided': 0,
+                  'percentage': [('Taco Truck', '25.00'),
+                                    ('Harvest', '25.00'),
+                                    ('Los pollos hermanos', '25.00'),
+                                    ('Wololo', '25.00')],
+                  'provided': 4,
+                  'show_graph': False,
+                  'total_count': 4}),
+            ('lieu',
+                  {'not_provided': 0,
+                  'provided': 4,
+                  'show_graph': False,
+                  'total_count': 4}),
+            ('type de restaurant',
+                  {'frequency': [('traditionnel', 2), ('avec vente \xe0 emporter', 1)],
+                  'not_provided': 1,
+                  'percentage': [('traditionnel', '50.00'),
+                                    ('avec vente \xe0 emporter', '25.00')],
+                  'provided': 3,
+                  'show_graph': True,
+                  'total_count': 4})
+         ]
 
     def test_rich_report(self):
 

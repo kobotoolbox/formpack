@@ -157,14 +157,13 @@ class FormField(FormDataDef):
     def format(self, val, lang=None, context=None):
         return {self.name: val}
 
-    def get_stats(self, metrics, lang=None):
+    def get_stats(self, metrics, lang=None, limit=100):
 
-        total = sum(metrics.values())
         not_provided = metrics.pop(None, 0)
-        provided = total - not_provided
+        provided = metrics.pop('__submissions__', 0)
 
         return {
-            'total_count': total,
+            'total_count': not_provided + provided,
             'not_provided': not_provided,
             'provided': provided,
             'show_graph': False
@@ -178,21 +177,18 @@ class TextField(FormField):
 
     def get_stats(self, metrics, lang=None, limit=100):
 
-        total = sum(metrics.values())
-        not_provided = metrics.pop(None, 0)
-        provided = total - not_provided
+        stats = super(TextField, self).get_stats(metrics, lang, limit)
 
         top = metrics.most_common(limit)
+        total = stats['total_count']
         percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
 
-        return {
-            'total_count': total,
-            'not_provided': not_provided,
-            'provided': provided,
+        stats.update({
             'frequency': top,
             'percentage': percentage,
-            'show_graph': False
-        }
+        })
+
+        return stats
 
 
 class DateField(FormField):
@@ -202,28 +198,23 @@ class DateField(FormField):
             Dates are sorted from old to new.
         """
 
-        if self.data_type != "date":
-            return {
-                'total_count': sum(metrics.values()),
-                'show_graph': False
-            }
+        stats = super(DateField, self).get_stats(metrics, lang, limit)
 
-        total = sum(metrics.values())
-        not_provided = metrics.pop(None, 0)
-        provided = total - not_provided
+        if self.data_type != "date":
+            return stats
 
         top = sorted(metrics.items(), key=itemgetter(0))[:limit]
-
+        total = stats['total_count']
         percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
 
-        return {
-            'total_count': total,
-            'not_provided': not_provided,
-            'provided': provided,
+        stats.update({
             'frequency': top,
             'percentage': percentage,
             'show_graph': True
-        }
+        })
+
+        return stats
+
 
 
 class NumField(FormField):
@@ -241,20 +232,14 @@ class NumField(FormField):
 
     def get_stats(self, metrics, lang=None, limit=100):
 
-        total = sum(metrics.values())
-        not_provided = metrics.pop(None, 0)
-        provided = total - not_provided
+        stats = super(NumField, self).get_stats(metrics, lang, limit)
 
-        stats = {
-            'total_count': total,
-            'show_graph': False,
-            'provided': provided,
-            'not_provided': not_provided,
+        stats.update({
             'median': '<N/A>',
             'mean': '<N/A>',
             'mode': '<N/A>',
             'stdev': '<N/A>'
-        }
+        })
 
         try:
             # require a non empty dataset
@@ -395,9 +380,8 @@ class FormChoiceField(FormField):
 
     def get_stats(self, metrics, lang=None, limit=100):
 
-        total = sum(metrics.values())
-        not_provided = metrics.pop(None, 0)
-        provided = total - not_provided
+        stats = super(FormChoiceField, self).get_stats(metrics, lang, limit)
+        total = stats['total_count']
 
         top = metrics.most_common(limit)
         top = [(self.get_translation(val, lang), freq) for val, freq in top]
@@ -407,14 +391,13 @@ class FormChoiceField(FormField):
             freq = "%.2f" % (freq * 100 / total)
             percentage.append((val, freq))
 
-        return {
-            'total_count': total,
-            'not_provided': not_provided,
-            'provided': provided,
+        stats.update({
             'frequency': top,
             'percentage': percentage,
             'show_graph': True
-        }
+        })
+
+        return stats
 
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):

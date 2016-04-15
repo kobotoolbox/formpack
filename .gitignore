@@ -77,3 +77,7 @@ env.source
 *.temp
 *.bak
 *.old
+
+# config file
+*sublime-*
+.vscode/
