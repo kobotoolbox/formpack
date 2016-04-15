@@ -353,40 +353,40 @@ class TestFormPackExport(unittest.TestCase):
         )
 
     def test_csv(self):
-        # title, schemas, submissions = build_fixture('grouped_questions')
-        # fp = FormPack(schemas, title)
-        # options = {'versions': 'gqs'}
-        # csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        title, schemas, submissions = build_fixture('grouped_questions')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'gqs'}
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
-        # expected = """
-        # "q1";"g1q1";"g1sg1q1";"g1q2";"g2q1";"qz"
-        # "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
-        # "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
-        # """
+        expected = """
+        "q1";"g1q1";"g1sg1q1";"g1q2";"g2q1";"qz"
+        "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
+        "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
+        """
 
-        # self.assertTextEqual(csv_data, expected)
+        self.assertTextEqual(csv_data, expected)
 
-        # options = {'versions': 'gqs', 'hierarchy_in_labels': True}
-        # csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        options = {'versions': 'gqs', 'hierarchy_in_labels': True}
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
-        # expected = """
-        # "q1";"g1/g1q1";"g1/sg1/g1sg1q1";"g1/g1q2";"g2/g2q1";"qz"
-        # "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
-        # "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
-        # """
+        expected = """
+        "q1";"g1/g1q1";"g1/sg1/g1sg1q1";"g1/g1q2";"g2/g2q1";"qz"
+        "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
+        "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
+        """
 
-        # self.assertTextEqual(csv_data, expected)
+        self.assertTextEqual(csv_data, expected)
 
-        # options = {'versions': 'gqs', 'hierarchy_in_labels': True,
-        #            'lang': "_default"}
-        # csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        options = {'versions': 'gqs', 'hierarchy_in_labels': True,
+                   'lang': "_default"}
+        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
-        # expected = """
-        # "Q1";"Group 1/G1Q1";"Group 1/Sub Group 1/G1SG1Q1";"Group 1/G1Q2";"g2/G2Q1";"QZed"
-        # "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
-        # "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
-        # """
-        # self.assertTextEqual(csv_data, expected)
+        expected = """
+        "Q1";"Group 1/G1Q1";"Group 1/Sub Group 1/G1SG1Q1";"Group 1/G1Q2";"g2/G2Q1";"QZed"
+        "respondent1's r1";"respondent1's r2";"respondent1's r2.5";"respondent1's r2.75 :)";"respondent1's r3";"respondent1's r4"
+        "respondent2's r1";"respondent2's r2";"respondent2's r2.5";"respondent2's r2.75 :)";"respondent2's r3";"respondent2's r4"
+        """
+        self.assertTextEqual(csv_data, expected)
 
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)

@@ -8,6 +8,7 @@ from collections import OrderedDict
 import pyxform
 import xlrd
 import re
+import datetime
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
@@ -89,6 +90,10 @@ def _parsed_sheet(sheet_lists):
 
     outputs a list of ordered dicts
     '''
+    # Treat sheets without at least two rows, i.e. without a header row
+    # and at least one data row, as empty
+    if len(sheet_lists) < 2:
+        return []
     columns = sheet_lists[0]
     rows = sheet_lists[1:]
     out_list = []
