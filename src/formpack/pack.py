@@ -13,7 +13,7 @@ except ImportError:
 
 from .version import FormVersion
 from .utils import get_version_identifiers, str_types
-from .reporting import Export
+from .reporting import Export, AutoReport
 
 
 class FormPack(object):
@@ -167,6 +167,73 @@ class FormPack(object):
             out.append(line)
         return ''.join(out)
 
+    def get_fields_for_versions(self, versions=-1):
+        """ Return a mapping containing fields
+
+            This is needed because when making an report for several
+            versions of the same form, fields get added, removed, and
+            edited. Hence we pre-generate mappings containing fields
+             for all versions so we can use them later as a
+            canvas to keep the export coherent.
+
+            Labels are used as column headers.
+
+        """
+
+        versions = list(self._get_versions(versions).values())
+
+        final_field_list = []  # [(name, field), (name...))]
+        processed_field_names = set()  # avoid expensive look ups
+
+        # Create the initial field mappings from the first form version
+        for section in versions[0].sections.values():
+            final_field_list.extend(section.fields.values())
+            processed_field_names.update(section.fields.keys())
+
+        # Process any new field added in the next versions
+        # The hard part is to insert it at a position that makes sense
+        for version in versions[1:]:
+            for section_name, section in version.sections.items():
+
+                # Potential new fields we want to add
+                new_fields = section.fields.items()
+
+                for i, (new_field_name, new_field_obj) in enumerate(new_fields):
+
+                    # The field already exists, let's replace it with the
+                    # last version
+                    if new_field_name in processed_field_names:
+                        final_list_copy = enumerate(list(final_field_list))
+                        for y, (name, field) in final_list_copy:
+                            if name == new_field_name:
+                                final_list_copy[y] = field
+                                break
+                        continue
+
+                    # The field needs to be inserted at the proper place.
+                    # We take this new field, and look for all new fields after
+                    # it to find the first one that is already in the base
+                    # fields. Then we get its index, so we can insert our fresh
+                    # new field right before it. This gives us a coherent
+                    # order of fields so that they are always, at worst,
+                    # adjacent to the last field they used to be to.
+                    for following_new_field in new_fields[i+1:]:
+                        if following_new_field in processed_field_names:
+                            final_list_copy = enumerate(list(final_field_list))
+                            for y, (name, field) in final_list_copy:
+                                if name == following_new_field:
+                                    final_field_list[y] = field
+                                    break
+                            break
+                    else:
+                        # We could not find a following_new_field,
+                        # so ad it at the end
+                        final_field_list.append(new_field_obj)
+
+                    processed_field_names.add(new_field_obj)
+
+        return final_field_list
+
     def to_dict(self, **kwargs):
         out = {
             u'versions': [v.to_dict() for v in self.versions.values()],
@@ -182,20 +249,29 @@ class FormPack(object):
     def to_json(self, **kwargs):
         return json.dumps(self.to_dict(), **kwargs)
 
-    def export(self, header_lang=None, translation=None,
-               group_sep='/', hierarchy_in_labels=False,
+    def export(self, lang=None, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
                force_index=False, copy_fields=()):
-        '''Create an export for a given version of the form'''
+        '''Create an export for a given versions of the form'''
+
+        versions = self._get_versions(versions)
+
+        return Export(versions, lang=lang, group_sep=group_sep,
+                      hierarchy_in_labels=hierarchy_in_labels,
+                      title='submissions', multiple_select=multiple_select,
+                      force_index=force_index, copy_fields=copy_fields)
+
+    def autoreport(self, versions=-1):
+        '''Create an automatic report for a given versions of the form'''
+        return AutoReport(self, self._get_versions(versions))
+
+    def _get_versions(self, versions):
+
+        if versions is None:
+            versions = -1
 
         if isinstance(versions, str_types + (int,)):
             versions = [versions]
         versions = [self[key] for key in versions]
 
-        versions = OrderedDict((v.id, v) for v in versions)
-        return Export(versions, header_lang=header_lang,
-                      translation=translation, group_sep=group_sep,
-                      hierarchy_in_labels=hierarchy_in_labels,
-                      title='submissions', multiple_select=multiple_select,
-                      force_index=force_index, copy_fields=copy_fields)
-
+        return OrderedDict((v.id, v) for v in versions)

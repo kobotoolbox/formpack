@@ -18,12 +18,12 @@ from ..utils.string import unicode
 
 class Export(object):
 
-    def __init__(self, form_versions, translation=None, header_lang=None,
+    def __init__(self, form_versions, lang=None,
                  group_sep="/", hierarchy_in_labels=False,
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
-        self.translation = translation
+        self.lang = lang
         self.group_sep = group_sep
         self.title = title
         self.versions = form_versions
@@ -41,8 +41,7 @@ class Export(object):
                 first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
-        header_lang = header_lang or translation
-        params = (header_lang, group_sep, hierarchy_in_labels, multiple_select)
+        params = (lang, group_sep, hierarchy_in_labels, multiple_select)
         res = self.get_fields_and_labels_for_all_versions(*params)
         self.sections, self.labels = res
 
@@ -80,21 +79,23 @@ class Export(object):
         self._indexes = {n: 1 for n in self.sections}
         # N.B: indexes are not affected by form versions
 
-    def get_fields_and_labels_for_all_versions(self, lang, group_sep,
+    def get_fields_and_labels_for_all_versions(self, lang=None, group_sep="/",
                                                 hierarchy_in_labels=False,
                                                 multiple_select="both"):
         """ Return 2 mappings containing field and labels by section
 
             This is needed because when making an export for several
             versions of the same form, fields get added, removed, and
-            edited. Hence we pre-generate mappings conteaining labels
-            and field for all version so we can use them later as a
+            edited. Hence we pre-generate mappings containing labels
+            and fields for all versions so we can use them later as a
             canvas to keep the export coherent.
 
             Labels are used as column headers.
 
             Field are used to create rows of data from submission.
         """
+
+        # TODO: refactor this to use FormPack.get_fields_for_versions
 
         section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
         section_labels = OrderedDict()  # {section: [field_label, field_label]}
@@ -261,7 +262,7 @@ class Export(object):
 
         # Some local aliases to get better perfs
         _section_name = current_section.name
-        _translation = self.translation
+        _lang = self.lang
         _empty_row = self._empty_row[_section_name]
         _indexes = self._indexes
         row = self._row_cache[_section_name]
@@ -302,7 +303,7 @@ class Export(object):
                         # get submission value for this field
                         val = entry[field.path]
                         # get a mapping of {"col_name": "val", ...}
-                        cells = field.format(val, _translation)
+                        cells = field.format(val, _lang)
                     except KeyError:
                         cells = field.empty_result
 
