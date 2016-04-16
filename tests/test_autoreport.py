@@ -35,7 +35,7 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions, lang='french')
 
-        assert list(stats) ==  [
+        assert list(stats) == [
             ('nom du restaurant',
                   {'frequency': [('Taco Truck', 1),
                                     ('Harvest', 1),
@@ -72,7 +72,7 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions)
 
-        assert list(stats) ==  [
+        assert list(stats) == [
             ('restaurant_name',
                   {'frequency': [('Felipes', 2),
                                  ('The other one', 2),
@@ -111,3 +111,162 @@ class TestAutoReport(unittest.TestCase):
                    'stdev': 0.5477225575051661,
                    'total_count': 6})
         ]
+
+    def test_aggregate(self):
+
+            title, schemas, submissions = build_fixture('auto_report')
+            fp = FormPack(schemas, title)
+
+            report = fp.autoreport()
+            stats = report.get_stats(submissions, group_by="when")
+
+            assert list(stats) == [
+                (
+                    'restaurant_name',
+                    [
+                        (
+                             '2003-01-01',
+                             {
+                                'frequency': [('That one', 1)],
+                                'not_provided': 0,
+                                'percentage': [('That one', '100.00')],
+                                'provided': 1,
+                                'show_graph': False,
+                                'total_count': 1
+                             }
+                        ),
+                        (
+                            '2001-01-01',
+                            {
+                                'frequency': [('Felipes', 2)],
+                                'not_provided': 0,
+                                'percentage': [('Felipes', '100.00')],
+                                'provided': 2,
+                                'show_graph': False,
+                                'total_count': 2
+                            }
+                        ),
+                        (
+                            '2002-01-01',
+                            {
+                                'frequency': [('The other one', 2)],
+                                'not_provided': 0,
+                                'percentage': [('The other one', '100.00')],
+                                'provided': 2,
+                                'show_graph': False,
+                                'total_count': 2
+                            }
+                        ),
+                        (
+                            None,
+                            {
+                                'frequency': [],
+                                'not_provided': 1,
+                                'percentage': [],
+                                'provided': 0,
+                                'show_graph': False,
+                                'total_count': 1
+                            }
+                        )
+                    ]
+                ),
+                (
+                    'location',
+                    [
+                        (
+                            '2003-01-01',
+                            {
+                                'not_provided': 0,
+                                'provided': 1,
+                                'show_graph': False,
+                                'total_count': 1
+                            }
+                        ),
+                        (
+                            '2001-01-01',
+                            {
+                                'not_provided': 0,
+                                'provided': 2,
+                                'show_graph': False,
+                                'total_count': 2
+                            }
+                        ),
+                        (
+                            '2002-01-01',
+                            {
+                                'not_provided': 0,
+                                'provided': 2,
+                                'show_graph': False,
+                                'total_count': 2
+                            }
+                        ),
+                        (
+                            None,
+                            {
+                                'not_provided': 1,
+                                'provided': 0,
+                                'show_graph': False,
+                                'total_count': 1
+                            }
+                        )
+                    ]
+                ),
+
+                (
+                    'howmany',
+                    [
+                        (
+                            '2003-01-01',
+                            {
+                                'mean': 1.0,
+                                'median': 1,
+                                'mode': '<N/A>',
+                                'not_provided': 0,
+                                'provided': 1,
+                                'show_graph': False,
+                                'stdev': '<N/A>',
+                                'total_count': 1
+                            }
+                        ),
+                        (
+                            '2001-01-01',
+                            {
+                                'mean': 1.5,
+                                'median': 1.5,
+                                'mode': '<N/A>',
+                                'not_provided': 0,
+                                'provided': 2,
+                                'show_graph': False,
+                                'stdev': 0.7071067811865476,
+                                'total_count': 2
+                            }
+                        ),
+                        (
+                            '2002-01-01',
+                            {
+                                'mean': 2.0,
+                                'median': 2.0,
+                                'mode': 2,
+                                'not_provided': 0,
+                                'provided': 2,
+                                'show_graph': False,
+                                'stdev': 0.0,
+                                'total_count': 2
+                            }
+                        ),
+                        (
+                            None,
+                            {
+                                'mean': '<N/A>',
+                                'median': '<N/A>',
+                                'mode': '<N/A>',
+                                'not_provided': 1,
+                                'provided': 0,
+                                'show_graph': False,
+                                'stdev': '<N/A>',
+                                'total_count': 1
+                            }
+                        )
+                    ]
+                )
+            ]
