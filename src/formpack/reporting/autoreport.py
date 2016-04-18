@@ -104,10 +104,10 @@ class AutoReport(object):
         all_fields = [field for field in all_fields if field.has_stats]
 
         fields = set(fields)
-
         if not fields:
             fields = all_fields
         else:
+            fields.add(group_by)
             fields = [field for field in all_fields if field.name in fields]
 
         if group_by:
