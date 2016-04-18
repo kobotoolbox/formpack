@@ -167,7 +167,7 @@ class FormPack(object):
             out.append(line)
         return ''.join(out)
 
-    def get_fields_for_versions(self, versions=-1):
+    def get_fields_for_versions(self, versions=-1, data_types=None):
         """ Return a mapping containing fields
 
             This is needed because when making an report for several
@@ -180,14 +180,18 @@ class FormPack(object):
 
         """
 
+        if data_types is not None:
+            if isinstance(data_types, str_types):
+                data_types = [data_types]
+
         versions = list(self._get_versions(versions).values())
 
-        final_field_list = []  # [(name, field), (name...))]
+        all_fields = []  # [(name, field), (name...))]
         processed_field_names = set()  # avoid expensive look ups
 
         # Create the initial field mappings from the first form version
         for section in versions[0].sections.values():
-            final_field_list.extend(section.fields.values())
+            all_fields.extend(section.fields.values())
             processed_field_names.update(section.fields.keys())
 
         # Process any new field added in the next versions
@@ -203,7 +207,7 @@ class FormPack(object):
                     # The field already exists, let's replace it with the
                     # last version
                     if new_field_name in processed_field_names:
-                        final_list_copy = enumerate(list(final_field_list))
+                        final_list_copy = enumerate(list(all_fields))
                         for y, (name, field) in final_list_copy:
                             if name == new_field_name:
                                 final_list_copy[y] = field
@@ -219,20 +223,24 @@ class FormPack(object):
                     # adjacent to the last field they used to be to.
                     for following_new_field in new_fields[i+1:]:
                         if following_new_field in processed_field_names:
-                            final_list_copy = enumerate(list(final_field_list))
+                            final_list_copy = enumerate(list(all_fields))
                             for y, (name, field) in final_list_copy:
                                 if name == following_new_field:
-                                    final_field_list[y] = field
+                                    all_fields[y] = field
                                     break
                             break
                     else:
                         # We could not find a following_new_field,
                         # so ad it at the end
-                        final_field_list.append(new_field_obj)
+                        all_fields.append(new_field_obj)
 
                     processed_field_names.add(new_field_obj)
 
-        return final_field_list
+        if data_types:
+            for dt in data_types:
+                all_fields = [f for f in all_fields if f.data_type == dt]
+
+        return all_fields
 
     def to_dict(self, **kwargs):
         out = {
