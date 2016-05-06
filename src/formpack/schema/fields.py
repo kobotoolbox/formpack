@@ -122,7 +122,7 @@ class FormField(FormDataDef):
         # Normalize some common data_type aliases
         data_type = re.sub('^select one', 'select_one', data_type)
         data_type = re.sub('^select multiple', 'select_multiple', data_type)
-        data_type = re.sub('^location', 'geopoint', data_type)
+        data_type = re.sub('^location$', 'geopoint', data_type)
 
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
