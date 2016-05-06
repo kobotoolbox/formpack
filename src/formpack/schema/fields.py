@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+import re
 from operator import itemgetter
 
 try:
@@ -10,10 +11,12 @@ try:
 except NameError:  # python 3
     xrange = range
 
+from collections import defaultdict, OrderedDict
+
 try:
     from cyordereddict import OrderedDict
 except ImportError:
-    from collections import OrderedDict
+    pass
 
 import statistics
 
@@ -118,10 +121,10 @@ class FormField(FormDataDef):
         data_type = definition['type']
         choice = None
 
-        # Normalize some common aliases
-        data_type = data_type.replace('select one', 'select_one')
-        data_type = data_type.replace('select multiple', 'select_multiple')
-        data_type = data_type.replace('location', 'geopoint')
+        # Normalize some common data_type aliases
+        data_type = re.sub('^select one', 'select_one', data_type)
+        data_type = re.sub('^select multiple', 'select_multiple', data_type)
+        data_type = re.sub('^location', 'geopoint', data_type)
 
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
@@ -169,6 +172,21 @@ class FormField(FormDataDef):
             'show_graph': False
         }
 
+    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+
+        not_provided = 0
+        provided = 0
+        for val, counter in metrics.items():
+            not_provided += counter.pop(None, 0)
+            provided += counter.pop('__submissions__', 0)
+
+        return {
+            'total_count': not_provided + provided,
+            'not_provided': not_provided,
+            'provided': provided,
+            'show_graph': False
+        }
+
     def parse_values(self, raw_values):
         yield raw_values
 
@@ -190,6 +208,39 @@ class TextField(FormField):
 
         return stats
 
+    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+
+        stats = super(TextField, self).get_disaggregated_stats(metrics, lang, limit)
+        total = stats['total_count']
+
+        substats = defaultdict(dict)
+        for val, counter in metrics.items():
+
+            ranks = sorted(counter.items(), key=itemgetter(1), reverse=True)
+            top = ranks[:limit]
+
+            if len(ranks) > limit:
+                top.append(('...', sum(count for val, count in ranks[limit:])))
+
+            percentage = [(k, "%.2f" % (v * 100 / total)) for k, v in top]
+
+            substats[val] = {
+                'frequency': top,
+                'percentage': percentage,
+            }
+
+        # sort values by total frequency
+        def sum_frequencies(element):
+            return sum(freq for name, freq in element[1]['frequency'])
+
+        values = sorted(substats.items(), key=sum_frequencies)
+
+        stats.update({
+            'values': values[:5]
+        })
+
+        return stats
+
 
 class DateField(FormField):
     def get_stats(self, metrics, lang=None, limit=100):
@@ -203,6 +254,7 @@ class DateField(FormField):
         if self.data_type != "date":
             return stats
 
+        # sort date from old to new
         top = sorted(metrics.items(), key=itemgetter(0))[:limit]
         total = stats['total_count']
         percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
@@ -215,6 +267,39 @@ class DateField(FormField):
 
         return stats
 
+    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+
+        stats = super(DateField, self).get_disaggregated_stats(metrics, lang, limit)
+
+        if self.data_type != "date":
+            return stats
+
+        total = stats['total_count']
+
+        substats = defaultdict(dict)
+        for val, counter in metrics.items():
+
+            ranks = sorted(counter.items(), key=itemgetter(1), reverse=True)
+            top = ranks[:limit]
+
+            if len(ranks) > limit:
+                top.append(('...', sum(count for val, count in ranks[limit:])))
+
+            percentage = [(k, "%.2f" % (v * 100 / total)) for k, v in top]
+            substats[val] = {
+                'frequency': top,
+                'percentage': percentage
+            }
+
+        # sort date from old to new
+        values = sorted(substats.items(), key=itemgetter(0))[:limit]
+
+        stats.update({
+            'show_graph': True,
+            'values': values[:limit]
+        })
+
+        return stats
 
 
 class NumField(FormField):
@@ -252,6 +337,46 @@ class NumField(FormField):
             stats['mode'] = statistics.mode(self.flatten_dataset(metrics))
         except statistics.StatisticsError:
             pass
+
+        return stats
+
+    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+
+        stats = super(NumField, self).get_disaggregated_stats(metrics, lang, limit)
+
+        substats = {}
+
+        # transpose the metrics data structure to look like
+        # {splitter1: [x, y, z], splitter2...}}
+        inversed_metrics = defaultdict(list)
+        for val, counter in metrics.items():
+            for splitter, count in counter.items():
+                inversed_metrics[splitter].extend([val] * count)
+
+        for splitter, values in inversed_metrics.items():
+
+            val_stats = substats[splitter] = {
+                'median': '<N/A>',
+                'mean': '<N/A>',
+                'mode': '<N/A>',
+                'stdev': '<N/A>'
+            }
+
+            try:
+                # require a non empty dataset
+                val_stats['mean'] = statistics.mean(values)
+                val_stats['median'] = statistics.median(values)
+                # requires at least 2 values in the dataset
+                val_stats['stdev'] = statistics.stdev(values,
+                                                  xbar=val_stats['mean'])
+                # requires a non empty dataset and a unique mode
+                val_stats['mode'] = statistics.mode(values)
+            except statistics.StatisticsError:
+                pass
+
+        stats.update({
+            'values': tuple(substats.items())[:limit]
+        })
 
         return stats
 
@@ -394,6 +519,39 @@ class FormChoiceField(FormField):
         stats.update({
             'frequency': top,
             'percentage': percentage,
+            'show_graph': True
+        })
+
+        return stats
+
+    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+
+        stats = super(FormChoiceField, self).get_disaggregated_stats(metrics, lang, limit)
+        total = stats['total_count']
+
+        substats = defaultdict(dict)
+        for val, counter in metrics.items():
+            ranks = sorted(counter.items(), key=itemgetter(1), reverse=True)
+            top = [(self.get_translation(val, lang), freq) for val, freq in ranks[:limit]]
+
+            if len(ranks) > limit:
+                top.append(('...', sum(count for val, count in ranks[limit:])))
+
+            percentage = [(k, "%.2f" % (v * 100 / total)) for k, v in top]
+
+            substats[val] = {
+                'frequency': top,
+                'percentage': percentage
+            }
+
+        # sort values by frequency
+        def sum_frequencies(element):
+            return sum(freq for name, freq in element[1]['frequency'])
+
+        values = sorted(substats.items(), key=sum_frequencies)
+
+        stats.update({
+            'values': values[:5],
             'show_graph': True
         })
 
