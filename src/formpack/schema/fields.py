@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+import re
 from operator import itemgetter
 
 try:
@@ -118,10 +119,10 @@ class FormField(FormDataDef):
         data_type = definition['type']
         choice = None
 
-        # Normalize some common aliases
-        data_type = data_type.replace('select one', 'select_one')
-        data_type = data_type.replace('select multiple', 'select_multiple')
-        data_type = data_type.replace('location', 'geopoint')
+        # Normalize some common data_type aliases
+        data_type = re.sub('^select one', 'select_one', data_type)
+        data_type = re.sub('^select multiple', 'select_multiple', data_type)
+        data_type = re.sub('^location$', 'geopoint', data_type)
 
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
