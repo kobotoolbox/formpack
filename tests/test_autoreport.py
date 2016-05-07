@@ -4,6 +4,7 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
+import pytest
 
 from formpack import FormPack
 from .fixtures import build_fixture
@@ -35,8 +36,12 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions, lang='french')
 
+        stats = [(repr(f), n, d) for f, n, d in stats]
+
         assert list(stats) == [
-            ('nom du restaurant',
+            (
+             "<TextField name='restaurant_name' type='text'>",
+             'nom du restaurant',
                   {'frequency': [('Taco Truck', 1),
                                     ('Harvest', 1),
                                     ('Los pollos hermanos', 1),
@@ -49,12 +54,16 @@ class TestAutoReport(unittest.TestCase):
                   'provided': 4,
                   'show_graph': False,
                   'total_count': 4}),
-            ('lieu',
+            (
+             "<FormGPSField name='location' type='geopoint'>",
+             'lieu',
                   {'not_provided': 0,
                   'provided': 4,
                   'show_graph': False,
                   'total_count': 4}),
-            ('type de restaurant',
+            (
+             "<FormChoiceFieldWithMultipleSelect name='eatery_type' type='select_multiple'>",
+             'type de restaurant',
                   {'frequency': [('traditionnel', 2), ('avec vente \xe0 emporter', 1)],
                   'not_provided': 1,
                   'percentage': [('traditionnel', '50.00'),
@@ -72,8 +81,12 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions)
 
+        stats = [(repr(f), n, d) for f, n, d in stats]
+
         assert list(stats) == [
-            ('restaurant_name',
+            (
+             "<TextField name='restaurant_name' type='text'>",
+             'restaurant_name',
                   {'frequency': [('Felipes', 2),
                                  ('The other one', 2),
                                    ('That one', 1)],
@@ -83,13 +96,19 @@ class TestAutoReport(unittest.TestCase):
                                    ('That one', '16.67')],
                    'provided': 5,
                    'show_graph': False,
-                   'total_count': 6}),
-            ('location',
+                   'total_count': 6}
+            ),
+            (
+             "<FormGPSField name='location' type='geopoint'>",
+             'location',
                   {'not_provided': 1,
                    'provided': 5,
                    'show_graph': False,
-                   'total_count': 6}),
-            ('when',
+                   'total_count': 6}
+            ),
+            (
+             "<DateField name='when' type='date'>",
+             'when',
                   {'frequency': [('2001-01-01', 2),
                                   ('2002-01-01', 2),
                                   ('2003-01-01', 1)],
@@ -100,8 +119,11 @@ class TestAutoReport(unittest.TestCase):
 
                    'provided': 5,
                    'show_graph': True,
-                   'total_count': 6}),
-            ('howmany',
+                   'total_count': 6}
+            ),
+            (
+             "<NumField name='howmany' type='integer'>",
+             'howmany',
                   {'mean': 1.6,
                    'median': 2,
                    'mode': 2,
@@ -109,164 +131,99 @@ class TestAutoReport(unittest.TestCase):
                    'provided': 5,
                    'show_graph': False,
                    'stdev': 0.5477225575051661,
-                   'total_count': 6})
+                   'total_count': 6}
+            )
         ]
 
-    def test_aggregate(self):
 
+    def test_disaggregate(self):
             title, schemas, submissions = build_fixture('auto_report')
             fp = FormPack(schemas, title)
 
             report = fp.autoreport()
-            stats = report.get_stats(submissions, group_by="when")
+            stats = report.get_stats(submissions, split_by="when")
+
+            stats = [(repr(f), n, d) for f, n, d in stats]
 
             assert list(stats) == [
-                (
-                    'restaurant_name',
-                    [
-                        (
-                             '2003-01-01',
-                             {
-                                'frequency': [('That one', 1)],
-                                'not_provided': 0,
-                                'percentage': [('That one', '100.00')],
-                                'provided': 1,
-                                'show_graph': False,
-                                'total_count': 1
-                             }
-                        ),
-                        (
-                            '2001-01-01',
+                          (
+                            "<TextField name='restaurant_name' type='text'>",
+                            'restaurant_name',
                             {
-                                'frequency': [('Felipes', 2)],
-                                'not_provided': 0,
-                                'percentage': [('Felipes', '100.00')],
-                                'provided': 2,
-                                'show_graph': False,
-                                'total_count': 2
+                              'not_provided': 1,
+                              'provided': 5,
+                              'show_graph': False,
+                              'total_count': 6,
+                              'values': [
+                              (None,
+                                {
+                                  'frequency': [], 'percentage': []
+                                }),
+                                ('That one',
+                                {
+                                  'frequency': [('2003-01-01', 1 ) ],
+                                  'percentage': [('2003-01-01', '16.67') ]
+                                }),
+                                ('Felipes',
+                                {
+                                  'frequency': [('2001-01-01', 2 ) ],
+                                  'percentage': [('2001-01-01', '33.33') ]
+                                }),
+                                ('The other one',
+                                {
+                                  'frequency': [('2002-01-01', 2 ) ],
+                                  'percentage': [('2002-01-01', '33.33') ]
+                                })
+                              ]
                             }
-                        ),
-                        (
-                            '2002-01-01',
+                          ),
+                          (
+                            "<FormGPSField name='location' type='geopoint'>",
+                            'location',
                             {
-                                'frequency': [('The other one', 2)],
-                                'not_provided': 0,
-                                'percentage': [('The other one', '100.00')],
-                                'provided': 2,
-                                'show_graph': False,
-                                'total_count': 2
+                              'not_provided': 1,
+                              'provided': 5,
+                              'show_graph': False,
+                              'total_count': 6
                             }
-                        ),
-                        (
-                            None,
+                          ),
+                          (
+                            "<NumField name='howmany' type='integer'>",
+                            'howmany',
                             {
-                                'frequency': [],
-                                'not_provided': 1,
-                                'percentage': [],
-                                'provided': 0,
-                                'show_graph': False,
-                                'total_count': 1
+                              'not_provided': 1,
+                              'provided': 5,
+                              'show_graph': False,
+                              'total_count': 6,
+                              'values': (
+                                (
+                                  '2001-01-01',
+                                  {
+                                    'mean': 1.5,
+                                    'median': 1.5,
+                                    'mode': '<N/A>',
+                                    'stdev': 0.7071067811865476
+                                  }
+                                ),
+                                (
+                                  '2002-01-01',
+                                  {
+                                    'mean': 2.0,
+                                    'median': 2.0,
+                                    'mode': 2,
+                                    'stdev': 0.0
+                                  }
+                                ),
+                                (
+                                  '2003-01-01',
+                                  {
+                                    'mean': 1.0,
+                                    'median': 1,
+                                    'mode': '<N/A>',
+                                    'stdev': '<N/A>'
+                                  }
+                                )
+                              )
                             }
-                        )
-                    ]
-                ),
-                (
-                    'location',
-                    [
-                        (
-                            '2003-01-01',
-                            {
-                                'not_provided': 0,
-                                'provided': 1,
-                                'show_graph': False,
-                                'total_count': 1
-                            }
-                        ),
-                        (
-                            '2001-01-01',
-                            {
-                                'not_provided': 0,
-                                'provided': 2,
-                                'show_graph': False,
-                                'total_count': 2
-                            }
-                        ),
-                        (
-                            '2002-01-01',
-                            {
-                                'not_provided': 0,
-                                'provided': 2,
-                                'show_graph': False,
-                                'total_count': 2
-                            }
-                        ),
-                        (
-                            None,
-                            {
-                                'not_provided': 1,
-                                'provided': 0,
-                                'show_graph': False,
-                                'total_count': 1
-                            }
-                        )
-                    ]
-                ),
-
-                (
-                    'howmany',
-                    [
-                        (
-                            '2003-01-01',
-                            {
-                                'mean': 1.0,
-                                'median': 1,
-                                'mode': '<N/A>',
-                                'not_provided': 0,
-                                'provided': 1,
-                                'show_graph': False,
-                                'stdev': '<N/A>',
-                                'total_count': 1
-                            }
-                        ),
-                        (
-                            '2001-01-01',
-                            {
-                                'mean': 1.5,
-                                'median': 1.5,
-                                'mode': '<N/A>',
-                                'not_provided': 0,
-                                'provided': 2,
-                                'show_graph': False,
-                                'stdev': 0.7071067811865476,
-                                'total_count': 2
-                            }
-                        ),
-                        (
-                            '2002-01-01',
-                            {
-                                'mean': 2.0,
-                                'median': 2.0,
-                                'mode': 2,
-                                'not_provided': 0,
-                                'provided': 2,
-                                'show_graph': False,
-                                'stdev': 0.0,
-                                'total_count': 2
-                            }
-                        ),
-                        (
-                            None,
-                            {
-                                'mean': '<N/A>',
-                                'median': '<N/A>',
-                                'mode': '<N/A>',
-                                'not_provided': 1,
-                                'provided': 0,
-                                'show_graph': False,
-                                'stdev': '<N/A>',
-                                'total_count': 1
-                            }
-                        )
-                    ]
-                )
-            ]
+                          )
+                        ]

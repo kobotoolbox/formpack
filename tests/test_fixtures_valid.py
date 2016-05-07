@@ -30,7 +30,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
         v0 = fp[0]
-        self.assertEqual(list(v0.sections['submissions'].fields.keys()),
+        self.assertEqual(list(v0.sections['Sanitation report'].fields.keys()),
                          ['restaurant_name',
                           'restaurant_rating',
                           'report_date'])
@@ -42,7 +42,7 @@ class TestFormPackFixtures(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
-        self.assertEqual(list(fp[0].sections['submissions'].fields.keys()),
+        self.assertEqual(list(fp[0].sections['Grouped questions'].fields.keys()),
                          ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
@@ -53,7 +53,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(schemas, title)
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
-        self.assertEqual(list(v0.sections['submissions'].fields.keys()),
+        self.assertEqual(list(v0.sections['Customer Satisfaction'].fields.keys()),
                          [u'restaurant_name', u'customer_enjoyment'])
         self.assertEqual(sorted(fp.to_dict().keys()),
                          [u'id_string', u'title', u'versions'])
@@ -66,7 +66,7 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 4)
         v0 = fp[0]
-        self.assertEqual(list(v0.sections['submissions'].fields.keys()),
+        self.assertEqual(list(v0.sections['Restaurant profile'].fields.keys()),
                          [u'restaurant_name', u'location'])
 
         self.assertEqual(sorted(fp.to_dict().keys()),

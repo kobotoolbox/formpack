@@ -35,6 +35,9 @@ class FormPack(object):
 
         self.title = title
 
+        if len(self.title) > 31: # excel sheet name size limit
+            self.title = self.title[:28] + '...'
+
         self.asset_type = asset_type
 
         self.load_all_versions(versions)
@@ -259,14 +262,14 @@ class FormPack(object):
 
     def export(self, lang=None, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
-               force_index=False, copy_fields=()):
+               force_index=False, copy_fields=(), title=None):
         '''Create an export for a given versions of the form'''
 
         versions = self._get_versions(versions)
-
+        title = title or self.title
         return Export(versions, lang=lang, group_sep=group_sep,
                       hierarchy_in_labels=hierarchy_in_labels,
-                      title='submissions', multiple_select=multiple_select,
+                      title=title, multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields)
 
     def autoreport(self, versions=-1):
