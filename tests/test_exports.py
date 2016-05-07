@@ -34,7 +34,7 @@ class TestFormPackExport(unittest.TestCase):
         forms = FormPack(schemas, title)
         export = forms.export().to_dict(submissions)
         expected = OrderedDict({
-                    "submissions": {
+                    "Customer Satisfaction": {
                         'fields': ["restaurant_name", "customer_enjoyment"],
                         'data': [
                             ["Felipes", "yes"],
@@ -55,7 +55,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
-        headers = fp.export(versions=0).to_dict(submissions)['submissions']['fields']
+        headers = fp.export(versions=0).to_dict(submissions)['Restaurant profile']['fields']
         self.assertEquals(headers, ['restaurant_name',
                                      'location',
                                      '_location_latitude',
@@ -68,7 +68,7 @@ class TestFormPackExport(unittest.TestCase):
         translations = fp[1].translations
         export = fp.export(lang=translations[0], versions=1)
         data = export.to_dict(submissions)
-        headers = data['submissions']['fields']
+        headers = data['Restaurant profile']['fields']
         self.assertEquals(headers, ['restaurant name',
                                     'location',
                                     '_location_latitude',
@@ -78,7 +78,7 @@ class TestFormPackExport(unittest.TestCase):
 
         export = fp.export(lang=translations[1], versions=1)
         data = export.to_dict(submissions)
-        headers = data['submissions']['fields']
+        headers = data['Restaurant profile']['fields']
         self.assertEquals(headers, ['nom du restaurant',
                                     'lieu',
                                     '_lieu_latitude',
@@ -90,7 +90,7 @@ class TestFormPackExport(unittest.TestCase):
         # TODO: make a separate test to test to test __getitem__
         export = fp.export(lang="_default", versions='rpv1')
         data = export.to_dict(submissions)
-        headers = data['submissions']['fields']
+        headers = data['Restaurant profile']['fields']
         self.assertEquals(headers, ['restaurant name',
                                     'location',
                                     '_location_latitude',
@@ -107,7 +107,7 @@ class TestFormPackExport(unittest.TestCase):
         # by default, exports use the question 'name' attribute
         options = {'versions': 'rpV3'}
 
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         self.assertEquals(export['fields'], ['restaurant_name',
                                              'location',
                                              '_location_latitude',
@@ -133,7 +133,7 @@ class TestFormPackExport(unittest.TestCase):
         # if a language is passed, fields with available translations
         # are translated into that language
         options['lang'] = fp[1].translations[0]
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         self.assertEquals(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
@@ -150,7 +150,7 @@ class TestFormPackExport(unittest.TestCase):
                                              'sit down']])
 
         options['lang'] = fp[1].translations[1]
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         self.assertEquals(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
@@ -174,7 +174,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # by default, groups are stripped.
         export = fp.export(**options).to_dict(submissions)
-        headers = export['submissions']['fields']
+        headers = export['Grouped questions']['fields']
         self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
                                     'g1q2', 'g2q1', 'qz'])
 
@@ -183,7 +183,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'gqs'}
 
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Grouped questions']
         self.assertEquals(export['fields'], ['q1', 'g1q1', 'g1sg1q1',
                                              'g1q2', 'g2q1', 'qz'])
         self.assertEquals(export['data'], [['respondent1\'s r1',
@@ -200,7 +200,7 @@ class TestFormPackExport(unittest.TestCase):
                                             'respondent2\'s r4']])
 
         options['hierarchy_in_labels'] = '/'
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Grouped questions']
         self.assertEquals(export['fields'], ['q1',
                                              'g1/g1q1',
                                              'g1/sg1/g1sg1q1',
@@ -227,7 +227,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(**options).to_dict(submissions)
 
         self.assertEqual(export, OrderedDict ([
-                            ('submissions',
+                            ('Household survey with repeat...',
                                 {
                                     'fields': [
                                         'household_location',
@@ -284,67 +284,67 @@ class TestFormPackExport(unittest.TestCase):
                                     'data': [
                                         [
                                             'peter',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             1
                                         ],
                                         [
                                             'kyle',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             2
                                         ],
                                         [
                                             'linda',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             2
                                         ],
                                         [
                                             'morty',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             3
                                         ],
                                         [
                                             'tony',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             4
                                         ],
                                         [
                                             'mary',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             4
                                         ],
                                         [
                                             'emma',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             5
                                         ],
                                         [
                                             'parker',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             5
                                         ],
                                         [
                                             'amadou',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             6
                                         ],
                                         [
                                             'esteban',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             6
                                         ],
                                         [
                                             'suzie',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             6
                                         ],
                                         [
                                             'fiona',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             6
                                         ],
                                         [
                                             'phillip',
-                                            'submissions',
+                                            'Household survey with repeat...',
                                             6
                                         ]
                                     ]
@@ -413,7 +413,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
         options = {'versions': 'rpV4'}
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         expected = {
             'fields': [
                 'restaurant_name',
@@ -479,7 +479,7 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'rpV4', "group_sep": "::",
                     'hierarchy_in_labels': True,
                    "lang": fp[-1].translations[1]}
-        export = fp.export(**options).to_dict(submissions)['submissions']
+        export = fp.export(**options).to_dict(submissions)['Restaurant profile']
 
         expected = {
             'fields': [
@@ -559,7 +559,7 @@ class TestFormPackExport(unittest.TestCase):
         forms = FormPack(schemas, title)
         export = forms.export(force_index=True).to_dict(submissions)
         expected = OrderedDict({
-                    "submissions": {
+                    "Customer Satisfaction": {
                         'fields': ["restaurant_name", "customer_enjoyment",
                                    "_index"],
                         'data': [
@@ -579,7 +579,7 @@ class TestFormPackExport(unittest.TestCase):
         export = forms.export(copy_fields=('_uuid', '_submission_time'))
         exported = export.to_dict(submissions)
         expected = OrderedDict({
-                    "submissions": {
+                    "Customer Satisfaction": {
                         'fields': ["restaurant_name", "customer_enjoyment",
                                    "_uuid", "_submission_time"],
                         'data': [
@@ -617,7 +617,7 @@ class TestFormPackExport(unittest.TestCase):
                               force_index=True)
         exported = export.to_dict(submissions)
         expected = OrderedDict({
-                    "submissions": {
+                    "Customer Satisfaction": {
                         'fields': ["restaurant_name", "customer_enjoyment",
                                    "_uuid", "_submission_time", "_index"],
                         'data': [

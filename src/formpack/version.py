@@ -76,8 +76,8 @@ class FormVersion(object):
 
         # Extract fields data
         group = None
-        section = FormSection()
-        self.sections["submissions"] = section
+        section = FormSection(name=form_pack.title)
+        self.sections[form_pack.title] = section
 
         # Those will keep track of were we are while traversing the
         # schema.
