@@ -350,6 +350,8 @@ class NumField(FormField):
         # {splitter1: [x, y, z], splitter2...}}
         inversed_metrics = defaultdict(list)
         for val, counter in metrics.items():
+            if val is None:
+                continue
             for splitter, count in counter.items():
                 inversed_metrics[splitter].extend([val] * count)
 
