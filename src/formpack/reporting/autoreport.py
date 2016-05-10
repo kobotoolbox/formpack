@@ -54,10 +54,15 @@ class AutoReport(object):
 
     def _disaggregate_stats(self, submissions, fields, versions, lang, split_by):
 
-        # Remove the split_by field from the values to get stats on
-        fields = [field for field in fields if field.name != split_by]
+        # We want only the most used values so we build a separate counter
+        # for it to filter them
+        top_splitters = Counter()
+        # Extract the split_by field from the values to get stats on
+        split_by_field = [f for f in fields if f.name == split_by][0]
+        fields = [f for f in fields if f.name != split_by]
 
-        # Mapping {field_name1: {
+        # Then we map fields, values and splitters:
+        #          {field_name1: {
         #                  'value1': Counter(
         #                      (splitter1, x),
         #                      (splitter2, y)
@@ -68,7 +73,6 @@ class AutoReport(object):
         #              field_name2...},
         #         ...}
         #
-
         metrics = {f.name: defaultdict(Counter) for f in fields}
 
         for version_id, entries in submissions:
@@ -84,7 +88,7 @@ class AutoReport(object):
                 # since we are going to pop one entry, we make a copy
                 # of it to avoid side effect
                 entry = dict(FormSubmission(entry).data)
-                splitter = entry.pop(split_by, None)
+                splitter = entry.pop(split_by_field.path, None)
 
                 for field in fields:
 
@@ -106,8 +110,20 @@ class AutoReport(object):
                             if value is not None:
                                 counters['__submissions__'] += 1
 
+                # collect stats for the split_by field
+                if splitter is not None:
+                    values = split_by_field.parse_values(splitter)
+                else:
+                    values = (None,)
+
+                top_splitters.update(values)
+
+        # keep the 5 most encountered split_by value
+        top_splitters = [key for key, val in top_splitters.most_common(5)]
+
         for field in fields:
-            stats = field.get_disaggregated_stats(metrics[field.name], lang=lang)
+            stats = field.get_disaggregated_stats(metrics[field.name], lang=lang,
+                                                  top_splitters=top_splitters)
             yield (field, field.get_labels(lang)[0], stats)
 
     def get_stats(self, submissions, fields=(), lang=None, split_by=None):

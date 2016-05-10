@@ -81,7 +81,7 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions)
 
-        stats = [(repr(f), n, d) for f, n, d in stats]
+        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         assert list(stats) == [
             (
@@ -146,85 +146,72 @@ class TestAutoReport(unittest.TestCase):
 
             stats = [(repr(f), n, d) for f, n, d in stats]
 
-            assert list(stats) == [
-                          (
-                            "<TextField name='restaurant_name' type='text'>",
-                            'restaurant_name',
-                            {
-                              'not_provided': 1 ,
-                              'provided': 5 ,
-                              'show_graph': False ,
-                              'total_count': 6 ,
-                              'values': [
-                              (None ,
-                                {
-                                  'frequency': [], 'percentage': []
-                                }),
-                                ('That one',
-                                {
-                                  'frequency': [('2003-01-01', 1 ) ],
-                                  'percentage': [('2003-01-01', '16.67') ]
-                                }),
-                                ('Felipes',
-                                {
-                                  'frequency': [('2001-01-01', 2 ) ],
-                                  'percentage': [('2001-01-01', '33.33') ]
-                                }),
-                                ('The other one',
-                                {
-                                  'frequency': [('2002-01-01', 2 ) ],
-                                  'percentage': [('2002-01-01', '33.33') ]
-                                })
-                              ]
-                            }
-                          ),
-                          (
-                            "<FormGPSField name='location' type='geopoint'>",
-                            'location',
-                            {
-                              'not_provided': 1 ,
-                              'provided': 5 ,
-                              'show_graph': False ,
-                              'total_count': 6
-                            }
-                          ),
-                          (
-                            "<NumField name='howmany' type='integer'>",
-                            'howmany',
-                            {
-                              'not_provided': 1 ,
-                              'provided': 5 ,
-                              'show_graph': False ,
-                              'total_count': 6 ,
-                              'values': (
-                                (
-                                  '2001-01-01',
-                                  {
-                                    'mean': 1.5 ,
-                                    'median': 1.5 ,
-                                    'mode': '<N/A>',
-                                    'stdev': 0.7071067811865476
-                                  }
-                                ),
-                                (
-                                  '2002-01-01',
-                                  {
-                                    'mean': 2.0 ,
-                                    'median': 2.0 ,
-                                    'mode': 2 ,
-                                    'stdev': 0.0
-                                  }
-                                ),
-                                (
-                                  '2003-01-01',
-                                  {
-                                    'mean': 1.0 ,
-                                    'median': 1 ,
-                                    'mode': '<N/A>',
-                                    'stdev': '<N/A>'
-                                  }
-                                )
-                              )
-                            }
-                          )
-                        ]
+            import pprint
+            pprint.pprint(stats)
+
+            assert list(stats) == [("<TextField name='restaurant_name' type='text'>",
+                                    u'restaurant_name',
+                                    {u'not_provided': 1,
+                                     u'provided': 5,
+                                     u'show_graph': False,
+                                     u'total_count': 6,
+                                     u'values': [(u'Felipes',
+                                                  {u'frequency': [(u'2001-01-01', 2),
+                                                                  (u'2002-01-01', u'*'),
+                                                                  (u'2003-01-01', u'*'),
+                                                                  (None, u'*')],
+                                                   u'percentage': [(u'2001-01-01', u'33.33'),
+                                                                   (u'2002-01-01', u'*'),
+                                                                   (u'2003-01-01', u'*'),
+                                                                   (None, u'*')]}),
+                                                 (u'The other one',
+                                                  {u'frequency': [(u'2001-01-01', u'*'),
+                                                                  (u'2002-01-01', 2),
+                                                                  (u'2003-01-01', u'*'),
+                                                                  (None, u'*')],
+                                                   u'percentage': [(u'2001-01-01', u'*'),
+                                                                   (u'2002-01-01', u'33.33'),
+                                                                   (u'2003-01-01', u'*'),
+                                                                   (None, u'*')]}),
+                                                 (u'That one',
+                                                  {u'frequency': [(u'2001-01-01', u'*'),
+                                                                  (u'2002-01-01', u'*'),
+                                                                  (u'2003-01-01', 1),
+                                                                  (None, u'*')],
+                                                   u'percentage': [(u'2001-01-01', u'*'),
+                                                                   (u'2002-01-01', u'*'),
+                                                                   (u'2003-01-01', u'16.67'),
+                                                                   (None, u'*')]}),
+                                                 (None,
+                                                  {u'frequency': [(u'2001-01-01', u'*'),
+                                                                  (u'2002-01-01', u'*'),
+                                                                  (u'2003-01-01', u'*'),
+                                                                  (None, u'*')],
+                                                   u'percentage': [(u'2001-01-01', u'*'),
+                                                                   (u'2002-01-01', u'*'),
+                                                                   (u'2003-01-01', u'*'),
+                                                                   (None, u'*')]})]}),
+                                   ("<FormGPSField name='location' type='geopoint'>",
+                                    u'location',
+                                    {u'not_provided': 1,
+                                     u'provided': 5,
+                                     u'show_graph': False,
+                                     u'total_count': 6}),
+                                   ("<NumField name='howmany' type='integer'>",
+                                    u'howmany',
+                                    {u'not_provided': 1,
+                                     u'provided': 5,
+                                     u'show_graph': False,
+                                     u'total_count': 6,
+                                     u'values': ((u'2001-01-01',
+                                                  {u'mean': 1.5,
+                                                   u'median': 1.5,
+                                                   u'mode': u'*',
+                                                   u'stdev': 0.7071067811865476}),
+                                                 (u'2002-01-01',
+                                                  {u'mean': 2.0, u'median': 2.0, u'mode': 2, u'stdev': 0.0}),
+                                                 (u'2003-01-01',
+                                                  {u'mean': 1.0,
+                                                   u'median': 1,
+                                                   u'mode': u'*',
+                                                   u'stdev': u'*'}))})]
