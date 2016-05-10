@@ -287,7 +287,7 @@ class DateField(FormField):
         for field_name, counter in metrics.items():
 
             top = []
-            pourcentage = []
+            percentage = []
             for splitter in top_splitters:
                 val = counter.pop(splitter, '*')
                 top.append((splitter, val))
@@ -568,7 +568,7 @@ class FormChoiceField(FormField):
 
         # sort values by frequency
         def sum_frequencies(element):
-            return sum(perc for name, perc in element[1]['frequency'])
+            return sum(v for k, v in element[1]['frequency'] if v != "*")
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
