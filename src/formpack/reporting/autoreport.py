@@ -52,14 +52,14 @@ class AutoReport(object):
                    field.get_labels(lang)[0],
                    field.get_stats(metrics[field.name], lang=lang))
 
-    def _disaggregate_stats(self, submissions, fields, versions, lang, split_by):
+    def _disaggregate_stats(self, submissions, fields, versions, lang, split_by_field):
 
         # We want only the most used values so we build a separate counter
         # for it to filter them
         top_splitters = Counter()
         # Extract the split_by field from the values to get stats on
-        split_by_field = [f for f in fields if f.name == split_by][0]
-        fields = [f for f in fields if f.name != split_by]
+
+        fields = [f for f in fields if f != split_by_field]
 
         # Then we map fields, values and splitters:
         #          {field_name1: {
@@ -143,12 +143,11 @@ class AutoReport(object):
         if split_by:
             try:
                 split_by_field = next(f for f in fields if f.name == split_by)
-                split_by = split_by_field.path
             except StopIteration:
                 raise ValueError('No field matching name "%s" '
                                  'for split_by' % split_by)
 
             return self._disaggregate_stats(submissions, fields,
-                                         versions, lang, split_by)
+                                         versions, lang, split_by_field)
 
         return self._calculate_stats(submissions, fields, versions, lang)
