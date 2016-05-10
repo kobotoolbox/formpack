@@ -218,14 +218,14 @@ class TextField(FormField):
         for field_name, counter in metrics.items():
             top = []
             percentage = []
-            for splitter in top_splitters:
+            for splitter, trans in top_splitters:
 
                 val = counter.pop(splitter, '*')
-                top.append((splitter, val))
+                top.append((trans, val))
                 if val != "*":
                     val = "%.2f" % (val * 100 / total)
 
-                percentage.append((splitter, val))
+                percentage.append((trans, val))
 
             if counter:
                 top.append(('...', sum(counter.values())))
@@ -288,12 +288,12 @@ class DateField(FormField):
 
             top = []
             percentage = []
-            for splitter in top_splitters:
+            for splitter, trans in top_splitters:
                 val = counter.pop(splitter, '*')
-                top.append((splitter, val))
+                top.append((trans, val))
                 if val != "*":
                     val = "%.2f" % (val * 100 / total)
-                percentage.append((splitter, val))
+                percentage.append((trans, val))
 
             if counter:
                 top.append(('...', sum(counter.values())))
@@ -550,9 +550,8 @@ class FormChoiceField(FormField):
 
             top = []
             percentage = []
-            for splitter in top_splitters:
+            for splitter, trans in top_splitters:
                 val = counter.pop(splitter, '*')
-                trans = self.get_translation(splitter, lang)
                 top.append((trans, val))
                 if val != "*":
                     val = "%.2f" % (val * 100 / total)

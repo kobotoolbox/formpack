@@ -56,7 +56,7 @@ class AutoReport(object):
 
         # We want only the most used values so we build a separate counter
         # for it to filter them
-        top_splitters = Counter()
+        splitters_rank = Counter()
         # Extract the split_by field from the values to get stats on
 
         fields = [f for f in fields if f != split_by_field]
@@ -114,12 +114,18 @@ class AutoReport(object):
                 if splitter is not None:
                     values = split_by_field.parse_values(splitter)
                 else:
-                    values = (None,)
+                    values = (None, )
 
-                top_splitters.update(values)
+                splitters_rank.update(values)
 
         # keep the 5 most encountered split_by value
-        top_splitters = [key for key, val in top_splitters.most_common(5)]
+        top_splitters = []
+        for val, count in splitters_rank.most_common(5):
+            if hasattr(split_by_field, 'get_translation'):
+                trans = split_by_field.get_translation(val, lang)
+            else:
+                trans = val
+            top_splitters.append((val, trans))
 
         for field in fields:
             stats = field.get_disaggregated_stats(metrics[field.name], lang=lang,
