@@ -560,7 +560,7 @@ class FormChoiceField(FormField):
             if counter:
                 top.append(('...', sum(counter.values())))
 
-            substats[field_name] = {
+            substats[self.get_translation(field_name, lang)] = {
                 'frequency': top,
                 'percentage': percentage
             }
