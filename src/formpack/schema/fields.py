@@ -552,11 +552,11 @@ class FormChoiceField(FormField):
             percentage = []
             for splitter in top_splitters:
                 val = counter.pop(splitter, '*')
-                label = self.get_translation(val, lang)
-                top.append((label, val))
+                val = self.get_translation(val, lang)
+                top.append((splitter, val))
                 if val != "*":
                     val = "%.2f" % (val * 100 / total)
-                percentage.append((label, val))
+                percentage.append((splitter, val))
 
             if counter:
                 top.append(('...', sum(counter.values())))
