@@ -146,9 +146,6 @@ class TestAutoReport(unittest.TestCase):
 
             stats = [(repr(f), n, d) for f, n, d in stats]
 
-            import pprint
-            pprint.pprint(stats)
-
             assert list(stats) == [("<TextField name='restaurant_name' type='text'>",
   'restaurant_name',
   {'not_provided': 1,

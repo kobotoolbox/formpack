@@ -215,6 +215,7 @@ class TextField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
+        add_ellipsis = len(top_splitters) == 5
         for field_value, counter in metrics.items():
 
             # do not display None answer in disaggregation
@@ -232,8 +233,12 @@ class TextField(FormField):
 
                 percentage.append((trans, val))
 
-            if counter:
-                top.append(('...', sum(counter.values())))
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter :
+                    top.append(('...', sum(counter.values())))
+                else:
+                    top.append(('...', 0))
 
             substats[field_value] = {
                 'frequency': top,
@@ -289,6 +294,7 @@ class DateField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
+        add_ellipsis = len(top_splitters) == 5
         for field_value, counter in metrics.items():
 
             # do not display None answer in disaggregation
@@ -304,8 +310,12 @@ class DateField(FormField):
                     val = "%.2f" % (val * 100 / total)
                 percentage.append((trans, val))
 
-            if counter:
-                top.append(('...', sum(counter.values())))
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter :
+                    top.append(('...', sum(counter.values())))
+                else:
+                    top.append(('...', 0))
 
             substats[field_value] = {
                 'frequency': top,
@@ -555,6 +565,8 @@ class FormChoiceField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
+        add_ellipsis = len(top_splitters) == 5
+
         for field_value, counter in metrics.items():
 
             # do not display None answer in disaggregation
@@ -570,8 +582,12 @@ class FormChoiceField(FormField):
                     val = "%.2f" % (val * 100 / total)
                 percentage.append((trans, val))
 
-            if counter:
-                top.append(('...', sum(counter.values())))
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter :
+                    top.append(('...', sum(counter.values())))
+                else:
+                    top.append(('...', 0))
 
             substats[self.get_translation(field_value, lang)] = {
                 'frequency': top,
