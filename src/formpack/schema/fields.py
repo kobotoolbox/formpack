@@ -215,7 +215,12 @@ class TextField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
-        for field_name, counter in metrics.items():
+        for field_value, counter in metrics.items():
+
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
+
             top = []
             percentage = []
             for splitter, trans in top_splitters:
@@ -230,7 +235,7 @@ class TextField(FormField):
             if counter:
                 top.append(('...', sum(counter.values())))
 
-            substats[field_name] = {
+            substats[field_value] = {
                 'frequency': top,
                 'percentage': percentage,
             }
@@ -284,7 +289,11 @@ class DateField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
-        for field_name, counter in metrics.items():
+        for field_value, counter in metrics.items():
+
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
 
             top = []
             percentage = []
@@ -298,7 +307,7 @@ class DateField(FormField):
             if counter:
                 top.append(('...', sum(counter.values())))
 
-            substats[field_name] = {
+            substats[field_value] = {
                 'frequency': top,
                 'percentage': percentage,
             }
@@ -546,7 +555,11 @@ class FormChoiceField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
-        for field_name, counter in metrics.items():
+        for field_value, counter in metrics.items():
+
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
 
             top = []
             percentage = []
@@ -560,7 +573,7 @@ class FormChoiceField(FormField):
             if counter:
                 top.append(('...', sum(counter.values())))
 
-            substats[self.get_translation(field_name, lang)] = {
+            substats[self.get_translation(field_value, lang)] = {
                 'frequency': top,
                 'percentage': percentage
             }
