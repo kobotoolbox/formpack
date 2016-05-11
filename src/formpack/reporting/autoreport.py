@@ -43,7 +43,7 @@ class AutoReport(object):
                         if raw_value is not None:
                             values = list(field.parse_values(raw_value))
                             counter.update(values)
-                            counter['__submissions__'] += len(values)
+                            counter['__submissions__'] += 1
                         else:
                             counter[None] += 1
 
@@ -120,12 +120,17 @@ class AutoReport(object):
 
         # keep the 5 most encountered split_by value
         top_splitters = []
-        for val, count in splitters_rank.most_common(5):
+        for val, count in splitters_rank.most_common(6):
+            if val is None:
+                continue
             if hasattr(split_by_field, 'get_translation'):
                 trans = split_by_field.get_translation(val, lang)
             else:
                 trans = val
             top_splitters.append((val, trans))
+
+        if len(top_splitters) > 5:
+            top_splitters.pop()
 
         for field in fields:
             stats = field.get_disaggregated_stats(metrics[field.name], lang=lang,

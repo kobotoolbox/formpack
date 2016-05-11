@@ -242,7 +242,7 @@ class TextField(FormField):
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
         stats.update({
-            'values': values[:5]
+            'values': values[:limit]
         })
 
         return stats
