@@ -36,6 +36,8 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions, lang='french')
 
+        assert stats.submissions_count == 4
+
         stats = [(repr(f), n, d) for f, n, d in stats]
 
         assert list(stats) == [
@@ -80,6 +82,8 @@ class TestAutoReport(unittest.TestCase):
 
         report = fp.autoreport()
         stats = report.get_stats(submissions)
+
+        assert stats.submissions_count == 6
 
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
@@ -143,6 +147,8 @@ class TestAutoReport(unittest.TestCase):
 
             report = fp.autoreport()
             stats = report.get_stats(submissions, split_by="when")
+
+            assert stats.submissions_count == 6
 
             stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
