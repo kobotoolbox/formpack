@@ -139,9 +139,8 @@ class AutoReport(object):
 
     def get_stats(self, submissions, fields=(), lang=None, split_by=None):
 
-        versions = self.versions
 
-        all_fields = self.formpack.get_fields_for_versions(versions)
+        all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_fields = [field for field in all_fields if field.has_stats]
 
         fields = set(fields)
@@ -159,6 +158,6 @@ class AutoReport(object):
                                  'for split_by' % split_by)
 
             return self._disaggregate_stats(submissions, fields,
-                                         versions, lang, split_by_field)
+                                         self.versions, lang, split_by_field)
 
-        return self._calculate_stats(submissions, fields, versions, lang)
+        return self._calculate_stats(submissions, fields, self.versions, lang)

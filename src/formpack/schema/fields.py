@@ -129,7 +129,7 @@ class FormField(FormDataDef):
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
-            data_type, choice_id = data_type.split(' ')[:2]  # ignore deprecated 'or_other' value
+            data_type, choice_id = data_type.split()[:2]  # ignore deprecated 'or_other' value
             choice = field_choices[choice_id]
 
         data_type_classes = {
@@ -235,7 +235,7 @@ class TextField(FormField):
 
             # add a summary for all other values
             if add_ellipsis:
-                if counter :
+                if counter:
                     top.append(('...', sum(counter.values())))
                 else:
                     top.append(('...', 0))
@@ -312,7 +312,7 @@ class DateField(FormField):
 
             # add a summary for all other values
             if add_ellipsis:
-                if counter :
+                if counter:
                     top.append(('...', sum(counter.values())))
                 else:
                     top.append(('...', 0))
@@ -584,7 +584,7 @@ class FormChoiceField(FormField):
 
             # add a summary for all other values
             if add_ellipsis:
-                if counter :
+                if counter:
                     top.append(('...', sum(counter.values())))
                 else:
                     top.append(('...', 0))
