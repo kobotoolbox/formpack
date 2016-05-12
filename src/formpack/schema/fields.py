@@ -124,12 +124,12 @@ class FormField(FormDataDef):
         # Normalize some common data_type aliases
         data_type = re.sub('^select one', 'select_one', data_type)
         data_type = re.sub('^select multiple', 'select_multiple', data_type)
-        data_type = re.sub('^location$', 'geopoint', data_type)
+        data_type = re.sub('^location', 'geopoint', data_type)
 
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
-            data_type, choice_id = data_type.split(' ')[:2]  # ignore deprecated 'or_other' value
+            data_type, choice_id = data_type.split()[:2]  # ignore deprecated 'or_other' value
             choice = field_choices[choice_id]
 
         data_type_classes = {
@@ -172,7 +172,7 @@ class FormField(FormDataDef):
             'show_graph': False
         }
 
-    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
 
         not_provided = 0
         provided = 0
@@ -199,7 +199,7 @@ class TextField(FormField):
 
         top = metrics.most_common(limit)
         total = stats['total_count']
-        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        percentage = [(key, round((val * 100 / total), 2)) for key, val in top]
 
         stats.update({
             'frequency': top,
@@ -208,35 +208,50 @@ class TextField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
 
-        stats = super(TextField, self).get_disaggregated_stats(metrics, lang, limit)
+        parent = super(TextField, self)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
         total = stats['total_count']
 
         substats = defaultdict(dict)
-        for val, counter in metrics.items():
+        add_ellipsis = len(top_splitters) == 5
+        for field_value, counter in metrics.items():
 
-            ranks = sorted(counter.items(), key=itemgetter(1), reverse=True)
-            top = ranks[:limit]
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
 
-            if len(ranks) > limit:
-                top.append(('...', sum(count for val, count in ranks[limit:])))
+            top = []
+            percentage = []
+            for splitter, trans in top_splitters:
 
-            percentage = [(k, "%.2f" % (v * 100 / total)) for k, v in top]
+                val = counter.pop(splitter, 0)
+                top.append((trans, val))
+                val = round((val * 100 / total), 2)
 
-            substats[val] = {
+                percentage.append((trans, val))
+
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter:
+                    top.append(('...', sum(counter.values())))
+                else:
+                    top.append(('...', 0))
+
+            substats[field_value] = {
                 'frequency': top,
                 'percentage': percentage,
             }
 
         # sort values by total frequency
         def sum_frequencies(element):
-            return sum(freq for name, freq in element[1]['frequency'])
+            return sum(v for k, v in element[1]['frequency'] if v != "*")
 
-        values = sorted(substats.items(), key=sum_frequencies)
+        values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
         stats.update({
-            'values': values[:5]
+            'values': values[:limit]
         })
 
         return stats
@@ -257,7 +272,7 @@ class DateField(FormField):
         # sort date from old to new
         top = sorted(metrics.items(), key=itemgetter(0))[:limit]
         total = stats['total_count']
-        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        percentage = [(key, round((val * 100 / total), 2)) for key, val in top]
 
         stats.update({
             'frequency': top,
@@ -267,9 +282,10 @@ class DateField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
+    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
 
-        stats = super(DateField, self).get_disaggregated_stats(metrics, lang, limit)
+        parent = super(DateField, self)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
 
         if self.data_type != "date":
             return stats
@@ -277,18 +293,31 @@ class DateField(FormField):
         total = stats['total_count']
 
         substats = defaultdict(dict)
-        for val, counter in metrics.items():
+        add_ellipsis = len(top_splitters) == 5
+        for field_value, counter in metrics.items():
 
-            ranks = sorted(counter.items(), key=itemgetter(1), reverse=True)
-            top = ranks[:limit]
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
 
-            if len(ranks) > limit:
-                top.append(('...', sum(count for val, count in ranks[limit:])))
+            top = []
+            percentage = []
+            for splitter, trans in top_splitters:
+                val = counter.pop(splitter, 0)
+                top.append((trans, val))
+                val = round((val * 100 / total), 2)
+                percentage.append((trans, val))
 
-            percentage = [(k, "%.2f" % (v * 100 / total)) for k, v in top]
-            substats[val] = {
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter:
+                    top.append(('...', sum(counter.values())))
+                else:
+                    top.append(('...', 0))
+
+            substats[field_value] = {
                 'frequency': top,
-                'percentage': percentage
+                'percentage': percentage,
             }
 
         # sort date from old to new
@@ -320,10 +349,10 @@ class NumField(FormField):
         stats = super(NumField, self).get_stats(metrics, lang, limit)
 
         stats.update({
-            'median': '<N/A>',
-            'mean': '<N/A>',
-            'mode': '<N/A>',
-            'stdev': '<N/A>'
+            'median': '*',
+            'mean': '*',
+            'mode': '*',
+            'stdev': '*'
         })
 
         try:
@@ -340,10 +369,11 @@ class NumField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
-        stats = super(NumField, self).get_disaggregated_stats(metrics,
-                                                              lang,
-                                                              limit)
+    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+
+        parent = super(NumField, self)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
+
         substats = {}
 
         # transpose the metrics data structure to look like
@@ -358,10 +388,10 @@ class NumField(FormField):
         for splitter, values in inversed_metrics.items():
 
             val_stats = substats[splitter] = {
-                'median': '<N/A>',
-                'mean': '<N/A>',
-                'mode': '<N/A>',
-                'stdev': '<N/A>'
+                'median': '*',
+                'mean': '*',
+                'mode': '*',
+                'stdev': '*'
             }
 
             try:
@@ -370,7 +400,7 @@ class NumField(FormField):
                 val_stats['median'] = statistics.median(values)
                 # requires at least 2 values in the dataset
                 val_stats['stdev'] = statistics.stdev(values,
-                                                      xbar=val_stats['mean'])
+                                                  xbar=val_stats['mean'])
                 # requires a non empty dataset and a unique mode
                 val_stats['mode'] = statistics.mode(values)
             except statistics.StatisticsError:
@@ -515,7 +545,7 @@ class FormChoiceField(FormField):
 
         percentage = []
         for val, freq in top:
-            freq = "%.2f" % (freq * 100 / total)
+            freq = round((freq * 100 / total), 2)
             percentage.append((val, freq))
 
         stats.update({
@@ -526,35 +556,49 @@ class FormChoiceField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, lang=None, limit=5):
-        stats = super(FormChoiceField, self
-                      ).get_disaggregated_stats(metrics, lang, limit)
+    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+
+        parent = super(FormChoiceField, self)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
         total = stats['total_count']
 
         substats = defaultdict(dict)
-        for val, counter in metrics.items():
-            ranks = sorted(counter.items(), key=itemgetter(1), reverse=True)
-            top = [(self.get_translation(val, lang), freq)
-                   for val, freq in ranks[:limit]]
+        add_ellipsis = len(top_splitters) == 5
 
-            if len(ranks) > limit:
-                top.append(('...', sum(count for val, count in ranks[limit:])))
+        for field_value, counter in metrics.items():
 
-            percentage = [(k, "%.2f" % (v * 100 / total)) for k, v in top]
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
 
-            substats[val] = {
+            top = []
+            percentage = []
+            for splitter, trans in top_splitters:
+                val = counter.pop(splitter, 0)
+                top.append((trans, val))
+                val = round((val * 100 / total), 2)
+                percentage.append((trans, val))
+
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter:
+                    top.append(('...', sum(counter.values())))
+                else:
+                    top.append(('...', 0))
+
+            substats[self.get_translation(field_value, lang)] = {
                 'frequency': top,
                 'percentage': percentage
             }
 
         # sort values by frequency
         def sum_frequencies(element):
-            return sum(freq for name, freq in element[1]['frequency'])
+            return sum(v for k, v in element[1]['frequency'] if v != "*")
 
-        values = sorted(substats.items(), key=sum_frequencies)
+        values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
         stats.update({
-            'values': values[:5],
+            'values': values[:limit],
             'show_graph': True
         })
 
@@ -565,8 +609,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
 
     def __init__(self, *args, **kwargs):
-        super(FormChoiceFieldWithMultipleSelect, self
-              ).__init__(*args, **kwargs)
+        super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
         # reset empty result so it doesn't contain '0'
         self.empty_result = dict.fromkeys(self.empty_result, '')
 
@@ -583,14 +626,13 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                    hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.
 
-        Most fields have only one label, so the list contains only one item,
-        but some fields can multiple values, and one label for each
-        value.
+            Most fields have only one label, so the list contains only one item,
+            but some fields can multiple values, and one label for each
+            value.
         """
         labels = []
         if multiple_select in ("both", "summary"):
-            labels.append(self._get_label(lang, group_sep, hierarchy_in_labels)
-                          )
+            labels.append(self._get_label(lang, group_sep, hierarchy_in_labels))
 
         if multiple_select in ("both", "details"):
             for option in self.choice.options.values():

@@ -47,10 +47,10 @@ class TestAutoReport(unittest.TestCase):
                                     ('Los pollos hermanos', 1),
                                     ('Wololo', 1)],
                   'not_provided': 0,
-                  'percentage': [('Taco Truck', '25.00'),
-                                    ('Harvest', '25.00'),
-                                    ('Los pollos hermanos', '25.00'),
-                                    ('Wololo', '25.00')],
+                  'percentage': [('Taco Truck', 25.00),
+                                    ('Harvest', 25.00),
+                                    ('Los pollos hermanos', 25.00),
+                                    ('Wololo', 25.00)],
                   'provided': 4,
                   'show_graph': False,
                   'total_count': 4}),
@@ -66,8 +66,8 @@ class TestAutoReport(unittest.TestCase):
              'type de restaurant',
                   {'frequency': [('traditionnel', 2), ('avec vente \xe0 emporter', 1)],
                   'not_provided': 1,
-                  'percentage': [('traditionnel', '50.00'),
-                                    ('avec vente \xe0 emporter', '25.00')],
+                  'percentage': [('traditionnel', 50.00),
+                                    ('avec vente \xe0 emporter', 25.00)],
                   'provided': 3,
                   'show_graph': True,
                   'total_count': 4})
@@ -81,7 +81,7 @@ class TestAutoReport(unittest.TestCase):
         report = fp.autoreport()
         stats = report.get_stats(submissions)
 
-        stats = [(repr(f), n, d) for f, n, d in stats]
+        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         assert list(stats) == [
             (
@@ -91,9 +91,9 @@ class TestAutoReport(unittest.TestCase):
                                  ('The other one', 2),
                                    ('That one', 1)],
                    'not_provided': 1,
-                   'percentage': [('Felipes', '33.33'),
-                                   ('The other one', '33.33'),
-                                   ('That one', '16.67')],
+                   'percentage': [('Felipes', 33.33),
+                                   ('The other one', 33.33),
+                                   ('That one', 16.67)],
                    'provided': 5,
                    'show_graph': False,
                    'total_count': 6}
@@ -113,9 +113,9 @@ class TestAutoReport(unittest.TestCase):
                                   ('2002-01-01', 2),
                                   ('2003-01-01', 1)],
                    'not_provided': 1,
-                   'percentage': [('2001-01-01', '33.33'),
-                                    ('2002-01-01', '33.33'),
-                                    ('2003-01-01', '16.67')],
+                   'percentage': [('2001-01-01', 33.33),
+                                    ('2002-01-01', 33.33),
+                                    ('2003-01-01', 16.67)],
 
                    'provided': 5,
                    'show_graph': True,
@@ -137,93 +137,63 @@ class TestAutoReport(unittest.TestCase):
 
 
     def test_disaggregate(self):
+
             title, schemas, submissions = build_fixture('auto_report')
             fp = FormPack(schemas, title)
 
             report = fp.autoreport()
             stats = report.get_stats(submissions, split_by="when")
 
-            stats = [(repr(f), n, d) for f, n, d in stats]
+            stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
-            assert list(stats) == [
-                          (
-                            "<TextField name='restaurant_name' type='text'>",
-                            'restaurant_name',
-                            {
-                              'not_provided': 1,
-                              'provided': 5,
-                              'show_graph': False,
-                              'total_count': 6,
-                              'values': [
-                              (None,
-                                {
-                                  'frequency': [], 'percentage': []
-                                }),
-                                ('That one',
-                                {
-                                  'frequency': [('2003-01-01', 1 ) ],
-                                  'percentage': [('2003-01-01', '16.67') ]
-                                }),
-                                ('Felipes',
-                                {
-                                  'frequency': [('2001-01-01', 2 ) ],
-                                  'percentage': [('2001-01-01', '33.33') ]
-                                }),
-                                ('The other one',
-                                {
-                                  'frequency': [('2002-01-01', 2 ) ],
-                                  'percentage': [('2002-01-01', '33.33') ]
-                                })
-                              ]
-                            }
-                          ),
-                          (
-                            "<FormGPSField name='location' type='geopoint'>",
-                            'location',
-                            {
-                              'not_provided': 1,
-                              'provided': 5,
-                              'show_graph': False,
-                              'total_count': 6
-                            }
-                          ),
-                          (
-                            "<NumField name='howmany' type='integer'>",
-                            'howmany',
-                            {
-                              'not_provided': 1,
-                              'provided': 5,
-                              'show_graph': False,
-                              'total_count': 6,
-                              'values': (
-                                (
-                                  '2001-01-01',
-                                  {
-                                    'mean': 1.5,
-                                    'median': 1.5,
-                                    'mode': '<N/A>',
-                                    'stdev': 0.7071067811865476
-                                  }
-                                ),
-                                (
-                                  '2002-01-01',
-                                  {
-                                    'mean': 2.0,
-                                    'median': 2.0,
-                                    'mode': 2,
-                                    'stdev': 0.0
-                                  }
-                                ),
-                                (
-                                  '2003-01-01',
-                                  {
-                                    'mean': 1.0,
-                                    'median': 1,
-                                    'mode': '<N/A>',
-                                    'stdev': '<N/A>'
-                                  }
-                                )
-                              )
-                            }
-                          )
-                        ]
+            assert list(stats) == [("<TextField name='restaurant_name' type='text'>",
+                    'restaurant_name',
+                    {'not_provided': 1,
+                     'provided': 5,
+                     'show_graph': False,
+                     'total_count': 6,
+                     'values': [('Felipes',
+                                  {'frequency': [('2001-01-01', 2),
+                                                  ('2002-01-01', 0),
+                                                  ('2003-01-01', 0)],
+                                   'percentage': [('2001-01-01', 33.33),
+                                                   ('2002-01-01', 0.00),
+                                                   ('2003-01-01', 0.00)]}),
+                                 ('The other one',
+                                  {'frequency': [('2001-01-01', 0),
+                                                  ('2002-01-01', 2),
+                                                  ('2003-01-01', 0)],
+                                   'percentage': [('2001-01-01', 0.00),
+                                                   ('2002-01-01', 33.33),
+                                                   ('2003-01-01', 0.00)]}),
+                                 ('That one',
+                                  {'frequency': [('2001-01-01', 0),
+                                                  ('2002-01-01', 0),
+                                                  ('2003-01-01', 1)],
+                                   'percentage': [('2001-01-01', 0.00),
+                                                   ('2002-01-01', 0.00),
+                                                   ('2003-01-01', 16.67)]})]}),
+                   ("<FormGPSField name='location' type='geopoint'>",
+                    'location',
+                    {'not_provided': 1,
+                     'provided': 5,
+                     'show_graph': False,
+                     'total_count': 6}),
+                   ("<NumField name='howmany' type='integer'>",
+                    'howmany',
+                    {'not_provided': 1,
+                     'provided': 5,
+                     'show_graph': False,
+                     'total_count': 6,
+                     'values': (('2001-01-01',
+                                  {'mean': 1.5,
+                                   'median': 1.5,
+                                   'mode': '*',
+                                   'stdev': 0.7071067811865476}),
+                                 ('2002-01-01',
+                                  {'mean': 2.0, 'median': 2.0, 'mode': 2, 'stdev': 0.0}),
+                                 ('2003-01-01',
+                                  {'mean': 1.0,
+                                   'median': 1,
+                                   'mode': '*',
+                                   'stdev': u'*'}))})]
