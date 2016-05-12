@@ -199,7 +199,7 @@ class TextField(FormField):
 
         top = metrics.most_common(limit)
         total = stats['total_count']
-        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        percentage = [(key, round((val * 100 / total), 2)) for key, val in top]
 
         stats.update({
             'frequency': top,
@@ -226,10 +226,9 @@ class TextField(FormField):
             percentage = []
             for splitter, trans in top_splitters:
 
-                val = counter.pop(splitter, '*')
+                val = counter.pop(splitter, 0)
                 top.append((trans, val))
-                if val != "*":
-                    val = "%.2f" % (val * 100 / total)
+                val = round((val * 100 / total), 2)
 
                 percentage.append((trans, val))
 
@@ -273,7 +272,7 @@ class DateField(FormField):
         # sort date from old to new
         top = sorted(metrics.items(), key=itemgetter(0))[:limit]
         total = stats['total_count']
-        percentage = [(key, "%.2f" % (val * 100 / total)) for key, val in top]
+        percentage = [(key, round((val * 100 / total), 2)) for key, val in top]
 
         stats.update({
             'frequency': top,
@@ -304,10 +303,9 @@ class DateField(FormField):
             top = []
             percentage = []
             for splitter, trans in top_splitters:
-                val = counter.pop(splitter, '*')
+                val = counter.pop(splitter, 0)
                 top.append((trans, val))
-                if val != "*":
-                    val = "%.2f" % (val * 100 / total)
+                val = round((val * 100 / total), 2)
                 percentage.append((trans, val))
 
             # add a summary for all other values
@@ -547,7 +545,7 @@ class FormChoiceField(FormField):
 
         percentage = []
         for val, freq in top:
-            freq = "%.2f" % (freq * 100 / total)
+            freq = round((freq * 100 / total), 2)
             percentage.append((val, freq))
 
         stats.update({
@@ -576,10 +574,9 @@ class FormChoiceField(FormField):
             top = []
             percentage = []
             for splitter, trans in top_splitters:
-                val = counter.pop(splitter, '*')
+                val = counter.pop(splitter, 0)
                 top.append((trans, val))
-                if val != "*":
-                    val = "%.2f" % (val * 100 / total)
+                val = round((val * 100 / total), 2)
                 percentage.append((trans, val))
 
             # add a summary for all other values
