@@ -134,6 +134,7 @@ class FormField(FormDataDef):
 
         data_type_classes = {
             "select_one": FormChoiceField,
+            "select_one_external": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
             "date": DateField,
