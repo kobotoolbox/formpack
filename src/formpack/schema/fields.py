@@ -246,7 +246,7 @@ class TextField(FormField):
 
         # sort values by total frequency
         def sum_frequencies(element):
-            return sum(v for k, v in element[1]['frequency'] if v != "*")
+            return sum(v for k, v in element[1]['frequency'])
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
@@ -593,7 +593,7 @@ class FormChoiceField(FormField):
 
         # sort values by frequency
         def sum_frequencies(element):
-            return sum(v for k, v in element[1]['frequency'] if v != "*")
+            return sum(v for k, v in element[1]['frequency'])
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 

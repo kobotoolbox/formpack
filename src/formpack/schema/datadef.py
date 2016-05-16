@@ -107,19 +107,23 @@ class FormChoice(FormDataDef):
             if 'list name' in choice_definition:
                 raise ValueError('use list_name instead of "list name"')
 
-            choice_name = choice_definition.get('list_name')
-
+            choice_key = choice_definition.get('list_name')
             # Handle an alias
-            choice_name = choice_name or choice_definition.get('list name')
+            choice_key = choice_key or choice_definition.get('list name')
+
+            choice_name = choice_definition.get('name')
+
+            if choice_name is None or choice_key is None:
+                continue
 
             try:
-                choices = all_choices[choice_name]
+                choices = all_choices[choice_key]
             except KeyError:
-                choices = all_choices[choice_name] = cls(choice_name)
+                choices = all_choices[choice_key] = cls(choice_key)
 
-            option = choices.options[choice_definition['name']] = {}
+            option = choices.options[choice_name] = {}
             option['labels'] = cls._extract_json_labels(choice_definition)
-            option['name'] = choice_definition['name']
+            option['name'] = choice_name
 
         return all_choices
 
