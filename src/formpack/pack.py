@@ -82,11 +82,10 @@ class FormPack(object):
         _stats['id_string'] = self.id_string
         _stats['versions'] = len(self.versions)
         # _stats['submissions'] = self.submissions_count()
-        _stats['row_count'] = len(self[-1]._v.get('content', {})
-                                             .get('survey', []))
+        _stats['row_count'] = len(self[-1].schema.get('content', {})
+                                                 .get('survey', []))
         # returns stats in the format [ key="value" ]
-        return '\n\t'.join(map(lambda key: '%s="%s"' % (
-                            key, str(_stats[key])), _stats.keys()))
+        return '\n\t'.join('%s="%s"' % item for item in _stats.items())
 
     def _load_submissions_xml(self, submissions):
         for submission_xml in submissions:
