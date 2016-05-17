@@ -69,7 +69,6 @@ class AutoReport(object):
                        field.get_labels(lang)[0],
                        field.get_stats(metrics[field.name], lang=lang))
 
-
         return AutoReportStats(self, stats_generator(), submissions_count)
 
     def _disaggregate_stats(self, submissions, fields, versions, lang, split_by_field):

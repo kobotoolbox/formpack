@@ -91,6 +91,31 @@ class FormVersion(object):
         for data_definition in survey:
 
             data_type = data_definition.get('type')
+            name = data_definition.get('name')
+
+            # parse closing groups and repeat
+            if data_type is None:
+                continue
+
+            if data_type in ('end group', 'end_group'):
+                # We go up in one level of nesting, so we set the current group
+                # to be what used to be the parent group. We also remote one
+                # level in the hierarchy.
+                hierarchy.pop()
+                group = group_stack.pop()
+                continue
+
+            if data_type in ('end repeat', 'end_repeat'):
+                # We go up in one level of nesting, so we set the current section
+                # to be what used to be the parent section
+                hierarchy.pop()
+                section = section_stack.pop()
+                continue
+
+            # parse defintinitions of stuff having a name such as fields
+            # or opening groups and repeats
+            if name is None:
+                continue
 
             if data_type in ('begin group', 'begin_group'):
                 group_stack.append(group)
@@ -101,14 +126,6 @@ class FormVersion(object):
 
                 # Get the labels and associated translations for this group
                 self.translations.update(OrderedDict.fromkeys(group.labels))
-                continue
-
-            if data_type in ('end group', 'end_group'):
-                # We go up in one level of nesting, so we set the current group
-                # to be what used to be the parent group. We also remote one
-                # level in the hierarchy.
-                hierarchy.pop()
-                group = group_stack.pop()
                 continue
 
             if data_type in ('begin repeat', 'begin_repeat'):
@@ -128,22 +145,14 @@ class FormVersion(object):
                 self.translations.update(translations)
                 continue
 
-            if data_type in ('end repeat', 'end_repeat'):
-                # We go up in one level of nesting, so we set the current section
-                # to be what used to be the parent section
-                hierarchy.pop()
-                section = section_stack.pop()
-                continue
-
+            # If we are here, it's a regular field
             # Get the the data name and type
+            field = FormField.from_json_definition(data_definition,
+                                                   hierarchy, section,
+                                                   field_choices)
+            section.fields[field.name] = field
 
-            if 'name' in data_definition and data_type:
-                field = FormField.from_json_definition(data_definition,
-                                                       hierarchy, section,
-                                                       field_choices)
-                section.fields[field.name] = field
-
-                self.translations.update(OrderedDict.fromkeys(field.labels))
+            self.translations.update(OrderedDict.fromkeys(field.labels))
 
         # Convert it back to a list to get numerical indexing
         self.translations = list(self.translations)

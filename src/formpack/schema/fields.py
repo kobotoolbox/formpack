@@ -134,6 +134,7 @@ class FormField(FormDataDef):
 
         data_type_classes = {
             "select_one": FormChoiceField,
+            "select_one_external": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
             "date": DateField,
@@ -199,7 +200,14 @@ class TextField(FormField):
 
         top = metrics.most_common(limit)
         total = stats['total_count']
-        percentage = [(key, round((val * 100 / total), 2)) for key, val in top]
+
+        percentage = []
+        for key, val in top:
+
+            if total: # avoid ZeroDivisionError
+                percentage.append((key, round((val * 100 / total), 2)))
+            else:
+                percentage.append((key, 0))
 
         stats.update({
             'frequency': top,
@@ -228,7 +236,11 @@ class TextField(FormField):
 
                 val = counter.pop(splitter, 0)
                 top.append((trans, val))
-                val = round((val * 100 / total), 2)
+
+                if total: # avoid ZeroDivisionError
+                    val = round((val * 100 / total), 2)
+                else:
+                    val = 0
 
                 percentage.append((trans, val))
 
@@ -246,7 +258,7 @@ class TextField(FormField):
 
         # sort values by total frequency
         def sum_frequencies(element):
-            return sum(v for k, v in element[1]['frequency'] if v != "*")
+            return sum(v for k, v in element[1]['frequency'])
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
@@ -272,7 +284,13 @@ class DateField(FormField):
         # sort date from old to new
         top = sorted(metrics.items(), key=itemgetter(0))[:limit]
         total = stats['total_count']
-        percentage = [(key, round((val * 100 / total), 2)) for key, val in top]
+
+        percentage = []
+        for key, val in top:
+            if total:
+                percentage.append((key, round((val * 100 / total), 2)))
+            else:
+                percentage.append((key, 0))
 
         stats.update({
             'frequency': top,
@@ -305,7 +323,12 @@ class DateField(FormField):
             for splitter, trans in top_splitters:
                 val = counter.pop(splitter, 0)
                 top.append((trans, val))
-                val = round((val * 100 / total), 2)
+
+                if total: # avoid ZeroDivisionError
+                    val = round((val * 100 / total), 2)
+                else:
+                    val = 0
+
                 percentage.append((trans, val))
 
             # add a summary for all other values
@@ -545,8 +568,13 @@ class FormChoiceField(FormField):
 
         percentage = []
         for val, freq in top:
-            freq = round((freq * 100 / total), 2)
-            percentage.append((val, freq))
+
+            if total: # avoid ZeroDivisionError
+                res = round((freq * 100 / total), 2)
+            else:
+                res = 0
+
+            percentage.append((val, res))
 
         stats.update({
             'frequency': top,
@@ -576,7 +604,12 @@ class FormChoiceField(FormField):
             for splitter, trans in top_splitters:
                 val = counter.pop(splitter, 0)
                 top.append((trans, val))
-                val = round((val * 100 / total), 2)
+
+                if total: # avoid ZeroDivisionError
+                    val = round((val * 100 / total), 2)
+                else:
+                    val = 0
+
                 percentage.append((trans, val))
 
             # add a summary for all other values
@@ -593,7 +626,7 @@ class FormChoiceField(FormField):
 
         # sort values by frequency
         def sum_frequencies(element):
-            return sum(v for k, v in element[1]['frequency'] if v != "*")
+            return sum(v for k, v in element[1]['frequency'])
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
