@@ -321,7 +321,7 @@ class Export(object):
                 row['_index'] = _indexes[_section_name]
 
             if '_parent_table_name' in row:
-                row['_parent_table_name'] = str(current_section.parent.name)
+                row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
 
             rows.append(list(row.values()))

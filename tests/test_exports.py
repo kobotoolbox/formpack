@@ -609,15 +609,15 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
-    def test_copy_fields_and_force_index(self):
+    def test_copy_fields_and_force_index_and_unicode(self):
         title, schemas, submissions = customer_satisfaction
 
-        forms = FormPack(schemas, title)
-        export = forms.export(copy_fields=('_uuid', '_submission_time'),
+        fp = FormPack(schemas, 'رضا العملاء')
+        export = fp.export(copy_fields=('_uuid', '_submission_time'),
                               force_index=True)
         exported = export.to_dict(submissions)
         expected = OrderedDict({
-                    "Customer Satisfaction": {
+                    "رضا العملاء": {
                         'fields': ["restaurant_name", "customer_enjoyment",
                                    "_uuid", "_submission_time", "_index"],
                         'data': [
@@ -649,3 +649,51 @@ class TestFormPackExport(unittest.TestCase):
                })
 
         self.assertEqual(exported, expected)
+
+        with tempdir() as d:
+            xls = d / 'test.xlsx'
+            fp.export().to_xlsx(xls, submissions)
+            assert xls.isfile()
+
+    def test_choices_external_as_text_field(self):
+        title, schemas, submissions = build_fixture('sanitation_report_external')
+
+        fp = FormPack(schemas, title)
+        export = fp.export(lang="_default")
+        exported = export.to_dict(submissions)
+        expected = OrderedDict ([
+                    (
+                        'Sanitation report external', {
+                            'fields': [
+                                'Restaurant name',
+                                'How did this restaurant do on its sanitation report?',
+                                'Report date'
+                            ],
+                            'data': [
+                                [
+                                    'Felipes',
+                                    'A',
+                                    '012345'
+                                ],
+                                [
+                                    'Chipotle',
+                                    'C',
+                                    '012346'
+                                ],
+                                [
+                                    'Dunkin Donuts',
+                                    'D',
+                                    '012347'
+                                ],
+                                [
+                                    'Boloco',
+                                    'B',
+                                    '012348'
+                                ]
+                            ]
+                        }
+                    )
+                ])
+
+        self.assertEqual(exported, expected)
+

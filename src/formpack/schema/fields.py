@@ -4,7 +4,9 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 import re
+
 from operator import itemgetter
+from functools import partial
 
 try:
     xrange = xrange
@@ -130,11 +132,16 @@ class FormField(FormDataDef):
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
             data_type, choice_id = data_type.split()[:2]  # ignore deprecated 'or_other' value
-            choice = field_choices[choice_id]
+
+            # currently select_one_external is considered a spacial case
+            # because user can erase definition on the fly. To avoid it
+            # breaking, we don't consider it a choice field, but a text field
+            if data_type != "select_one_external":
+                choice = field_choices[choice_id]
 
         data_type_classes = {
             "select_one": FormChoiceField,
-            "select_one_external": FormChoiceField,
+            "select_one_external": partial(TextField, data_type="select_one_external"),
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
             "date": DateField,

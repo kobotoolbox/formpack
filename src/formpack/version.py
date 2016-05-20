@@ -9,7 +9,7 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from .utils import formversion_pyxform, slugify
+from .utils import formversion_pyxform
 
 from .submission import FormSubmission
 from .utils import parse_xml_to_xmljson
@@ -29,7 +29,7 @@ class FormVersion(object):
         self.form_pack = form_pack
 
         # slug of title
-        self._root_node_name = slugify(form_pack.title)
+        self._root_node_name = form_pack.title
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
