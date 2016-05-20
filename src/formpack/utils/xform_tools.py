@@ -10,33 +10,27 @@ from pyxform.builder import create_survey_element_from_dict
 from pyquery import PyQuery
 
 
-DATA_TYPE_ALIASES = {
-    "add select one prompt using": 'select_one',
-    "select one from": 'select_one',
-    "select1": 'select_one',
-    "select one": 'select_one',
-    "add select multiple prompt using": 'select_multiple',
-    "select all that apply from": 'select_multiple',
-    "select multiple": 'select_multiple',
-    "select all that apply": 'select_multiple',
-
-    "select_one_external": "select one external",
-    'cascading select': 'cascading_select',
-
-    'location': 'geopoint',
-
-    "begin lgroup": 'begin_repeat',
-    "end lgroup": 'end_repeat',
-
-    "begin group": 'begin_group',
-    "end group": 'end_group',
-
-    "begin repeat": 'begin_repeat',
-    "end repeat": 'end_repeat',
-
-    "begin looped group": 'begin_repeat',
-    "end looped group": 'end_repeat',
-}
+DATA_TYPE_ALIASES = (
+    ("add select one prompt using", 'select_one'),
+    ("select one from", 'select_one'),
+    ("select1", 'select_one'),
+    ("select one", 'select_one'),
+    ("add select multiple prompt using", 'select_multiple'),
+    ("select all that apply from", 'select_multiple'),
+    ("select multiple", 'select_multiple'),
+    ("select all that apply", 'select_multiple'),
+    ("select_one_external", "select one external"),
+    ('cascading select', 'cascading_select'),
+    ('location', 'geopoint'),
+    ("begin lgroup", 'begin_repeat'),
+    ("end lgroup", 'end_repeat'),
+    ("begin group", 'begin_group'),
+    ("end group", 'end_group'),
+    ("begin repeat", 'begin_repeat'),
+    ("end repeat", 'end_repeat'),
+    ("begin looped group", 'begin_repeat'),
+    ("end looped group", 'end_repeat'),
+)
 
 
 def formversion_pyxform(data):
@@ -90,7 +84,7 @@ def normalize_data_type(data_type):
     data_type = ' '.join(data_type.split())
 
     # replace some common data_type aliases
-    for alias, standard in DATA_TYPE_ALIASES.items():
+    for alias, standard in DATA_TYPE_ALIASES:
         if data_type.startswith(alias):
             data_type = re.sub('^%s' % alias, standard, data_type)
             break
