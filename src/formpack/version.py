@@ -101,7 +101,7 @@ class FormVersion(object):
             if data_type is None:
                 continue
 
-            if data_type == 'end_group':
+            if data_type.startswith('end_group'):
                 # We go up in one level of nesting, so we set the current group
                 # to be what used to be the parent group. We also remote one
                 # level in the hierarchy.
@@ -109,7 +109,7 @@ class FormVersion(object):
                 group = group_stack.pop()
                 continue
 
-            if data_type == 'end_repeat':
+            if data_type.startswith('end_repeat'):
                 # We go up in one level of nesting, so we set the current section
                 # to be what used to be the parent section
                 hierarchy.pop()
@@ -121,7 +121,7 @@ class FormVersion(object):
             if name is None:
                 continue
 
-            if data_type == 'begin_group':
+            if data_type.startswith('begin_group'):
                 group_stack.append(group)
                 group = FormGroup.from_json_definition(data_definition)
                 # We go down in one level on nesting, so save the parent group.
@@ -132,7 +132,7 @@ class FormVersion(object):
                 self.translations.update(OrderedDict.fromkeys(group.labels))
                 continue
 
-            if data_type == 'begin_repeat':
+            if data_type.startswith('begin_repeat'):
                 # We go down in one level on nesting, so save the parent section.
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
