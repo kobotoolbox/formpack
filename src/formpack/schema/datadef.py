@@ -109,10 +109,11 @@ class FormChoice(FormDataDef):
                 choice_key = choice_definition.get(alias)
                 if choice_key:
                     break
+            else: # handle no list_name given
+                continue
 
             choice_name = choice_definition.get('name')
-
-            if choice_name is None or choice_key is None:
+            if not choice_name:
                 continue
 
             try:

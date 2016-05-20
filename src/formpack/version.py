@@ -90,7 +90,11 @@ class FormVersion(object):
 
         for data_definition in survey:
 
-            data_type = normalize_data_type(data_definition.get('type'))
+            data_type = data_definition.get('type')
+            if not data_type: # handle broken data type definition
+                continue
+
+            data_type = normalize_data_type(data_type)
             name = data_definition.get('name')
 
             # parse closing groups and repeat
