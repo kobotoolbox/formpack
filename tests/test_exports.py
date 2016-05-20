@@ -352,6 +352,139 @@ class TestFormPackExport(unittest.TestCase):
                             ])
         )
 
+
+    def test_repeats_alias(self):
+        title, schemas, submissions = build_fixture('grouped_repeatable_alias')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'rgv1'}
+        export = fp.export(**options).to_dict(submissions)
+
+        self.assertEqual(export, OrderedDict ([
+                            ('Grouped Repeatable Alias',
+                                {
+                                    'fields': [
+                                        'household_location',
+                                        'start',
+                                        'end',
+                                        '_index'
+                                    ],
+                                    'data': [
+                                        [
+                                            'montreal',
+                                            '2016-03-14T14:15:48.000-04:00',
+                                            '2016-03-14T14:18:35.000-04:00',
+                                            1
+                                        ],
+                                        [
+                                            'marseille',
+                                            '2016-03-14T14:14:10.000-04:00',
+                                            '2016-03-14T14:15:48.000-04:00',
+                                            2
+                                        ],
+                                        [
+                                            'rocky mountains',
+                                            '2016-03-14T14:13:53.000-04:00',
+                                            '2016-03-14T14:14:10.000-04:00',
+                                            3
+                                        ],
+                                        [
+                                            'toronto',
+                                            '2016-03-14T14:12:54.000-04:00',
+                                            '2016-03-14T14:13:53.000-04:00',
+                                            4
+                                        ],
+                                        [
+                                            'new york',
+                                            '2016-03-14T14:18:35.000-04:00',
+                                            '2016-03-14T15:19:20.000-04:00',
+                                            5
+                                        ],
+                                        [
+                                            'boston',
+                                            '2016-03-14T14:11:25.000-04:00',
+                                            '2016-03-14T14:12:03.000-04:00',
+                                            6
+                                        ]
+                                    ]
+                                }),
+                            ('houshold_member_repeat',
+                                {
+                                    'fields': [
+                                        'household_member_name',
+                                        '_parent_table_name',
+                                        '_parent_index'
+                                    ],
+                                    'data': [
+                                        [
+                                            'peter',
+                                            'Grouped Repeatable Alias',
+                                            1
+                                        ],
+                                        [
+                                            'kyle',
+                                            'Grouped Repeatable Alias',
+                                            2
+                                        ],
+                                        [
+                                            'linda',
+                                            'Grouped Repeatable Alias',
+                                            2
+                                        ],
+                                        [
+                                            'morty',
+                                            'Grouped Repeatable Alias',
+                                            3
+                                        ],
+                                        [
+                                            'tony',
+                                            'Grouped Repeatable Alias',
+                                            4
+                                        ],
+                                        [
+                                            'mary',
+                                            'Grouped Repeatable Alias',
+                                            4
+                                        ],
+                                        [
+                                            'emma',
+                                            'Grouped Repeatable Alias',
+                                            5
+                                        ],
+                                        [
+                                            'parker',
+                                            'Grouped Repeatable Alias',
+                                            5
+                                        ],
+                                        [
+                                            'amadou',
+                                            'Grouped Repeatable Alias',
+                                            6
+                                        ],
+                                        [
+                                            'esteban',
+                                            'Grouped Repeatable Alias',
+                                            6
+                                        ],
+                                        [
+                                            'suzie',
+                                            'Grouped Repeatable Alias',
+                                            6
+                                        ],
+                                        [
+                                            'fiona',
+                                            'Grouped Repeatable Alias',
+                                            6
+                                        ],
+                                        [
+                                            'phillip',
+                                            'Grouped Repeatable Alias',
+                                            6
+                                        ]
+                                    ]
+                                })
+                            ])
+        )
+
     def test_csv(self):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
@@ -609,15 +742,15 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
-    def test_copy_fields_and_force_index(self):
+    def test_copy_fields_and_force_index_and_unicode(self):
         title, schemas, submissions = customer_satisfaction
 
-        forms = FormPack(schemas, title)
-        export = forms.export(copy_fields=('_uuid', '_submission_time'),
+        fp = FormPack(schemas, 'رضا العملاء')
+        export = fp.export(copy_fields=('_uuid', '_submission_time'),
                               force_index=True)
         exported = export.to_dict(submissions)
         expected = OrderedDict({
-                    "Customer Satisfaction": {
+                    "رضا العملاء": {
                         'fields': ["restaurant_name", "customer_enjoyment",
                                    "_uuid", "_submission_time", "_index"],
                         'data': [
@@ -649,3 +782,51 @@ class TestFormPackExport(unittest.TestCase):
                })
 
         self.assertEqual(exported, expected)
+
+        with tempdir() as d:
+            xls = d / 'test.xlsx'
+            fp.export().to_xlsx(xls, submissions)
+            assert xls.isfile()
+
+    def test_choices_external_as_text_field(self):
+        title, schemas, submissions = build_fixture('sanitation_report_external')
+
+        fp = FormPack(schemas, title)
+        export = fp.export(lang="_default")
+        exported = export.to_dict(submissions)
+        expected = OrderedDict ([
+                    (
+                        'Sanitation report external', {
+                            'fields': [
+                                'Restaurant name',
+                                'How did this restaurant do on its sanitation report?',
+                                'Report date'
+                            ],
+                            'data': [
+                                [
+                                    'Felipes',
+                                    'A',
+                                    '012345'
+                                ],
+                                [
+                                    'Chipotle',
+                                    'C',
+                                    '012346'
+                                ],
+                                [
+                                    'Dunkin Donuts',
+                                    'D',
+                                    '012347'
+                                ],
+                                [
+                                    'Boloco',
+                                    'B',
+                                    '012348'
+                                ]
+                            ]
+                        }
+                    )
+                ])
+
+        self.assertEqual(exported, expected)
+

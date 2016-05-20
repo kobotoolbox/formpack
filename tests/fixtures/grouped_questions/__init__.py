@@ -24,7 +24,7 @@ DATA = {
                         'label': 'Q1'
                     },
                     {
-                        'type': 'begin group',
+                        'type': 'begin  group',
                         'name': 'g1',
                         'label': 'Group 1',
                     },
@@ -52,7 +52,7 @@ DATA = {
                         'label': 'G1Q2'
                     },
                     {
-                        'type': 'end group',
+                        'type': 'end  group',
                     },
                     {
                         'type': 'begin group',

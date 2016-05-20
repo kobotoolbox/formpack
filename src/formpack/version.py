@@ -9,10 +9,10 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from .utils import formversion_pyxform, slugify
+from .utils import formversion_pyxform
 
 from .submission import FormSubmission
-from .utils import parse_xml_to_xmljson
+from .utils import parse_xml_to_xmljson, normalize_data_type
 from .schema import (FormField, FormGroup, FormSection, FormChoice)
 
 
@@ -29,7 +29,7 @@ class FormVersion(object):
         self.form_pack = form_pack
 
         # slug of title
-        self._root_node_name = slugify(form_pack.title)
+        self._root_node_name = form_pack.title
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
@@ -91,13 +91,17 @@ class FormVersion(object):
         for data_definition in survey:
 
             data_type = data_definition.get('type')
+            if not data_type: # handle broken data type definition
+                continue
+
+            data_type = normalize_data_type(data_type)
             name = data_definition.get('name')
 
             # parse closing groups and repeat
             if data_type is None:
                 continue
 
-            if data_type in ('end group', 'end_group'):
+            if data_type.startswith('end_group'):
                 # We go up in one level of nesting, so we set the current group
                 # to be what used to be the parent group. We also remote one
                 # level in the hierarchy.
@@ -105,7 +109,7 @@ class FormVersion(object):
                 group = group_stack.pop()
                 continue
 
-            if data_type in ('end repeat', 'end_repeat'):
+            if data_type.startswith('end_repeat'):
                 # We go up in one level of nesting, so we set the current section
                 # to be what used to be the parent section
                 hierarchy.pop()
@@ -117,7 +121,7 @@ class FormVersion(object):
             if name is None:
                 continue
 
-            if data_type in ('begin group', 'begin_group'):
+            if data_type.startswith('begin_group'):
                 group_stack.append(group)
                 group = FormGroup.from_json_definition(data_definition)
                 # We go down in one level on nesting, so save the parent group.
@@ -128,7 +132,7 @@ class FormVersion(object):
                 self.translations.update(OrderedDict.fromkeys(group.labels))
                 continue
 
-            if data_type in ('begin repeat', 'begin_repeat'):
+            if data_type.startswith('begin_repeat'):
                 # We go down in one level on nesting, so save the parent section.
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section

@@ -45,6 +45,7 @@ class FormDataDef(object):
 
         for key, val in definition.items():
             if key.startswith('label:'):
+                # sometime the label can be separated with 2 ::
                 _, lang = re.split(r'::?', key, maxsplit=1, flags=re.U)
                 labels[lang] = val
         return labels
@@ -76,8 +77,7 @@ class FormSection(FormDataDef):
     @classmethod
     def from_json_definition(cls, definition, hierarchy=(None,), parent=None):
         labels = cls._extract_json_labels(definition)
-        return cls(definition['name'], labels, hierarchy=hierarchy,
-                   parent=parent)
+        return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
 
     def get_label(self, lang="_default"):
         return [self.labels.get(lang) or self.name]
@@ -103,17 +103,17 @@ class FormChoice(FormDataDef):
 
         all_choices = {}
         for choice_definition in definition:
-            # raise an exception if the incorrect alias is used
-            if 'list name' in choice_definition:
-                raise ValueError('use list_name instead of "list name"')
 
-            choice_key = choice_definition.get('list_name')
-            # Handle an alias
-            choice_key = choice_key or choice_definition.get('list name')
+            # get the name, from one of the possible keys
+            for alias in ('list_name', 'list name', 'List_name'):
+                choice_key = choice_definition.get(alias)
+                if choice_key:
+                    break
+            else: # handle no list_name given
+                continue
 
             choice_name = choice_definition.get('name')
-
-            if choice_name is None or choice_key is None:
+            if not choice_name:
                 continue
 
             try:

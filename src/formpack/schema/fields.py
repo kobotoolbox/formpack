@@ -4,7 +4,9 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 import re
+
 from operator import itemgetter
+from functools import partial
 
 try:
     xrange = xrange
@@ -20,6 +22,7 @@ except ImportError:
 
 import statistics
 
+from ..utils.xform_tools import normalize_data_type
 from .datadef import FormDataDef, FormChoice
 
 
@@ -118,34 +121,40 @@ class FormField(FormDataDef):
         """
         name = definition['name']
         labels = cls._extract_json_labels(definition)
-        data_type = definition['type']
-        choice = None
 
-        # Normalize some common data_type aliases
-        data_type = re.sub('^select one', 'select_one', data_type)
-        data_type = re.sub('^select multiple', 'select_multiple', data_type)
-        data_type = re.sub('^location', 'geopoint', data_type)
+        # normalize spaces
+        data_type = normalize_data_type(definition['type'])
+        choice = None
 
         # Get the data type. If it has a foreign key, instanciate a subclass
         # dedicated to handle choices and pass it the choices matching this fk
         if " " in data_type:
             data_type, choice_id = data_type.split()[:2]  # ignore deprecated 'or_other' value
-            choice = field_choices[choice_id]
+
+            # currently select_one_external is considered a spacial case
+            # because user can erase definition on the fly. To avoid it
+            # breaking, we don't consider it a choice field, but a text field
+            if data_type in ('select_one', 'select_multiple'):
+                choice = field_choices[choice_id]
 
         data_type_classes = {
             "select_one": FormChoiceField,
-            "select_one_external": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
             "date": DateField,
             "text": TextField,
             "barcode": TextField,
+
             # calculate is usually not text but for our purpose it's good
             # enough
             "calculate": TextField,
             "acknowledge": TextField,
             "integer": NumField,
-            'decimal': NumField
+            'decimal': NumField,
+
+            # legacy type, treat them as text
+            "select_one_external": partial(TextField, data_type=data_type),
+            "cascading_select": partial(TextField, data_type=data_type),
         }
 
         args = {
