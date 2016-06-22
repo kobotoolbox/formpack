@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 import json
 
 from formpack.utils.expand_content import expand_content, _get_special_survey_cols
+from formpack.utils.flatten_content import flatten_content
 
 
 def test_expand_select_one():
@@ -119,7 +120,11 @@ def test_expand_translations():
           'translations': ['English', 'Français']}
     expand_content(s1)
     assert s1 == x1
-
+    flatten_content(x1)
+    assert x1 == {'survey': [{'type': 'text',
+                              'label::English': 'OK?',
+                              'label::Français': 'OK!'}],
+                  'translations': ['English', 'Français']}
 
 def test_expand_translations2():
     s1 = {'survey': [{'type': 'text',
