@@ -1,0 +1,49 @@
+{
+    "id_string": "sanitation_report_external",
+    "content": {
+        "survey": [
+            {
+                "required": "true",
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "Restaurant name"
+            },
+            {
+                "required": "true",
+                "type": "select_one_external xy3qc67",
+                "name": "restaurant_rating",
+                "label": "How did this restaurant do on its sanitation report?"
+            },
+            {
+                "required": "true",
+                "name": "report_date",
+                "type": "datetime",
+                "label": "Report date"
+            }
+        ],
+        "choices_external": [
+        ]
+    },
+    "submissions": [
+        {
+            "report_date": "012345",
+            "restaurant_name": "Felipes",
+            "restaurant_rating": "A"
+        },
+        {
+            "report_date": "012346",
+            "restaurant_rating": "C",
+            "restaurant_name": "Chipotle"
+        },
+        {
+            "report_date": "012347",
+            "restaurant_rating": "D",
+            "restaurant_name": "Dunkin Donuts"
+        },
+        {
+            "report_date": "012348",
+            "restaurant_rating": "B",
+            "restaurant_name": "Boloco"
+        }
+    ]
+}
