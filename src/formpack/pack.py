@@ -156,15 +156,15 @@ class FormPack(object):
         v2 = self.versions[vn2]
 
         def summr(v):
-            return json.dumps(v._v.get('content'),
+            return json.dumps(v.schema.get('content'),
                               indent=4,
                               sort_keys=True,
                               ).splitlines(1)
         out = []
         for line in difflib.unified_diff(summr(v1),
                                          summr(v2),
-                                         fromfile="v%d" % vn1,
-                                         tofile="v%d" % vn2,
+                                         fromfile=vn1,
+                                         tofile=vn2,
                                          n=1):
             out.append(line)
         return ''.join(out)

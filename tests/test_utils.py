@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 from formpack.utils.xls_to_ss_structure import _parsed_sheet
+from formpack.utils.flatten_content import flatten_content
 
 
 class TestXlsToSpreadsheetStructure(unittest.TestCase):
@@ -40,3 +41,46 @@ class TestXlsToSpreadsheetStructure(unittest.TestCase):
 
         sheet_dicts = self._to_dicts(_parsed_sheet([]))
         self.assertEqual(sheet_dicts, [])
+
+
+class TestNestedStructureToFlattenedStructure(unittest.TestCase):
+    def _wrap_field(self, field_name, value):
+        return {'survey': [
+            {'type': 'text', 'name': 'x'},
+            {'type': 'text', 'name': 'y', field_name: value},
+        ]}
+
+    def _wrap_type(self, type_val):
+        return {'survey': [{
+            'type': type_val,
+            'name': 'q_yn',
+            'label': 'Yes or No',
+        }], 'choices': [
+            {'list_name': 'yn', 'name': 'y', 'label': 'Yes'},
+            {'list_name': 'yn', 'name': 'n', 'label': 'No'},
+        ]}
+
+    def test_flatten_empty_relevant(self):
+        a1 = flatten_content(self._wrap_field('relevant', []))
+        ss_struct = a1['survey']
+        self.assertEqual(ss_struct[1]['relevant'], '')
+
+    def test_flatten_relevant(self):
+        a1 = flatten_content(self._wrap_field('relevant', [{'$lookup': 'x'}]))
+        ss_struct = a1['survey']
+        self.assertEqual(ss_struct[1]['relevant'], '${x}')
+
+    def test_flatten_constraints(self):
+        a1 = flatten_content(self._wrap_field('constraint', ['.', '>', {'$lookup': 'x'}]))
+        ss_struct = a1['survey']
+        self.assertEqual(ss_struct[1]['constraint'], '. > ${x}')
+
+    def test_flatten_select_one_type(self):
+        a1 = flatten_content(self._wrap_type({'select_one': 'yn'}))
+        ss_struct = a1['survey']
+        self.assertEqual(ss_struct[0]['type'], 'select_one yn')
+
+    def test_flatten_select_multiple_type(self):
+        a1 = flatten_content(self._wrap_type({'select_multiple': 'yn'}))
+        ss_struct = a1['survey']
+        self.assertEqual(ss_struct[0]['type'], 'select_multiple yn')
