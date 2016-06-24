@@ -12,7 +12,7 @@ def flatten_content(survey_content):
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
     '''
-    translations = survey_content.get('translations')
+    translations = survey_content.get('translations', [])
     if 'survey' in survey_content:
         for row in survey_content['survey']:
             _flatten_survey_row(row)
