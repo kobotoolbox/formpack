@@ -43,10 +43,10 @@ def _flatten_translated_fields(row, translations):
             items = val
             del row[key]
             for i in xrange(0, len(translations)):
-                translation = translations[i]
+                _t = translations[i]
                 value = items[i]
-                if value is not None:
-                    row['{}::{}'.format(key, translation)] = value
+                tkey = key if _t is None else '{}::{}'.format(key, _t)
+                row[tkey] = value
 
 
 def _flatten_survey_row(row):

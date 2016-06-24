@@ -30,6 +30,11 @@ def test_expand_media():
               'media::image': 'ugh.jpg'
             }
         ]}
+    flatten_content(s1)
+    assert s1 == {'survey': [{
+        'type': 'note',
+        'media::image': 'ugh.jpg',
+      }]}
 
 
 def test_expand_translated_media():
@@ -43,6 +48,12 @@ def test_expand_translated_media():
              }
         ],
         'translations': ['English']}
+    flatten_content(s1)
+    assert s1 == {'survey': [{
+        'type': 'note',
+        'media::image::English': 'eng.jpg',
+      }],
+      'translations': ['English']}
 
 
 def test_expand_translated_media_with_no_translated():
@@ -58,6 +69,13 @@ def test_expand_translated_media_with_no_translated():
              }
         ],
         'translations': ['English', None]}
+    flatten_content(s1)
+    assert s1 == {'survey': [{
+        'type': 'note',
+        'media::image': 'nolang.jpg',
+        'media::image::English': 'eng.jpg',
+      }],
+      'translations': ['English', None]}
 
 
 def _s(rows):
@@ -125,6 +143,7 @@ def test_expand_translations():
                               'label::English': 'OK?',
                               'label::Français': 'OK!'}],
                   'translations': ['English', 'Français']}
+
 
 def test_expand_translations2():
     s1 = {'survey': [{'type': 'text',
