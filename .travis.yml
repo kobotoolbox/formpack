@@ -6,4 +6,4 @@ install:
   - "pip install pytest"
   - "python setup.py install"
 script:
-  - "pytest tests"
+  - "py.test -sv"
