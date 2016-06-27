@@ -13,11 +13,15 @@ def flatten_content(survey_content):
     will pass through to pyxform and to XLS exports
     '''
     translations = survey_content.get('translations', [])
-    if 'survey' in survey_content:
-        for row in survey_content['survey']:
-            _flatten_survey_row(row)
-            if len(translations) > 0:
-                _flatten_translated_fields(row, translations)
+
+    def _iter_through_sheet(sheet_name):
+        if sheet_name in survey_content:
+            for row in survey_content[sheet_name]:
+                _flatten_survey_row(row)
+                if len(translations) > 0:
+                    _flatten_translated_fields(row, translations)
+    _iter_through_sheet('survey')
+    _iter_through_sheet('choices')
     return survey_content
 
 
