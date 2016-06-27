@@ -4,8 +4,10 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
+from collections import OrderedDict
 from formpack.utils.xls_to_ss_structure import _parsed_sheet
 from formpack.utils.flatten_content import flatten_content
+from formpack.utils.json_hash import json_hash
 
 
 class TestXlsToSpreadsheetStructure(unittest.TestCase):
@@ -84,3 +86,32 @@ class TestNestedStructureToFlattenedStructure(unittest.TestCase):
         a1 = flatten_content(self._wrap_type({'select_multiple': 'yn'}))
         ss_struct = a1['survey']
         self.assertEqual(ss_struct[0]['type'], 'select_multiple yn')
+
+
+def test_json_hash():
+    # consistent output
+    assert json_hash({'a': 'z', 'b': 'y', 'c': 'x'}) == 'f6117d60'
+
+    # second parameter is size of string
+    val = json_hash(['abc'], 35)
+    assert len(val) == 35
+
+    # even OrderedDicts have the keys reordered
+    assert json_hash(OrderedDict([
+            ('c', 'x'),
+            ('b', 'y'),
+            ('a', 'z'),
+        ])) == json_hash(OrderedDict([
+            ('a', 'z'),
+            ('b', 'y'),
+            ('c', 'x'),
+        ]))
+
+    # identical objects match (==)
+    assert json_hash({'d': 1, 'e': 2, 'f': 3}) == json_hash({'d': 1,
+                                                             'e': 2,
+                                                             'f': 3})
+    # types don't match (1 != '1')
+    assert json_hash({'d': 1, 'e': 2, 'f': 3}) != json_hash({'d': '1',
+                                                             'e': '2',
+                                                             'f': '3'})
