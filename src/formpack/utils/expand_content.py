@@ -34,9 +34,7 @@ def _get_translations_from_special_cols(special_cols, translations):
 
 
 def expand_content(content):
-    specials = _get_special_survey_cols(content)
-    translations = _get_translations_from_special_cols(specials,
-                      content.get('translations', []))
+    (specials, translations) = _get_special_survey_cols(content)
 
     if len(translations) > 0:
         content['translations'] = translations
@@ -48,6 +46,10 @@ def expand_content(content):
                     row['type'] = _expand_type_to_dict(row['type'])
                 else:
                     row[key] = _expand_xpath_to_list(row[key])
+        for (key, vals) in specials.iteritems():
+            if key in row:
+                _convert_special_label_col(content, row, key, vals)
+    for row in content.get('choices', []):
         for (key, vals) in specials.iteritems():
             if key in row:
                 _convert_special_label_col(content, row, key, vals)
@@ -63,12 +65,18 @@ def _get_special_survey_cols(content):
         'hint::English',
     For more examples, see tests.
     '''
-    uniq_cols = set()
-    special = {}
-    for row in content.get('survey', []):
-        uniq_cols.update(row.keys())
+    uniq_cols = OrderedDict()
+    special = OrderedDict()
 
-    for column_name in uniq_cols:
+    def _pluck_uniq_cols(sheet_name):
+        for row in content.get(sheet_name, []):
+            _row = dict(filter(lambda (k, v): not isinstance(v, list),
+                        row.items()))
+            uniq_cols.update(OrderedDict.fromkeys(row.keys()))
+    _pluck_uniq_cols('survey')
+    _pluck_uniq_cols('choices')
+
+    for column_name in uniq_cols.keys():
         if ':' not in column_name:
             continue
         if column_name.startswith('bind:'):
@@ -97,6 +105,7 @@ def _get_special_survey_cols(content):
             continue
         mtch = re.match('^([^:]+)\s*::?\s*([^:]+)$', column_name)
         if mtch:
+            # example: label::x, constraint_message::x, hint::x
             matched = mtch.groups()
             column_shortname = matched[0]
             special[column_name] = {
@@ -110,7 +119,9 @@ def _get_special_survey_cols(content):
                     'translation': None,
                 }
             continue
-    return special
+    translations = _get_translations_from_special_cols(special,
+                        content.get('translations', []))
+    return (special, translations)
 
 
 def _expand_type_to_dict(type_str):
