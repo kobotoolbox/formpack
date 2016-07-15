@@ -14,8 +14,11 @@ def build_fixture(modulename):
 
         # separate the submissions from the schema
         schemas = [dict(v) for v in fixtures['versions']]
-        submissions = [(s.get('version'), s.pop('submissions')) for s in schemas]
-
+        submissions = []
+        for s in schemas:
+            _version = s.get('version')
+            submissions.append([s.update({'__version__': _version})
+                                for s in s.pop('submissions')])
         return title, schemas, submissions
     except KeyError:
         # TODO: generalize this ?
