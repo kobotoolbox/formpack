@@ -830,3 +830,8 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
+    def test_multi_version_export(self):
+        title, schemas, submissions = restaurant_profile
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 4)
+        failure = fp.export(lang='_default', versions=fp.versions.keys())
