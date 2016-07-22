@@ -38,15 +38,25 @@ class AutoReport(object):
         metrics = {field.name: Counter() for field in fields}
 
         submissions_count = 0
+        version_id_key = versions.values()[0].form_pack.version_id_key
 
-        for version_id, entries in submissions:
+        for _submission_iter in submissions:
+            if isinstance(_submission_iter, tuple):
+                version_id, entries = _submission_iter
+                # Skip unrequested versions
+                _pull_version_from_submission = False
+                if version_id not in versions:
+                    continue
+            else:
+                version_id = None
+                _pull_version_from_submission = True
+                entries = _submission_iter
 
-            # Skip unrequested versions
-            if version_id not in versions:
-                continue
-
-            # TODO: change this to use __version__
             for entry in entries:
+                if _pull_version_from_submission:
+                    version_id = entry.get(version_id_key)
+                    if version_id not in versions:
+                        continue
 
                 submissions_count += 1
 

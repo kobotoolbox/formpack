@@ -20,6 +20,7 @@ class Export(object):
 
     def __init__(self, form_versions, lang=None,
                  group_sep="/", hierarchy_in_labels=False,
+                 version_id_key=None,
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
@@ -30,7 +31,7 @@ class Export(object):
         self.copy_fields = copy_fields
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
-
+        self.version_id_key = version_id_key
         # If some fields need to be arbitrarly copied, add them
         # to the first section
         if copy_fields:
@@ -59,15 +60,33 @@ class Export(object):
         """ Return the a generators yielding formatted chunks of the data set"""
         self.reset()
         versions = self.versions
-        for version_id, entries in submissions:
-            try:
-                section = versions[version_id].sections[self.title]
+        for _submission_iter in submissions:
+            if isinstance(_submission_iter, tuple):
+                _pull_version_id_from_submission = False
+                version_id, entries = _submission_iter
+            else:
+                _pull_version_id_from_submission = True
+                entries = _submission_iter
+
+            if _pull_version_id_from_submission:
                 for entry in entries:
-                    # TODO: do we really need FormSubmission ?
-                    submission = FormSubmission(entry)
-                    yield self.format_one_submission([submission.data], section)
-            except KeyError:  # this versions is NOT requested in the export
-                pass
+                    version_id = entry.get(self.version_id_key)
+                    try:
+                        section = versions[version_id].sections[self.title]
+                        submission = FormSubmission(entry)
+                        yield self.format_one_submission([submission.data], section)
+                    except KeyError:
+                        pass
+            else:
+                try:
+                    section = versions[version_id].sections[self.title]
+                    for entry in entries:
+                        # TODO: do we really need FormSubmission ?
+                        submission = FormSubmission(entry)
+                        yield self.format_one_submission([submission.data], section)
+                except KeyError:  # this versions is NOT requested in the export
+                    pass
+
 
     def reset(self):
         """ Reset sections and indexes to initial values """

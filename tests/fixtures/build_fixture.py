@@ -17,8 +17,12 @@ def build_fixture(modulename):
         submissions = []
         for s in schemas:
             _version = s.get('version')
-            submissions.append([s.update({'__version__': _version})
-                                for s in s.pop('submissions')])
+            _chunk = []
+            _version_id_key = s.get('version_id_key', '__version__')
+            for _s in s.pop('submissions'):
+                _s.update({_version_id_key: _version})
+                _chunk.append(_s)
+            submissions.append(_chunk)
         return title, schemas, submissions
     except KeyError:
         # TODO: generalize this ?
