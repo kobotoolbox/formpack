@@ -60,32 +60,14 @@ class Export(object):
         """ Return the a generators yielding formatted chunks of the data set"""
         self.reset()
         versions = self.versions
-        for _submission_iter in submissions:
-            if isinstance(_submission_iter, tuple):
-                _pull_version_id_from_submission = False
-                version_id, entries = _submission_iter
-            else:
-                _pull_version_id_from_submission = True
-                entries = _submission_iter
-
-            if _pull_version_id_from_submission:
-                for entry in entries:
-                    version_id = entry.get(self.version_id_key)
-                    try:
-                        section = versions[version_id].sections[self.title]
-                        submission = FormSubmission(entry)
-                        yield self.format_one_submission([submission.data], section)
-                    except KeyError:
-                        pass
-            else:
-                try:
-                    section = versions[version_id].sections[self.title]
-                    for entry in entries:
-                        # TODO: do we really need FormSubmission ?
-                        submission = FormSubmission(entry)
-                        yield self.format_one_submission([submission.data], section)
-                except KeyError:  # this versions is NOT requested in the export
-                    pass
+        for entry in submissions:
+            version_id = entry.get(self.version_id_key)
+            try:
+                section = versions[version_id].sections[self.title]
+                submission = FormSubmission(entry)
+                yield self.format_one_submission([submission.data], section)
+            except KeyError:
+                pass
 
 
     def reset(self):

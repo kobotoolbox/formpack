@@ -40,38 +40,25 @@ class AutoReport(object):
         submissions_count = 0
         version_id_key = versions.values()[0].form_pack.version_id_key
 
-        for _submission_iter in submissions:
-            if isinstance(_submission_iter, tuple):
-                version_id, entries = _submission_iter
-                # Skip unrequested versions
-                _pull_version_from_submission = False
-                if version_id not in versions:
-                    continue
-            else:
-                version_id = None
-                _pull_version_from_submission = True
-                entries = _submission_iter
+        for entry in submissions:
+            version_id = entry.get(version_id_key)
+            if version_id not in versions:
+                continue
 
-            for entry in entries:
-                if _pull_version_from_submission:
-                    version_id = entry.get(version_id_key)
-                    if version_id not in versions:
-                        continue
+            submissions_count += 1
 
-                submissions_count += 1
-
-                # TODO: do we really need FormSubmission ?
-                entry = FormSubmission(entry).data
-                for field in fields:
-                    if field.has_stats:
-                        counter = metrics[field.name]
-                        raw_value = entry.get(field.path)
-                        if raw_value is not None:
-                            values = list(field.parse_values(raw_value))
-                            counter.update(values)
-                            counter['__submissions__'] += 1
-                        else:
-                            counter[None] += 1
+            # TODO: do we really need FormSubmission ?
+            entry = FormSubmission(entry).data
+            for field in fields:
+                if field.has_stats:
+                    counter = metrics[field.name]
+                    raw_value = entry.get(field.path)
+                    if raw_value is not None:
+                        values = list(field.parse_values(raw_value))
+                        counter.update(values)
+                        counter['__submissions__'] += 1
+                    else:
+                        counter[None] += 1
 
         def stats_generator():
             for field in fields:
