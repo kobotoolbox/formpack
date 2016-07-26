@@ -22,7 +22,7 @@ def multiselect_question_not_sel(params):
     (qn, val) = params
     return [
         "not(selected(",
-        {'$lookup': qn},
+        {'@lookup': qn},
         ",",
         val,
         "))",
@@ -30,10 +30,10 @@ def multiselect_question_not_sel(params):
 
 
 _fns = {
-    u'$response_not_equal': response_not_equal,
-    u'$and': _join('and'),
-    u'$or': _join('or'),
-    u'$multiselect_question_not_selected': multiselect_question_not_sel,
+    u'@response_not_equal': response_not_equal,
+    u'@and': _join('and'),
+    u'@or': _join('or'),
+    u'@multiselect_question_not_selected': multiselect_question_not_sel,
 }
 
 
@@ -92,30 +92,30 @@ def test_equiv_9():
 
 
 def test_equiv_10():
-    inp = [{u'$lookup': u'abc'}]
+    inp = [{u'@lookup': u'abc'}]
     expected = "${abc}"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_11():
-    inp = [{u'$lookup': u'abc'}]
+    inp = [{u'@lookup': u'abc'}]
     expected = "${abc}"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_12():
-    inp = [{u'$response_not_equal': [u'question_a', u"'a'"]}]
+    inp = [{u'@response_not_equal': [u'question_a', u"'a'"]}]
     expected = "${question_a} != 'a'"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_13():
-    inp = [{u'$and': [[{u'$lookup': u'a'}, u'=', u"'a'"], [{u'$lookup': u'b'}, u'=', u"'b'"], [{u'$lookup': u'c'}, u'=', u"'c'"]]}, u'and', {u'$or': [[{u'$lookup': u'x'}, u'=', u"'x'"], [{u'$lookup': u'y'}, u'=', u"'y'"]]}]
+    inp = [{u'@and': [[{u'@lookup': u'a'}, u'=', u"'a'"], [{u'@lookup': u'b'}, u'=', u"'b'"], [{u'@lookup': u'c'}, u'=', u"'c'"]]}, u'and', {u'@or': [[{u'@lookup': u'x'}, u'=', u"'x'"], [{u'@lookup': u'y'}, u'=', u"'y'"]]}]
     expected = "${a} = 'a' and ${b} = 'b' and ${c} = 'c' and ${x} = 'x' or ${y} = 'y'"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_14():
-    inp = [{u'aa__q1': [{u'$lookup': u'question_a'}, u'!=', u"'a'"]}, u'and', [u'${question_b}', u'<=', 123], u'and', [{u'$multiselect_question_not_selected': [u'question_c', u"'option_2'"]}], u'and', [{u'$lookup': u'question_d'}, u'=', u"'option_2'"]]
+    inp = [{u'aa__q1': [{u'@lookup': u'question_a'}, u'!=', u"'a'"]}, u'and', [u'${question_b}', u'<=', 123], u'and', [{u'@multiselect_question_not_selected': [u'question_c', u"'option_2'"]}], u'and', [{u'@lookup': u'question_d'}, u'=', u"'option_2'"]]
     expected = "${question_a} != 'a' and ${question_b} <= 123 and not(selected(${question_c}, 'option_2')) and ${question_d} = 'option_2'"
     assert expected == array_to_xpath(inp, _fns)

@@ -17,8 +17,8 @@ SPACE_PADDING = {
 }
 
 DEFAULT_FNS = {
-    u'$lookup': lambda x: "${%s}" % x,
-    u'$fn': lambda *args: args,
+    u'@lookup': lambda x: "${%s}" % x,
+    u'@fn': lambda *args: args,
 }
 
 
@@ -50,7 +50,7 @@ def array_to_flattened_array(outer_arr, _fns):
                 if key.startswith('#'):
                     continue
                 # handle keys that begin with '$' as transformable
-                elif key.startswith('$'):
+                elif key.startswith('@'):
                     if key not in fns:
                         raise ValueError('Transform function not found: %s'
                                          % key)
