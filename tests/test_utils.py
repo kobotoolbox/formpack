@@ -66,12 +66,12 @@ class TestNestedStructureToFlattenedStructure(unittest.TestCase):
         self.assertEqual(ss_struct[1]['relevant'], '')
 
     def test_flatten_relevant(self):
-        a1 = flatten_content(self._wrap_field('relevant', [{'$lookup': 'x'}]))
+        a1 = flatten_content(self._wrap_field('relevant', [{'@lookup': 'x'}]))
         ss_struct = a1['survey']
         self.assertEqual(ss_struct[1]['relevant'], '${x}')
 
     def test_flatten_constraints(self):
-        a1 = flatten_content(self._wrap_field('constraint', ['.', '>', {'$lookup': 'x'}]))
+        a1 = flatten_content(self._wrap_field('constraint', ['.', '>', {'@lookup': 'x'}]))
         ss_struct = a1['survey']
         self.assertEqual(ss_struct[1]['constraint'], '. > ${x}')
 

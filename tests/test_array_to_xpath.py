@@ -1,40 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
-import json
 
 from formpack.utils.array_to_xpath import array_to_xpath
 
-
-def response_not_equal(p):
-    return "${%s} != %s" % tuple(p)
+_fns = {}
 
 
-def _join(join_with_what):
-    def fn(p):
-        for n in range(len(p)-1, 0, -1):
-            p.insert(n, join_with_what)
-        return p
-    return fn
-
-
-def multiselect_question_not_sel(params):
-    (qn, val) = params
-    return [
-        "not(selected(",
-        {'@lookup': qn},
-        ",",
-        val,
-        "))",
-    ]
-
-
-_fns = {
-    u'@response_not_equal': response_not_equal,
-    u'@and': _join('and'),
-    u'@or': _join('or'),
-    u'@multiselect_question_not_selected': multiselect_question_not_sel,
-}
+def test_custom_directive():
+    assert u'dlrow olleh' == array_to_xpath({
+        u'@string_reverse': u'hello world'
+    }, {
+        u'@string_reverse': lambda args: [args[::-1]]
+    })
 
 
 def test_equiv_1():
@@ -116,6 +94,6 @@ def test_equiv_13():
 
 
 def test_equiv_14():
-    inp = [{u'aa__q1': [{u'@lookup': u'question_a'}, u'!=', u"'a'"]}, u'and', [u'${question_b}', u'<=', 123], u'and', [{u'@multiselect_question_not_selected': [u'question_c', u"'option_2'"]}], u'and', [{u'@lookup': u'question_d'}, u'=', u"'option_2'"]]
+    inp = [{u'aa__q1': [{u'@lookup': u'question_a'}, u'!=', u"'a'"]}, u'and', [u'${question_b}', u'<=', 123], u'and', [{u'@not_multiselected': [u'question_c', u"'option_2'"]}], u'and', [{u'@lookup': u'question_d'}, u'=', u"'option_2'"]]
     expected = "${question_a} != 'a' and ${question_b} <= 123 and not(selected(${question_c}, 'option_2')) and ${question_d} = 'option_2'"
     assert expected == array_to_xpath(inp, _fns)

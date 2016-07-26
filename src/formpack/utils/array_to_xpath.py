@@ -18,7 +18,17 @@ SPACE_PADDING = {
 
 DEFAULT_FNS = {
     u'@lookup': lambda x: "${%s}" % x,
-    u'@fn': lambda *args: args,
+    u'@response_not_equal': lambda args: [{'@lookup': args[0]}, '!=', args[1]],
+    u'@join': lambda p: reduce(lambda x, v: x + [v, p[0]], p[1], [])[:-1],
+    u'@and': lambda args: {'@join': ['and', args]},
+    u'@or': lambda args: {'@join': ['or', args]},
+    u'@not': lambda args: ['not', {'@parens': args}],
+    u'@predicate': lambda args: ['[', args, ']'],
+    u'@parens': lambda args: ['('] + args + [')'],
+    u'@axis': lambda args: [args[0], '::', args[1]],
+    u'@multiselected': lambda args: [['selected', {'@parens': [
+                                     {'@lookup': args[0]}, ',', args[1]]}]],
+    u'@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
 }
 
 
