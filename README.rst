@@ -1,6 +1,9 @@
 formpack: machinery to build and export reports for kobocat data
 ================================================================
 
+.. image:: https://travis-ci.org/kobotoolbox/formpack.svg?branch=master
+    :target: https://travis-ci.org/kobotoolbox/formpack
+
 Setup
 -----
 
