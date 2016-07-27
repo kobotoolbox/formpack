@@ -46,13 +46,6 @@ class FormPack(object):
 
         self.load_all_versions(versions)
 
-        # QUESTION FOR ALEX: can you fix that ? I don't know how it works
-        # nor what it's for. My guess is it should be outside of here,
-        # in a separate tool, so that it export the same generator than
-        # we use in build_fixture.py
-        # if submissions_xml:
-        #     self._load_submissions_xml(submissions_xml)
-
     def __repr__(self):
         return '<FormPack %s>' % self._stats()
 
@@ -90,14 +83,6 @@ class FormPack(object):
                                                  .get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join('%s="%s"' % item for item in _stats.items())
-
-    def _load_submissions_xml(self, submissions):
-        for submission_xml in submissions:
-            (id_string, version_id) = get_version_identifiers(submission_xml)
-            if version_id not in self.versions:
-                raise KeyError('version [%s] is not available' % version_id)
-            cur_ver = self.versions[version_id]
-            cur_ver._load_submission_xml(submission_xml)
 
     def load_all_versions(self, versions):
         for schema in versions:
