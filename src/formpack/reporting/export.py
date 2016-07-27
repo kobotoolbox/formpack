@@ -20,7 +20,7 @@ class Export(object):
 
     def __init__(self, form_versions, lang=None,
                  group_sep="/", hierarchy_in_labels=False,
-                 version_id_key=None,
+                 version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
@@ -31,7 +31,8 @@ class Export(object):
         self.copy_fields = copy_fields
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
-        self.version_id_key = version_id_key
+        self.version_id_keys = version_id_keys
+
         # If some fields need to be arbitrarly copied, add them
         # to the first section
         if copy_fields:
@@ -61,7 +62,14 @@ class Export(object):
         self.reset()
         versions = self.versions
         for entry in submissions:
-            version_id = entry.get(self.version_id_key)
+            version_id = None
+
+            # find the first version_id present in the submission
+            for _key in self.version_id_keys:
+                if _key in entry:
+                    version_id = entry.get(_key)
+                    break
+
             try:
                 section = versions[version_id].sections[self.title]
                 submission = FormSubmission(entry)

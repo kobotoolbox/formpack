@@ -18,10 +18,12 @@ from ..submission import FormSubmission
 
 class AutoReportStats(object):
 
-    def __init__(self, autoreport, stats, submissions_count):
+    def __init__(self, autoreport, stats, submissions_count,
+                 submission_counts_by_version):
         self.autoreport = autoreport
         self.stats = stats
         self.submissions_count = submissions_count
+        self.submission_counts_by_version = submission_counts_by_version
 
     def __iter__(self):
         return self.stats
@@ -39,6 +41,7 @@ class AutoReport(object):
 
         submissions_count = 0
         version_id_keys = self.formpack.version_id_keys()
+        submission_counts_by_version = Counter()
 
         for entry in submissions:
             version_id = None
@@ -53,6 +56,7 @@ class AutoReport(object):
                 continue
 
             submissions_count += 1
+            submission_counts_by_version[version_id] += 1
 
             # TODO: do we really need FormSubmission ?
             entry = FormSubmission(entry).data
@@ -73,7 +77,8 @@ class AutoReport(object):
                        field.get_labels(lang)[0],
                        field.get_stats(metrics[field.name], lang=lang))
 
-        return AutoReportStats(self, stats_generator(), submissions_count)
+        return AutoReportStats(self, stats_generator(), submissions_count,
+                               submission_counts_by_version)
 
     def _disaggregate_stats(self, submissions, fields, versions, lang, split_by_field):
 

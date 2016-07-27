@@ -10,8 +10,8 @@ from .fixtures import build_fixture
 restaurant_profile = build_fixture('restaurant_profile')
 
 
-class TestVersionIds(unittest.TestCase):
-    def test_fixture_has_translations(self):
+class TestSubmissionsToVersions(unittest.TestCase):
+    def test_submission_counts_match(self):
         '''
         restauraunt_profile@v2 has two translations
         '''
@@ -24,3 +24,9 @@ class TestVersionIds(unittest.TestCase):
         report = fp.autoreport_all_versions()
         stats = report.get_stats(submissions)
         assert stats.submissions_count == len(submissions)
+        assert stats.submission_counts_by_version == {
+            u'rpv1': 1,
+            u'rpV2': 1,
+            u'rpV3': 2,
+            u'rpV4': 4,
+        }

@@ -794,7 +794,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         export = fp.export(lang="_default")
         exported = export.to_dict(submissions)
-        expected = OrderedDict ([
+        expected = OrderedDict([
                     (
                         'Sanitation report external', {
                             'fields': [

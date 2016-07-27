@@ -49,7 +49,10 @@ class FormPack(object):
     def __repr__(self):
         return '<FormPack %s>' % self._stats()
 
-    def version_id_keys(self):
+    def version_id_keys(self, _versions=None):
+        # if no parameter is passed, default to 'all'
+        if _versions is None:
+            _versions = self.versions
         _id_keys = []
         for version in self.versions.values():
             _id_key = version.version_id_key
@@ -266,6 +269,7 @@ class FormPack(object):
         title = title or self.title
         return Export(versions, lang=lang, group_sep=group_sep,
                       hierarchy_in_labels=hierarchy_in_labels,
+                      version_id_keys=self.version_id_keys(versions),
                       title=title, multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields)
 
