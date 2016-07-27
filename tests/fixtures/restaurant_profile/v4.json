@@ -1,6 +1,7 @@
 {
     "id_string": "restaurant_profile",
     "version": "rpV4",
+    "version_id_key": "__version4__",
     "content": {
         "survey": [
             {

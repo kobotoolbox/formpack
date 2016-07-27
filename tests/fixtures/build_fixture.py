@@ -4,10 +4,11 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import importlib
+from copy import deepcopy
 
 
 def build_fixture(modulename):
-    fixtures = importlib.import_module('..%s' % modulename, __name__).DATA
+    fixtures = deepcopy(importlib.import_module('..%s' % modulename, __name__).DATA)
 
     try:
         title = fixtures.get('title')

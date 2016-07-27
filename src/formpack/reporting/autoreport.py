@@ -38,10 +38,17 @@ class AutoReport(object):
         metrics = {field.name: Counter() for field in fields}
 
         submissions_count = 0
-        version_id_key = versions.values()[0].form_pack.version_id_key
+        version_id_keys = self.formpack.version_id_keys()
 
         for entry in submissions:
-            version_id = entry.get(version_id_key)
+            version_id = None
+
+            # uses the first matching version_id_key
+            for version_id_key in version_id_keys:
+                version_id = entry.get(version_id_key)
+                if version_id:
+                    break
+
             if version_id not in versions:
                 continue
 

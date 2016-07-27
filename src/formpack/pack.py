@@ -20,7 +20,7 @@ class FormPack(object):
 
     # TODO: make a clear signature for __init__
     def __init__(self, versions, title='Submissions', id_string=None,
-                 version_id_key='__version__',
+                 default_version_id_key='__version__',
                  asset_type=None, submissions_xml=None):
 
         if not versions:
@@ -33,7 +33,7 @@ class FormPack(object):
         self.versions = OrderedDict()
 
         # the name of the field in submissions which stores the version ID
-        self.version_id_key = version_id_key
+        self.default_version_id_key = default_version_id_key
 
         self.id_string = id_string
 
@@ -48,6 +48,15 @@ class FormPack(object):
 
     def __repr__(self):
         return '<FormPack %s>' % self._stats()
+
+    def version_id_keys(self):
+        _id_keys = []
+        for version in self.versions.values():
+            _id_key = version.version_id_key
+            if _id_key not in _id_keys:
+                _id_keys.append(_id_key)
+        return _id_keys
+
 
     @property
     def available_translations(self):
@@ -257,13 +266,16 @@ class FormPack(object):
         title = title or self.title
         return Export(versions, lang=lang, group_sep=group_sep,
                       hierarchy_in_labels=hierarchy_in_labels,
-                      version_id_key=self.version_id_key,
                       title=title, multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields)
 
     def autoreport(self, versions=-1):
         '''Create an automatic report for a given versions of the form'''
         return AutoReport(self, self._get_versions(versions))
+
+    def autoreport_all_versions(self):
+        '''Create an automatic report for a given versions of the form'''
+        return AutoReport(self, self.versions.keys())
 
     def _get_versions(self, versions):
 
