@@ -208,9 +208,9 @@ class FormPack(object):
                     # last version
                     if new_field_name in processed_field_names:
                         final_list_copy = enumerate(list(all_fields))
-                        for y, (name, field) in final_list_copy:
-                            if name == new_field_name:
-                                final_list_copy[y] = field
+                        for y, _field in final_list_copy:
+                            if _field.name == new_field_name:
+                                all_fields[y] = _field
                                 break
                         continue
 
