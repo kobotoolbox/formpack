@@ -6,6 +6,8 @@ from __future__ import (unicode_literals, print_function,
 from collections import OrderedDict
 import re
 
+from .array_to_xpath import EXPANDABLE_FIELD_TYPES
+
 
 def _convert_special_label_col(content, row, col_shortname, vals):
     if 'translation' in vals:
@@ -40,7 +42,6 @@ def expand_content(content):
         content['translations'] = translations
 
     for row in content.get('survey', []):
-        for key in ['type', 'constraint', 'relevant', 'calculation']:
         if 'type' in row:
             _type = row['type']
             if isinstance(_type, basestring):
@@ -48,6 +49,7 @@ def expand_content(content):
             elif isinstance(_type, dict):
                 row.update({u'type': _type.keys()[0],
                             u'select_from': _type.values()[0]})
+        for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], basestring):
                 row[key] = _expand_xpath_to_list(row[key])
         for (key, vals) in specials.iteritems():

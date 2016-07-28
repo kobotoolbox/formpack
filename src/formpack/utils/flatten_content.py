@@ -54,7 +54,7 @@ def _flatten_translated_fields(row, translations):
 
 
 def _flatten_survey_row(row):
-    for key in ['relevant', 'constraint']:
+    for key in EXPANDABLE_FIELD_TYPES:
         if key in row and isinstance(row[key], (list, tuple)):
             row[key] = array_to_xpath(row[key])
 
