@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from array_to_xpath import array_to_xpath
+from array_to_xpath import array_to_xpath, EXPANDABLE_FIELD_TYPES
 
 TYPE_KEYS = ['select_one', 'select_multiple']
 
@@ -57,5 +57,14 @@ def _flatten_survey_row(row):
     for key in ['relevant', 'constraint']:
         if key in row and isinstance(row[key], (list, tuple)):
             row[key] = array_to_xpath(row[key])
-    if 'type' in row and isinstance(row['type'], dict):
-        row['type'] = _stringify_type(row['type'])
+
+    if 'type' in row:
+        _type = row['type']
+        if isinstance(_type, dict):
+            row['type'] = _stringify_type(_type)
+        elif 'select_from' in row:
+            _list_name = row.pop('select_from')
+            if row['type'] == 'select_one_or_other':
+                row['type'] = 'select_one {} or_other'.format(_list_name)
+            else:
+                row['type'] = '{} {}'.format(_type, _list_name)
