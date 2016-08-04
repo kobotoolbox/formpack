@@ -47,14 +47,14 @@ def test_select_multiple_aliases_replaced():
 
 
 def test_misc_types():
-    assert dealias_type('begin group') == 'begin group'
-    assert dealias_type('end group') == 'end group'
-    assert dealias_type('begin repeat') == 'begin repeat'
-    assert dealias_type('end repeat') == 'end repeat'
-    assert dealias_type('begin_group') == 'begin group'
-    assert dealias_type('end_group') == 'end group'
-    assert dealias_type('begin_repeat') == 'begin repeat'
-    assert dealias_type('end_repeat') == 'end repeat'
+    assert dealias_type('begin group') == 'begin_group'
+    assert dealias_type('end group') == 'end_group'
+    assert dealias_type('begin repeat') == 'begin_repeat'
+    assert dealias_type('end repeat') == 'end_repeat'
+    assert dealias_type('begin_group') == 'begin_group'
+    assert dealias_type('end_group') == 'end_group'
+    assert dealias_type('begin_repeat') == 'begin_repeat'
+    assert dealias_type('end_repeat') == 'end_repeat'
 
 
 def _fail_type(_type):
