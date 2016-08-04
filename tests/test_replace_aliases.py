@@ -47,6 +47,10 @@ def test_select_multiple_aliases_replaced():
 
 
 def test_misc_types():
+    assert dealias_type('begin group') == 'begin group'
+    assert dealias_type('end group') == 'end group'
+    assert dealias_type('begin repeat') == 'begin repeat'
+    assert dealias_type('end repeat') == 'end repeat'
     assert dealias_type('begin_group') == 'begin group'
     assert dealias_type('end_group') == 'end group'
     assert dealias_type('begin_repeat') == 'begin repeat'

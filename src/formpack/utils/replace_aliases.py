@@ -9,12 +9,12 @@ from __future__ import (unicode_literals, print_function,
 # question types, and values.
 
 import json
+from copy import deepcopy
 from collections import OrderedDict
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
-_KNOWN_TYPES = QUESTION_TYPE_DICT.keys()
 
 TF_COLUMNS = [
     'required',
@@ -30,17 +30,20 @@ formpack_preferred_type_aliases = {
     'begin_repeat': 'begin repeat',
     'end_repeat': 'end repeat',
 }
-pyxform_aliases.select.update(formpack_preferred_type_aliases)
-pyxform_aliases.select.update({
+pyxform_select = deepcopy(pyxform_aliases.select)
+pyxform_select.update(formpack_preferred_type_aliases)
+pyxform_select.update({
     'select multiple': 'select_multiple',
     'select many': 'select_multiple',
     'select_many': 'select_multiple',
 })
 
+_KNOWN_TYPES = QUESTION_TYPE_DICT.keys() + pyxform_select.values()
+
 select_aliases = OrderedDict()
 # sort select_aliases in order of string length
-for key in sorted(pyxform_aliases.select.keys(), key=lambda k: -1*len(k)):
-    val = pyxform_aliases.select[key]
+for key in sorted(pyxform_select.keys(), key=lambda k: -1*len(k)):
+    val = pyxform_select[key]
     if key in formpack_preferred_type_aliases.values():
         select_aliases[key] = key
         continue
@@ -96,7 +99,7 @@ def dealias_type(type_str, strict=False):
 def replace_aliases(content):
     for row in content.get('survey', []):
         if row.get('type'):
-            row['type'] = dealias_type(row.get('type', False))
+            row['type'] = dealias_type(row.get('type'), strict=True)
 
         for col in TF_COLUMNS:
             if col in row:
