@@ -26,10 +26,17 @@ formpack_preferred_type_aliases = {
     'select all that apply': 'select_multiple',
     'select one external': 'select_one_external',
     'begin group': 'begin_group',
+    'begin  group': 'begin_group',
     'end group': 'end_group',
+    'end  group': 'end_group',
+    'begin lgroup': 'begin_repeat',
+    'end lgroup': 'end_repeat',
     'begin repeat': 'begin_repeat',
     'end repeat': 'end_repeat',
+    'begin looped group': 'begin_repeat',
+    'end looped group': 'end_repeat',
 }
+
 pyxform_select = deepcopy(pyxform_aliases.select)
 pyxform_select.update(formpack_preferred_type_aliases)
 pyxform_select.update({

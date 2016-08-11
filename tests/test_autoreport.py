@@ -25,8 +25,8 @@ class TestAutoReport(unittest.TestCase):
         assert field_names == ['restaurant_name', 'location', 'eatery_type']
 
         field_types = [field.__class__.__name__ for field in fields]
-        assert field_types == ['TextField', 'FormGPSField',
-                               'FormChoiceFieldWithMultipleSelect']
+        assert ' '.join(field_types) == ' '.join(['TextField', 'FormGPSField',
+                               'FormChoiceFieldWithMultipleSelect'])
 
     def test_simple_report(self):
 
@@ -40,7 +40,7 @@ class TestAutoReport(unittest.TestCase):
 
         stats = [(repr(f), n, d) for f, n, d in stats]
 
-        assert list(stats) == [
+        expected = [
             (
              "<TextField name='restaurant_name' type='text'>",
              'nom du restaurant',
@@ -73,7 +73,9 @@ class TestAutoReport(unittest.TestCase):
                   'provided': 3,
                   'show_graph': True,
                   'total_count': 4})
-         ]
+        ]
+        for (i, stat) in enumerate(stats):
+            assert stat == expected[i]
 
     def test_rich_report(self):
 

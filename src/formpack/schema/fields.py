@@ -100,7 +100,8 @@ class FormField(FormDataDef):
 
     @classmethod
     def from_json_definition(cls, definition, hierarchy=None,
-                             section=None, field_choices={}):
+                             section=None, field_choices={},
+                             translations=None):
         """Return an instance of a Field class matching this JSON field def
 
         Depending of the data datype extracted from the field definition,
@@ -120,22 +121,22 @@ class FormField(FormDataDef):
                   The FormField instance matching this definiton.
         """
         name = definition['name']
-        labels = cls._extract_json_labels(definition)
+        label = definition.get('label')
+        if label:
+            labels = OrderedDict(zip(translations, label))
+        else:
+            labels = {}
 
         # normalize spaces
-        data_type = normalize_data_type(definition['type'])
+        data_type = definition['type']
         choice = None
 
-        # Get the data type. If it has a foreign key, instanciate a subclass
-        # dedicated to handle choices and pass it the choices matching this fk
-        if " " in data_type:
-            data_type, choice_id = data_type.split()[:2]  # ignore deprecated 'or_other' value
+        if ' ' in data_type:
+            raise ValueError('invalid data_type: %s' % data_type)
 
-            # currently select_one_external is considered a spacial case
-            # because user can erase definition on the fly. To avoid it
-            # breaking, we don't consider it a choice field, but a text field
-            if data_type in ('select_one', 'select_multiple'):
-                choice = field_choices[choice_id]
+        if data_type in ('select_one', 'select_multiple'):
+            choice_id = definition['select_from']
+            choice = field_choices[choice_id]
 
         data_type_classes = {
             "select_one": FormChoiceField,

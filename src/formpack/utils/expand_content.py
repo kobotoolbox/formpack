@@ -7,19 +7,22 @@ from collections import OrderedDict
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
+from ..constants import DEFAULT_TRANSLATION_KEY
 
 
-def _convert_special_label_col(content, row, col_shortname, vals):
-    if 'translation' in vals:
+def _convert_special_label_col(content, row, col_shortname,
+                               special_column_details):
+    _scd = special_column_details
+    if 'translation' in _scd:
         translations = content['translations']
-        cur_translation = vals['translation']
+        cur_translation = _scd['translation']
         cur_translation_index = translations.index(cur_translation)
-        _expandable_col = vals['column']
+        _expandable_col = _scd['column']
         if _expandable_col not in row:
             row[_expandable_col] = [None] * len(translations)
         elif not isinstance(row[_expandable_col], list):
             _oldval = row[_expandable_col]
-            _nti = translations.index(None)
+            _nti = translations.index(DEFAULT_TRANSLATION_KEY)
             row[_expandable_col] = [None] * len(translations)
             row[_expandable_col][_nti] = _oldval
         if col_shortname != _expandable_col:
@@ -76,8 +79,6 @@ def _get_special_survey_cols(content):
 
     def _pluck_uniq_cols(sheet_name):
         for row in content.get(sheet_name, []):
-            _row = dict(filter(lambda (k, v): not isinstance(v, list),
-                        row.items()))
             uniq_cols.update(OrderedDict.fromkeys(row.keys()))
     _pluck_uniq_cols('survey')
     _pluck_uniq_cols('choices')
@@ -107,6 +108,7 @@ def _get_special_survey_cols(content):
                 'coltype': 'media',
                 'column': 'media::{}'.format(media_type),
                 'media': media_type,
+                'translation': DEFAULT_TRANSLATION_KEY,
             }
             continue
         mtch = re.match('^([^:]+)\s*::?\s*([^:]+)$', column_name)
@@ -122,18 +124,19 @@ def _get_special_survey_cols(content):
             if column_shortname in uniq_cols:
                 special[column_shortname] = {
                     'column': column_shortname,
-                    'translation': None,
+                    'translation': DEFAULT_TRANSLATION_KEY,
                 }
             continue
     translations = _get_translations_from_special_cols(special,
-                        content.get('translations', []))
+                       content.get('translations', []))
     return (special, translations)
 
 
 def _expand_type_to_dict(type_str):
     for _re in [
-                '^(select_one) (\w+)$',
-                '^(select_multiple) (\w+)$',
+                '^(select_one)\s+(\w+)$',
+                '^(select_multiple)\s+(\w+)$',
+                '^(select_one_external)\s+(\w+)$',
                ]:
         match = re.match(_re, type_str)
         if match:
@@ -141,7 +144,7 @@ def _expand_type_to_dict(type_str):
             return {u'type': type_,
                     u'select_from': list_name}
 
-    _or_other = re.match('^select_one (\w+) or_other$', type_str)
+    _or_other = re.match('^select_one\s+(\w+)\s+or_other$', type_str)
     if _or_other:
         list_name = _or_other.groups()[0]
         return {u'type': 'select_one_or_other',

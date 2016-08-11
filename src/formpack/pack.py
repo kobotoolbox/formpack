@@ -14,6 +14,10 @@ except ImportError:
 from .version import FormVersion
 from .utils import get_version_identifiers, str_types
 from .reporting import Export, AutoReport
+from .utils.expand_content import expand_content
+from .utils.replace_aliases import replace_aliases
+
+from copy import deepcopy
 
 
 class FormPack(object):
@@ -98,7 +102,7 @@ class FormPack(object):
 
     def load_all_versions(self, versions):
         for schema in versions:
-            self.load_version(schema)
+            self.load_version(deepcopy(schema))
 
     def load_version(self, schema):
         """ Load one version and attach it to this Formpack
@@ -116,6 +120,8 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
+        replace_aliases(schema['content'])
+        expand_content(schema['content'])
 
         # TODO: make that an alternative constructor from_json_schema ?
         # this way we could get rid of the construct accepting a json schema
