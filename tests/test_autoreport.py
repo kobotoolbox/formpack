@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 import pytest
+import json
 
 from formpack import FormPack
 from .fixtures import build_fixture
@@ -13,6 +14,11 @@ from .fixtures import build_fixture
 class TestAutoReport(unittest.TestCase):
 
     maxDiff = None
+
+    def assertDictEquals(self, arg1, arg2):
+        _j = lambda arg: json.dumps(arg, indent=4, sort_keys=True)
+        assert _j(arg1) == _j(arg2)
+
 
     def test_list_fields_on_packs(self):
 
@@ -89,7 +95,7 @@ class TestAutoReport(unittest.TestCase):
 
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
-        assert list(stats) == [
+        self.assertDictEquals(list(stats), [
             (
              "<TextField name='restaurant_name' type='text'>",
              'restaurant_name',
@@ -139,7 +145,7 @@ class TestAutoReport(unittest.TestCase):
                    'stdev': 0.5477225575051661,
                    'total_count': 6}
             )
-        ]
+        ])
 
 '''
     def test_disaggregate(self):

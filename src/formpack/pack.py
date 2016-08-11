@@ -16,6 +16,8 @@ from .utils import get_version_identifiers, str_types
 from .reporting import Export, AutoReport
 from .utils.expand_content import expand_content
 from .utils.replace_aliases import replace_aliases
+from .constants import UNSPECIFIED_TRANSLATION
+
 
 from copy import deepcopy
 
@@ -268,7 +270,7 @@ class FormPack(object):
     def to_json(self, **kwargs):
         return json.dumps(self.to_dict(), **kwargs)
 
-    def export(self, lang=None, group_sep='/', hierarchy_in_labels=False,
+    def export(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
                force_index=False, copy_fields=(), title=None):
         '''Create an export for a given versions of the form'''

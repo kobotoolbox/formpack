@@ -7,7 +7,7 @@ from collections import OrderedDict
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
-from ..constants import DEFAULT_TRANSLATION_KEY
+from ..constants import UNTRANSLATED
 
 
 def _convert_special_label_col(content, row, col_shortname,
@@ -22,7 +22,7 @@ def _convert_special_label_col(content, row, col_shortname,
             row[_expandable_col] = [None] * len(translations)
         elif not isinstance(row[_expandable_col], list):
             _oldval = row[_expandable_col]
-            _nti = translations.index(DEFAULT_TRANSLATION_KEY)
+            _nti = translations.index(UNTRANSLATED)
             row[_expandable_col] = [None] * len(translations)
             row[_expandable_col][_nti] = _oldval
         if col_shortname != _expandable_col:
@@ -108,7 +108,7 @@ def _get_special_survey_cols(content):
                 'coltype': 'media',
                 'column': 'media::{}'.format(media_type),
                 'media': media_type,
-                'translation': DEFAULT_TRANSLATION_KEY,
+                'translation': UNTRANSLATED,
             }
             continue
         mtch = re.match('^([^:]+)\s*::?\s*([^:]+)$', column_name)
@@ -124,7 +124,7 @@ def _get_special_survey_cols(content):
             if column_shortname in uniq_cols:
                 special[column_shortname] = {
                     'column': column_shortname,
-                    'translation': DEFAULT_TRANSLATION_KEY,
+                    'translation': UNTRANSLATED,
                 }
             continue
     translations = _get_translations_from_special_cols(special,

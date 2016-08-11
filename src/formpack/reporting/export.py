@@ -14,11 +14,12 @@ from pyexcelerate import Workbook
 from ..submission import FormSubmission
 from ..schema import CopyField
 from ..utils.string import unicode
+from ..constants import UNSPECIFIED_TRANSLATION
 
 
 class Export(object):
 
-    def __init__(self, form_versions, lang=None,
+    def __init__(self, form_versions, lang=UNSPECIFIED_TRANSLATION,
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
@@ -58,7 +59,7 @@ class Export(object):
             self._empty_row[section_name] = dict(self._row_cache[section_name])
 
     def parse_submissions(self, submissions):
-        """ Return the a generators yielding formatted chunks of the data set"""
+        """Return the a generators yielding formatted chunks of the data set"""
         self.reset()
         versions = self.versions
         for entry in submissions:
@@ -88,7 +89,7 @@ class Export(object):
         self._indexes = {n: 1 for n in self.sections}
         # N.B: indexes are not affected by form versions
 
-    def get_fields_and_labels_for_all_versions(self, lang=None, group_sep="/",
+    def get_fields_and_labels_for_all_versions(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                                                 hierarchy_in_labels=False,
                                                 multiple_select="both"):
         """ Return 2 mappings containing field and labels by section

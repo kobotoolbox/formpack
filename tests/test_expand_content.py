@@ -9,7 +9,7 @@ from collections import OrderedDict
 from formpack.utils.expand_content import expand_content
 from formpack.utils.expand_content import _get_special_survey_cols
 from formpack.utils.flatten_content import flatten_content
-from formpack.constants import DEFAULT_TRANSLATION_KEY
+from formpack.constants import UNTRANSLATED
 
 
 def test_expand_select_one():
@@ -36,7 +36,7 @@ def test_expand_media():
               'media::image': ['ugh.jpg']
             }
         ],
-        'translations': [DEFAULT_TRANSLATION_KEY]
+        'translations': [UNTRANSLATED]
         }
     flatten_content(s1)
     assert s1 == {'survey': [{
@@ -69,21 +69,21 @@ def test_expand_translated_media_with_no_translated():
                       'media::image': 'nolang.jpg',
                       'media::image::English': 'eng.jpg',
                       }],
-          'translations': ['English', DEFAULT_TRANSLATION_KEY]}
+          'translations': ['English', UNTRANSLATED]}
     expand_content(s1)
     assert s1 == {'survey': [
             {'type': 'note',
                 'media::image': ['eng.jpg', 'nolang.jpg']
              }
         ],
-        'translations': ['English', DEFAULT_TRANSLATION_KEY]}
+        'translations': ['English', UNTRANSLATED]}
     flatten_content(s1)
     assert s1 == {'survey': [{
         'type': 'note',
         'media::image': 'nolang.jpg',
         'media::image::English': 'eng.jpg',
       }],
-      'translations': ['English', DEFAULT_TRANSLATION_KEY]}
+      'translations': ['English', UNTRANSLATED]}
 
 
 def test_convert_select_objects():
@@ -197,7 +197,7 @@ def test_get_special_survey_cols():
     assert sorted(map(lambda x: x.get('translation'), values)
                   ) == sorted(['English', 'English', 'English', 'English',
                                'chinese', 'Arabic', 'German', 'Français',
-                               DEFAULT_TRANSLATION_KEY, DEFAULT_TRANSLATION_KEY])
+                               UNTRANSLATED, UNTRANSLATED])
 
 
 def test_not_special_cols():
@@ -257,10 +257,10 @@ def test_expand_translations_null_lang():
     s1 = {'survey': [{'type': 'text',
                       'label': 'NoLang',
                       'label::English': 'EnglishLang'}],
-          'translations': [DEFAULT_TRANSLATION_KEY, 'English']}
+          'translations': [UNTRANSLATED, 'English']}
     x1 = {'survey': [{'type': 'text',
                       'label': ['NoLang', 'EnglishLang']}],
-          'translations': [DEFAULT_TRANSLATION_KEY, 'English']}
+          'translations': [UNTRANSLATED, 'English']}
     s1_copy = copy.deepcopy(s1)
     expand_content(s1)
     assert s1.get('translations') == x1.get('translations')

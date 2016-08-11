@@ -15,7 +15,7 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from ..constants import DEFAULT_TRANSLATION_KEY
+from ..constants import UNTRANSLATED
 
 
 class FormDataDef(object):
@@ -43,7 +43,7 @@ class FormDataDef(object):
         """ Extract translation labels from the JSON data definition """
         labels = OrderedDict()
         if "label" in definition:
-            labels[DEFAULT_TRANSLATION_KEY] = definition['label']
+            labels[UNTRANSLATED] = definition['label']
 
         for key, val in definition.items():
             if key.startswith('label:'):
@@ -65,7 +65,7 @@ class FormSection(FormDataDef):
                  *args, **kwargs):
 
         if labels is None:
-            labels = {DEFAULT_TRANSLATION_KEY: 'submissions'}
+            labels = {UNTRANSLATED: 'submissions'}
 
         super(FormSection, self).__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
@@ -81,7 +81,7 @@ class FormSection(FormDataDef):
         labels = cls._extract_json_labels(definition)
         return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
 
-    def get_label(self, lang=DEFAULT_TRANSLATION_KEY):
+    def get_label(self, lang=UNTRANSLATED):
         return [self.labels.get(lang) or self.name]
 
     def __repr__(self):

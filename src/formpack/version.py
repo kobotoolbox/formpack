@@ -11,7 +11,7 @@ except ImportError:
 
 from copy import deepcopy
 
-from .constants import DEFAULT_TRANSLATION_KEY
+from .constants import UNTRANSLATED
 from .submission import FormSubmission
 from .utils import formversion_pyxform
 from .utils import parse_xml_to_xmljson, normalize_data_type
@@ -64,7 +64,7 @@ class FormVersion(object):
 
         content = self.schema['content']
 
-        self.translations = map(lambda t: t if t is not None else DEFAULT_TRANSLATION_KEY,
+        self.translations = map(lambda t: t if t is not None else UNTRANSLATED,
                                 content.get('translations', [None]))
 
         # TODO: put those parts in a separate method and unit test it
@@ -221,7 +221,7 @@ class FormVersion(object):
             return self.form_pack.title
         return self.version_title
 
-    def get_labels(self, lang=DEFAULT_TRANSLATION_KEY, group_sep=None):
+    def get_labels(self, lang=UNTRANSLATED, group_sep=None):
         """ Returns a mapping of labels for {section: [field_label, ...]...}
 
             Sections and fields labels can be set to use their slug name,

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from array_to_xpath import array_to_xpath, EXPANDABLE_FIELD_TYPES
-from ..constants import DEFAULT_TRANSLATION_KEY
+from ..constants import UNTRANSLATED
 
 TYPE_KEYS = ['select_one', 'select_multiple']
 
@@ -25,7 +25,7 @@ def flatten_content(survey_content):
     _iter_through_sheet('choices')
 
     # do not list translations when only default exists
-    if len(translations) == 1 and translations[0] == DEFAULT_TRANSLATION_KEY:
+    if len(translations) == 1 and translations[0] == UNTRANSLATED:
         del survey_content['translations']
 
     return survey_content
@@ -55,7 +55,7 @@ def _flatten_translated_fields(row, translations):
             for i in xrange(0, len(translations)):
                 _t = translations[i]
                 value = items[i]
-                if _t is DEFAULT_TRANSLATION_KEY:
+                if _t is UNTRANSLATED:
                     row[key] = value
                 else:
                     row['{}::{}'.format(key, _t)] = value

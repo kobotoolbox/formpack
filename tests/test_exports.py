@@ -17,7 +17,7 @@ from path import tempdir
 from formpack import FormPack
 from .fixtures import build_fixture
 
-from formpack.constants import DEFAULT_TRANSLATION_KEY
+from formpack.constants import UNTRANSLATED
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')
@@ -89,7 +89,7 @@ class TestFormPackExport(unittest.TestCase):
                                     '_lieu_precision'])
 
         # TODO: make a separate test to test to test __getitem__
-        export = fp.export(lang=DEFAULT_TRANSLATION_KEY, versions='rpv1')
+        export = fp.export(lang=UNTRANSLATED, versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
         self.assertEquals(headers, ['restaurant name',
@@ -516,7 +516,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertTextEqual(csv_data, expected)
 
         options = {'versions': 'gqs', 'hierarchy_in_labels': True,
-                   'lang': DEFAULT_TRANSLATION_KEY}
+                   'lang': UNTRANSLATED}
         csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
@@ -745,7 +745,7 @@ class TestFormPackExport(unittest.TestCase):
                     }
                })
 
-        self.assertEqual(exported, expected)
+        self.assertDictEquals(exported, expected)
 
     def test_copy_fields_and_force_index_and_unicode(self):
         title, schemas, submissions = customer_satisfaction
@@ -797,7 +797,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('sanitation_report_external')
 
         fp = FormPack(schemas, title)
-        export = fp.export(lang=DEFAULT_TRANSLATION_KEY)
+        export = fp.export(lang=UNTRANSLATED)
         exported = export.to_dict(submissions)
         expected = OrderedDict([
                     (
