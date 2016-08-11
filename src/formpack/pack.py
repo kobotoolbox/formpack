@@ -126,8 +126,6 @@ class FormPack(object):
         # while version id are id unique to one of the versions of the form
 
         # Avoid duplicate versions id
-        # import pdb
-        # pdb.set_trace()
         if form_version.id in self.versions:
             if form_version.id is None:
                 raise ValueError('cannot have two versions without '
@@ -136,8 +134,8 @@ class FormPack(object):
             raise ValueError('cannot have duplicate version id: %s'
                              % form_version.id)
 
-        # If the form pack doesn't have an id_string, we get it from the
-        # first form version. We also avoid heterogenenous id_string in versions
+        # If the form pack doesn't have an id_string, we get it from the first
+        # form version. We also avoid heterogenenous id_string in versions
         if form_version.id_string:
             if self.id_string and self.id_string != form_version.id_string:
                 raise ValueError('Versions must of the same form must '
