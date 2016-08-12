@@ -60,6 +60,22 @@ class TestNestedStructureToFlattenedStructure(unittest.TestCase):
             {'list_name': 'yn', 'name': 'n', 'label': 'No'},
         ]}
 
+    def test_flatten_select_type(self):
+        s1 = {'survey': [{'type': 'select_multiple',
+                          'select_from': 'xyz'}]}
+        flatten_content(s1)
+        row0 = s1['survey'][0]
+        assert row0['type'] == 'select_multiple xyz'
+        assert 'select_from' not in row0
+
+    def test_flatten_select_or_other(self):
+        s1 = {'survey': [{'type': 'select_one_or_other',
+                          'select_from': 'xyz'}]}
+        flatten_content(s1)
+        row0 = s1['survey'][0]
+        assert row0['type'] == 'select_one xyz or_other'
+        assert 'select_from' not in row0
+
     def test_flatten_empty_relevant(self):
         a1 = flatten_content(self._wrap_field('relevant', []))
         ss_struct = a1['survey']

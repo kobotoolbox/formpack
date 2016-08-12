@@ -6,6 +6,8 @@ from __future__ import (unicode_literals, print_function,
 from collections import OrderedDict
 import re
 
+from .array_to_xpath import EXPANDABLE_FIELD_TYPES
+
 
 def _convert_special_label_col(content, row, col_shortname, vals):
     if 'translation' in vals:
@@ -40,12 +42,16 @@ def expand_content(content):
         content['translations'] = translations
 
     for row in content.get('survey', []):
-        for key in ['type', 'constraint', 'relevant', 'calculation']:
+        if 'type' in row:
+            _type = row['type']
+            if isinstance(_type, basestring):
+                row.update(_expand_type_to_dict(row['type']))
+            elif isinstance(_type, dict):
+                row.update({u'type': _type.keys()[0],
+                            u'select_from': _type.values()[0]})
+        for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], basestring):
-                if key == 'type':
-                    row['type'] = _expand_type_to_dict(row['type'])
-                else:
-                    row[key] = _expand_xpath_to_list(row[key])
+                row[key] = _expand_xpath_to_list(row[key])
         for (key, vals) in specials.iteritems():
             if key in row:
                 _convert_special_label_col(content, row, key, vals)
@@ -132,13 +138,17 @@ def _expand_type_to_dict(type_str):
         match = re.match(_re, type_str)
         if match:
             (type_, list_name) = match.groups()
-            return {type_: list_name}
+            return {u'type': type_,
+                    u'select_from': list_name}
+
     _or_other = re.match('^select_one (\w+) or_other$', type_str)
     if _or_other:
         list_name = _or_other.groups()[0]
-        return {'select_one_or_other': list_name}
+        return {u'type': 'select_one_or_other',
+                u'select_from': list_name}
+
     # if it does not expand, we return the original string
-    return type_str
+    return {u'type': type_str}
 
 
 def _expand_xpath_to_list(xpath_string):

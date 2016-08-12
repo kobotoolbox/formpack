@@ -21,6 +21,8 @@ DEFAULT_FNS = {
     u'$fn': lambda *args: args,
 }
 
+EXPANDABLE_FIELD_TYPES = ['relevant', 'constraint', 'calculation']
+
 
 def array_to_xpath(outer_arr, fns={}):
     flattened = array_to_xpath.array_to_flattened_array(outer_arr, fns)

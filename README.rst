@@ -1,12 +1,16 @@
-formpack: machinery to build and export reports for kobocat data
+formpack: machinery to build and export reports for xlsform data
 ================================================================
+
+.. image:: https://travis-ci.org/kobotoolbox/formpack.svg?branch=master
+    :target: https://travis-ci.org/kobotoolbox/formpack
 
 Setup
 -----
 
 Install::
 
-    python setup.py install # or develop if you want to edit the code
+    python setup.py install
+    # or develop the code: python setup.py develop
 
 Test::
 

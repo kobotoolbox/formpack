@@ -20,6 +20,7 @@ class Export(object):
 
     def __init__(self, form_versions, lang=None,
                  group_sep="/", hierarchy_in_labels=False,
+                 version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
@@ -30,6 +31,7 @@ class Export(object):
         self.copy_fields = copy_fields
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
+        self.version_id_keys = version_id_keys
 
         # If some fields need to be arbitrarly copied, add them
         # to the first section
@@ -59,15 +61,22 @@ class Export(object):
         """ Return the a generators yielding formatted chunks of the data set"""
         self.reset()
         versions = self.versions
-        for version_id, entries in submissions:
+        for entry in submissions:
+            version_id = None
+
+            # find the first version_id present in the submission
+            for _key in self.version_id_keys:
+                if _key in entry:
+                    version_id = entry.get(_key)
+                    break
+
             try:
                 section = versions[version_id].sections[self.title]
-                for entry in entries:
-                    # TODO: do we really need FormSubmission ?
-                    submission = FormSubmission(entry)
-                    yield self.format_one_submission([submission.data], section)
-            except KeyError:  # this versions is NOT requested in the export
+                submission = FormSubmission(entry)
+                yield self.format_one_submission([submission.data], section)
+            except KeyError:
                 pass
+
 
     def reset(self):
         """ Reset sections and indexes to initial values """

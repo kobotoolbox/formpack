@@ -33,6 +33,8 @@ class FormVersion(object):
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
+        self.version_id_key = schema.get('version_id_key',
+                                         form_pack.default_version_id_key)
 
         # form string id, unique to this form, shared accross versions
         self.id_string = schema.get('id_string')

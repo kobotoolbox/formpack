@@ -13,14 +13,15 @@ from formpack.utils.flatten_content import flatten_content
 def test_expand_select_one():
     s1 = {'survey': [{'type': 'select_one dogs'}]}
     expand_content(s1)
-    assert s1['survey'][0]['type'] == {'select_one': 'dogs'}
+    assert s1['survey'][0]['type'] == 'select_one'
+    assert s1['survey'][0]['select_from'] == 'dogs'
 
 
 def test_expand_select_multiple():
     s1 = {'survey': [{'type': 'select_multiple dogs'}]}
     expand_content(s1)
-    assert s1['survey'][0]['type'] == {'select_multiple': 'dogs'}
-
+    assert s1['survey'][0]['type'] == 'select_multiple'
+    assert s1['survey'][0]['select_from'] == 'dogs'
 
 def test_expand_media():
     s1 = {'survey': [{'type': 'note',
@@ -80,6 +81,25 @@ def test_expand_translated_media_with_no_translated():
       'translations': ['English', None]}
 
 
+def test_convert_select_objects():
+    s1 = {'survey': [{'type': {'select_one': 'xyz'}},
+                     {'type': {'select_one_or_other': 'xyz'}},
+                     {'type': {'select_multiple': 'xyz'}}
+                     ]}
+    expand_content(s1)
+    _row = s1['survey'][0]
+    assert _row['type'] == 'select_one'
+    assert _row['select_from'] == 'xyz'
+
+    _row = s1['survey'][1]
+    assert _row['type'] == 'select_one_or_other'
+    assert _row['select_from'] == 'xyz'
+
+    _row = s1['survey'][2]
+    assert _row['type'] == 'select_multiple'
+    assert _row['select_from'] == 'xyz'
+
+
 def test_expand_translated_choice_sheets():
     s1 = {'survey': [{'type': 'select_one yn',
                       'label::En': 'English Select1',
@@ -98,7 +118,9 @@ def test_expand_translated_choice_sheets():
                       }],
           'translations': ['En', 'Fr']}
     expand_content(s1)
-    assert s1 == {'survey': [{'type': {'select_one': 'yn'},
+    assert s1 == {'survey': [{
+                  'type': 'select_one',
+                  'select_from': 'yn',
                   'label': ['English Select1', 'French Select1'],
                   }],
                   'choices': [{'list_name': 'yn',

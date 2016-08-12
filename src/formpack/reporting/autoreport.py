@@ -18,10 +18,12 @@ from ..submission import FormSubmission
 
 class AutoReportStats(object):
 
-    def __init__(self, autoreport, stats, submissions_count):
+    def __init__(self, autoreport, stats, submissions_count,
+                 submission_counts_by_version):
         self.autoreport = autoreport
         self.stats = stats
         self.submissions_count = submissions_count
+        self.submission_counts_by_version = submission_counts_by_version
 
     def __iter__(self):
         return self.stats
@@ -38,30 +40,36 @@ class AutoReport(object):
         metrics = {field.name: Counter() for field in fields}
 
         submissions_count = 0
+        version_id_keys = self.formpack.version_id_keys()
+        submission_counts_by_version = Counter()
 
-        for version_id, entries in submissions:
+        for entry in submissions:
+            version_id = None
 
-            # Skip unrequested versions
+            # uses the first matching version_id_key
+            for version_id_key in version_id_keys:
+                version_id = entry.get(version_id_key)
+                if version_id:
+                    break
+
             if version_id not in versions:
                 continue
 
-            # TODO: change this to use __version__
-            for entry in entries:
+            submissions_count += 1
+            submission_counts_by_version[version_id] += 1
 
-                submissions_count += 1
-
-                # TODO: do we really need FormSubmission ?
-                entry = FormSubmission(entry).data
-                for field in fields:
-                    if field.has_stats:
-                        counter = metrics[field.name]
-                        raw_value = entry.get(field.path)
-                        if raw_value is not None:
-                            values = list(field.parse_values(raw_value))
-                            counter.update(values)
-                            counter['__submissions__'] += 1
-                        else:
-                            counter[None] += 1
+            # TODO: do we really need FormSubmission ?
+            entry = FormSubmission(entry).data
+            for field in fields:
+                if field.has_stats:
+                    counter = metrics[field.name]
+                    raw_value = entry.get(field.path)
+                    if raw_value is not None:
+                        values = list(field.parse_values(raw_value))
+                        counter.update(values)
+                        counter['__submissions__'] += 1
+                    else:
+                        counter[None] += 1
 
         def stats_generator():
             for field in fields:
@@ -69,7 +77,8 @@ class AutoReport(object):
                        field.get_labels(lang)[0],
                        field.get_stats(metrics[field.name], lang=lang))
 
-        return AutoReportStats(self, stats_generator(), submissions_count)
+        return AutoReportStats(self, stats_generator(), submissions_count,
+                               submission_counts_by_version)
 
     def _disaggregate_stats(self, submissions, fields, versions, lang, split_by_field):
 

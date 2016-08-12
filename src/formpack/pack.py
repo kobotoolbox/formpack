@@ -20,6 +20,7 @@ class FormPack(object):
 
     # TODO: make a clear signature for __init__
     def __init__(self, versions, title='Submissions', id_string=None,
+                 default_version_id_key='__version__',
                  asset_type=None, submissions_xml=None):
 
         if not versions:
@@ -30,6 +31,9 @@ class FormPack(object):
             versions = [versions]
 
         self.versions = OrderedDict()
+
+        # the name of the field in submissions which stores the version ID
+        self.default_version_id_key = default_version_id_key
 
         self.id_string = id_string
 
@@ -42,15 +46,20 @@ class FormPack(object):
 
         self.load_all_versions(versions)
 
-        # QUESTION FOR ALEX: can you fix that ? I don't know how it works
-        # nor what it's for. My guess is it should be outside of here,
-        # in a separate tool, so that it export the same generator than
-        # we use in build_fixture.py
-        # if submissions_xml:
-        #     self._load_submissions_xml(submissions_xml)
-
     def __repr__(self):
         return '<FormPack %s>' % self._stats()
+
+    def version_id_keys(self, _versions=None):
+        # if no parameter is passed, default to 'all'
+        if _versions is None:
+            _versions = self.versions
+        _id_keys = []
+        for version in self.versions.values():
+            _id_key = version.version_id_key
+            if _id_key not in _id_keys:
+                _id_keys.append(_id_key)
+        return _id_keys
+
 
     @property
     def available_translations(self):
@@ -86,14 +95,6 @@ class FormPack(object):
                                                  .get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join('%s="%s"' % item for item in _stats.items())
-
-    def _load_submissions_xml(self, submissions):
-        for submission_xml in submissions:
-            (id_string, version_id) = get_version_identifiers(submission_xml)
-            if version_id not in self.versions:
-                raise KeyError('version [%s] is not available' % version_id)
-            cur_ver = self.versions[version_id]
-            cur_ver._load_submission_xml(submission_xml)
 
     def load_all_versions(self, versions):
         for schema in versions:
@@ -133,8 +134,8 @@ class FormPack(object):
             raise ValueError('cannot have duplicate version id: %s'
                              % form_version.id)
 
-        # If the form pack doesn't have an id_string, we get it from the
-        # first form version. We also avoid heterogenenous id_string in versions
+        # If the form pack doesn't have an id_string, we get it from the first
+        # form version. We also avoid heterogenenous id_string in versions
         if form_version.id_string:
             if self.id_string and self.id_string != form_version.id_string:
                 raise ValueError('Versions must of the same form must '
@@ -210,9 +211,9 @@ class FormPack(object):
                     # last version
                     if new_field_name in processed_field_names:
                         final_list_copy = enumerate(list(all_fields))
-                        for y, (name, field) in final_list_copy:
-                            if name == new_field_name:
-                                final_list_copy[y] = field
+                        for y, _field in final_list_copy:
+                            if _field.name == new_field_name:
+                                all_fields[y] = _field
                                 break
                         continue
 
@@ -268,6 +269,7 @@ class FormPack(object):
         title = title or self.title
         return Export(versions, lang=lang, group_sep=group_sep,
                       hierarchy_in_labels=hierarchy_in_labels,
+                      version_id_keys=self.version_id_keys(versions),
                       title=title, multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields)
 
