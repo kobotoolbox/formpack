@@ -4,7 +4,9 @@ python:
   - "2.7"
 install:
   - "pip install funcsigs"
-  - "pip install pytest"
+  - "pip install pytest pytest-cov"
   - "python setup.py install"
 script:
-  - "py.test tests -vv"
+  - "py.test tests --cov=src -vv"
+after_success:
+  - coveralls
