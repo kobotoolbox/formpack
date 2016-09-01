@@ -4,12 +4,9 @@ python:
   - "2.7"
 install:
   - "pip install funcsigs"
-  - "pip install pytest pytest-cov python-coveralls"
-  - "python setup.py install"
+  - "pip install pytest pytest-cov"
+  - "python setup.py develop"
 script:
-  - "pip uninstall -y formpack"
-  - "export PYTHONPATH=$(pwd):${PYTHONPATH}"
-  - "cd src"
-  - "py.test ../tests --cov=. -vv"
+  - "py.test tests --cov=. -vv"
 after_success:
   - coveralls
