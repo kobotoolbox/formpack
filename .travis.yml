@@ -9,6 +9,6 @@ install:
 script:
   - "export PYTHONPATH=$(pwd):${PYTHONPATH}"
   - "cd src"
-  - "py.test ../tests --cov=src -vv"
+  - "py.test ../tests --cov=. -vv"
 after_success:
   - coveralls
