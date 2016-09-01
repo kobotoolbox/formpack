@@ -174,7 +174,7 @@ class FormVersion(object):
     def _stats(self):
         _stats = OrderedDict()
         _stats['id_string'] = self._get_id_string()
-        _stats['version'] = self.form_pack.id_string or ''
+        _stats['version'] = self.id
         _stats['row_count'] = len(self.schema.get('content', {}).get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
