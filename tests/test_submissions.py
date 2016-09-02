@@ -15,8 +15,6 @@ class TestSubmissionsToVersions(unittest.TestCase):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
 
-        self.assertEqual(len(fp[1].translations), 2)
-
         report = fp.autoreport(versions=fp.versions.keys())
         stats = report.get_stats(submissions)
         assert stats.submissions_count == len(submissions)

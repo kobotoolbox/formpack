@@ -14,6 +14,7 @@ except ImportError:
 from collections import Counter, defaultdict
 
 from ..submission import FormSubmission
+from ..constants import UNSPECIFIED_TRANSLATION
 
 
 class AutoReportStats(object):
@@ -174,7 +175,7 @@ class AutoReport(object):
 
         return AutoReportStats(self, stats_generator(), submissions_count)
 
-    def get_stats(self, submissions, fields=(), lang=None, split_by=None):
+    def get_stats(self, submissions, fields=(), lang=UNSPECIFIED_TRANSLATION, split_by=None):
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_fields = [field for field in all_fields if field.has_stats]

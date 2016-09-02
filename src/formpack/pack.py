@@ -14,6 +14,12 @@ except ImportError:
 from .version import FormVersion
 from .utils import get_version_identifiers, str_types
 from .reporting import Export, AutoReport
+from .utils.expand_content import expand_content
+from .utils.replace_aliases import replace_aliases
+from .constants import UNSPECIFIED_TRANSLATION
+
+
+from copy import deepcopy
 
 
 class FormPack(object):
@@ -98,7 +104,7 @@ class FormPack(object):
 
     def load_all_versions(self, versions):
         for schema in versions:
-            self.load_version(schema)
+            self.load_version(deepcopy(schema))
 
     def load_version(self, schema):
         """ Load one version and attach it to this Formpack
@@ -116,6 +122,8 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
+        replace_aliases(schema['content'])
+        expand_content(schema['content'])
 
         # TODO: make that an alternative constructor from_json_schema ?
         # this way we could get rid of the construct accepting a json schema
@@ -134,8 +142,8 @@ class FormPack(object):
             raise ValueError('cannot have duplicate version id: %s'
                              % form_version.id)
 
-        # If the form pack doesn't have an id_string, we get it from the first
-        # form version. We also avoid heterogenenous id_string in versions
+        # If the form pack doesn't have an id_string, we get it from the
+        # first form version. We also avoid heterogenenous id_string in versions
         if form_version.id_string:
             if self.id_string and self.id_string != form_version.id_string:
                 raise ValueError('Versions must of the same form must '
@@ -260,7 +268,7 @@ class FormPack(object):
     def to_json(self, **kwargs):
         return json.dumps(self.to_dict(), **kwargs)
 
-    def export(self, lang=None, group_sep='/', hierarchy_in_labels=False,
+    def export(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
                force_index=False, copy_fields=(), title=None):
         '''Create an export for a given versions of the form'''
