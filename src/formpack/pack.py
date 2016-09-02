@@ -134,8 +134,6 @@ class FormPack(object):
         # while version id are id unique to one of the versions of the form
 
         # Avoid duplicate versions id
-        # import pdb
-        # pdb.set_trace()
         if form_version.id in self.versions:
             if form_version.id is None:
                 raise ValueError('cannot have two versions without '
