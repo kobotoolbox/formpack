@@ -7,6 +7,6 @@ install:
   - "pip install pytest pytest-cov python-coveralls"
   - "python setup.py develop"
 script:
-  - "py.test tests --cov=src -vv"
+  - "py.test tests --cov=. -vv"
 after_success:
   - coveralls
