@@ -16,14 +16,14 @@ def test_expand_select_one():
     s1 = {'survey': [{'type': 'select_one dogs'}]}
     expand_content(s1)
     assert s1['survey'][0]['type'] == 'select_one'
-    assert s1['survey'][0]['select_from'] == 'dogs'
+    assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 
 def test_expand_select_multiple():
     s1 = {'survey': [{'type': 'select_multiple dogs'}]}
     expand_content(s1)
     assert s1['survey'][0]['type'] == 'select_multiple'
-    assert s1['survey'][0]['select_from'] == 'dogs'
+    assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 
 def test_expand_media():
@@ -94,15 +94,15 @@ def test_convert_select_objects():
     expand_content(s1)
     _row = s1['survey'][0]
     assert _row['type'] == 'select_one'
-    assert _row['select_from'] == 'xyz'
+    assert _row['select_from_list_name'] == 'xyz'
 
     _row = s1['survey'][1]
     assert _row['type'] == 'select_one_or_other'
-    assert _row['select_from'] == 'xyz'
+    assert _row['select_from_list_name'] == 'xyz'
 
     _row = s1['survey'][2]
     assert _row['type'] == 'select_multiple'
-    assert _row['select_from'] == 'xyz'
+    assert _row['select_from_list_name'] == 'xyz'
 
 
 def test_expand_translated_choice_sheets():
@@ -125,7 +125,7 @@ def test_expand_translated_choice_sheets():
     expand_content(s1)
     assert s1 == {'survey': [{
                   'type': 'select_one',
-                  'select_from': 'yn',
+                  'select_from_list_name': 'yn',
                   'label': ['English Select1', 'French Select1'],
                   }],
                   'choices': [{'list_name': 'yn',

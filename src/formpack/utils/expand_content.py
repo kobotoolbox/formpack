@@ -51,7 +51,7 @@ def expand_content(content):
                 row.update(_expand_type_to_dict(row['type']))
             elif isinstance(_type, dict):
                 row.update({u'type': _type.keys()[0],
-                            u'select_from': _type.values()[0]})
+                            u'select_from_list_name': _type.values()[0]})
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], basestring):
                 row[key] = _expand_xpath_to_list(row[key])
@@ -142,13 +142,13 @@ def _expand_type_to_dict(type_str):
         if match:
             (type_, list_name) = match.groups()
             return {u'type': type_,
-                    u'select_from': list_name}
+                    u'select_from_list_name': list_name}
 
     _or_other = re.match('^select_one\s+(\w+)\s+or_other$', type_str)
     if _or_other:
         list_name = _or_other.groups()[0]
         return {u'type': 'select_one_or_other',
-                u'select_from': list_name}
+                u'select_from_list_name': list_name}
 
     # if it does not expand, we return the original string
     return {u'type': type_str}

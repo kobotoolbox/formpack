@@ -70,8 +70,8 @@ def _flatten_survey_row(row):
         _type = row['type']
         if isinstance(_type, dict):
             row['type'] = _stringify_type(_type)
-        elif 'select_from' in row:
-            _list_name = row.pop('select_from')
+        elif 'select_from_list_name' in row:
+            _list_name = row.pop('select_from_list_name')
             if row['type'] == 'select_one_or_other':
                 row['type'] = 'select_one {} or_other'.format(_list_name)
             else:
