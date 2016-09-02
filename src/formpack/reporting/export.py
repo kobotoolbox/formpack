@@ -158,10 +158,7 @@ class Export(object):
                 # Potential new fields we want to add
                 new_fields = list(section.fields.keys())
 
-                for i, new_field in enumerate(new_fields):
-
-                    new_field_name, _ = new_field
-
+                for i, new_field_name in enumerate(new_fields):
                     # Extract the labels for this field, language, group
                     # separator and muliple_select policy
                     labels = field.get_labels(lang, group_sep,
@@ -175,7 +172,11 @@ class Export(object):
                     # version available
                     if new_field_name in processed_field_names:
                         base_labels = enumerate(list(base_fields_labels))
-                        for i, (name, field) in base_labels:
+                        for i, _labels in base_labels:
+                            if len(_labels) != 2:
+                                # e.g. [u'location', u'_location_latitude',...]
+                                continue
+                            (name, field) = _labels
                             if name == new_field_name:
                                 base_fields_labels[i] = labels
                                 break
@@ -218,7 +219,14 @@ class Export(object):
 
         # Flatten all the names for all the value of all the fields
         for section, fields in list(section_fields.items()):
-            name_lists = (field.value_names for field_name, field in fields)
+            name_lists = []
+            for _field_data in fields:
+                if len(_field_data) != 2:
+                    # e.g. [u'location', u'_location_latitude',...]
+                    continue
+                (field_name, field) = _field_data
+                name_lists.append(field.value_names)
+
             names = [name for name_list in name_lists for name in name_list]
 
             # add auto fields:
