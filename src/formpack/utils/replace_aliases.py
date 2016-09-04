@@ -61,12 +61,15 @@ for key in sorted(pyxform_select.keys(), key=lambda k: -1*len(k)):
 
 def _unpack_headers(p_aliases, fp_preferred):
     _aliases = p_aliases.copy().items()
-    return dict([
+    combined = dict([
         (key, val if (val not in fp_preferred) else fp_preferred[val])
         for (key, val) in _aliases
-    ] + [
-        (key, val) for (key, val) in fp_preferred.items()
-    ])
+    ] + fp_preferred.items())
+    # ensure that id_string points to id_string (for example)
+    combined.update(dict([
+        (val, val) for val in combined.values()
+    ]))
+    return combined
 
 formpack_preferred_settings_headers = {
     'title': 'form_title',
