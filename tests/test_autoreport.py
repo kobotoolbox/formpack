@@ -95,8 +95,7 @@ class TestAutoReport(unittest.TestCase):
 
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
-        self.assertDictEquals(list(stats), [
-            (
+        expected = [(
              "<TextField name='restaurant_name' type='text'>",
              'restaurant_name',
                   {'frequency': [('Felipes', 2),
@@ -145,70 +144,72 @@ class TestAutoReport(unittest.TestCase):
                    'stdev': 0.5477225575051661,
                    'total_count': 6}
             )
-        ])
+        ]
+        for (i, stat) in enumerate(stats):
+            assert stat == expected[i]
 
-'''
     def test_disaggregate(self):
 
-            title, schemas, submissions = build_fixture('auto_report')
-            fp = FormPack(schemas, title)
+        title, schemas, submissions = build_fixture('auto_report')
+        fp = FormPack(schemas, title)
 
-            report = fp.autoreport()
-            stats = report.get_stats(submissions, split_by="when")
+        report = fp.autoreport()
+        stats = report.get_stats(submissions, split_by="when")
 
-            assert stats.submissions_count == 6
+        assert stats.submissions_count == 6
 
-            stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
-            assert list(stats) == [("<TextField name='restaurant_name' type='text'>",
-                    'restaurant_name',
-                    {'not_provided': 1,
-                     'provided': 5,
-                     'show_graph': False,
-                     'total_count': 6,
-                     'values': [('Felipes',
-                                  {'frequency': [('2001-01-01', 2),
-                                                  ('2002-01-01', 0),
-                                                  ('2003-01-01', 0)],
-                                   'percentage': [('2001-01-01', 33.33),
-                                                   ('2002-01-01', 0.00),
-                                                   ('2003-01-01', 0.00)]}),
-                                 ('The other one',
-                                  {'frequency': [('2001-01-01', 0),
-                                                  ('2002-01-01', 2),
-                                                  ('2003-01-01', 0)],
-                                   'percentage': [('2001-01-01', 0.00),
-                                                   ('2002-01-01', 33.33),
-                                                   ('2003-01-01', 0.00)]}),
-                                 ('That one',
-                                  {'frequency': [('2001-01-01', 0),
-                                                  ('2002-01-01', 0),
-                                                  ('2003-01-01', 1)],
-                                   'percentage': [('2001-01-01', 0.00),
-                                                   ('2002-01-01', 0.00),
-                                                   ('2003-01-01', 16.67)]})]}),
-                   ("<FormGPSField name='location' type='geopoint'>",
-                    'location',
-                    {'not_provided': 1,
-                     'provided': 5,
-                     'show_graph': False,
-                     'total_count': 6}),
-                   ("<NumField name='howmany' type='integer'>",
-                    'howmany',
-                    {'not_provided': 1,
-                     'provided': 5,
-                     'show_graph': False,
-                     'total_count': 6,
-                     'values': (('2001-01-01',
-                                  {'mean': 1.5,
-                                   'median': 1.5,
-                                   'mode': '*',
-                                   'stdev': 0.7071067811865476}),
-                                 ('2002-01-01',
-                                  {'mean': 2.0, 'median': 2.0, 'mode': 2, 'stdev': 0.0}),
-                                 ('2003-01-01',
-                                  {'mean': 1.0,
-                                   'median': 1,
-                                   'mode': '*',
-                                   'stdev': u'*'}))})]
-'''
+        expected = [("<TextField name='restaurant_name' type='text'>",
+                'restaurant_name',
+                {'not_provided': 1,
+                 'provided': 5,
+                 'show_graph': False,
+                 'total_count': 6,
+                 'values': [('Felipes',
+                              {'frequency': [('2001-01-01', 2),
+                                              ('2002-01-01', 0),
+                                              ('2003-01-01', 0)],
+                               'percentage': [('2001-01-01', 33.33),
+                                               ('2002-01-01', 0.00),
+                                               ('2003-01-01', 0.00)]}),
+                             ('The other one',
+                              {'frequency': [('2001-01-01', 0),
+                                              ('2002-01-01', 2),
+                                              ('2003-01-01', 0)],
+                               'percentage': [('2001-01-01', 0.00),
+                                               ('2002-01-01', 33.33),
+                                               ('2003-01-01', 0.00)]}),
+                             ('That one',
+                              {'frequency': [('2001-01-01', 0),
+                                              ('2002-01-01', 0),
+                                              ('2003-01-01', 1)],
+                               'percentage': [('2001-01-01', 0.00),
+                                               ('2002-01-01', 0.00),
+                                               ('2003-01-01', 16.67)]})]}),
+               ("<FormGPSField name='location' type='geopoint'>",
+                'location',
+                {'not_provided': 1,
+                 'provided': 5,
+                 'show_graph': False,
+                 'total_count': 6}),
+               ("<NumField name='howmany' type='integer'>",
+                'howmany',
+                {'not_provided': 1,
+                 'provided': 5,
+                 'show_graph': False,
+                 'total_count': 6,
+                 'values': (('2001-01-01',
+                              {'mean': 1.5,
+                               'median': 1.5,
+                               'mode': '*',
+                               'stdev': 0.7071067811865476}),
+                             ('2002-01-01',
+                              {'mean': 2.0, 'median': 2.0, 'mode': 2, 'stdev': 0.0}),
+                             ('2003-01-01',
+                              {'mean': 1.0,
+                               'median': 1,
+                               'mode': '*',
+                               'stdev': u'*'}))})]
+        for (i, stat) in enumerate(stats):
+            assert stat == expected[i]
