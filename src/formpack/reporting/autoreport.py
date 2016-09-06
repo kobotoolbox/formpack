@@ -131,7 +131,7 @@ class AutoReport(object):
             # TODO: change this to use __version__
 
             submissions_count += 1
-            submission_counts_by_version.update(version_id)
+            submission_counts_by_version.update([version_id])
 
             # TODO: do we really need FormSubmission ?
 
@@ -181,6 +181,8 @@ class AutoReport(object):
 
         if len(top_splitters) > 5:
             top_splitters.pop()
+        # TODO: Figure out a better way of reproducibly ordering values.
+        top_splitters.sort(key=lambda (val, trans): val)
 
         def stats_generator():
             for field in fields:

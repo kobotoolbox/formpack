@@ -44,7 +44,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 4
 
-        stats = [(repr(f), n, d) for f, n, d in stats]
+        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
             (
