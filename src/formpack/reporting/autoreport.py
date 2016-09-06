@@ -103,6 +103,7 @@ class AutoReport(object):
 
         # total number of submissions
         submissions_count = 0
+        submission_counts_by_version = Counter()
 
         fields = [f for f in fields if f != split_by_field]
 
@@ -120,52 +121,52 @@ class AutoReport(object):
         #
         metrics = {f.name: defaultdict(Counter) for f in fields}
 
-        for entries in submissions:
+        for sbmssn in submissions:
 
             # Skip unrequested versions
-            version_id = self._get_version_id_from_submission(entry)
+            version_id = self._get_version_id_from_submission(sbmssn)
             if version_id not in versions:
                 continue
 
             # TODO: change this to use __version__
-            for entry in entries:
 
-                submissions_count += 1
+            submissions_count += 1
+            submission_counts_by_version.update(version_id)
 
-                # TODO: do we really need FormSubmission ?
+            # TODO: do we really need FormSubmission ?
 
-                # since we are going to pop one entry, we make a copy
-                # of it to avoid side effect
-                entry = dict(FormSubmission(entry).data)
-                splitter = entry.pop(split_by_field.path, None)
+            # since we are going to pop one entry, we make a copy
+            # of it to avoid side effect
+            entry = dict(FormSubmission(sbmssn).data)
+            splitter = entry.pop(split_by_field.path, None)
 
-                for field in fields:
+            for field in fields:
 
-                    if field.has_stats:
+                if field.has_stats:
 
-                        raw_value = entry.get(field.path)
+                    raw_value = entry.get(field.path)
 
-                        if raw_value is not None:
-                            values = field.parse_values(raw_value)
-                        else:
-                            values = (None,)
+                    if raw_value is not None:
+                        values = field.parse_values(raw_value)
+                    else:
+                        values = (None,)
 
-                        value_metrics = metrics[field.name]
+                    value_metrics = metrics[field.name]
 
-                        for value in values:
-                            counters = value_metrics[value]
-                            counters[splitter] += 1
+                    for value in values:
+                        counters = value_metrics[value]
+                        counters[splitter] += 1
 
-                            if value is not None:
-                                counters['__submissions__'] += 1
+                        if value is not None:
+                            counters['__submissions__'] += 1
 
-                # collect stats for the split_by field
-                if splitter is not None:
-                    values = split_by_field.parse_values(splitter)
-                else:
-                    values = (None, )
+            # collect stats for the split_by field
+            if splitter is not None:
+                values = split_by_field.parse_values(splitter)
+            else:
+                values = (None, )
 
-                splitters_rank.update(values)
+            splitters_rank.update(values)
 
         # keep the 5 most encountered split_by value
         top_splitters = []
@@ -187,7 +188,8 @@ class AutoReport(object):
                                                       top_splitters=top_splitters)
                 yield (field, field.get_labels(lang)[0], stats)
 
-        return AutoReportStats(self, stats_generator(), submissions_count)
+        return AutoReportStats(self, stats_generator(), submissions_count,
+                               submission_counts_by_version)
 
     def get_stats(self, submissions, fields=(), lang=UNSPECIFIED_TRANSLATION, split_by=None):
 
