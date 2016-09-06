@@ -36,23 +36,36 @@ class AutoReport(object):
         self.formpack = formpack
         self.versions = form_versions
 
+    def _get_version_id_from_submission(self, submission):
+        '''
+        Get the version ID from the provided submission, or `None` if not found.
+
+        :param dict submission: An individual data submission.
+        :rtype: basestring or NoneType
+        '''
+        version_id_keys = set(self.formpack.version_id_keys()).\
+            intersection(set(submission.keys()))
+        if len(version_id_keys) == 0:
+            return None
+        elif len(version_id_keys) > 1:
+            possible_versions_dict = {v_id_ky: submission[v_id_ky] for v_id_ky in version_id_keys}
+            raise ValueError('Submission version ambiguous. Multiple possible version ID keys: {}.'
+                             .format(possible_versions_dict))
+        version_id_key = version_id_keys.pop()
+
+        version_id = submission.get(version_id_key)
+        return version_id
+
     def _calculate_stats(self, submissions, fields, versions, lang):
 
         metrics = {field.name: Counter() for field in fields}
 
         submissions_count = 0
-        version_id_keys = self.formpack.version_id_keys()
         submission_counts_by_version = Counter()
 
         for entry in submissions:
-            version_id = None
 
-            # uses the first matching version_id_key
-            for version_id_key in version_id_keys:
-                version_id = entry.get(version_id_key)
-                if version_id:
-                    break
-
+            version_id = self._get_version_id_from_submission(entry)
             if version_id not in versions:
                 continue
 
@@ -107,9 +120,10 @@ class AutoReport(object):
         #
         metrics = {f.name: defaultdict(Counter) for f in fields}
 
-        for version_id, entries in submissions:
+        for entries in submissions:
 
             # Skip unrequested versions
+            version_id = self._get_version_id_from_submission(entry)
             if version_id not in versions:
                 continue
 
