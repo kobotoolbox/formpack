@@ -90,11 +90,10 @@ class FormSection(FormDataDef):
 
 
 class FormChoice(FormDataDef):
-
     def __init__(self, name, *args, **kwargs):
         super(FormChoice, self).__init__(name, *args, **kwargs)
         self.name = name
-        self.options = {}
+        self.options = OrderedDict()
 
     @classmethod
     def all_from_json_definition(cls, definition, translation_list):
@@ -110,7 +109,7 @@ class FormChoice(FormDataDef):
                 choices = all_choices[choice_key] = cls(choice_key)
 
             option = choices.options[choice_name] = {}
-            _label = choice_definition.pop('label')
+            _label = choice_definition['label']
             if isinstance(_label, basestring):
                 _label = [_label]
             option['labels'] = OrderedDict(zip(translation_list, _label))

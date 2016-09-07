@@ -2,6 +2,7 @@
 
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
+from copy import deepcopy
 
 from formpack import FormPack
 from .fixtures import build_fixture
@@ -15,6 +16,16 @@ def test_fixture_has_translations():
     title, schemas, submissions = build_fixture('restaurant_profile')
     fp = FormPack(schemas, title)
     assert len(fp[1].translations) == 2
+
+
+def test_to_dict():
+    schema = build_fixture('restaurant_profile')[1][2]
+    _copy = deepcopy(schema)
+    fp = FormPack([schema], 'title')
+    original_content = _copy['content']
+    new_content = fp[0].to_dict()['content']
+    assert new_content.pop('translations') == ['english', 'french']
+    assert original_content == new_content
 
 
 def test_to_xml():
