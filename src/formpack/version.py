@@ -11,12 +11,29 @@ except ImportError:
 
 from copy import deepcopy
 
-from .constants import UNTRANSLATED
+from .constants import UNTRANSLATED, UNSPECIFIED_TRANSLATION
 from .submission import FormSubmission
-from .utils import formversion_pyxform
+from .utils.xform_tools import formversion_pyxform
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .utils.flatten_content import flatten_content
 from .schema import (FormField, FormGroup, FormSection, FormChoice)
+from .errors import TranslationError
+
+
+class LabelStruct(object):
+    '''
+    LabelStruct stores labels + translations assigned to `field.labels`
+    '''
+
+    def __init__(self, labels=[], translations=[]):
+        if len(labels) != len(translations):
+            raise TranslationError('Mismatched')
+        self._labels = labels
+        self._translations = translations
+        self._vals = dict(zip(translations, labels))
+
+    def get(self, key, default=None):
+        return self._vals.get(key, default)
 
 
 class FormVersion(object):
@@ -159,14 +176,16 @@ class FormVersion(object):
             section.fields[field.name] = field
 
             _f = fields_by_name[field.name]
+            _labels = LabelStruct()
+
             if 'label' in _f:
                 if not isinstance(_f['label'], list):
                     _f['label'] = [_f['label']]
-                _f['labels'] = OrderedDict(zip(self.translations, _f['label']))
-            else:
-                _f['labels'] = {}
+                _labels = LabelStruct(labels=_f['label'],
+                                      translations=self.translations)
 
-            field.labels = _f['labels']
+            field.labels = _labels
+            assert 'labels' not in _f
 
     def __repr__(self):
         return '<FormVersion %s>' % self._stats()
@@ -217,9 +236,9 @@ class FormVersion(object):
         '''
         if formversion has no name, uses form's name
         '''
-        if self.version_title is None:
+        if self.title is None:
             return self.form_pack.title
-        return self.version_title
+        return self.title
 
     def get_labels(self, lang=UNTRANSLATED, group_sep=None):
         """ Returns a mapping of labels for {section: [field_label, ...]...}
@@ -244,8 +263,7 @@ class FormVersion(object):
         return all_labels
 
     def to_xml(self):
-        survey = formversion_pyxform(self.schema)
-
+        survey = formversion_pyxform(self.to_dict())
         title = self._get_title()
 
         if title is None:
@@ -253,7 +271,7 @@ class FormVersion(object):
         survey.update({
             'name': self.lookup('root_node_name', 'data'),
             'id_string': self.lookup('id_string'),
-            'title': title,
-            'version': self.form_pack.id_string,
+            'title': self.lookup('title'),
+            'version': self.lookup('id_string'),
         })
         return survey.to_xml().encode('utf-8')

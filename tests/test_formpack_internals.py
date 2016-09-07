@@ -15,3 +15,14 @@ def test_fixture_has_translations():
     title, schemas, submissions = build_fixture('restaurant_profile')
     fp = FormPack(schemas, title)
     assert len(fp[1].translations) == 2
+
+
+def test_to_xml():
+    '''
+    at the very least, version.to_xml() does not fail
+    '''
+    title, schemas, submissions = build_fixture('restaurant_profile')
+    fp = FormPack(schemas, title)
+    for version in fp.versions.keys():
+        fp.versions[version].to_xml()
+    # TODO: test output matches what is expected

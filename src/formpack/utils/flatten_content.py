@@ -19,8 +19,7 @@ def flatten_content(survey_content):
         if sheet_name in survey_content:
             for row in survey_content[sheet_name]:
                 _flatten_survey_row(row)
-                if len(translations) > 0:
-                    _flatten_translated_fields(row, translations)
+                _flatten_translated_fields(row, translations)
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
 
@@ -47,6 +46,9 @@ def _stringify_type(json_qtype):
 
 
 def _flatten_translated_fields(row, translations):
+    # a workaround to get the desired values
+    if len(translations) == 0:
+        translations = [UNTRANSLATED]
     for key in row.keys():
         val = row[key]
         if isinstance(val, list):
