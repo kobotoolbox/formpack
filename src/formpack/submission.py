@@ -10,6 +10,7 @@ from collections import OrderedDict
 from lxml import etree
 
 try:
+    # FIXME: Create failing test for this and remove.
     from cStringIO import StringIO
 except ImportError:  # we are on Python 3
     from io import StringIO

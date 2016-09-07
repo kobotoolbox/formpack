@@ -1,20 +1,11 @@
 # coding: utf-8
 
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
-
-
-from operator import itemgetter
-
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from __future__ import (division, print_function, unicode_literals)
 
 from collections import Counter, defaultdict
 
-from ..submission import FormSubmission
 from ..constants import UNSPECIFIED_TRANSLATION
+from ..submission import FormSubmission
 
 
 class AutoReportStats(object):
@@ -170,7 +161,7 @@ class AutoReport(object):
 
         # keep the 5 most encountered split_by value
         top_splitters = []
-        for val, count in splitters_rank.most_common(6):
+        for val, _ in splitters_rank.most_common(6):
             if val is None:
                 continue
             if hasattr(split_by_field, 'get_translation'):
@@ -182,7 +173,7 @@ class AutoReport(object):
         if len(top_splitters) > 5:
             top_splitters.pop()
         # TODO: Figure out a better way of reproducibly ordering values.
-        top_splitters.sort(key=lambda (val, trans): val)
+        top_splitters.sort(key=lambda (val, _): val)
 
         def stats_generator():
             for field in fields:
@@ -216,4 +207,3 @@ class AutoReport(object):
                                             self.versions, lang, split_by_field)
 
         return self._calculate_stats(submissions, fields, self.versions, lang)
-
