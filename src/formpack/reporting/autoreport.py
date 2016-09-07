@@ -1,20 +1,11 @@
 # coding: utf-8
 
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
-
-
-from operator import itemgetter
-
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from __future__ import (division, print_function, unicode_literals)
 
 from collections import Counter, defaultdict
 
-from ..submission import FormSubmission
 from ..constants import UNSPECIFIED_TRANSLATION
+from ..submission import FormSubmission
 
 
 class AutoReportStats(object):
@@ -36,23 +27,36 @@ class AutoReport(object):
         self.formpack = formpack
         self.versions = form_versions
 
+    def _get_version_id_from_submission(self, submission):
+        '''
+        Get the version ID from the provided submission, or `None` if not found.
+
+        :param dict submission: An individual data submission.
+        :rtype: basestring or NoneType
+        '''
+        version_id_keys = set(self.formpack.version_id_keys()).\
+            intersection(set(submission.keys()))
+        if len(version_id_keys) == 0:
+            return None
+        elif len(version_id_keys) > 1:
+            possible_versions_dict = {v_id_ky: submission[v_id_ky] for v_id_ky in version_id_keys}
+            raise ValueError('Submission version ambiguous. Multiple possible version ID keys: {}.'
+                             .format(possible_versions_dict))
+        version_id_key = version_id_keys.pop()
+
+        version_id = submission.get(version_id_key)
+        return version_id
+
     def _calculate_stats(self, submissions, fields, versions, lang):
 
         metrics = {field.name: Counter() for field in fields}
 
         submissions_count = 0
-        version_id_keys = self.formpack.version_id_keys()
         submission_counts_by_version = Counter()
 
         for entry in submissions:
-            version_id = None
 
-            # uses the first matching version_id_key
-            for version_id_key in version_id_keys:
-                version_id = entry.get(version_id_key)
-                if version_id:
-                    break
-
+            version_id = self._get_version_id_from_submission(entry)
             if version_id not in versions:
                 continue
 
@@ -90,6 +94,7 @@ class AutoReport(object):
 
         # total number of submissions
         submissions_count = 0
+        submission_counts_by_version = Counter()
 
         fields = [f for f in fields if f != split_by_field]
 
@@ -107,55 +112,56 @@ class AutoReport(object):
         #
         metrics = {f.name: defaultdict(Counter) for f in fields}
 
-        for version_id, entries in submissions:
+        for sbmssn in submissions:
 
             # Skip unrequested versions
+            version_id = self._get_version_id_from_submission(sbmssn)
             if version_id not in versions:
                 continue
 
             # TODO: change this to use __version__
-            for entry in entries:
 
-                submissions_count += 1
+            submissions_count += 1
+            submission_counts_by_version.update([version_id])
 
-                # TODO: do we really need FormSubmission ?
+            # TODO: do we really need FormSubmission ?
 
-                # since we are going to pop one entry, we make a copy
-                # of it to avoid side effect
-                entry = dict(FormSubmission(entry).data)
-                splitter = entry.pop(split_by_field.path, None)
+            # since we are going to pop one entry, we make a copy
+            # of it to avoid side effect
+            entry = dict(FormSubmission(sbmssn).data)
+            splitter = entry.pop(split_by_field.path, None)
 
-                for field in fields:
+            for field in fields:
 
-                    if field.has_stats:
+                if field.has_stats:
 
-                        raw_value = entry.get(field.path)
+                    raw_value = entry.get(field.path)
 
-                        if raw_value is not None:
-                            values = field.parse_values(raw_value)
-                        else:
-                            values = (None,)
+                    if raw_value is not None:
+                        values = field.parse_values(raw_value)
+                    else:
+                        values = (None,)
 
-                        value_metrics = metrics[field.name]
+                    value_metrics = metrics[field.name]
 
-                        for value in values:
-                            counters = value_metrics[value]
-                            counters[splitter] += 1
+                    for value in values:
+                        counters = value_metrics[value]
+                        counters[splitter] += 1
 
-                            if value is not None:
-                                counters['__submissions__'] += 1
+                        if value is not None:
+                            counters['__submissions__'] += 1
 
-                # collect stats for the split_by field
-                if splitter is not None:
-                    values = split_by_field.parse_values(splitter)
-                else:
-                    values = (None, )
+            # collect stats for the split_by field
+            if splitter is not None:
+                values = split_by_field.parse_values(splitter)
+            else:
+                values = (None, )
 
-                splitters_rank.update(values)
+            splitters_rank.update(values)
 
         # keep the 5 most encountered split_by value
         top_splitters = []
-        for val, count in splitters_rank.most_common(6):
+        for val, _ in splitters_rank.most_common(6):
             if val is None:
                 continue
             if hasattr(split_by_field, 'get_translation'):
@@ -166,6 +172,8 @@ class AutoReport(object):
 
         if len(top_splitters) > 5:
             top_splitters.pop()
+        # TODO: Figure out a better way of reproducibly ordering values.
+        top_splitters.sort(key=lambda (val, _): val)
 
         def stats_generator():
             for field in fields:
@@ -173,7 +181,8 @@ class AutoReport(object):
                                                       top_splitters=top_splitters)
                 yield (field, field.get_labels(lang)[0], stats)
 
-        return AutoReportStats(self, stats_generator(), submissions_count)
+        return AutoReportStats(self, stats_generator(), submissions_count,
+                               submission_counts_by_version)
 
     def get_stats(self, submissions, fields=(), lang=UNSPECIFIED_TRANSLATION, split_by=None):
 
@@ -198,4 +207,3 @@ class AutoReport(object):
                                             self.versions, lang, split_by_field)
 
         return self._calculate_stats(submissions, fields, self.versions, lang)
-
