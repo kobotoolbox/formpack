@@ -9,12 +9,6 @@ from formpack import FormPack
 from .fixtures import build_fixture
 
 
-sanitation_report = build_fixture('sanitation_report')
-customer_satisfaction = build_fixture('customer_satisfaction')
-restaurant_profile = build_fixture('restaurant_profile')
-favcolor = build_fixture('favcolor')
-
-
 class TestFormPackFixtures(unittest.TestCase):
     maxDiff = None
 
@@ -26,7 +20,7 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         sanitation_report
         '''
-        title, schemas, submissions = sanitation_report
+        title, schemas, submissions = build_fixture('sanitation_report')
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
         v0 = fp[0]
@@ -49,7 +43,7 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         customer_satisfaction
         '''
-        title, schemas, submissions = customer_satisfaction
+        title, schemas, submissions = build_fixture('customer_satisfaction')
         fp = FormPack(schemas, title)
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
@@ -63,7 +57,7 @@ class TestFormPackFixtures(unittest.TestCase):
         #                                 u'versions': schemas})
 
     def test_restaurant_profile(self):
-        title, schemas, submissions = restaurant_profile
+        title, schemas, submissions = build_fixture('restaurant_profile')
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 4)
         v0 = fp[0]
@@ -82,6 +76,6 @@ class TestFormPackFixtures(unittest.TestCase):
         '''
         favcolor has submissions_xml specified
         '''
-        fp = FormPack(**favcolor)
+        fp = FormPack(**build_fixture('favcolor'))
         self.assertEqual(len(fp.versions), 2)
 

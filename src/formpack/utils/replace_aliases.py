@@ -21,52 +21,72 @@ TF_COLUMNS = [
 ]
 
 
-formpack_preferred_type_aliases = {
-    'select one': 'select_one',
-    'select all that apply': 'select_multiple',
-    'select one external': 'select_one_external',
-    'begin group': 'begin_group',
-    'begin  group': 'begin_group',
-    'end group': 'end_group',
-    'end  group': 'end_group',
-    'begin lgroup': 'begin_repeat',
-    'end lgroup': 'end_repeat',
-    'begin repeat': 'begin_repeat',
-    'end repeat': 'end_repeat',
-    'begin looped group': 'begin_repeat',
-    'end looped group': 'end_repeat',
-}
+def aliases_to_ordered_dict(_d):
+    '''
+    unpacks a dict-with-lists to an ordered dict with keys sorted by length
+    '''
+    arr = []
+    for (original, aliases) in _d.items():
+        arr.append((original, original))
+        for alias in aliases:
+            arr.append((alias, original,))
+    return OrderedDict(sorted(arr, key=lambda _kv: 0-len(_kv[0])))
 
-pyxform_select = deepcopy(pyxform_aliases.select)
-pyxform_select.update(formpack_preferred_type_aliases)
-pyxform_select.update({
-    'select multiple': 'select_multiple',
-    'select many': 'select_multiple',
-    'select_many': 'select_multiple',
+types = aliases_to_ordered_dict({
+    u'begin_group': [
+        u'begin group',
+        u'begin  group',
+    ],
+    u'end_group': [
+        u'end group',
+        u'end  group'
+    ],
+    u'begin_repeat': [
+        u'begin lgroup',
+        u'begin repeat',
+        u'begin looped group',
+    ],
+    u'end_repeat': [
+        u'end lgroup',
+        u'end repeat',
+        u'end looped group',
+    ],
 })
 
-_KNOWN_TYPES = QUESTION_TYPE_DICT.keys() + pyxform_select.values()
+selects = aliases_to_ordered_dict({
+    u'select_multiple': [
+        u'select all that apply',
+        u'select multiple',
+        u'select many',
+        u'select_many',
+        u'select all that apply from',
+        u'add select multiple prompt using',
+    ],
+    u'select_one_external': [
+        u'select one external',
+    ],
+    u'select_one': [
+        u'select one',
+        u'select one from',
+        u'add select one prompt using',
+        u'select1',
+    ],
+})
 
-select_aliases = OrderedDict()
-# sort select_aliases in order of string length
-for key in sorted(pyxform_select.keys(), key=lambda k: -1*len(k)):
-    val = pyxform_select[key]
-    if key in formpack_preferred_type_aliases.values():
-        select_aliases[key] = key
-        continue
-    if val in formpack_preferred_type_aliases:
-        val = formpack_preferred_type_aliases[val]
-    select_aliases[key] = val
+KNOWN_TYPES = set(QUESTION_TYPE_DICT.keys() + selects.values() + types.values())
 
 
 def _unpack_headers(p_aliases, fp_preferred):
     _aliases = p_aliases.copy().items()
-    return dict([
+    combined = dict([
         (key, val if (val not in fp_preferred) else fp_preferred[val])
         for (key, val) in _aliases
-    ] + [
-        (key, val) for (key, val) in fp_preferred.items()
-    ])
+    ] + fp_preferred.items())
+    # ensure that id_string points to id_string (for example)
+    combined.update(dict([
+        (val, val) for val in combined.values()
+    ]))
+    return combined
 
 formpack_preferred_settings_headers = {
     'title': 'form_title',
@@ -94,11 +114,13 @@ survey_header_columns = _unpack_headers(pyxform_aliases.survey_header,
 
 
 def dealias_type(type_str, strict=False):
-    if type_str in _KNOWN_TYPES:
+    if type_str in KNOWN_TYPES:
         return type_str
-    for key in select_aliases.keys():
+    if type_str in types.keys():
+        return types[type_str]
+    for key in selects.keys():
         if type_str.startswith(key):
-            return type_str.replace(key, select_aliases[key])
+            return type_str.replace(key, selects[key])
     if strict:
         raise ValueError('unknown type {}'.format([type_str]))
 

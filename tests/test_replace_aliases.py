@@ -84,6 +84,7 @@ def test_settings_get_replaced():
     _setting('set form title', 'form_title')
     _setting('set form id', 'id_string')
     _setting('form_id', 'id_string')
+    _setting('id_string', 'id_string')
     # no change
     _setting('form_title', 'form_title')
     _setting('sms_keyword', 'sms_keyword')
