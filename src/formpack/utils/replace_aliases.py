@@ -10,7 +10,7 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 from copy import deepcopy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
@@ -73,6 +73,74 @@ selects = aliases_to_ordered_dict({
     ],
 })
 
+SELECT_TYPES = [
+    'select_one',
+    'select_multiple',
+    'select_one_external',
+]
+
+LABEL_OPTIONAL_TYPES = [
+    'start',
+    'today',
+    'end',
+    'calculate',
+    'deviceid',
+    'phone_number',
+    'simserial',
+    'begin_group',
+    'begin_repeat',
+]
+
+MAIN_TYPES = [
+    # basic entry
+    'text',
+    'integer',
+    'decimal',
+    'email',
+    'barcode',
+    # collect media
+    'video',
+    'image',
+    'audio',
+    # enter time values
+    'date',
+    'datetime',
+    'time',
+    # calculate
+    'subscriberid',
+
+    # meta values
+    'username',
+
+    # prompt to collect geo data
+    'location',
+    'gps',
+    'geopoint',
+    'geoshape',
+    'geotrace',
+
+    # no response
+    'acknowledge',
+    'note',
+]
+formpack_preferred_types = MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES
+
+_pyxform_type_aliases = defaultdict(list)
+_formpack_type_reprs = {}
+
+for (_type, val) in QUESTION_TYPE_DICT.items():
+    _xform_repr = json.dumps(val, sort_keys=True)
+    if _type in formpack_preferred_types:
+        _formpack_type_reprs[_type] = _xform_repr
+    else:
+        _pyxform_type_aliases[_xform_repr].append(_type)
+
+formpack_type_aliases = aliases_to_ordered_dict(dict([
+        (_type, _pyxform_type_aliases[_repr])
+        for (_type, _repr) in _formpack_type_reprs.items()
+    ]))
+
+
 KNOWN_TYPES = set(QUESTION_TYPE_DICT.keys() + selects.values() + types.values())
 
 
@@ -90,6 +158,7 @@ def _unpack_headers(p_aliases, fp_preferred):
 
 formpack_preferred_settings_headers = {
     'title': 'form_title',
+    'form_id': 'id_string',
 }
 settings_header_columns = _unpack_headers(pyxform_aliases.settings_header,
                                           formpack_preferred_settings_headers)
@@ -113,7 +182,16 @@ survey_header_columns = _unpack_headers(pyxform_aliases.survey_header,
                                         formpack_preferred_survey_headers)
 
 
+tp_aliases = {
+    'string': 'text',
+    'trigger': 'acknowledge',
+    'photo': 'image',
+    'dateTime': 'datetime',
+}
+
 def dealias_type(type_str, strict=False):
+    if type_str in tp_aliases:
+        return tp_aliases[type_str]
     if type_str in KNOWN_TYPES:
         return type_str
     if type_str in types.keys():

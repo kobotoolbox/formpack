@@ -25,15 +25,15 @@ from copy import deepcopy
 class FormPack(object):
 
     # TODO: make a clear signature for __init__
-    def __init__(self, versions, title='Submissions', id_string=None,
+    def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  asset_type=None, submissions_xml=None):
 
         if not versions:
-            raise ValueError('A FormPack must contain at least one FormVersion')
+            versions = []
 
         # accept a single version, but normalize it to an iterable
-        if "content" in versions:
+        if isinstance(versions, dict):
             versions = [versions]
 
         self.versions = OrderedDict()
@@ -124,6 +124,7 @@ class FormPack(object):
         """
         replace_aliases(schema['content'])
         expand_content(schema['content'])
+        FormVersion.verify_schema_structure(schema)
 
         # TODO: make that an alternative constructor from_json_schema ?
         # this way we could get rid of the construct accepting a json schema
