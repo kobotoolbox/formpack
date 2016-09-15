@@ -71,12 +71,12 @@ def expand_content_copy(content):
     return content_copy
 
 
-def expand_content(content):
-    # keeping this method around; but in the future we should
-    # not rely on it modifying the content in place.
-    # instead, use 'expand_content_inplace'
-    expand_content_inplace(content)
-    # should return a copy? this is what flatten_content does
+def expand_content(content, in_place=False):
+    if in_place:
+        expand_content_inplace(content)
+        return None
+    else:
+        return expand_content_copy(content)
 
 
 def _get_special_survey_cols(content):

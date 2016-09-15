@@ -33,9 +33,12 @@ def flatten_content_copy(survey_content):
     return survey_content_copy
 
 
-def flatten_content(survey_content):
-    flatten_content_inplace(survey_content)
-    return survey_content
+def flatten_content(survey_content, inplace=False):
+    if inplace:
+        flatten_content_inplace(survey_content)
+        return None
+    else:
+        return flatten_content_copy(survey_content)
 
 
 def _stringify_type__depr(json_qtype):
