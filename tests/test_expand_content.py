@@ -48,6 +48,25 @@ def test_expand_media():
     }
 
 
+def test_get_translated_cols():
+    x1 = {'survey': [
+          {'type': 'text', 'something::a': 'something-a', 'name': 'q1',
+           'something_else': 'x'}
+          ],
+          'choices': [
+          {'list_name': 'x', 'name': 'x1', 'something': 'something',
+           'something_else::b': 'something_else::b'}
+          ],
+          'translations': [None]}
+    expanded = expand_content(x1)
+    assert expanded['translated'] == ['something', 'something_else']
+    assert expanded['translations'] == [None, 'a', 'b']
+    assert type(expanded['choices'][0]['something']) == list
+    assert expanded['survey'][0]['something'] == [None, 'something-a', None]
+    assert expanded['survey'][0]['something_else'] == ['x', None, None]
+    assert expanded['choices'][0]['something'] == ['something', None, None]
+
+
 def test_expand_translated_media():
     s1 = {'survey': [{'type': 'note',
                       'media::image::English': 'eng.jpg'
