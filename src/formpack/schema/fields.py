@@ -23,6 +23,7 @@ except ImportError:
 import statistics
 
 from ..utils.xform_tools import normalize_data_type
+from ..constants import UNSPECIFIED_TRANSLATION
 from .datadef import FormDataDef, FormChoice
 
 
@@ -48,12 +49,12 @@ class FormField(FormDataDef):
         else:
             self.has_stats = data_type != "note"
 
-        self.empty_result = self.format('', lang=None)
+        self.empty_result = self.format('', lang=UNSPECIFIED_TRANSLATION)
 
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
-    def get_labels(self, lang=None, group_sep="/",
+    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                    hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.
 
@@ -65,7 +66,7 @@ class FormField(FormDataDef):
         return [self._get_label(*args)]
 
     # TODO: remove multiple_select ?
-    def _get_label(self, lang=None, group_sep='/',
+    def _get_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both",
                    _hierarchy_end=None):
         """Return the label for this field
@@ -100,7 +101,8 @@ class FormField(FormDataDef):
 
     @classmethod
     def from_json_definition(cls, definition, hierarchy=None,
-                             section=None, field_choices={}):
+                             section=None, field_choices={},
+                             translations=None):
         """Return an instance of a Field class matching this JSON field def
 
         Depending of the data datype extracted from the field definition,
@@ -120,22 +122,22 @@ class FormField(FormDataDef):
                   The FormField instance matching this definiton.
         """
         name = definition['name']
-        labels = cls._extract_json_labels(definition)
+        label = definition.get('label')
+        if label:
+            labels = OrderedDict(zip(translations, label))
+        else:
+            labels = {}
 
         # normalize spaces
-        data_type = normalize_data_type(definition['type'])
+        data_type = definition['type']
         choice = None
 
-        # Get the data type. If it has a foreign key, instanciate a subclass
-        # dedicated to handle choices and pass it the choices matching this fk
-        if " " in data_type:
-            data_type, choice_id = data_type.split()[:2]  # ignore deprecated 'or_other' value
+        if ' ' in data_type:
+            raise ValueError('invalid data_type: %s' % data_type)
 
-            # currently select_one_external is considered a spacial case
-            # because user can erase definition on the fly. To avoid it
-            # breaking, we don't consider it a choice field, but a text field
-            if data_type in ('select_one', 'select_multiple'):
-                choice = field_choices[choice_id]
+        if data_type in ('select_one', 'select_multiple'):
+            choice_id = definition['select_from_list_name']
+            choice = field_choices[choice_id]
 
         data_type_classes = {
             "select_one": FormChoiceField,
@@ -167,10 +169,10 @@ class FormField(FormDataDef):
         }
         return data_type_classes.get(data_type, cls)(**args)
 
-    def format(self, val, lang=None, context=None):
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
         return {self.name: val}
 
-    def get_stats(self, metrics, lang=None, limit=100):
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         not_provided = metrics.pop(None, 0)
         provided = metrics.pop('__submissions__', 0)
@@ -182,7 +184,8 @@ class FormField(FormDataDef):
             'show_graph': False
         }
 
-    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+    def get_disaggregated_stats(self, metrics, top_splitters,
+                                lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         not_provided = 0
         provided = 0
@@ -203,7 +206,7 @@ class FormField(FormDataDef):
 
 class TextField(FormField):
 
-    def get_stats(self, metrics, lang=None, limit=100):
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         stats = super(TextField, self).get_stats(metrics, lang, limit)
 
@@ -225,10 +228,12 @@ class TextField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+    def get_disaggregated_stats(self, metrics, top_splitters,
+                                lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         parent = super(TextField, self)
-        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
+                                               limit)
         total = stats['total_count']
 
         substats = defaultdict(dict)
@@ -279,7 +284,7 @@ class TextField(FormField):
 
 
 class DateField(FormField):
-    def get_stats(self, metrics, lang=None, limit=100):
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
         """ Return total count for all, and freq and % for 'date' date types
 
             Dates are sorted from old to new.
@@ -309,10 +314,12 @@ class DateField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+    def get_disaggregated_stats(self, metrics, top_splitters,
+                                lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         parent = super(DateField, self)
-        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
+                                               limit)
 
         if self.data_type != "date":
             return stats
@@ -376,7 +383,7 @@ class NumField(FormField):
             for x in xrange(freq):
                 yield value
 
-    def get_stats(self, metrics, lang=None, limit=100):
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         stats = super(NumField, self).get_stats(metrics, lang, limit)
 
@@ -401,10 +408,12 @@ class NumField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+    def get_disaggregated_stats(self, metrics, top_splitters,
+                                lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         parent = super(NumField, self)
-        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
+                                               limit)
 
         substats = {}
 
@@ -432,7 +441,7 @@ class NumField(FormField):
                 val_stats['median'] = statistics.median(values)
                 # requires at least 2 values in the dataset
                 val_stats['stdev'] = statistics.stdev(values,
-                                                  xbar=val_stats['mean'])
+                                                      xbar=val_stats['mean'])
                 # requires a non empty dataset and a unique mode
                 val_stats['mode'] = statistics.mode(values)
             except statistics.StatisticsError:
@@ -474,7 +483,7 @@ class FormGPSField(FormField):
         super(FormGPSField, self).__init__(name, labels, data_type,
                                            hierarchy, section, *args, **kwargs)
 
-    def get_labels(self, lang=None, group_sep='/',
+    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
         """Return a list of labels for this field.
 
@@ -515,7 +524,7 @@ class FormGPSField(FormField):
 
         return names
 
-    def format(self, val, lang=None, *args, **kwargs):
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, *args, **kwargs):
         """Same than other format(), but dealing with 2 to 4 values
 
         The GPS value can contain 2, 3 or 4 numerical separated by a
@@ -556,18 +565,18 @@ class FormChoiceField(FormField):
                                               hierarchy, section,
                                               *args, **kwargs)
 
-    def get_translation(self, val, lang=None):
+    def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
         try:
             return self.choice.options[val]['labels'][lang]
         except KeyError:
             return val
 
-    def format(self, val, lang=None, multiple_select="both"):
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
         if lang:
             val = self.get_translation(val, lang)
         return {self.name: val}
 
-    def get_stats(self, metrics, lang=None, limit=100):
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         stats = super(FormChoiceField, self).get_stats(metrics, lang, limit)
         total = stats['total_count']
@@ -593,10 +602,12 @@ class FormChoiceField(FormField):
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, top_splitters, lang=None, limit=100):
+    def get_disaggregated_stats(self, metrics, top_splitters,
+                                lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         parent = super(FormChoiceField, self)
-        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang, limit)
+        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
+                                               limit)
         total = stats['total_count']
 
         substats = defaultdict(dict)
@@ -655,7 +666,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         # reset empty result so it doesn't contain '0'
         self.empty_result = dict.fromkeys(self.empty_result, '')
 
-    def _get_option_label(self, lang=None, group_sep='/',
+    def _get_option_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                           hierarchy_in_labels=False, option=None):
         """ Return the label for this field and this option in particular """
 
@@ -664,7 +675,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         group_sep = group_sep or "/"
         return label + group_sep + option_label
 
-    def get_labels(self, lang=None, group_sep='/',
+    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.
 
@@ -699,7 +710,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
 
     # maybe try to cache those
-    def format(self, val, lang=None,
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION,
                group_sep="/", hierarchy_in_labels=False,
                multiple_select="both"):
         """ Same than other format(), with an option for multiple_select layout

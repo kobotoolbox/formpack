@@ -4,6 +4,7 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import unittest
+import json
 
 from textwrap import dedent
 
@@ -16,6 +17,7 @@ from path import tempdir
 from formpack import FormPack
 from .fixtures import build_fixture
 
+from formpack.constants import UNTRANSLATED
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')
@@ -86,9 +88,8 @@ class TestFormPackExport(unittest.TestCase):
                                     '_lieu_altitude',
                                     '_lieu_precision'])
 
-        # "_default" use the "Label" field
         # TODO: make a separate test to test to test __getitem__
-        export = fp.export(lang="_default", versions='rpv1')
+        export = fp.export(lang=UNTRANSLATED, versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
         self.assertEquals(headers, ['restaurant name',
@@ -178,15 +179,19 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
                                     'g1q2', 'g2q1', 'qz'])
 
+    def assertDictEquals(self, arg1, arg2):
+        _j = lambda arg: json.dumps(arg, indent=4, sort_keys=True)
+        assert _j(arg1) == _j(arg2)
+
     def test_submissions_of_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
         options = {'versions': 'gqs'}
 
         export = fp.export(**options).to_dict(submissions)['Grouped questions']
-        self.assertEquals(export['fields'], ['q1', 'g1q1', 'g1sg1q1',
+        self.assertDictEquals(export['fields'], ['q1', 'g1q1', 'g1sg1q1',
                                              'g1q2', 'g2q1', 'qz'])
-        self.assertEquals(export['data'], [['respondent1\'s r1',
+        self.assertDictEquals(export['data'], [['respondent1\'s r1',
                                             'respondent1\'s r2',
                                             'respondent1\'s r2.5',
                                             'respondent1\'s r2.75 :)',
@@ -201,13 +206,13 @@ class TestFormPackExport(unittest.TestCase):
 
         options['hierarchy_in_labels'] = '/'
         export = fp.export(**options).to_dict(submissions)['Grouped questions']
-        self.assertEquals(export['fields'], ['q1',
+        self.assertDictEquals(export['fields'], ['q1',
                                              'g1/g1q1',
                                              'g1/sg1/g1sg1q1',
                                              'g1/g1q2',
                                              'g2/g2q1',
                                              'qz'])
-        self.assertEquals(export['data'], [['respondent1\'s r1',
+        self.assertDictEquals(export['data'], [['respondent1\'s r1',
                                             'respondent1\'s r2',
                                             'respondent1\'s r2.5',
                                             'respondent1\'s r2.75 :)',
@@ -511,7 +516,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertTextEqual(csv_data, expected)
 
         options = {'versions': 'gqs', 'hierarchy_in_labels': True,
-                   'lang': "_default"}
+                   'lang': UNTRANSLATED}
         csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
         expected = """
@@ -740,7 +745,7 @@ class TestFormPackExport(unittest.TestCase):
                     }
                })
 
-        self.assertEqual(exported, expected)
+        self.assertDictEquals(exported, expected)
 
     def test_copy_fields_and_force_index_and_unicode(self):
         title, schemas, submissions = customer_satisfaction
@@ -792,9 +797,9 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('sanitation_report_external')
 
         fp = FormPack(schemas, title)
-        export = fp.export(lang="_default")
+        export = fp.export(lang=UNTRANSLATED)
         exported = export.to_dict(submissions)
-        expected = OrderedDict ([
+        expected = OrderedDict([
                     (
                         'Sanitation report external', {
                             'fields': [

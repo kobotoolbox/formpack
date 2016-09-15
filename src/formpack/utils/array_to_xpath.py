@@ -34,6 +34,9 @@ DEFAULT_FNS = {
     u'@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
 }
 
+# this will be phased out shortly, since most fields are expandable in some way
+EXPANDABLE_FIELD_TYPES = ['relevant', 'constraint', 'calculation', 'repeat_count']
+
 
 def array_to_xpath(outer_arr, fns={}):
     flattened = array_to_xpath.array_to_flattened_array(outer_arr, fns)

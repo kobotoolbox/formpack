@@ -15,6 +15,8 @@ try:
 except ImportError:
     from collections import OrderedDict
 
+from ..constants import UNTRANSLATED
+
 
 class FormDataDef(object):
     """ Any object composing a form. It's only used with a subclass. """
@@ -41,7 +43,7 @@ class FormDataDef(object):
         """ Extract translation labels from the JSON data definition """
         labels = OrderedDict()
         if "label" in definition:
-            labels['_default'] = definition['label']
+            labels[UNTRANSLATED] = definition['label']
 
         for key, val in definition.items():
             if key.startswith('label:'):
@@ -63,7 +65,7 @@ class FormSection(FormDataDef):
                  *args, **kwargs):
 
         if labels is None:
-            labels = {'_default': 'submissions'}
+            labels = {UNTRANSLATED: 'submissions'}
 
         super(FormSection, self).__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
@@ -79,7 +81,7 @@ class FormSection(FormDataDef):
         labels = cls._extract_json_labels(definition)
         return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
 
-    def get_label(self, lang="_default"):
+    def get_label(self, lang=UNTRANSLATED):
         return [self.labels.get(lang) or self.name]
 
     def __repr__(self):
@@ -88,44 +90,32 @@ class FormSection(FormDataDef):
 
 
 class FormChoice(FormDataDef):
-
     def __init__(self, name, *args, **kwargs):
         super(FormChoice, self).__init__(name, *args, **kwargs)
         self.name = name
-        self.options = {}
+        self.options = OrderedDict()
 
     @classmethod
-    def from_json_definition(cls, definition):
-        raise NotImplemented('Use all_from_json_definition() or __init__()')
-
-    @classmethod
-    def all_from_json_definition(cls, definition):
-
+    def all_from_json_definition(cls, definition, translation_list):
         all_choices = {}
         for choice_definition in definition:
-
-            # get the name, from one of the possible keys
-            for alias in ('list_name', 'list name', 'List_name'):
-                choice_key = choice_definition.get(alias)
-                if choice_key:
-                    break
-            else: # handle no list_name given
-                continue
-
             choice_name = choice_definition.get('name')
             if not choice_name:
                 continue
-
+            choice_key = choice_definition['list_name']
             try:
                 choices = all_choices[choice_key]
             except KeyError:
                 choices = all_choices[choice_key] = cls(choice_key)
 
             option = choices.options[choice_name] = {}
-            option['labels'] = cls._extract_json_labels(choice_definition)
+            _label = choice_definition['label']
+            if isinstance(_label, basestring):
+                _label = [_label]
+            option['labels'] = OrderedDict(zip(translation_list, _label))
             option['name'] = choice_name
-
         return all_choices
+
 
     @property
     def translations(self):

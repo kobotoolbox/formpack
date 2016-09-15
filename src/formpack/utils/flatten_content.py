@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from array_to_xpath import array_to_xpath
 from copy import deepcopy
+from array_to_xpath import array_to_xpath, EXPANDABLE_FIELD_TYPES
+from ..constants import UNTRANSLATED
 
 
 def flatten_content_inplace(survey_content):
@@ -17,10 +18,12 @@ def flatten_content_inplace(survey_content):
         if sheet_name in survey_content:
             for row in survey_content[sheet_name]:
                 _flatten_survey_row(row)
-                if len(translations) > 0:
-                    _flatten_translated_fields(row, translations)
+                _flatten_translated_fields(row, translations)
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
+    # do not list translations when only default exists
+    if len(translations) == 1 and translations[0] == UNTRANSLATED:
+        del survey_content['translations']
     return None
 
 
@@ -55,6 +58,9 @@ def _stringify_type__depr(json_qtype):
 
 
 def _flatten_translated_fields(row, translations):
+    # a workaround to get the desired values
+    if len(translations) == 0:
+        translations = [UNTRANSLATED]
     for key in row.keys():
         val = row[key]
         if isinstance(val, list):
@@ -63,13 +69,23 @@ def _flatten_translated_fields(row, translations):
             for i in xrange(0, len(translations)):
                 _t = translations[i]
                 value = items[i]
-                tkey = key if _t is None else '{}::{}'.format(key, _t)
-                row[tkey] = value
+                if _t is UNTRANSLATED:
+                    row[key] = value
+                else:
+                    row['{}::{}'.format(key, _t)] = value
 
 
 def _flatten_survey_row(row):
-    for key in ['relevant', 'constraint', 'calculation', 'repeat_count']:
+    for key in EXPANDABLE_FIELD_TYPES:
         if key in row and isinstance(row[key], (list, tuple)):
             row[key] = array_to_xpath(row[key])
-    if 'type' in row and isinstance(row['type'], dict):
-        row['type'] = _stringify_type__depr(row['type'])
+    if 'type' in row:
+        _type = row['type']
+        if isinstance(_type, dict):
+            row['type'] = _stringify_type__depr(_type)
+        elif 'select_from_list_name' in row:
+            _list_name = row.pop('select_from_list_name')
+            if row['type'] == 'select_one_or_other':
+                row['type'] = 'select_one {} or_other'.format(_list_name)
+            else:
+                row['type'] = '{} {}'.format(_type, _list_name)

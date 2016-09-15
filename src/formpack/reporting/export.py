@@ -14,12 +14,14 @@ from pyexcelerate import Workbook
 from ..submission import FormSubmission
 from ..schema import CopyField
 from ..utils.string import unicode
+from ..constants import UNSPECIFIED_TRANSLATION
 
 
 class Export(object):
 
-    def __init__(self, form_versions, lang=None,
+    def __init__(self, form_versions, lang=UNSPECIFIED_TRANSLATION,
                  group_sep="/", hierarchy_in_labels=False,
+                 version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
@@ -30,6 +32,7 @@ class Export(object):
         self.copy_fields = copy_fields
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
+        self.version_id_keys = version_id_keys
 
         # If some fields need to be arbitrarly copied, add them
         # to the first section
@@ -56,18 +59,25 @@ class Export(object):
             self._empty_row[section_name] = dict(self._row_cache[section_name])
 
     def parse_submissions(self, submissions):
-        """ Return the a generators yielding formatted chunks of the data set"""
+        """Return the a generators yielding formatted chunks of the data set"""
         self.reset()
         versions = self.versions
-        for version_id, entries in submissions:
+        for entry in submissions:
+            version_id = None
+
+            # find the first version_id present in the submission
+            for _key in self.version_id_keys:
+                if _key in entry:
+                    version_id = entry.get(_key)
+                    break
+
             try:
                 section = versions[version_id].sections[self.title]
-                for entry in entries:
-                    # TODO: do we really need FormSubmission ?
-                    submission = FormSubmission(entry)
-                    yield self.format_one_submission([submission.data], section)
-            except KeyError:  # this versions is NOT requested in the export
+                submission = FormSubmission(entry)
+                yield self.format_one_submission([submission.data], section)
+            except KeyError:
                 pass
+
 
     def reset(self):
         """ Reset sections and indexes to initial values """
@@ -79,7 +89,7 @@ class Export(object):
         self._indexes = {n: 1 for n in self.sections}
         # N.B: indexes are not affected by form versions
 
-    def get_fields_and_labels_for_all_versions(self, lang=None, group_sep="/",
+    def get_fields_and_labels_for_all_versions(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                                                 hierarchy_in_labels=False,
                                                 multiple_select="both"):
         """ Return 2 mappings containing field and labels by section
@@ -148,10 +158,7 @@ class Export(object):
                 # Potential new fields we want to add
                 new_fields = list(section.fields.keys())
 
-                for i, new_field in enumerate(new_fields):
-
-                    new_field_name, _ = new_field
-
+                for i, new_field_name in enumerate(new_fields):
                     # Extract the labels for this field, language, group
                     # separator and muliple_select policy
                     labels = field.get_labels(lang, group_sep,
@@ -165,7 +172,11 @@ class Export(object):
                     # version available
                     if new_field_name in processed_field_names:
                         base_labels = enumerate(list(base_fields_labels))
-                        for i, (name, field) in base_labels:
+                        for i, _labels in base_labels:
+                            if len(_labels) != 2:
+                                # e.g. [u'location', u'_location_latitude',...]
+                                continue
+                            (name, field) = _labels
                             if name == new_field_name:
                                 base_fields_labels[i] = labels
                                 break
@@ -208,7 +219,14 @@ class Export(object):
 
         # Flatten all the names for all the value of all the fields
         for section, fields in list(section_fields.items()):
-            name_lists = (field.value_names for field_name, field in fields)
+            name_lists = []
+            for _field_data in fields:
+                if len(_field_data) != 2:
+                    # e.g. [u'location', u'_location_latitude',...]
+                    continue
+                (field_name, field) = _field_data
+                name_lists.append(field.value_names)
+
             names = [name for name_list in name_lists for name in name_list]
 
             # add auto fields:
