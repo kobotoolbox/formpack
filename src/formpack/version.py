@@ -9,8 +9,6 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from copy import deepcopy
-
 from .constants import UNTRANSLATED, UNSPECIFIED_TRANSLATION
 from .submission import FormSubmission
 from .utils.xform_tools import formversion_pyxform
