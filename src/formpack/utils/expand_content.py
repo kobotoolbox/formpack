@@ -32,18 +32,21 @@ def _convert_special_label_col(content, row, col_shortname,
 
 
 def _get_translations_from_special_cols(special_cols, translations):
+    translated_cols = []
     for (colname, parsedvals) in special_cols.iteritems():
         if 'translation' in parsedvals:
+            translated_cols.append(parsedvals['column'])
             if parsedvals['translation'] not in translations:
                 translations.append(parsedvals['translation'])
-    return translations
+    return (translations, set(translated_cols))
 
 
 def expand_content_in_place(content):
-    (specials, translations) = _get_special_survey_cols(content)
+    (specials, translations, transl_cols) = _get_special_survey_cols(content)
 
     if len(translations) > 0:
         content['translations'] = translations
+        content['translated'] = transl_cols
 
     for row in content.get('survey', []):
         if 'type' in row:
@@ -138,9 +141,10 @@ def _get_special_survey_cols(content):
                     'translation': UNTRANSLATED,
                 }
             continue
-    translations = _get_translations_from_special_cols(special,
-                       content.get('translations', []))
-    return (special, translations)
+    (translations,
+     translated_cols) = _get_translations_from_special_cols(special,
+                        content.get('translations', []))
+    return (special, translations, sorted(translated_cols))
 
 
 def _expand_type_to_dict(type_str):

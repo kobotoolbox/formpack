@@ -36,6 +36,7 @@ def test_expand_media():
               'media::image': ['ugh.jpg']
             }
         ],
+        'translated': ['media::image'],
         'translations': [UNTRANSLATED]
         }
     flatten_content(s1, in_place=True)
@@ -43,6 +44,7 @@ def test_expand_media():
         'type': 'note',
         'media::image': 'ugh.jpg',
       }],
+      'translated': ['media::image'],
     }
 
 
@@ -56,12 +58,14 @@ def test_expand_translated_media():
                 'media::image': ['eng.jpg']
              }
         ],
+        'translated': ['media::image'],
         'translations': ['English']}
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
         'type': 'note',
         'media::image::English': 'eng.jpg',
       }],
+      'translated': ['media::image'],
       'translations': ['English']}
 
 
@@ -77,6 +81,7 @@ def test_expand_translated_media_with_no_translated():
                 'media::image': ['eng.jpg', 'nolang.jpg']
              }
         ],
+        'translated': ['media::image'],
         'translations': ['English', UNTRANSLATED]}
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
@@ -84,6 +89,7 @@ def test_expand_translated_media_with_no_translated():
         'media::image': 'nolang.jpg',
         'media::image::English': 'eng.jpg',
       }],
+      'translated': ['media::image'],
       'translations': ['English', UNTRANSLATED]}
 
 
@@ -138,6 +144,7 @@ def test_expand_translated_choice_sheets():
                                'name': 'n',
                                'label': ['En N', 'Fr N'],
                                }],
+                  'translated': ['label'],
                   'translations': ['En', 'Fr']}
 
 
@@ -146,7 +153,7 @@ def _s(rows):
 
 
 def test_ordered_dict_preserves_order():
-    (special, t) = _get_special_survey_cols({
+    (special, t, tc) = _get_special_survey_cols({
             'survey': [
                 OrderedDict([
                         ('label::A', 'A'),
@@ -156,7 +163,7 @@ def test_ordered_dict_preserves_order():
             ]
         })
     assert t == ['A', 'B', 'C']
-    (special, t) = _get_special_survey_cols({
+    (special, t, tc) = _get_special_survey_cols({
             'survey': [
                 OrderedDict([
                         ('label::C', 'C'),
@@ -169,7 +176,7 @@ def test_ordered_dict_preserves_order():
 
 
 def test_get_special_survey_cols():
-    (special, t) = _get_special_survey_cols(_s([
+    (special, t, tc) = _get_special_survey_cols(_s([
             'type',
             'media::image',
             'media::image::English',
@@ -211,7 +218,7 @@ def test_not_special_cols():
         'body::acuracyThreshold',
         'body:accuracyThreshold',
     ]
-    (not_special, _t) = _get_special_survey_cols(_s(not_special))
+    (not_special, _t, tc) = _get_special_survey_cols(_s(not_special))
     assert not_special.keys() == []
 
 
@@ -223,6 +230,7 @@ def test_expand_constraint_message():
                       'constraint_message::XX': 'X: . > 3',
                       'constraint_message::YY': 'Y: . > 3',
                       }],
+          'translated': ['constraint_message', 'label'],
           'translations': ['XX', 'YY']}
     s1_copy = copy.deepcopy(s1)
     x1 = {'survey': [{'type': 'integer',
@@ -230,6 +238,7 @@ def test_expand_constraint_message():
                       'label': ['X number', 'Y number'],
                       'constraint_message': ['X: . > 3', 'Y: . > 3'],
                       }],
+          'translated': ['constraint_message', 'label'],
           'translations': ['XX', 'YY'],
           }
     expand_content(s1, in_place=True)
@@ -244,6 +253,7 @@ def test_expand_translations():
                       'label::Français': 'OK!'}]}
     x1 = {'survey': [{'type': 'text',
                       'label': ['OK?', 'OK!']}],
+          'translated': ['label'],
           'translations': ['English', 'Français']}
     expand_content(s1, in_place=True)
     assert s1 == x1
@@ -251,6 +261,7 @@ def test_expand_translations():
     assert s1 == {'survey': [{'type': 'text',
                               'label::English': 'OK?',
                               'label::Français': 'OK!'}],
+                  'translated': ['label'],
                   'translations': ['English', 'Français']}
 
 
@@ -258,13 +269,16 @@ def test_expand_translations_null_lang():
     s1 = {'survey': [{'type': 'text',
                       'label': 'NoLang',
                       'label::English': 'EnglishLang'}],
+          'translated': ['label'],
           'translations': [UNTRANSLATED, 'English']}
     x1 = {'survey': [{'type': 'text',
                       'label': ['NoLang', 'EnglishLang']}],
+          'translated': ['label'],
           'translations': [UNTRANSLATED, 'English']}
     s1_copy = copy.deepcopy(s1)
     expand_content(s1, in_place=True)
     assert s1.get('translations') == x1.get('translations')
+    assert s1.get('translated') == ['label']
     assert s1.get('survey')[0] == x1.get('survey')[0]
     assert s1 == x1
     flatten_content(s1, in_place=True)

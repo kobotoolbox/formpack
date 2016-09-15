@@ -25,6 +25,7 @@ def test_to_dict():
     original_content = _copy['content']
     new_content = fp[0].to_dict()
     assert new_content.pop('translations') == ['english', 'french']
+    assert new_content.pop('translated') == ['label']
     assert original_content == new_content
 
 

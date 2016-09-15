@@ -262,7 +262,9 @@ class FormVersion(object):
         return all_labels
 
     def to_xml(self):
-        survey = formversion_pyxform(self.to_dict(remove_fields=['translations']))
+        survey = formversion_pyxform(
+            self.to_dict(remove_fields=['translations', 'translated'])
+                                     )
         title = self._get_title()
 
         if title is None:
