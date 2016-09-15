@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+from copy import deepcopy
 from collections import OrderedDict
 import re
 
@@ -33,7 +34,7 @@ def _get_translations_from_special_cols(special_cols, translations):
     return translations
 
 
-def expand_content(content):
+def expand_content_inplace(content):
     (specials, translations) = _get_special_survey_cols(content)
 
     if len(translations) > 0:
@@ -53,6 +54,20 @@ def expand_content(content):
         for (key, vals) in specials.iteritems():
             if key in row:
                 _convert_special_label_col(content, row, key, vals)
+
+
+def expand_content_copy(content):
+    content_copy = deepcopy(content)
+    expand_content_inplace(content_copy)
+    return content_copy
+
+
+def expand_content(content):
+    # keeping this method around; but in the future we should
+    # not rely on it modifying the content in place.
+    # instead, use 'expand_content_inplace'
+    expand_content_inplace(content)
+    # should return a copy? this is what flatten_content does
 
 
 def _get_special_survey_cols(content):

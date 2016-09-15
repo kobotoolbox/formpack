@@ -2,11 +2,10 @@
 from __future__ import unicode_literals
 
 from array_to_xpath import array_to_xpath
+from copy import deepcopy
 
-TYPE_KEYS = ['select_one', 'select_multiple']
 
-
-def flatten_content(survey_content):
+def flatten_content_inplace(survey_content):
     '''
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
@@ -22,18 +21,33 @@ def flatten_content(survey_content):
                     _flatten_translated_fields(row, translations)
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
+    return None
+
+
+def flatten_content_copy(survey_content):
+    survey_content_copy = deepcopy(survey_content)
+    flatten_content_inplace(survey_content_copy)
+    return survey_content_copy
+
+
+def flatten_content(survey_content):
+    flatten_content_inplace(survey_content)
     return survey_content
 
 
-def _stringify_type(json_qtype):
+def _stringify_type__depr(json_qtype):
     '''
+    NOTE: This particular representation of select_* types is being
+          deprecated. [Oct 2016]
+
     {'select_one': 'xyz'} -> 'select_one xyz'
     {'select_multiple': 'xyz'} -> 'select_mutliple xyz'
     '''
+    _type_keys = ['select_one', 'select_multiple']
     if len(json_qtype.keys()) != 1:
         raise ValueError('Type object must have exactly one key: %s' %
-                         ', '.join(TYPE_KEYS))
-    for try_key in TYPE_KEYS:
+                         ', '.join(_type_keys))
+    for try_key in _type_keys:
         if try_key in json_qtype:
             return '{} {}'.format(try_key, json_qtype[try_key])
     if 'select_one_or_other' in json_qtype:
@@ -54,8 +68,8 @@ def _flatten_translated_fields(row, translations):
 
 
 def _flatten_survey_row(row):
-    for key in ['relevant', 'constraint']:
+    for key in ['relevant', 'constraint', 'calculation', 'repeat_count']:
         if key in row and isinstance(row[key], (list, tuple)):
             row[key] = array_to_xpath(row[key])
     if 'type' in row and isinstance(row['type'], dict):
-        row['type'] = _stringify_type(row['type'])
+        row['type'] = _stringify_type__depr(row['type'])
