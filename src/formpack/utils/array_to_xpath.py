@@ -27,8 +27,8 @@ DEFAULT_FNS = {
     u'@parens': lambda args: ['('] + args + [')'],
     u'@axis': lambda args: [args[0], '::', args[1]],
     u'@position': lambda args: ['position', {'@parens': [args]}],
-    u'@selectedAt': lambda args: ['selected-at', {'@parens': [args[0], ',', args[1]]}],
-    u'@countSelected': lambda args: ['count-selected', {'@parens': args}],
+    u'@selected_at': lambda args: ['selected-at', {'@parens': [args[0], ',', args[1]]}],
+    u'@count_selected': lambda args: ['count-selected', {'@parens': args}],
     u'@multiselected': lambda args: [['selected', {'@parens': [
                                      {'@lookup': args[0]}, ',', args[1]]}]],
     u'@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
