@@ -6,7 +6,7 @@ from array_to_xpath import array_to_xpath, EXPANDABLE_FIELD_TYPES
 from ..constants import UNTRANSLATED
 
 
-def flatten_content_inplace(survey_content):
+def flatten_content_in_place(survey_content):
     '''
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
@@ -27,18 +27,14 @@ def flatten_content_inplace(survey_content):
     return None
 
 
-def flatten_content_copy(survey_content):
-    survey_content_copy = deepcopy(survey_content)
-    flatten_content_inplace(survey_content_copy)
-    return survey_content_copy
-
-
-def flatten_content(survey_content, inplace=False):
-    if inplace:
-        flatten_content_inplace(survey_content)
+def flatten_content(survey_content, in_place=False):
+    if in_place:
+        flatten_content_in_place(survey_content)
         return None
     else:
-        return flatten_content_copy(survey_content)
+        survey_content_copy = deepcopy(survey_content)
+        flatten_content_in_place(survey_content_copy)
+        return survey_content_copy
 
 
 def _stringify_type__depr(json_qtype):

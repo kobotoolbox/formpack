@@ -39,7 +39,7 @@ def _get_translations_from_special_cols(special_cols, translations):
     return translations
 
 
-def expand_content_inplace(content):
+def expand_content_in_place(content):
     (specials, translations) = _get_special_survey_cols(content)
 
     if len(translations) > 0:
@@ -65,18 +65,14 @@ def expand_content_inplace(content):
                 _convert_special_label_col(content, row, key, vals)
 
 
-def expand_content_copy(content):
-    content_copy = deepcopy(content)
-    expand_content_inplace(content_copy)
-    return content_copy
-
-
 def expand_content(content, in_place=False):
     if in_place:
-        expand_content_inplace(content)
+        expand_content_in_place(content)
         return None
     else:
-        return expand_content_copy(content)
+        content_copy = deepcopy(content)
+        expand_content_in_place(content_copy)
+        return content_copy
 
 
 def _get_special_survey_cols(content):

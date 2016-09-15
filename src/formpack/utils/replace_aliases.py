@@ -127,15 +127,15 @@ def dealias_type(type_str, strict=False):
 
 def replace_aliases(content, in_place=False):
     if in_place:
-        replace_aliases_inplace(content)
+        replace_aliases_in_place(content)
         return None
     else:
         _content = deepcopy(content)
-        replace_aliases_inplace(_content)
+        replace_aliases_in_place(_content)
         return _content
 
 
-def replace_aliases_inplace(content):
+def replace_aliases_in_place(content):
     for row in content.get('survey', []):
         if row.get('type'):
             row['type'] = dealias_type(row.get('type'), strict=True)
