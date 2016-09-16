@@ -136,3 +136,117 @@ def test_json_hash():
     assert json_hash({'d': 1, 'e': 2, 'f': 3}) != json_hash({'d': '1',
                                                              'e': '2',
                                                              'f': '3'})
+
+
+# should be test_flatten
+from formpack.utils.spreadsheet_content import (flatten_to_spreadsheet_content,
+                                                _order_cols,
+                                                _order_sheet_names)
+
+import pytest
+from collections import OrderedDict
+
+
+def test_flatten_fails_with_too_many_translations_listed():
+    with pytest.raises(ValueError) as err:
+        flatten_content({'survey': [
+                {'type': 'text', 'name': 'q1',
+                    'label': ['lang1', 'lang2']
+                 },
+            ],
+            'translated': ['label'],
+            'translations': ['lang1', 'lang2', 'lang3'],
+        })
+    assert 'Incorrect translation count: "label"' in str(err.value)
+
+def test_flatten_fails_with_not_enough_translations_listed():
+    with pytest.raises(ValueError) as err:
+        flatten_content({'survey': [
+                {'type': 'text', 'name': 'q1',
+                    'label': ['lang1', 'lang2', 'lang3'],
+                 },
+            ],
+            'translated': ['label'],
+            'translations': ['lang1', 'lang2'],
+        })
+    assert 'Incorrect translation count: "label"' in str(err.value)
+
+
+def test_order_sheet_names():
+    assert _order_sheet_names([]) == []
+    assert _order_sheet_names(['a', 'survey', 'z']) == ['survey', 'a', 'z']
+    assert _order_sheet_names(['settings', 'choices', 'survey']) == ['survey', 'choices', 'settings']
+
+
+def test_flatten_label_with_xpath():
+    _c = flatten_content({'survey': [
+                {'type': 'acknowledge', 'name': 'verifnote',
+                    'label': [
+                        'You answered ',
+                        {'@lookup': 'foo'},
+                        ' to the foo question'
+                    ]}
+            ]})
+    assert _c['survey'][0]['label'] == 'You answered ${foo} to the foo question'
+
+
+def test_flatten_to_spreadsheet_content():
+    _e = {
+        'survey': [
+            {'type': 'text', 'name': 'q1',
+                'label': ['lang1'],
+             },
+        ],
+        'choices': [
+            {'list_name': 'xyz',
+                'name': 'x',
+                'label': ['X']},
+            {'list_name': 'xyz',
+                'name': 'y',
+                'label': ['Y']},
+            {'list_name': 'xyz',
+                'name': 'z',
+                'label': ['Z']},
+        ],
+        'settings': {
+            'xyz': 'abc',
+        },
+        'translated': ['label'],
+        'translations': ['lang1'],
+    }
+    _c = flatten_to_spreadsheet_content(_e)
+    assert isinstance(_c, OrderedDict)
+    assert _c.keys() == ['survey', 'choices', 'settings']
+
+
+def test_col_order():
+    assert _order_cols([
+            'label',
+            'type',
+            'name',
+        ]) == ['type', 'name', 'label']
+
+
+def test_flatten_translated_label_with_xpath():
+    _c = flatten_content({'survey': [
+                {'type': 'acknowledge', 'name': 'verifnote',
+                    'label': [
+                        [
+                            'You answered ',
+                            {'@lookup': 'foo'},
+                            ' to the foo question'
+                        ],
+                        [
+                            'U ansrd ',
+                            {'@lookup': 'foo'},
+                            ' 2da foo q'
+                        ],
+                    ]},
+            ],
+            'translated': ['label'],
+            'translations': ['en', 'txtspk'],
+            })
+    row = _c['survey'][0]
+    assert 'label' not in row
+    assert row['label::en'] == 'You answered ${foo} to the foo question'
+    assert row['label::txtspk'] == 'U ansrd ${foo} 2da foo q'
