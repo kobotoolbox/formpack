@@ -2,11 +2,7 @@ sudo: false
 language: python
 python:
   - "2.7"
-cache:
-  directories:
-    - $HOME/.cache/pip
 install:
-  - "pip install wheel"
   - "pip install funcsigs"
   - "pip install pytest pytest-cov python-coveralls"
   - "python setup.py develop"
