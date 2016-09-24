@@ -9,8 +9,6 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from copy import deepcopy
-
 from .constants import UNTRANSLATED, UNSPECIFIED_TRANSLATION
 from .submission import FormSubmission
 from .utils.xform_tools import formversion_pyxform
@@ -199,10 +197,11 @@ class FormVersion(object):
         return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
                                _stats.keys()))
 
-    def to_dict(self):
-        schema = deepcopy(self.schema)
-        flatten_content(schema['content'])
-        return schema
+    def to_dict(self, remove_fields=[]):
+        flattened_schema = flatten_content(self.schema['content'])
+        for field in remove_fields:
+            flattened_schema.pop(field, None)
+        return flattened_schema
 
     # TODO: find where to move that
     def _load_submission_xml(self, xml):
@@ -263,7 +262,7 @@ class FormVersion(object):
         return all_labels
 
     def to_xml(self):
-        survey = formversion_pyxform(self.to_dict())
+        survey = formversion_pyxform(self.to_dict(remove_fields=['translations']))
         title = self._get_title()
 
         if title is None:

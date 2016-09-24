@@ -11,9 +11,9 @@ from formpack.utils.replace_aliases import (replace_aliases, dealias_type,
                                             )
 
 
-def test_expand_select_one():
+def test_replace_select_one():
     s1 = {'survey': [{'type': 'select1 dogs'}]}
-    replace_aliases(s1)
+    replace_aliases(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_one dogs'
 
 
@@ -32,7 +32,7 @@ def test_true_false_value_replaced():
             False, 'NO', 'no', 'false()', 'FALSE'
         ]
     ]}
-    replace_aliases(s1)
+    replace_aliases(s1, in_place=True)
     tfs = [row['required'] for row in s1['survey']]
     assert tfs == [True] * 5 + [False] * 5
 
@@ -74,7 +74,7 @@ def _setting(settings_key, expected):
     _s = {}
     _s[settings_key] = 'value'
     _o = {'survey': [], 'settings': [_s]}
-    replace_aliases(_o)
+    replace_aliases(_o, in_place=True)
     assert len(_o['settings'].keys()) == 1
     assert _o['settings'].keys()[0] == expected
 
@@ -94,7 +94,7 @@ def _assert_column_converted_to(original, desired):
     row = {}
     row[original] = 'ABC'
     surv = {'survey': [row]}
-    replace_aliases(surv)
+    replace_aliases(surv, in_place=True)
     assert len(surv['survey'][0].keys()) == 1
     assert surv['survey'][0].keys()[0] == desired
 

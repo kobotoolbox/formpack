@@ -36,7 +36,7 @@ requirements, dep_links = get_requirements('requirements.txt')
 dev_requirements, dev_dep_links = get_requirements('dev-requirements.txt')
 
 setup(name='formpack',
-      version='1.1',
+      version='1.2',
       description='Manipulation tools for kobocat forms',
       author='Alex Dorey',
       author_email='alex.dorey@kobotoolbox.org',

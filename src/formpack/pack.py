@@ -122,8 +122,8 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
-        replace_aliases(schema['content'])
-        expand_content(schema['content'])
+        replace_aliases(schema['content'], in_place=True)
+        expand_content(schema['content'], in_place=True)
 
         # TODO: make that an alternative constructor from_json_schema ?
         # this way we could get rid of the construct accepting a json schema

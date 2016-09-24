@@ -14,14 +14,14 @@ from formpack.constants import UNTRANSLATED
 
 def test_expand_select_one():
     s1 = {'survey': [{'type': 'select_one dogs'}]}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_one'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 
 def test_expand_select_multiple():
     s1 = {'survey': [{'type': 'select_multiple dogs'}]}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_multiple'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
@@ -29,7 +29,7 @@ def test_expand_select_multiple():
 def test_expand_media():
     s1 = {'survey': [{'type': 'note',
                       'media::image': 'ugh.jpg'}]}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1 == {'survey': [
             {
               'type': 'note',
@@ -38,25 +38,26 @@ def test_expand_media():
         ],
         'translations': [UNTRANSLATED]
         }
-    flatten_content(s1)
+    flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
         'type': 'note',
         'media::image': 'ugh.jpg',
-      }]}
+      }],
+    }
 
 
 def test_expand_translated_media():
     s1 = {'survey': [{'type': 'note',
                       'media::image::English': 'eng.jpg'
                       }]}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1 == {'survey': [
             {'type': 'note',
                 'media::image': ['eng.jpg']
              }
         ],
         'translations': ['English']}
-    flatten_content(s1)
+    flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
         'type': 'note',
         'media::image::English': 'eng.jpg',
@@ -70,14 +71,14 @@ def test_expand_translated_media_with_no_translated():
                       'media::image::English': 'eng.jpg',
                       }],
           'translations': ['English', UNTRANSLATED]}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1 == {'survey': [
             {'type': 'note',
                 'media::image': ['eng.jpg', 'nolang.jpg']
              }
         ],
         'translations': ['English', UNTRANSLATED]}
-    flatten_content(s1)
+    flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
         'type': 'note',
         'media::image': 'nolang.jpg',
@@ -91,7 +92,7 @@ def test_convert_select_objects():
                      {'type': {'select_one_or_other': 'xyz'}},
                      {'type': {'select_multiple': 'xyz'}}
                      ]}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     _row = s1['survey'][0]
     assert _row['type'] == 'select_one'
     assert _row['select_from_list_name'] == 'xyz'
@@ -122,7 +123,7 @@ def test_expand_translated_choice_sheets():
                        'label::Fr': 'Fr N',
                       }],
           'translations': ['En', 'Fr']}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1 == {'survey': [{
                   'type': 'select_one',
                   'select_from_list_name': 'yn',
@@ -231,9 +232,9 @@ def test_expand_constraint_message():
                       }],
           'translations': ['XX', 'YY'],
           }
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1 == x1
-    flatten_content(x1)
+    flatten_content(x1, in_place=True)
     assert x1 == s1_copy
 
 
@@ -244,9 +245,9 @@ def test_expand_translations():
     x1 = {'survey': [{'type': 'text',
                       'label': ['OK?', 'OK!']}],
           'translations': ['English', 'Français']}
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1 == x1
-    flatten_content(s1)
+    flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{'type': 'text',
                               'label::English': 'OK?',
                               'label::Français': 'OK!'}],
@@ -262,9 +263,9 @@ def test_expand_translations_null_lang():
                       'label': ['NoLang', 'EnglishLang']}],
           'translations': [UNTRANSLATED, 'English']}
     s1_copy = copy.deepcopy(s1)
-    expand_content(s1)
+    expand_content(s1, in_place=True)
     assert s1.get('translations') == x1.get('translations')
     assert s1.get('survey')[0] == x1.get('survey')[0]
     assert s1 == x1
-    flatten_content(s1)
+    flatten_content(s1, in_place=True)
     assert s1 == s1_copy

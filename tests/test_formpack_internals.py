@@ -23,7 +23,7 @@ def test_to_dict():
     _copy = deepcopy(schema)
     fp = FormPack([schema], 'title')
     original_content = _copy['content']
-    new_content = fp[0].to_dict()['content']
+    new_content = fp[0].to_dict()
     assert new_content.pop('translations') == ['english', 'french']
     assert original_content == new_content
 

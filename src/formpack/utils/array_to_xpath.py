@@ -17,11 +17,25 @@ SPACE_PADDING = {
 }
 
 DEFAULT_FNS = {
-    u'$lookup': lambda x: "${%s}" % x,
-    u'$fn': lambda *args: args,
+    u'@lookup': lambda x: "${%s}" % x,
+    u'@response_not_equal': lambda args: [{'@lookup': args[0]}, '!=', args[1]],
+    u'@join': lambda p: reduce(lambda x, v: x + [v, p[0]], p[1], [])[:-1],
+    u'@and': lambda args: {'@join': ['and', args]},
+    u'@or': lambda args: {'@join': ['or', args]},
+    u'@not': lambda args: ['not', {'@parens': args}],
+    u'@predicate': lambda args: ['[', args, ']'],
+    u'@parens': lambda args: ['('] + args + [')'],
+    u'@axis': lambda args: [args[0], '::', args[1]],
+    u'@position': lambda args: ['position', {'@parens': [args]}],
+    u'@selected_at': lambda args: ['selected-at', {'@parens': [args[0], ',', args[1]]}],
+    u'@count_selected': lambda args: ['count-selected', {'@parens': args}],
+    u'@multiselected': lambda args: [['selected', {'@parens': [
+                                     {'@lookup': args[0]}, ',', args[1]]}]],
+    u'@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
 }
 
-EXPANDABLE_FIELD_TYPES = ['relevant', 'constraint', 'calculation']
+# this will be phased out shortly, since most fields are expandable in some way
+EXPANDABLE_FIELD_TYPES = ['relevant', 'constraint', 'calculation', 'repeat_count']
 
 
 def array_to_xpath(outer_arr, fns={}):
@@ -51,8 +65,8 @@ def array_to_flattened_array(outer_arr, _fns):
                 # skip keys that begin with '#' as comments
                 if key.startswith('#'):
                     continue
-                # handle keys that begin with '$' as transformable
-                elif key.startswith('$'):
+                # handle keys that begin with '@' as transformable
+                elif key.startswith('@'):
                     if key not in fns:
                         raise ValueError('Transform function not found: %s'
                                          % key)

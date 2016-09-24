@@ -35,7 +35,7 @@ DATA_TYPE_ALIASES = (
 
 
 def formversion_pyxform(data):
-    content = flatten_content(data.get('content'))
+    content = flatten_content(data)
     imported_survey_json = workbook_to_json(content)
     return create_survey_element_from_dict(imported_survey_json)
 
