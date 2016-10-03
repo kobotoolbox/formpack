@@ -206,6 +206,27 @@ class TestAutoReport(unittest.TestCase):
                           {'mean': 1.0,
                            'median': 1,
                            'mode': '*',
-                                   'stdev': u'*'}))})]
+                                   'stdev': u'*'}))}),
+            ("<FormChoiceFieldWithMultipleSelect name='colors' type='select_multiple'>",
+             'colors',
+             {'not_provided': 1,
+              'provided': 5,
+              'show_graph': False,
+              'total_count': 6,
+              'values': [(u'red',
+                           {u'frequency': [(u'2001-01-01', 2),
+                                           (u'2002-01-01', 2),
+                                           (u'2003-01-01', 1)],
+                            u'percentage': [(u'2001-01-01', 33.33),
+                                            (u'2002-01-01', 33.33),
+                                            ]})
+              ],
+              'frequency': [
+                  (u'2001-01-01', 2),
+                  (u'2002-01-01', 2),
+                  (u'2003-01-01', 1)]
+              })
+            ]
+
         for (i, stat) in enumerate(stats):
             assert stat == expected[i]

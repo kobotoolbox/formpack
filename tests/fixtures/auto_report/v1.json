@@ -27,6 +27,54 @@
                 "type": "integer",
                 "name": "howmany",
                 "label": "How many"
+            },
+            {
+                "type": "select_multiple",
+                "select_from_list_name": "colors",
+                "name": "colors",
+                "label": "Colors"
+            }
+        ],
+        "choices": [
+            {
+                "list_name": "colors",
+                "name": "red",
+                "label": "Red"
+            },
+            {
+                "list_name": "colors",
+                "name": "yellow",
+                "label": "Yellow"
+            },
+            {
+                "list_name": "colors",
+                "name": "pink",
+                "label": "Pink"
+            },
+            {
+                "list_name": "colors",
+                "name": "green",
+                "label": "Green"
+            },
+            {
+                "list_name": "colors",
+                "name": "orange",
+                "label": "Orange"
+            },
+            {
+                "list_name": "colors",
+                "name": "purple",
+                "label": "Purple"
+            },
+            {
+                "list_name": "colors",
+                "name": "blue",
+                "label": "Blue"
+            },
+            {
+                "list_name": "colors",
+                "name": "black",
+                "label": "Black"
             }
         ]
     },
@@ -36,6 +84,7 @@
             "restaurant_name": "Felipes",
             "note": "Bla",
             "when": "2001-01-01",
+            "colors": "red",
             "howmany": 1
         },
         {
@@ -43,6 +92,7 @@
             "restaurant_name": "Felipes",
             "note": "Bla",
             "when": "2001-01-01",
+            "colors": "red green",
             "howmany": 2
         },
         {},
@@ -51,6 +101,7 @@
             "restaurant_name": "The other one",
             "note": "Bla",
             "when": "2002-01-01",
+            "colors": "pink red",
             "howmany": 2
         },
         {
@@ -58,6 +109,7 @@
             "restaurant_name": "The other one",
             "note": "Bla",
             "when": "2002-01-01",
+            "colors": "red blue",
             "howmany": 2
         },
         {
@@ -65,6 +117,7 @@
             "restaurant_name": "That one",
             "note": "Bla",
             "when": "2003-01-01",
+            "colors": "blue",
             "howmany": 1
         }
     ]
