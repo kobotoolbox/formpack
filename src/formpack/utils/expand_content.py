@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 from copy import deepcopy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
@@ -59,10 +59,21 @@ def expand_content_in_place(content):
         for (key, vals) in specials.iteritems():
             if key in row:
                 _convert_special_label_col(content, row, key, vals)
+
+    if 'choices' in content and isinstance(content['choices'], list):
+        choices = defaultdict(list)
+        for choice in content['choices']:
+            choices[choice['list_name']].append(choice)
+        content['choices'] = dict(choices)
+
     for row in content.get('choices', []):
         for (key, vals) in specials.iteritems():
             if key in row:
                 _convert_special_label_col(content, row, key, vals)
+
+    settings = content.get('settings', [])
+    if isinstance(settings, list):
+        content['settings'] = {} if len(settings) is 0 else settings[0]
 
 
 def expand_content(content, in_place=False):
