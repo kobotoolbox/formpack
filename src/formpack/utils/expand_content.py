@@ -1,5 +1,9 @@
 # coding: utf-8
 
+# This module might be more appropriately named "standardize_content"
+# and pass content through to formpack.utils.replace_aliases during
+# the standardization step: expand_content_in_place(...)
+
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
@@ -75,6 +79,12 @@ def expand_content_in_place(content):
         for (key, vals) in specials.iteritems():
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
+
+    if 'settings' in content and isinstance(content['settings'], list):
+        if len(content['settings']) > 0:
+            content['settings'] = content['settings'][0]
+        else:
+            content['settings'] = {}
 
 
 def expand_content(content, in_place=False):

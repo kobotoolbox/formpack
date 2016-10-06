@@ -243,8 +243,9 @@ def replace_aliases_in_place(content, allowed_types=None):
 
     # replace settings
     settings = content.get('settings', {})
-    if isinstance(settings, list) and len(settings) > 0:
-        settings = settings[0]
+    if isinstance(settings, list):
+        raise ValueError('Cannot run replace_aliases() on content which has not'
+                         ' first been parsed through "expand_content".')
 
     if settings:
         content['settings'] = dict([
