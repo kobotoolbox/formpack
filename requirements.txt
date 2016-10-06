@@ -5,4 +5,5 @@ pyxform == 0.9.22
 cyordereddict==1.0.0
 PyExcelerate==0.6.7
 path.py==8.1.2
+jsonschema==2.5.1
 statistics==1.0.3.5
