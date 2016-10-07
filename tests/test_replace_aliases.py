@@ -75,7 +75,7 @@ def test_select_one_external_replaced():
 def _setting(settings_key, expected):
     _s = {}
     _s[settings_key] = 'value'
-    _o = {'survey': [], 'settings': [_s]}
+    _o = {'survey': [], 'settings': _s}
     replace_aliases(_o, in_place=True)
     assert len(_o['settings'].keys()) == 1
     assert _o['settings'].keys()[0] == expected
