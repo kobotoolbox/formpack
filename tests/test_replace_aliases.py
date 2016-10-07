@@ -55,6 +55,8 @@ def test_misc_types():
     assert dealias_type('end_group') == 'end_group'
     assert dealias_type('begin_repeat') == 'begin_repeat'
     assert dealias_type('end_repeat') == 'end_repeat'
+    assert dealias_type('imei') == 'deviceid'
+    assert dealias_type('gps') == 'geopoint'
 
 
 def _fail_type(_type):
@@ -73,7 +75,7 @@ def test_select_one_external_replaced():
 def _setting(settings_key, expected):
     _s = {}
     _s[settings_key] = 'value'
-    _o = {'survey': [], 'settings': [_s]}
+    _o = {'survey': [], 'settings': _s}
     replace_aliases(_o, in_place=True)
     assert len(_o['settings'].keys()) == 1
     assert _o['settings'].keys()[0] == expected
@@ -88,6 +90,28 @@ def test_settings_get_replaced():
     # no change
     _setting('form_title', 'form_title')
     _setting('sms_keyword', 'sms_keyword')
+
+
+def test_custom_allowed_types():
+    ex1 = replace_aliases({'survey': [{'type': 'x_y_z_a_b_c'}]}, allowed_types={
+            'xyzabc': 'x_y_z_a_b_c'
+        })
+    assert ex1['survey'][0]['type'] == 'xyzabc'
+
+    ex2 = replace_aliases({'survey': [{'type': 'xyzabc'}]}, allowed_types={
+            'xyzabc': ['x_y_z_a_b_c'],
+        })
+    assert ex2['survey'][0]['type'] == 'xyzabc'
+
+    ex3 = replace_aliases({'survey': [{'type': 'xyzabc'}]}, allowed_types={
+            'xyzabc': True,
+        })
+    assert ex3['survey'][0]['type'] == 'xyzabc'
+
+
+def test_list_name_renamed():
+    ex1 = replace_aliases({'choices': [{'list name': 'mylist'}]})
+    assert ex1['choices'][0].keys() == ['list_name']
 
 
 def _assert_column_converted_to(original, desired):

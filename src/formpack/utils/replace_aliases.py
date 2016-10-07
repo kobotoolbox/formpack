@@ -10,7 +10,7 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 from copy import deepcopy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
@@ -28,6 +28,10 @@ def aliases_to_ordered_dict(_d):
     arr = []
     for (original, aliases) in _d.items():
         arr.append((original, original))
+        if isinstance(aliases, bool):
+            aliases = [original]
+        elif isinstance(aliases, basestring):
+            aliases = [aliases]
         for alias in aliases:
             arr.append((alias, original,))
     return OrderedDict(sorted(arr, key=lambda _kv: 0-len(_kv[0])))
@@ -51,6 +55,12 @@ types = aliases_to_ordered_dict({
         u'end repeat',
         u'end looped group',
     ],
+    'text': ['string'],
+    'acknowledge': ['trigger'],
+    'image': ['photo'],
+    'datetime': ['dateTime'],
+    'deviceid': ['imei'],
+    'geopoint': ['gps'],
 })
 
 selects = aliases_to_ordered_dict({
@@ -73,6 +83,74 @@ selects = aliases_to_ordered_dict({
     ],
 })
 
+SELECT_TYPES = [
+    'select_one',
+    'select_multiple',
+    'select_one_external',
+]
+
+LABEL_OPTIONAL_TYPES = [
+    'start',
+    'today',
+    'end',
+    'calculate',
+    'deviceid',
+    'phone_number',
+    'simserial',
+    'begin_group',
+    'begin_repeat',
+]
+
+MAIN_TYPES = [
+    # basic entry
+    'text',
+    'integer',
+    'decimal',
+    'email',
+    'barcode',
+    # collect media
+    'video',
+    'image',
+    'audio',
+    # enter time values
+    'date',
+    'datetime',
+    'time',
+    # calculate
+    'subscriberid',
+
+    # meta values
+    'username',
+
+    # prompt to collect geo data
+    'location',
+    'gps',
+    'geopoint',
+    'geoshape',
+    'geotrace',
+
+    # no response
+    'acknowledge',
+    'note',
+]
+formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
+
+_pyxform_type_aliases = defaultdict(list)
+_formpack_type_reprs = {}
+
+for (_type, val) in QUESTION_TYPE_DICT.items():
+    _xform_repr = json.dumps(val, sort_keys=True)
+    if _type in formpack_preferred_types:
+        _formpack_type_reprs[_type] = _xform_repr
+    else:
+        _pyxform_type_aliases[_xform_repr].append(_type)
+
+formpack_type_aliases = aliases_to_ordered_dict(dict([
+        (_type, _pyxform_type_aliases[_repr])
+        for (_type, _repr) in _formpack_type_reprs.items()
+    ]))
+
+
 KNOWN_TYPES = set(QUESTION_TYPE_DICT.keys() + selects.values() + types.values())
 
 
@@ -90,6 +168,7 @@ def _unpack_headers(p_aliases, fp_preferred):
 
 formpack_preferred_settings_headers = {
     'title': 'form_title',
+    'form_id': 'id_string',
 }
 settings_header_columns = _unpack_headers(pyxform_aliases.settings_header,
                                           formpack_preferred_settings_headers)
@@ -113,11 +192,16 @@ survey_header_columns = _unpack_headers(pyxform_aliases.survey_header,
                                         formpack_preferred_survey_headers)
 
 
-def dealias_type(type_str, strict=False):
-    if type_str in KNOWN_TYPES:
-        return type_str
+def dealias_type(type_str, strict=False, allowed_types=None):
+    if allowed_types is None:
+        allowed_types = {}
+
     if type_str in types.keys():
         return types[type_str]
+    if type_str in allowed_types.keys():
+        return allowed_types[type_str]
+    if type_str in KNOWN_TYPES:
+        return type_str
     for key in selects.keys():
         if type_str.startswith(key):
             return type_str.replace(key, selects[key])
@@ -125,20 +209,23 @@ def dealias_type(type_str, strict=False):
         raise ValueError('unknown type {}'.format([type_str]))
 
 
-def replace_aliases(content, in_place=False):
+def replace_aliases(content, in_place=False, allowed_types=None):
     if in_place:
-        replace_aliases_in_place(content)
+        replace_aliases_in_place(content, allowed_types=allowed_types)
         return None
     else:
         _content = deepcopy(content)
-        replace_aliases_in_place(_content)
+        replace_aliases_in_place(_content, allowed_types=allowed_types)
         return _content
 
 
-def replace_aliases_in_place(content):
+def replace_aliases_in_place(content, allowed_types=None):
+    if allowed_types is not None:
+        allowed_types = aliases_to_ordered_dict(allowed_types)
+
     for row in content.get('survey', []):
         if row.get('type'):
-            row['type'] = dealias_type(row.get('type'), strict=True)
+            row['type'] = dealias_type(row.get('type'), strict=True, allowed_types=allowed_types)
 
         for col in TF_COLUMNS:
             if col in row:
@@ -150,10 +237,15 @@ def replace_aliases_in_place(content):
                 row[val] = row[key]
                 del row[key]
 
+    for row in content.get('choices', []):
+        if 'list name' in row:
+            row['list_name'] = row.pop('list name')
+
     # replace settings
     settings = content.get('settings', {})
-    if isinstance(settings, list) and len(settings) > 0:
-        settings = settings[0]
+    if isinstance(settings, list):
+        raise ValueError('Cannot run replace_aliases() on content which has not'
+                         ' first been parsed through "expand_content".')
 
     if settings:
         content['settings'] = dict([

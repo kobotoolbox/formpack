@@ -25,15 +25,16 @@ from copy import deepcopy
 class FormPack(object):
 
     # TODO: make a clear signature for __init__
-    def __init__(self, versions, title='Submissions', id_string=None,
+    def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
+                 strict_schema=False,
                  asset_type=None, submissions_xml=None):
 
         if not versions:
-            raise ValueError('A FormPack must contain at least one FormVersion')
+            versions = []
 
         # accept a single version, but normalize it to an iterable
-        if "content" in versions:
+        if isinstance(versions, dict):
             versions = [versions]
 
         self.versions = OrderedDict()
@@ -44,6 +45,7 @@ class FormPack(object):
         self.id_string = id_string
 
         self.title = title
+        self.strict_schema = strict_schema
 
         if len(self.title) > 31: # excel sheet name size limit
             self.title = self.title[:28] + '...'
@@ -125,9 +127,9 @@ class FormPack(object):
         replace_aliases(schema['content'], in_place=True)
         expand_content(schema['content'], in_place=True)
 
-        # TODO: make that an alternative constructor from_json_schema ?
-        # this way we could get rid of the construct accepting a json schema
-        # and pass it the choices, repeat and fieds
+        if self.strict_schema:
+            FormVersion.verify_schema_structure(schema)
+
         form_version = FormVersion(self, schema)
 
         # NB: id_string are readable string unique to the form
