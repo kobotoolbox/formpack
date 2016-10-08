@@ -116,15 +116,19 @@ def _get_special_survey_cols(content):
     def _pluck_uniq_cols(sheet_name):
         for row in content.get(sheet_name, []):
             uniq_cols.update(OrderedDict.fromkeys(row.keys()))
+
+    def _mark_special(**kwargs):
+        column_name = kwargs.pop('column_name')
+        special[column_name] = kwargs
+
     _pluck_uniq_cols('survey')
     _pluck_uniq_cols('choices')
 
     for column_name in uniq_cols.keys():
         if column_name in ['label', 'hint']:
-            special[column_name] = {
-                'column': column_name,
-                'translation': UNTRANSLATED,
-            }
+            _mark_special(column_name=column_name,
+                          column=column_name,
+                          translation=UNTRANSLATED)
         if ':' not in column_name:
             continue
         if column_name.startswith('bind:'):
@@ -135,38 +139,35 @@ def _get_special_survey_cols(content):
         if mtch:
             matched = mtch.groups()
             media_type = matched[0]
-            special[column_name] = {
-                'coltype': 'media',
-                'column': 'media::{}'.format(media_type),
-                'media': media_type,
-                'translation': matched[1],
-            }
+            _mark_special(column_name=column_name,
+                          column='media::{}'.format(media_type),
+                          coltype='media',
+                          media=media_type,
+                          translation=matched[1])
             continue
         mtch = re.match('^media\s*::?\s*([^:]+)$', column_name)
         if mtch:
             media_type = mtch.groups()[0]
-            special[column_name] = {
-                'coltype': 'media',
-                'column': 'media::{}'.format(media_type),
-                'media': media_type,
-                'translation': UNTRANSLATED,
-            }
+            _mark_special(column_name=column_name,
+                          column='media::{}'.format(media_type),
+                          coltype='media',
+                          media=media_type,
+                          translation=UNTRANSLATED)
             continue
         mtch = re.match('^([^:]+)\s*::?\s*([^:]+)$', column_name)
         if mtch:
             # example: label::x, constraint_message::x, hint::x
             matched = mtch.groups()
             column_shortname = matched[0]
-            special[column_name] = {
-                'column': column_shortname,
-                'translation': matched[1],
-            }
+            _mark_special(column_name=column_name,
+                          column=column_shortname,
+                          translation=matched[1])
+
             # also add the empty column if it exists
             if column_shortname in uniq_cols:
-                special[column_shortname] = {
-                    'column': column_shortname,
-                    'translation': UNTRANSLATED,
-                }
+                _mark_special(column_name=column_shortname,
+                              column=column_shortname,
+                              translation=UNTRANSLATED)
             continue
     (translations,
      translated_cols) = _get_translations_from_special_cols(special,
