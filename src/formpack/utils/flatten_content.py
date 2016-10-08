@@ -12,8 +12,8 @@ def flatten_content_in_place(survey_content):
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
     '''
-    translations = survey_content.get('translations', [])
-    translated_cols = survey_content.get('translated', [])
+    translations = survey_content.pop('translations', [])
+    translated_cols = survey_content.pop('translated', [])
 
     def _iter_through_sheet(sheet_name):
         if sheet_name in survey_content:
@@ -26,9 +26,6 @@ def flatten_content_in_place(survey_content):
     if isinstance(survey_content.get('settings'), dict):
         survey_content['settings'] = [survey_content['settings']]
 
-    # do not list translations when only default exists
-    if len(translations) == 1 and translations[0] == UNTRANSLATED:
-        del survey_content['translations']
     return None
 
 
