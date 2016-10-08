@@ -62,6 +62,16 @@ def test_expand_media():
     }
 
 
+def test_graceful_double_expand():
+    s1 = {'survey': [{'type': 'note',
+                      'media::image::English': 'eng.jpg'
+                      }]}
+    content = expand_content(
+            expand_content(s1)
+        )
+    assert content['translations'] == ['English']
+
+
 def test_get_translated_cols():
     x1 = {'survey': [
           {'type': 'text', 'something::a': 'something-a', 'name': 'q1',

@@ -28,8 +28,11 @@ class LabelStruct(object):
 
     def __init__(self, labels=[], translations=[]):
         if len(labels) != len(translations):
-            raise TranslationError('Mismatched labels and translations: '
-                                   '%d %d' % (len(labels), len(translations)))
+            errmsg = 'Mismatched labels and translations: [{}] [{}] ' \
+                '{}!={}'.format(', '.join(labels),
+                                ', '.join(translations), len(labels),
+                                len(translations))
+            raise TranslationError(errmsg)
         self._labels = labels
         self._translations = translations
         self._vals = dict(zip(translations, labels))

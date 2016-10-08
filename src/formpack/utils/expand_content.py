@@ -113,9 +113,15 @@ def _get_special_survey_cols(content):
     uniq_cols = OrderedDict()
     special = OrderedDict()
 
+    known_translated_cols = content.get('translated', [])
+
     def _pluck_uniq_cols(sheet_name):
         for row in content.get(sheet_name, []):
-            uniq_cols.update(OrderedDict.fromkeys(row.keys()))
+            # we don't want to expand columns which are already known
+            # to be parsed and translated in a previous iteration
+            _cols = filter(lambda r: r not in known_translated_cols,
+                           row.keys())
+            uniq_cols.update(OrderedDict.fromkeys(_cols))
 
     def _mark_special(**kwargs):
         column_name = kwargs.pop('column_name')
