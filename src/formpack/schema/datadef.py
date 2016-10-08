@@ -100,16 +100,21 @@ class FormChoice(FormDataDef):
         all_choices = {}
         for choice_definition in definition:
             choice_name = choice_definition.get('name')
-            if not choice_name:
+            choice_key = choice_definition.get('list_name')
+            if not choice_name or not choice_key:
                 continue
-            choice_key = choice_definition['list_name']
-            try:
-                choices = all_choices[choice_key]
-            except KeyError:
-                choices = all_choices[choice_key] = cls(choice_key)
+
+            if choice_key not in all_choices:
+                all_choices[choice_key] = FormChoice(choice_key)
+            choices = all_choices[choice_key]
 
             option = choices.options[choice_name] = {}
-            _label = choice_definition['label']
+
+            # apparently choices dont need a label if they have an image
+            if 'label' in choice_definition:
+                _label = choice_definition['label']
+            else:
+                _label = choice_definition.get('image')
             if isinstance(_label, basestring):
                 _label = [_label]
             option['labels'] = OrderedDict(zip(translation_list, _label))

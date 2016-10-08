@@ -22,6 +22,10 @@ def flatten_content_in_place(survey_content):
                 _flatten_survey_row(row)
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
+
+    if isinstance(survey_content.get('settings'), dict):
+        survey_content['settings'] = [survey_content['settings']]
+
     # do not list translations when only default exists
     if len(translations) == 1 and translations[0] == UNTRANSLATED:
         del survey_content['translations']
@@ -119,11 +123,15 @@ def _flatten_survey_row(row):
             row[key] = array_to_xpath(row[key])
     if 'type' in row:
         _type = row['type']
+        if isinstance(row.get('required'), bool):
+            row['required'] = 'true' if row['required'] else 'false'
         if isinstance(_type, dict):
             row['type'] = _stringify_type__depr(_type)
         elif 'select_from_list_name' in row:
             _list_name = row.pop('select_from_list_name')
             if row['type'] == 'select_one_or_other':
                 row['type'] = 'select_one {} or_other'.format(_list_name)
+            elif row['type'] == 'select_multiple_or_other':
+                row['type'] = 'select_multiple {} or_other'.format(_list_name)
             else:
                 row['type'] = '{} {}'.format(_type, _list_name)

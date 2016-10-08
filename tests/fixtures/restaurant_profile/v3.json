@@ -11,7 +11,7 @@
                 "label::french": "nom du restaurant"
             },
             {
-                "required": true,
+                "required": "true",
                 "type": "geopoint",
                 "name": "location",
                 "label::english": "location",

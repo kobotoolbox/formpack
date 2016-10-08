@@ -19,6 +19,20 @@ def test_expand_select_one():
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 
+def test_expand_select_multiple_or_other():
+    s1 = {'survey': [{'type': 'select_multiple dogs or_other'}]}
+    expand_content(s1, in_place=True)
+    assert s1['survey'][0]['type'] == 'select_multiple_or_other'
+    assert s1['survey'][0]['select_from_list_name'] == 'dogs'
+
+
+def test_expand_select_one_or_other():
+    s1 = {'survey': [{'type': 'select_one dogs or_other'}]}
+    expand_content(s1, in_place=True)
+    assert s1['survey'][0]['type'] == 'select_one_or_other'
+    assert s1['survey'][0]['select_from_list_name'] == 'dogs'
+
+
 def test_expand_select_multiple():
     s1 = {'survey': [{'type': 'select_multiple dogs'}]}
     expand_content(s1, in_place=True)
@@ -165,6 +179,29 @@ def test_expand_translated_choice_sheets():
                                }],
                   'translated': ['label'],
                   'translations': ['En', 'Fr']}
+
+
+def test_expand_hints_and_labels():
+    '''
+    this was an edge case that triggered some weird behavior
+    '''
+    s1 = {'survey': [{'type': 'select_one yn',
+                      'label': 'null lang select1',
+                      }],
+          'choices': [{'list_name': 'yn',
+                       'name': 'y',
+                       'label': 'y',
+                       'hint::En': 'En Y',
+                      },
+                      {
+                       'list_name': 'yn',
+                       'name': 'n',
+                       'label': 'n',
+                       'hint::En': 'En N',
+                      }],
+          }
+    expand_content(s1, in_place=True)
+    assert sorted(s1['translations']) == [None, 'En']
 
 
 def _s(rows):

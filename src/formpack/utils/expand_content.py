@@ -1,5 +1,9 @@
 # coding: utf-8
 
+# This module might be more appropriately named "standardize_content"
+# and pass content through to formpack.utils.replace_aliases during
+# the standardization step: expand_content_in_place(...)
+
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
@@ -11,8 +15,11 @@ from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from ..constants import UNTRANSLATED
 
 
-def _convert_special_label_col(content, row, col_shortname,
-                               special_column_details):
+REMOVE_EMPTY_STRINGS = True
+
+
+def _expand_translatable_content(content, row, col_shortname,
+                                 special_column_details):
     _scd = special_column_details
     if 'translation' in _scd:
         translations = content['translations']
@@ -49,11 +56,15 @@ def expand_content_in_place(content):
         content['translated'] = transl_cols
 
     for row in content.get('survey', []):
+        if 'name' in row and row['name'] == None:
+            del row['name']
         if 'type' in row:
             _type = row['type']
             if isinstance(_type, basestring):
                 row.update(_expand_type_to_dict(row['type']))
             elif isinstance(_type, dict):
+                # legacy {'select_one': 'xyz'} format might
+                # still be on kobo-prod
                 row.update({u'type': _type.keys()[0],
                             u'select_from_list_name': _type.values()[0]})
         for key in EXPANDABLE_FIELD_TYPES:
@@ -61,11 +72,22 @@ def expand_content_in_place(content):
                 row[key] = _expand_xpath_to_list(row[key])
         for (key, vals) in specials.iteritems():
             if key in row:
-                _convert_special_label_col(content, row, key, vals)
+                _expand_translatable_content(content, row, key, vals)
+
+        if REMOVE_EMPTY_STRINGS:
+            for (key, val) in row.items():
+                if val == "":
+                    del row[key]
     for row in content.get('choices', []):
         for (key, vals) in specials.iteritems():
             if key in row:
-                _convert_special_label_col(content, row, key, vals)
+                _expand_translatable_content(content, row, key, vals)
+
+    if 'settings' in content and isinstance(content['settings'], list):
+        if len(content['settings']) > 0:
+            content['settings'] = content['settings'][0]
+        else:
+            content['settings'] = {}
 
 
 def expand_content(content, in_place=False):
@@ -98,6 +120,11 @@ def _get_special_survey_cols(content):
     _pluck_uniq_cols('choices')
 
     for column_name in uniq_cols.keys():
+        if column_name in ['label', 'hint']:
+            special[column_name] = {
+                'column': column_name,
+                'translation': UNTRANSLATED,
+            }
         if ':' not in column_name:
             continue
         if column_name.startswith('bind:'):
@@ -149,9 +176,11 @@ def _get_special_survey_cols(content):
 
 def _expand_type_to_dict(type_str):
     for _re in [
-                '^(select_one)\s+(\w+)$',
-                '^(select_multiple)\s+(\w+)$',
-                '^(select_one_external)\s+(\w+)$',
+                '^(select_one_or_other)\s+(\S+)$',
+                '^(select_one)\s+(\S+)$',
+                '^(select_multiple_or_other)\s+(\S+)$',
+                '^(select_multiple)\s+(\S+)$',
+                '^(select_one_external)\s+(\S+)$',
                ]:
         match = re.match(_re, type_str)
         if match:
@@ -159,10 +188,11 @@ def _expand_type_to_dict(type_str):
             return {u'type': type_,
                     u'select_from_list_name': list_name}
 
-    _or_other = re.match('^select_one\s+(\w+)\s+or_other$', type_str)
+    _or_other = re.match('^(select_one|select_multiple)\s+(\w+)\s+or.other$',
+                         type_str)
     if _or_other:
-        list_name = _or_other.groups()[0]
-        return {u'type': 'select_one_or_other',
+        (select_mult, list_name) = _or_other.groups()
+        return {u'type': '{}_or_other'.format(select_mult),
                 u'select_from_list_name': list_name}
 
     # if it does not expand, we return the original string

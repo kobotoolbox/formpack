@@ -90,7 +90,14 @@ class FormField(FormDataDef):
         if hierarchy_in_labels:
             path = []
             for level in self.hierarchy[1:_hierarchy_end]:
-                path.append(level.labels.get(lang) or level.name)
+                _t = level.labels.get(lang)
+                if isinstance(_t, list) and len(_t) is 1:
+                    _t = _t[0]
+                # sometimes, level.labels returns a list
+                if _t:
+                    path.append(_t)
+                else:
+                    path.append(level.name)
             return group_sep.join(path)
 
         return self.labels.get(lang, self.name)

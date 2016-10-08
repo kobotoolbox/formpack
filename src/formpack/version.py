@@ -9,10 +9,13 @@ try:
 except ImportError:
     from collections import OrderedDict
 
+from .validators import validate_content
+
 from .constants import UNTRANSLATED, UNSPECIFIED_TRANSLATION
 from .submission import FormSubmission
 from .utils.xform_tools import formversion_pyxform
 from .utils import parse_xml_to_xmljson, normalize_data_type
+from .errors import SchemaError
 from .utils.flatten_content import flatten_content
 from .schema import (FormField, FormGroup, FormSection, FormChoice)
 from .errors import TranslationError
@@ -25,7 +28,8 @@ class LabelStruct(object):
 
     def __init__(self, labels=[], translations=[]):
         if len(labels) != len(translations):
-            raise TranslationError('Mismatched')
+            raise TranslationError('Mismatched labels and translations: '
+                                   '%d %d' % (len(labels), len(translations)))
         self._labels = labels
         self._translations = translations
         self._vals = dict(zip(translations, labels))
@@ -35,6 +39,13 @@ class LabelStruct(object):
 
 
 class FormVersion(object):
+    @classmethod
+    def verify_schema_structure(cls, struct):
+        if 'content' not in struct:
+            raise SchemaError('version content must have "content"')
+        if 'survey' not in struct['content']:
+            raise SchemaError('version content must have "survey"')
+        validate_content(struct['content'])
 
     # QUESTION FOR ALEX: get rid off _root_node_name ? What is it for ?
     def __init__(self, form_pack, schema):
@@ -47,7 +58,7 @@ class FormVersion(object):
         self.form_pack = form_pack
 
         # slug of title
-        self._root_node_name = form_pack.title
+        self.root_node_name = schema.get('root_node_name', 'data')
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
@@ -269,10 +280,11 @@ class FormVersion(object):
 
         if title is None:
             raise ValueError('cannot create xml on a survey with no title.')
+
         survey.update({
             'name': self.lookup('root_node_name', 'data'),
             'id_string': self.lookup('id_string'),
             'title': self.lookup('title'),
-            'version': self.lookup('id_string'),
+            'version': self.lookup('id'),
         })
-        return survey.to_xml().encode('utf-8')
+        return survey._to_pretty_xml().encode('utf-8')
