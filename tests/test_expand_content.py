@@ -58,7 +58,6 @@ def test_expand_media():
         'type': 'note',
         'media::image': 'ugh.jpg',
       }],
-      'translated': ['media::image'],
     }
 
 
@@ -108,8 +107,7 @@ def test_expand_translated_media():
         'type': 'note',
         'media::image::English': 'eng.jpg',
       }],
-      'translated': ['media::image'],
-      'translations': ['English']}
+      }
 
 
 def test_expand_translated_media_with_no_translated():
@@ -132,8 +130,7 @@ def test_expand_translated_media_with_no_translated():
         'media::image': 'nolang.jpg',
         'media::image::English': 'eng.jpg',
       }],
-      'translated': ['media::image'],
-      'translations': ['English', UNTRANSLATED]}
+      }
 
 
 def test_convert_select_objects():
@@ -310,6 +307,8 @@ def test_expand_constraint_message():
     expand_content(s1, in_place=True)
     assert s1 == x1
     flatten_content(x1, in_place=True)
+    s1_copy.pop('translated')
+    s1_copy.pop('translations')
     assert x1 == s1_copy
 
 
@@ -327,8 +326,7 @@ def test_expand_translations():
     assert s1 == {'survey': [{'type': 'text',
                               'label::English': 'OK?',
                               'label::Français': 'OK!'}],
-                  'translated': ['label'],
-                  'translations': ['English', 'Français']}
+                  }
 
 
 def test_expand_translations_null_lang():
@@ -348,4 +346,6 @@ def test_expand_translations_null_lang():
     assert s1.get('survey')[0] == x1.get('survey')[0]
     assert s1 == x1
     flatten_content(s1, in_place=True)
+    s1_copy.pop('translated')
+    s1_copy.pop('translations')
     assert s1 == s1_copy
