@@ -87,19 +87,31 @@ SELECT_TYPES = [
     'select_one',
     'select_multiple',
     'select_one_external',
+    'select_one_or_other',
+    'select_multiple_or_other',
 ]
 
-LABEL_OPTIONAL_TYPES = [
+META_TYPES = [
     'start',
     'today',
     'end',
-    'calculate',
     'deviceid',
     'phone_number',
     'simserial',
+    # meta values
+    'username',
+    # reconsider:
+    'phonenumber',
+    'imei',
+    'subscriberid',
+]
+
+LABEL_OPTIONAL_TYPES = [
+    'calculate',
     'begin_group',
     'begin_repeat',
-]
+] + META_TYPES
+
 
 MAIN_TYPES = [
     # basic entry
@@ -116,11 +128,6 @@ MAIN_TYPES = [
     'date',
     'datetime',
     'time',
-    # calculate
-    'subscriberid',
-
-    # meta values
-    'username',
 
     # prompt to collect geo data
     'location',

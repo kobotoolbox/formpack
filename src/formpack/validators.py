@@ -1,59 +1,9 @@
 from jsonschema import validate
-
-SELECT_TYPES = [
-            'select_one',
-            'select_multiple',
-            'select_one_external',
-            'select_one_or_other',
-            'select_multiple_or_other',
-]
-
-LABEL_OPTIONAL_TYPES = [
-            'start',
-            'today',
-            'end',
-            'calculate',
-            'deviceid',
-            'phone_number',
-            'simserial',
-            'begin_group',
-            'begin_repeat',
-            'subscriberid',
-            # meta values
-            'username',
-
-            #reconsider:
-            'phonenumber',
-            'imei',
-]
-
-MAIN_TYPES = [
-            # basic entry
-            'text',
-            'integer',
-            'decimal',
-            'email',
-            'barcode',
-            # collect media
-            'video',
-            'image',
-            'audio',
-            # enter time values
-            'date',
-            'datetime',
-            'time',
-
-            # prompt to collect geo data
-            'location',
-            'gps',
-            'geopoint',
-            'geoshape',
-            'geotrace',
-
-            # no response
-            'acknowledge',
-            'note',
-]
+from .utils.replace_aliases import (
+    LABEL_OPTIONAL_TYPES,
+    MAIN_TYPES,
+    SELECT_TYPES,
+)
 
 MAIN_SCHEMA = {
     'properties': {
