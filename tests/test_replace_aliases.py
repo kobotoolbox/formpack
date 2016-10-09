@@ -113,6 +113,23 @@ def test_list_name_renamed():
     ex1 = replace_aliases({'choices': [{'list name': 'mylist'}]})
     assert ex1['choices'][0].keys() == ['list_name']
 
+# when formpack exports support choice['value'] as the identifier for the choice, then we
+# will use choice['value']; until then, we will do the opposite; since both are accepted
+# aliases in pyxform
+# def test_choice_name_becomes_value():
+#     ex1 = replace_aliases({'choices': [{'list_name': 'mylist', 'name': 'myvalue'}]})
+#     c1 = ex1['choices'][0]
+#     assert 'value' in c1
+#     assert c1['value'] == 'myvalue'
+
+
+def test_choice_value_becomes_name__temp():
+    'in the meantime, we ensure that "value" alias is changed to "name"'
+    ex1 = replace_aliases({'choices': [{'list_name': 'mylist', 'value': 'myvalue'}]})
+    c1 = ex1['choices'][0]
+    assert 'name' in c1
+    assert c1['name'] == 'myvalue'
+
 
 def _assert_column_converted_to(original, desired):
     row = {}

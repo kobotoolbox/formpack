@@ -247,6 +247,10 @@ def replace_aliases_in_place(content, allowed_types=None):
     for row in content.get('choices', []):
         if 'list name' in row:
             row['list_name'] = row.pop('list name')
+        if 'name' in row and 'value' in row and row['name'] != row['value']:
+            raise ValueError('Conflicting name and value in row: {}'.format(repr(row)))
+        if 'value' in row:
+            row['name'] = row.pop('value')
 
     # replace settings
     settings = content.get('settings', {})
