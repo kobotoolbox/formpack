@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from copy import deepcopy
-from array_to_xpath import array_to_xpath, EXPANDABLE_FIELD_TYPES
+from array_to_xpath import array_to_xpath
 from ..constants import UNTRANSLATED
 
 

@@ -12,6 +12,7 @@ from collections import OrderedDict
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
+from .replace_aliases import META_TYPES
 from ..constants import UNTRANSLATED
 
 
@@ -55,11 +56,16 @@ def expand_content_in_place(content):
         content['translations'] = translations
         content['translated'] = transl_cols
 
-    for row in content.get('survey', []):
+    survey_content = content.get('survey', [])
+    _metas = []
+
+    for row in survey_content:
         if 'name' in row and row['name'] == None:
             del row['name']
         if 'type' in row:
             _type = row['type']
+            if _type in META_TYPES:
+                _metas.append(row)
             if isinstance(_type, basestring):
                 row.update(_expand_type_to_dict(row['type']))
             elif isinstance(_type, dict):
@@ -78,6 +84,13 @@ def expand_content_in_place(content):
             for (key, val) in row.items():
                 if val == "":
                     del row[key]
+
+    # for now, prepend meta questions to the beginning of the survey
+    # eventually, we may want to create a new "sheet" with these fields
+    for row in _metas[::-1]:
+        survey_content.remove(row)
+        survey_content.insert(0, row)
+
     for row in content.get('choices', []):
         for (key, vals) in specials.iteritems():
             if key in row:
