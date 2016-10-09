@@ -58,7 +58,8 @@ def _stringify_type__depr(json_qtype):
         return 'select_one %s or_other' % json_qtype['select_one_or_other']
 
 
-def _flatten_translated_fields(row, translations, translated_cols, col_order=False):
+def _flatten_translated_fields(row, translations, translated_cols,
+                               col_order=False):
     if len(translations) == 0:
         translations = [UNTRANSLATED]
 

@@ -1,5 +1,5 @@
 import re
-from copy import deepcopy
+from copy import deepcopy, copy
 from collections import OrderedDict
 
 from .flatten_content import _flatten_translated_fields, _flatten_survey_row
@@ -27,30 +27,60 @@ ORDERS_BY_SHEET = {
 }
 
 
-def flatten_to_spreadsheet_content(expanded_content):
+def flatten_to_spreadsheet_content(expanded_content,
+                                   prioritized_columns=None,
+                                   deprioritized_columns=None,
+                                   remove_columns=None
+                                   ):
+    if prioritized_columns is None:
+        prioritized_columns = []
+    if deprioritized_columns is None:
+        deprioritized_columns = []
+    if remove_columns is None:
+        remove_columns = []
+
     content = deepcopy(expanded_content)
     translations = content.pop('translations')
     translated_cols = content.pop('translated')
-    if 'settings' in content and isinstance(content['settings'], (dict, OrderedDict)):
+    if 'settings' in content and isinstance(content['settings'], dict):
         content['settings'] = [content['settings']]
     sheet_names = _order_sheet_names(content.keys())
 
-    def _row_to_ordered_dict(sheet_name, row):
-        cols = row.keys()
-        _ordered_cols = _order_cols(cols, sheet_name)
+    def _row_to_ordered_dict(row, cols):
         _flatten_translated_fields(row, translations, translated_cols,
-                                   col_order=_ordered_cols)
+                                   col_order=cols)
         newcols = row.keys()
-        if not set(newcols).issubset(_ordered_cols):
+
+        for pa in prioritized_columns[::-1]:
+            if pa in cols:
+                cols.remove(pa)
+                cols.insert(0, pa)
+        for pz in deprioritized_columns:
+            if pz in cols:
+                cols.remove(pz)
+                cols.append(pz)
+
+        if not set(newcols).issubset(cols):
             raise Exception('not all columns are included in ordered list')
+        for xcol in remove_columns:
+            if xcol in cols:
+                cols.remove(xcol)
+        _flatten_survey_row(row)
         return OrderedDict([
-                (key, row.get(key, None)) for key in _ordered_cols
+                (key, row.get(key, None)) for key in cols
             ])
 
+    def _sheet_to_ordered_dicts(sheet_name):
+        rows = content[sheet_name]
+        all_cols = OrderedDict()
+        for row in rows:
+            all_cols.update(OrderedDict.fromkeys(row.keys()))
+        _all_cols = _order_cols(all_cols.keys(), sheet_name)
+        return [
+            _row_to_ordered_dict(row, copy(_all_cols)) for row in rows
+        ]
     return OrderedDict([
-        (sheet_name, [
-            _row_to_ordered_dict(sheet_name, row) for row in content[sheet_name]
-          ]) for sheet_name in sheet_names
+            (sheet_name, _sheet_to_ordered_dicts(sheet_name)) for sheet_name in sheet_names
         ])
 
 
