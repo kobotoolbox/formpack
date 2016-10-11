@@ -275,7 +275,8 @@ class FormVersion(object):
 
         return all_labels
 
-    def to_xml(self):
+    def to_xml(self, warnings=None):
+        # todo: collect warnings from pyxform compilation when a list is passed
         survey = formversion_pyxform(
             self.to_dict(remove_fields=['translations', 'translated'])
                                      )
