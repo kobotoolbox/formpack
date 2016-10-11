@@ -112,6 +112,12 @@ LABEL_OPTIONAL_TYPES = [
     'begin_repeat',
 ] + META_TYPES
 
+GEO_TYPES = [
+    'gps',
+    'geopoint',
+    'geoshape',
+    'geotrace',
+]
 
 MAIN_TYPES = [
     # basic entry
@@ -131,15 +137,11 @@ MAIN_TYPES = [
 
     # prompt to collect geo data
     'location',
-    'gps',
-    'geopoint',
-    'geoshape',
-    'geotrace',
 
     # no response
     'acknowledge',
     'note',
-]
+] + GEO_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
 _pyxform_type_aliases = defaultdict(list)
