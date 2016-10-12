@@ -61,7 +61,7 @@ class FormVersion(object):
         self.form_pack = form_pack
 
         # slug of title
-        self.root_node_name = schema.get('root_node_name', 'data')
+        self.root_node_name = self._get_root_node_name()
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')

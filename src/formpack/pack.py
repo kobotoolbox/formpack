@@ -28,6 +28,7 @@ class FormPack(object):
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
+                 root_node_name='data',
                  asset_type=None, submissions_xml=None):
 
         if not versions:
@@ -43,6 +44,7 @@ class FormPack(object):
         self.default_version_id_key = default_version_id_key
 
         self.id_string = id_string
+        self.root_node_name = root_node_name
 
         self.title = title
         self.strict_schema = strict_schema
