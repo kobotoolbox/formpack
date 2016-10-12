@@ -262,6 +262,6 @@ def replace_aliases_in_place(content, allowed_types=None):
 
     if settings:
         content['settings'] = dict([
-            (settings_header_columns[key], val)
-            for (key, val) in settings.items() if key in settings_header_columns
+            (settings_header_columns.get(key, key), val)
+            for (key, val) in settings.items()
         ])
