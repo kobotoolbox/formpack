@@ -65,6 +65,8 @@ def _flatten_translated_fields(row, translations, translated_cols,
         translations = [UNTRANSLATED]
 
     _placed_cols = set()
+    if not isinstance(row, list):
+        return
 
     def _place_col_in_order(col, base_col=None):
         if col_order is False:

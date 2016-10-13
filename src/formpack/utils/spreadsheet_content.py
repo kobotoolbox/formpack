@@ -30,7 +30,8 @@ ORDERS_BY_SHEET = {
 def flatten_to_spreadsheet_content(expanded_content,
                                    prioritized_columns=None,
                                    deprioritized_columns=None,
-                                   remove_columns=None
+                                   remove_columns=None,
+                                   remove_sheets=None,
                                    ):
     if prioritized_columns is None:
         prioritized_columns = []
@@ -38,13 +39,16 @@ def flatten_to_spreadsheet_content(expanded_content,
         deprioritized_columns = []
     if remove_columns is None:
         remove_columns = []
+    if remove_sheets is None:
+        remove_sheets = []
 
     content = deepcopy(expanded_content)
     translations = content.pop('translations')
     translated_cols = content.pop('translated')
     if 'settings' in content and isinstance(content['settings'], dict):
         content['settings'] = [content['settings']]
-    sheet_names = _order_sheet_names(content.keys())
+    sheet_names = _order_sheet_names(filter(lambda x: x not in remove_sheets,
+                                            content.keys()))
 
     def _row_to_ordered_dict(row, cols):
         _flatten_translated_fields(row, translations, translated_cols,
@@ -73,6 +77,8 @@ def flatten_to_spreadsheet_content(expanded_content,
     def _sheet_to_ordered_dicts(sheet_name):
         rows = content[sheet_name]
         all_cols = OrderedDict()
+        if not isinstance(rows, list):
+            return None
         for row in rows:
             all_cols.update(OrderedDict.fromkeys(row.keys()))
         _all_cols = _order_cols(all_cols.keys(), sheet_name)
