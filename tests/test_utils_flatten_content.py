@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 from collections import OrderedDict
+from formpack.constants import OR_OTHER_COLUMN
 from formpack.utils.xls_to_ss_structure import _parsed_sheet
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.json_hash import json_hash
@@ -184,6 +185,33 @@ def test_order_sheet_names():
     assert _order_sheet_names([]) == []
     assert _order_sheet_names(['a', 'survey', 'z']) == ['survey', 'a', 'z']
     assert _order_sheet_names(['settings', 'choices', 'survey']) == ['survey', 'choices', 'settings']
+
+
+def test_flatten_select_types():
+    def _flatten_type(_r):
+        return flatten_content({'survey': [_r]})['survey'][0]['type']
+    assert _flatten_type({'type': 'select_one',
+                          'select_from_list_name': 'xyz'}
+                         ) == 'select_one xyz'
+    assert _flatten_type({'type': 'select_multiple',
+                          'select_from_list_name': 'xyz'}
+                         ) == 'select_multiple xyz'
+    assert _flatten_type({'type': 'select_one',
+                          OR_OTHER_COLUMN: False,
+                          'select_from_list_name': 'xyz'}
+                         ) == 'select_one xyz'
+    assert _flatten_type({'type': 'select_multiple',
+                          OR_OTHER_COLUMN: False,
+                          'select_from_list_name': 'xyz'}
+                         ) == 'select_multiple xyz'
+    assert _flatten_type({'type': 'select_one',
+                          OR_OTHER_COLUMN: True,
+                          'select_from_list_name': 'xyz'}
+                         ) == 'select_one xyz or_other'
+    assert _flatten_type({'type': 'select_multiple',
+                          OR_OTHER_COLUMN: True,
+                          'select_from_list_name': 'xyz'}
+                         ) == 'select_multiple xyz or_other'
 
 
 def test_flatten_label_with_xpath():

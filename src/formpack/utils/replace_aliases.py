@@ -83,13 +83,7 @@ selects = aliases_to_ordered_dict({
     ],
 })
 
-SELECT_TYPES = [
-    'select_one',
-    'select_multiple',
-    'select_one_external',
-    'select_one_or_other',
-    'select_multiple_or_other',
-]
+SELECT_TYPES = selects.keys()
 
 META_TYPES = [
     'start',
@@ -142,7 +136,7 @@ MAIN_TYPES = [
     'acknowledge',
     'note',
 ] + GEO_TYPES
-formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
+formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + selects.keys())
 
 _pyxform_type_aliases = defaultdict(list)
 _formpack_type_reprs = {}

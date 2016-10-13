@@ -21,3 +21,9 @@ UNSPECIFIED_TRANSLATION = False
 #   ------+-----------+----------
 #   X     | En        | Fr
 UNTRANSLATED = None
+
+# the column used to denote "or_other" in a select question type
+# this is non-standard XLSForm
+OR_OTHER_COLUMN = '_or_other'
+# in the long run, the "select_one x or_other" syntax should be deprecated
+# because the or_other strings are not translatable

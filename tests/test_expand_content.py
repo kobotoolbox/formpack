@@ -6,10 +6,25 @@ from __future__ import (unicode_literals, print_function,
 import copy
 from collections import OrderedDict
 
-from formpack.utils.expand_content import expand_content
+from formpack.utils.expand_content import expand_content, _expand_type_to_dict
 from formpack.utils.expand_content import _get_special_survey_cols
 from formpack.utils.flatten_content import flatten_content
 from formpack.constants import UNTRANSLATED
+from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
+
+
+
+def test_expand_selects_with_or_other():
+    assert _expand_type_to_dict('select_one xx or other').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_one_or_other xx').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_multiple_or_other xx').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_multiple xx or other').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_one_or_other').get(_OR_OTHER
+                                ) == True
 
 
 def test_expand_select_one():
@@ -22,14 +37,15 @@ def test_expand_select_one():
 def test_expand_select_multiple_or_other():
     s1 = {'survey': [{'type': 'select_multiple dogs or_other'}]}
     expand_content(s1, in_place=True)
-    assert s1['survey'][0]['type'] == 'select_multiple_or_other'
+    assert s1['survey'][0]['type'] == 'select_multiple'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
+    assert s1['survey'][0][_OR_OTHER] == True
 
 
 def test_expand_select_one_or_other():
     s1 = {'survey': [{'type': 'select_one dogs or_other'}]}
     expand_content(s1, in_place=True)
-    assert s1['survey'][0]['type'] == 'select_one_or_other'
+    assert s1['survey'][0]['type'] == 'select_one'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 
@@ -139,12 +155,13 @@ def test_convert_select_objects():
                      {'type': {'select_multiple': 'xyz'}}
                      ]}
     expand_content(s1, in_place=True)
+    # print('_row', _row)
     _row = s1['survey'][0]
     assert _row['type'] == 'select_one'
     assert _row['select_from_list_name'] == 'xyz'
 
     _row = s1['survey'][1]
-    assert _row['type'] == 'select_one_or_other'
+    assert _row['type'] == 'select_one'
     assert _row['select_from_list_name'] == 'xyz'
 
     _row = s1['survey'][2]

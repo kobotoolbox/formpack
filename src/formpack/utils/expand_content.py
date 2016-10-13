@@ -13,7 +13,7 @@ import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .replace_aliases import META_TYPES
-from ..constants import UNTRANSLATED
+from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
 
 REMOVE_EMPTY_STRINGS = True
@@ -71,8 +71,10 @@ def expand_content_in_place(content):
             elif isinstance(_type, dict):
                 # legacy {'select_one': 'xyz'} format might
                 # still be on kobo-prod
-                row.update({u'type': _type.keys()[0],
-                            u'select_from_list_name': _type.values()[0]})
+                _type_str = _expand_type_to_dict(_type.keys()[0])['type']
+                _list_name = _type.values()[0]
+                row.update({u'type': _type_str,
+                            u'select_from_list_name': _list_name})
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], basestring):
                 row[key] = _expand_xpath_to_list(row[key])
@@ -195,26 +197,29 @@ def _get_special_survey_cols(content):
 
 
 def _expand_type_to_dict(type_str):
+    out = {}
+    match = re.search('( or.other)$', type_str)
+    if match:
+        type_str = type_str.replace(match.groups()[0], '')
+        out[OR_OTHER_COLUMN] = True
+    match = re.search('select_(one|multiple)(_or_other)', type_str)
+    if match:
+        type_str = type_str.replace('_or_other', '')
+        out[OR_OTHER_COLUMN] = True
+    if type_str in ['select_one', 'select_multiple']:
+        out['type'] = type_str
+        return out
     for _re in [
-                '^(select_one_or_other)\s+(\S+)$',
                 '^(select_one)\s+(\S+)$',
-                '^(select_multiple_or_other)\s+(\S+)$',
                 '^(select_multiple)\s+(\S+)$',
                 '^(select_one_external)\s+(\S+)$',
                ]:
         match = re.match(_re, type_str)
         if match:
             (type_, list_name) = match.groups()
-            return {u'type': type_,
-                    u'select_from_list_name': list_name}
-
-    _or_other = re.match('^(select_one|select_multiple)\s+(\w+)\s+or.other$',
-                         type_str)
-    if _or_other:
-        (select_mult, list_name) = _or_other.groups()
-        return {u'type': '{}_or_other'.format(select_mult),
-                u'select_from_list_name': list_name}
-
+            out['type'] = type_
+            out['select_from_list_name'] = list_name
+            return out
     # if it does not expand, we return the original string
     return {u'type': type_str}
 

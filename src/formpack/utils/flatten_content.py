@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 from array_to_xpath import array_to_xpath
-from ..constants import UNTRANSLATED
+from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
 
 def flatten_content_in_place(survey_content):
@@ -131,5 +131,7 @@ def _flatten_survey_row(row):
                 row['type'] = 'select_one {} or_other'.format(_list_name)
             elif row['type'] == 'select_multiple_or_other':
                 row['type'] = 'select_multiple {} or_other'.format(_list_name)
+            elif row.get(OR_OTHER_COLUMN):
+                row['type'] = '{} {} or_other'.format(_type, _list_name)
             else:
                 row['type'] = '{} {}'.format(_type, _list_name)
