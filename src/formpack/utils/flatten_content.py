@@ -14,6 +14,7 @@ def flatten_content_in_place(survey_content):
     '''
     translations = survey_content.pop('translations', [])
     translated_cols = survey_content.pop('translated', [])
+    schema_version = survey_content.pop('schema', None)
 
     def _iter_through_sheet(sheet_name):
         if sheet_name in survey_content:

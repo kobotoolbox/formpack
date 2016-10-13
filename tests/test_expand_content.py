@@ -8,6 +8,7 @@ from collections import OrderedDict
 
 from formpack.utils.expand_content import expand_content, _expand_type_to_dict
 from formpack.utils.expand_content import _get_special_survey_cols
+from formpack.utils.expand_content import SCHEMA_VERSION
 from formpack.utils.flatten_content import flatten_content
 from formpack.constants import UNTRANSLATED
 from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
@@ -67,7 +68,8 @@ def test_expand_media():
             }
         ],
         'translated': ['media::image'],
-        'translations': [UNTRANSLATED]
+        'translations': [UNTRANSLATED],
+        'schema': SCHEMA_VERSION,
         }
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
@@ -117,6 +119,7 @@ def test_expand_translated_media():
              }
         ],
         'translated': ['media::image'],
+        'schema': SCHEMA_VERSION,
         'translations': ['English']}
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
@@ -138,6 +141,7 @@ def test_expand_translated_media_with_no_translated():
                 'media::image': ['eng.jpg', 'nolang.jpg']
              }
         ],
+        'schema': SCHEMA_VERSION,
         'translated': ['media::image'],
         'translations': ['English', UNTRANSLATED]}
     flatten_content(s1, in_place=True)
@@ -178,7 +182,7 @@ def test_expand_translated_choice_sheets():
                        'name': 'y',
                        'label::En': 'En Y',
                        'label::Fr': 'Fr Y',
-                      },
+                       },
                       {
                        'list_name': 'yn',
                        'name': 'n',
@@ -201,6 +205,7 @@ def test_expand_translated_choice_sheets():
                                'name': 'n',
                                'label': ['En N', 'Fr N'],
                                }],
+                  'schema': SCHEMA_VERSION,
                   'translated': ['label'],
                   'translations': ['En', 'Fr']}
 
@@ -318,6 +323,7 @@ def test_expand_constraint_message():
                       'label': ['X number', 'Y number'],
                       'constraint_message': ['X: . > 3', 'Y: . > 3'],
                       }],
+          'schema': SCHEMA_VERSION,
           'translated': ['constraint_message', 'label'],
           'translations': ['XX', 'YY'],
           }
@@ -335,6 +341,7 @@ def test_expand_translations():
                       'label::Français': 'OK!'}]}
     x1 = {'survey': [{'type': 'text',
                       'label': ['OK?', 'OK!']}],
+          'schema': SCHEMA_VERSION,
           'translated': ['label'],
           'translations': ['English', 'Français']}
     expand_content(s1, in_place=True)
@@ -354,6 +361,7 @@ def test_expand_translations_null_lang():
           'translations': [UNTRANSLATED, 'English']}
     x1 = {'survey': [{'type': 'text',
                       'label': ['NoLang', 'EnglishLang']}],
+          'schema': SCHEMA_VERSION,
           'translated': ['label'],
           'translations': [UNTRANSLATED, 'English']}
     s1_copy = copy.deepcopy(s1)

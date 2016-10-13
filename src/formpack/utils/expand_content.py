@@ -15,8 +15,10 @@ from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .replace_aliases import META_TYPES
 from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
-
 REMOVE_EMPTY_STRINGS = True
+# this will be used to check which version of formpack was used to compile the
+# asset content
+SCHEMA_VERSION = "1.3"
 
 
 def _expand_translatable_content(content, row, col_shortname,
@@ -103,6 +105,7 @@ def expand_content_in_place(content):
             content['settings'] = content['settings'][0]
         else:
             content['settings'] = {}
+    content['schema'] = SCHEMA_VERSION
 
 
 def expand_content(content, in_place=False):
