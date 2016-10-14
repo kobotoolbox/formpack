@@ -196,6 +196,7 @@ def _get_special_survey_cols(content):
     (translations,
      translated_cols) = _get_translations_from_special_cols(special,
                         content.get('translations', []))
+    translated_cols.update(known_translated_cols)
     return (special, translations, sorted(translated_cols))
 
 

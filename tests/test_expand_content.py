@@ -81,12 +81,16 @@ def test_expand_media():
 
 def test_graceful_double_expand():
     s1 = {'survey': [{'type': 'note',
-                      'media::image::English': 'eng.jpg'
+                      'label::English': 'english',
+                      'hint::English': 'hint',
                       }]}
-    content = expand_content(
-            expand_content(s1)
-        )
+    content = expand_content(s1)
     assert content['translations'] == ['English']
+    assert content['translated'] == ['hint', 'label']
+
+    content = expand_content(content)
+    assert content['translations'] == ['English']
+    assert content['translated'] == ['hint', 'label']
 
 
 def test_get_translated_cols():
