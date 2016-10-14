@@ -27,7 +27,8 @@ ORDERS_BY_SHEET = {
 }
 
 
-def flatten_to_spreadsheet_content(expanded_content,
+def flatten_to_spreadsheet_content(content,
+                                   in_place=False,
                                    prioritized_columns=None,
                                    deprioritized_columns=None,
                                    remove_columns=None,
@@ -41,8 +42,9 @@ def flatten_to_spreadsheet_content(expanded_content,
         remove_columns = []
     if remove_sheets is None:
         remove_sheets = []
+    if not in_place:
+        content = deepcopy(content)
 
-    content = deepcopy(expanded_content)
     translations = content.pop('translations')
     translated_cols = content.pop('translated')
     if 'settings' in content and isinstance(content['settings'], dict):
@@ -74,8 +76,7 @@ def flatten_to_spreadsheet_content(expanded_content,
                 (key, row.get(key, None)) for key in cols
             ])
 
-    def _sheet_to_ordered_dicts(sheet_name):
-        rows = content[sheet_name]
+    def _sheet_to_ordered_dicts(sheet_name, rows):
         all_cols = OrderedDict()
         if not isinstance(rows, list):
             return None
@@ -85,9 +86,20 @@ def flatten_to_spreadsheet_content(expanded_content,
         return [
             _row_to_ordered_dict(row, copy(_all_cols)) for row in rows
         ]
-    return OrderedDict([
-            (sheet_name, _sheet_to_ordered_dicts(sheet_name)) for sheet_name in sheet_names
-        ])
+    if in_place:
+        _od = content
+        for sheet in remove_sheets:
+            _od.pop(sheet)
+    else:
+        _od = OrderedDict()
+    all_sheets = content.keys()
+    for sheet_name in sheet_names:
+        rows = content.pop(sheet_name)
+        if sheet_name in all_sheets:
+            all_sheets.remove(sheet_name)
+        _od[sheet_name] = _sheet_to_ordered_dicts(sheet_name, rows)
+    if not in_place:
+        return _od
 
 
 def _order_sheet_names(sheet_names):

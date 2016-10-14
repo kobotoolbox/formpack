@@ -6,7 +6,10 @@ from array_to_xpath import array_to_xpath
 from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
 
-def flatten_content_in_place(survey_content):
+def flatten_content_in_place(survey_content,
+                             remove_columns=[],
+                             remove_sheets=[],
+                             ):
     '''
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
@@ -30,13 +33,13 @@ def flatten_content_in_place(survey_content):
     return None
 
 
-def flatten_content(survey_content, in_place=False):
+def flatten_content(survey_content, in_place=False, **opts):
     if in_place:
-        flatten_content_in_place(survey_content)
+        flatten_content_in_place(survey_content, **opts)
         return None
     else:
         survey_content_copy = deepcopy(survey_content)
-        flatten_content_in_place(survey_content_copy)
+        flatten_content_in_place(survey_content_copy, **opts)
         return survey_content_copy
 
 
