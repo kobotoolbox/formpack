@@ -160,6 +160,31 @@ def test_json_hash():
                                                              'f': '3'})
 
 
+def test_flatten_can_remove_sheet():
+    c = flatten_content({'survey': [
+            {'type': 'text',
+                'name': 'q1',
+                'label': 'lang1'
+             },
+        ],
+    },
+        remove_sheets=['survey'],
+    )
+    assert 'survey' not in c
+
+
+def test_flatten_can_remove_column():
+    c = flatten_content({'survey': [
+            {'type': 'text',
+                'name': 'q1',
+                'label': 'lang1'
+             },
+        ],
+    },
+        remove_columns=['label'],
+    )
+    assert 'label' not in c['survey'][0].keys()
+
 
 def test_flatten_fails_with_too_many_translations_listed():
     with pytest.raises(ValueError) as err:

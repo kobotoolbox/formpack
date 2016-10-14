@@ -7,23 +7,34 @@ from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
 
 def flatten_content_in_place(survey_content,
-                             remove_columns=[],
-                             remove_sheets=[],
+                             remove_columns=None,
+                             remove_sheets=None,
                              ):
     '''
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
     '''
-    translations = survey_content.pop('translations', [])
-    translated_cols = survey_content.pop('translated', [])
-    schema_version = survey_content.pop('schema', None)
+
+    if remove_columns is None:
+        remove_columns = []
+    if remove_sheets is None:
+        remove_sheets = []
+    remove_sheets = set(remove_sheets + ['translated', 'translations', 'schema'])
+    popped_sheets = {}
+    for sheet_name in remove_sheets:
+        popped_sheets[sheet_name] = survey_content.pop(sheet_name, [])
 
     def _iter_through_sheet(sheet_name):
         if sheet_name in survey_content:
             for row in survey_content[sheet_name]:
-                _flatten_translated_fields(row, translations, translated_cols)
+                _flatten_translated_fields(row,
+                                           popped_sheets.get('translations'),
+                                           popped_sheets.get('translated'),
+                                           )
                 _flatten_survey_row(row)
+                for key in remove_columns:
+                    row.pop(key, None)
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
 
