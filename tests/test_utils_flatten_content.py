@@ -181,7 +181,7 @@ def test_flatten_can_remove_column():
              },
         ],
     },
-        remove_columns=['label'],
+        remove_columns={'survey':['label']},
     )
     assert 'label' not in c['survey'][0].keys()
 

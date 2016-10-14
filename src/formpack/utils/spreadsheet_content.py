@@ -35,11 +35,11 @@ def flatten_to_spreadsheet_content(content,
                                    remove_sheets=None,
                                    ):
     if prioritized_columns is None:
-        prioritized_columns = []
+        prioritized_columns = {}
     if deprioritized_columns is None:
-        deprioritized_columns = []
+        deprioritized_columns = {}
     if remove_columns is None:
-        remove_columns = []
+        remove_columns = {}
     if remove_sheets is None:
         remove_sheets = []
     if not in_place:
@@ -52,29 +52,13 @@ def flatten_to_spreadsheet_content(content,
     sheet_names = _order_sheet_names(filter(lambda x: x not in remove_sheets,
                                             content.keys()))
 
-    def _row_to_ordered_dict(row, cols):
+    def _row_to_ordered_dict(row, dest):
         _flatten_translated_fields(row, translations, translated_cols,
-                                   col_order=cols)
-        newcols = row.keys()
-
-        for pa in prioritized_columns[::-1]:
-            if pa in cols:
-                cols.remove(pa)
-                cols.insert(0, pa)
-        for pz in deprioritized_columns:
-            if pz in cols:
-                cols.remove(pz)
-                cols.append(pz)
-
-        if not set(newcols).issubset(cols):
-            raise Exception('not all columns are included in ordered list')
-        for xcol in remove_columns:
-            if xcol in cols:
-                cols.remove(xcol)
+                                   col_order=dest.keys())
         _flatten_survey_row(row)
-        return OrderedDict([
-                (key, row.get(key, None)) for key in cols
-            ])
+        for key in dest.keys():
+            dest[key] = row.get(key, None)
+        return dest
 
     def _sheet_to_ordered_dicts(sheet_name, rows):
         all_cols = OrderedDict()
@@ -83,8 +67,17 @@ def flatten_to_spreadsheet_content(content,
         for row in rows:
             all_cols.update(OrderedDict.fromkeys(row.keys()))
         _all_cols = _order_cols(all_cols.keys(), sheet_name)
+
+        removed = remove_columns.get(sheet_name, [])
+        firsts = prioritized_columns.get(sheet_name, [])
+        firsts = list(filter(lambda x: x in _all_cols, firsts))
+        lasts = deprioritized_columns.get(sheet_name, [])
+        lasts = list(filter(lambda x: x in _all_cols, lasts))
+        _not_mids = firsts + lasts + removed
+        mids = list(filter(lambda x: x not in _not_mids, _all_cols))
+        _ordered_cols = firsts + mids + lasts
         return [
-            _row_to_ordered_dict(row, copy(_all_cols)) for row in rows
+            _row_to_ordered_dict(row, OrderedDict.fromkeys(_ordered_cols)) for row in rows
         ]
     if in_place:
         _od = content

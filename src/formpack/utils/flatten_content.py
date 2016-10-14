@@ -15,9 +15,10 @@ def flatten_content_in_place(survey_content,
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
     '''
-
+    if isinstance(remove_columns, list):
+        raise Exception('bad')
     if remove_columns is None:
-        remove_columns = []
+        remove_columns = {}
     if remove_sheets is None:
         remove_sheets = []
     remove_sheets = set(remove_sheets + ['translated', 'translations', 'schema'])
@@ -26,6 +27,7 @@ def flatten_content_in_place(survey_content,
         popped_sheets[sheet_name] = survey_content.pop(sheet_name, [])
 
     def _iter_through_sheet(sheet_name):
+        _removed = remove_columns.get(sheet_name, [])
         if sheet_name in survey_content:
             for row in survey_content[sheet_name]:
                 _flatten_translated_fields(row,
@@ -33,7 +35,7 @@ def flatten_content_in_place(survey_content,
                                            popped_sheets.get('translated'),
                                            )
                 _flatten_survey_row(row)
-                for key in remove_columns:
+                for key in _removed:
                     row.pop(key, None)
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
