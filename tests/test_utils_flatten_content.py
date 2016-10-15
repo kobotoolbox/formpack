@@ -8,7 +8,7 @@ import pytest
 from collections import OrderedDict
 from formpack.constants import OR_OTHER_COLUMN
 from formpack.utils.xls_to_ss_structure import _parsed_sheet
-from formpack.utils.flatten_content import flatten_content
+from formpack.utils.flatten_content import flatten_content, translated_col_list
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import (flatten_to_spreadsheet_content,
                                                 _order_cols,
@@ -255,6 +255,59 @@ def test_flatten_label_with_xpath():
                     ]}
             ]})
     assert _c['survey'][0]['label'] == 'You answered ${foo} to the foo question'
+
+
+def test_flatten_translated_to_spreadsheet_content():
+    s1 = {'survey': [{'type': 'note',
+                      'label': ['lang1 label', 'lang2 label'],
+                      'hint': ['lang1 hint', 'lang2 hint'],
+                      }],
+          'translations': ['Lang1', 'Lang2'],
+          'translated': ['label', 'hint']}
+    _c = flatten_to_spreadsheet_content(s1)
+    _r1 = _c['survey'][0]
+    assert _r1['type'] == 'note'
+    # we should do this
+    assert 'label' not in _r1
+    assert 'label::Lang1' in _r1
+    assert 'label::Lang2' in _r1
+    assert 'hint::Lang1' in _r1
+    assert 'hint::Lang2' in _r1
+
+
+def test_flatten_translated_to_spreadsheet_content_with_null_lang():
+    s1 = {'survey': [{'type': 'note',
+                      'label': ['lang1 label', 'lang2 label', 'label nolang'],
+                      'hint': ['lang1 hint', 'lang2 hint',  None],
+                      }],
+          'translations': ['Lang1', 'Lang2', None],
+          'translated': ['label', 'hint']}
+    _c = flatten_to_spreadsheet_content(s1)
+    _r1 = _c['survey'][0]
+    assert 'label' in _r1
+    # ok that hint is in there, even though all the hints are None
+    assert 'hint' in _r1
+    assert 'label::Lang1' in _r1
+    assert 'label::Lang2' in _r1
+    assert 'hint::Lang1' in _r1
+    assert 'hint::Lang2' in _r1
+
+
+def test_translated_col_list():
+    assert [
+        'c1', 'c2', 'c3::l1', 'c3::l2'
+    ] == translated_col_list(['c1', 'c2', 'c3'], ['l1', 'l2'], ['c3'])
+
+    assert [
+        'c1', 'c2', 'c3::l1', 'c3::l2', 'c3',
+    ] == translated_col_list(['c1', 'c2', 'c3'], ['l1', 'l2', None], ['c3'])
+
+    assert [
+        'c1', 'c2', 'c3',
+    ] == translated_col_list(['c1', 'c2', 'c3'], [None], ['c3'])
+
+    with pytest.raises(ValueError) as err:
+        translated_col_list(['c1', 'c2', 'c3'], [], ['c3'])
 
 
 def test_flatten_to_spreadsheet_content():

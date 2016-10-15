@@ -75,6 +75,25 @@ def _stringify_type__depr(json_qtype):
         return 'select_one %s or_other' % json_qtype['select_one_or_other']
 
 
+def translated_col_list(columns, translations, translated):
+    if (len(translations) == 0 and len(translated) != 0) or (
+            len(translations) != 0 and len(translated) == 0):
+        raise ValueError('cannot have translations with no translated')
+
+    def _for_each_t(col):
+        return lambda arr, _tr: arr + [
+            col if (_tr is None) else "{}::{}".format(col, _tr)
+        ]
+
+    def _expand_translateds(arr, col):
+        if col in translated:
+            arr += reduce(_for_each_t(col), translations, [])
+        else:
+            arr.append(col)
+        return arr
+    return reduce(_expand_translateds, columns, [])
+
+
 def _flatten_translated_fields(row, translations, translated_cols,
                                col_order=False):
     if len(translations) == 0:
@@ -94,7 +113,6 @@ def _flatten_translated_fields(row, translations, translated_cols,
                 _i = col_order.index(base_col)
                 col_order.insert(_i, col)
                 _placed_cols.update([col])
-                return
             else:
                 col_order.append(col)
                 _placed_cols.update([col])

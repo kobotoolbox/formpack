@@ -1,8 +1,9 @@
 import re
 from copy import deepcopy, copy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
-from .flatten_content import _flatten_translated_fields, _flatten_survey_row
+from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
+                              translated_col_list)
 
 # xlsform specific ordering preferences
 
@@ -45,8 +46,8 @@ def flatten_to_spreadsheet_content(content,
     if not in_place:
         content = deepcopy(content)
 
-    translations = content.pop('translations')
-    translated_cols = content.pop('translated')
+    translations = content.pop('translations', [])
+    translated_cols = content.pop('translated', [])
     if 'settings' in content and isinstance(content['settings'], dict):
         content['settings'] = [content['settings']]
     sheet_names = _order_sheet_names(filter(lambda x: x not in remove_sheets,
@@ -54,7 +55,8 @@ def flatten_to_spreadsheet_content(content,
 
     def _row_to_ordered_dict(row, dest):
         _flatten_translated_fields(row, translations, translated_cols,
-                                   col_order=dest.keys())
+                                   col_order=dest.keys(),
+                                   )
         _flatten_survey_row(row)
         for key in dest.keys():
             dest[key] = row.get(key, None)
@@ -75,9 +77,11 @@ def flatten_to_spreadsheet_content(content,
         lasts = list(filter(lambda x: x in _all_cols, lasts))
         _not_mids = firsts + lasts + removed
         mids = list(filter(lambda x: x not in _not_mids, _all_cols))
-        _ordered_cols = firsts + mids + lasts
+
+        ordered_cols = translated_col_list((firsts + mids + lasts), translations, translated_cols)
+
         return [
-            _row_to_ordered_dict(row, OrderedDict.fromkeys(_ordered_cols)) for row in rows
+            _row_to_ordered_dict(row, OrderedDict.fromkeys(ordered_cols)) for row in rows
         ]
     if in_place:
         _od = content
