@@ -211,11 +211,8 @@ class FormVersion(object):
         return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
                                _stats.keys()))
 
-    def to_dict(self, remove_fields=[]):
-        flattened_schema = flatten_content(self.schema['content'])
-        for field in remove_fields:
-            flattened_schema.pop(field, None)
-        return flattened_schema
+    def to_dict(self, **opts):
+        return flatten_content(self.schema['content'], **opts)
 
     # TODO: find where to move that
     def _load_submission_xml(self, xml):
@@ -278,7 +275,8 @@ class FormVersion(object):
     def to_xml(self, warnings=None):
         # todo: collect warnings from pyxform compilation when a list is passed
         survey = formversion_pyxform(
-            self.to_dict(remove_fields=['translations', 'translated'])
+            self.to_dict(remove_sheets=['translations', 'translated'],
+                         )
                                      )
         title = self._get_title()
 

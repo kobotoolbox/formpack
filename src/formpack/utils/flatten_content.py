@@ -95,7 +95,9 @@ def translated_col_list(columns, translations, translated):
 
 
 def _flatten_translated_fields(row, translations, translated_cols,
-                               col_order=False):
+                               col_order=False,
+                               strip_null_vals_from_named_translations=True,
+                               ):
     if len(translations) == 0:
         translations = [UNTRANSLATED]
 
@@ -142,6 +144,8 @@ def _flatten_translated_fields(row, translations, translated_cols,
                 _place_col_in_order(key)
             else:
                 _built_colname = '{}::{}'.format(key, _t)
+                if (value is None) and strip_null_vals_from_named_translations:
+                    value = ''
                 row[_built_colname] = value
                 _place_col_in_order(_built_colname, key)
     _placed_cols.update(row.keys())
