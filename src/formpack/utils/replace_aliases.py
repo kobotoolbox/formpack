@@ -83,22 +83,34 @@ selects = aliases_to_ordered_dict({
     ],
 })
 
-SELECT_TYPES = [
-    'select_one',
-    'select_multiple',
-    'select_one_external',
-]
+SELECT_TYPES = selects.keys()
 
-LABEL_OPTIONAL_TYPES = [
+META_TYPES = [
     'start',
     'today',
     'end',
-    'calculate',
     'deviceid',
     'phone_number',
     'simserial',
+    # meta values
+    'username',
+    # reconsider:
+    'phonenumber',
+    'imei',
+    'subscriberid',
+]
+
+LABEL_OPTIONAL_TYPES = [
+    'calculate',
     'begin_group',
     'begin_repeat',
+] + META_TYPES
+
+GEO_TYPES = [
+    'gps',
+    'geopoint',
+    'geoshape',
+    'geotrace',
 ]
 
 MAIN_TYPES = [
@@ -116,24 +128,15 @@ MAIN_TYPES = [
     'date',
     'datetime',
     'time',
-    # calculate
-    'subscriberid',
-
-    # meta values
-    'username',
 
     # prompt to collect geo data
     'location',
-    'gps',
-    'geopoint',
-    'geoshape',
-    'geotrace',
 
     # no response
     'acknowledge',
     'note',
-]
-formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
+] + GEO_TYPES
+formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + selects.keys())
 
 _pyxform_type_aliases = defaultdict(list)
 _formpack_type_reprs = {}
@@ -240,6 +243,10 @@ def replace_aliases_in_place(content, allowed_types=None):
     for row in content.get('choices', []):
         if 'list name' in row:
             row['list_name'] = row.pop('list name')
+        if 'name' in row and 'value' in row and row['name'] != row['value']:
+            raise ValueError('Conflicting name and value in row: {}'.format(repr(row)))
+        if 'value' in row:
+            row['name'] = row.pop('value')
 
     # replace settings
     settings = content.get('settings', {})
@@ -249,6 +256,6 @@ def replace_aliases_in_place(content, allowed_types=None):
 
     if settings:
         content['settings'] = dict([
-            (settings_header_columns[key], val)
-            for (key, val) in settings.items() if key in settings_header_columns
+            (settings_header_columns.get(key, key), val)
+            for (key, val) in settings.items()
         ])

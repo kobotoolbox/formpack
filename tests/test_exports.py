@@ -230,51 +230,50 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'rgv1'}
         export = fp.export(**options).to_dict(submissions)
-
-        self.assertEqual(export, OrderedDict ([
+        self.assertEqual(export, OrderedDict([
                             ('Household survey with repeat...',
                                 {
                                     'fields': [
-                                        'household_location',
                                         'start',
                                         'end',
+                                        'household_location',
                                         '_index'
                                     ],
                                     'data': [
                                         [
-                                            'montreal',
                                             '2016-03-14T14:15:48.000-04:00',
                                             '2016-03-14T14:18:35.000-04:00',
+                                            'montreal',
                                             1
                                         ],
                                         [
-                                            'marseille',
                                             '2016-03-14T14:14:10.000-04:00',
                                             '2016-03-14T14:15:48.000-04:00',
+                                            'marseille',
                                             2
                                         ],
                                         [
-                                            'rocky mountains',
                                             '2016-03-14T14:13:53.000-04:00',
                                             '2016-03-14T14:14:10.000-04:00',
+                                            'rocky mountains',
                                             3
                                         ],
                                         [
-                                            'toronto',
                                             '2016-03-14T14:12:54.000-04:00',
                                             '2016-03-14T14:13:53.000-04:00',
+                                            'toronto',
                                             4
                                         ],
                                         [
-                                            'new york',
                                             '2016-03-14T14:18:35.000-04:00',
                                             '2016-03-14T15:19:20.000-04:00',
+                                            'new york',
                                             5
                                         ],
                                         [
-                                            'boston',
                                             '2016-03-14T14:11:25.000-04:00',
                                             '2016-03-14T14:12:03.000-04:00',
+                                            'boston',
                                             6
                                         ]
                                     ]
@@ -368,46 +367,46 @@ class TestFormPackExport(unittest.TestCase):
                             ('Grouped Repeatable Alias',
                                 {
                                     'fields': [
-                                        'household_location',
                                         'start',
                                         'end',
+                                        'household_location',
                                         '_index'
                                     ],
                                     'data': [
                                         [
-                                            'montreal',
                                             '2016-03-14T14:15:48.000-04:00',
                                             '2016-03-14T14:18:35.000-04:00',
+                                            'montreal',
                                             1
                                         ],
                                         [
-                                            'marseille',
                                             '2016-03-14T14:14:10.000-04:00',
                                             '2016-03-14T14:15:48.000-04:00',
+                                            'marseille',
                                             2
                                         ],
                                         [
-                                            'rocky mountains',
                                             '2016-03-14T14:13:53.000-04:00',
                                             '2016-03-14T14:14:10.000-04:00',
+                                            'rocky mountains',
                                             3
                                         ],
                                         [
-                                            'toronto',
                                             '2016-03-14T14:12:54.000-04:00',
                                             '2016-03-14T14:13:53.000-04:00',
+                                            'toronto',
                                             4
                                         ],
                                         [
-                                            'new york',
                                             '2016-03-14T14:18:35.000-04:00',
                                             '2016-03-14T15:19:20.000-04:00',
+                                            'new york',
                                             5
                                         ],
                                         [
-                                            'boston',
                                             '2016-03-14T14:11:25.000-04:00',
                                             '2016-03-14T14:12:03.000-04:00',
+                                            'boston',
                                             6
                                         ]
                                     ]

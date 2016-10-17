@@ -6,10 +6,26 @@ from __future__ import (unicode_literals, print_function,
 import copy
 from collections import OrderedDict
 
-from formpack.utils.expand_content import expand_content
+from formpack.utils.expand_content import expand_content, _expand_type_to_dict
 from formpack.utils.expand_content import _get_special_survey_cols
+from formpack.utils.expand_content import SCHEMA_VERSION
 from formpack.utils.flatten_content import flatten_content
 from formpack.constants import UNTRANSLATED
+from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
+
+
+
+def test_expand_selects_with_or_other():
+    assert _expand_type_to_dict('select_one xx or other').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_one_or_other xx').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_multiple_or_other xx').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_multiple xx or other').get(_OR_OTHER
+                                ) == True
+    assert _expand_type_to_dict('select_one_or_other').get(_OR_OTHER
+                                ) == True
 
 
 def test_expand_select_one():
@@ -22,14 +38,15 @@ def test_expand_select_one():
 def test_expand_select_multiple_or_other():
     s1 = {'survey': [{'type': 'select_multiple dogs or_other'}]}
     expand_content(s1, in_place=True)
-    assert s1['survey'][0]['type'] == 'select_multiple_or_other'
+    assert s1['survey'][0]['type'] == 'select_multiple'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
+    assert s1['survey'][0][_OR_OTHER] == True
 
 
 def test_expand_select_one_or_other():
     s1 = {'survey': [{'type': 'select_one dogs or_other'}]}
     expand_content(s1, in_place=True)
-    assert s1['survey'][0]['type'] == 'select_one_or_other'
+    assert s1['survey'][0]['type'] == 'select_one'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 
@@ -50,7 +67,9 @@ def test_expand_media():
               'media::image': ['ugh.jpg']
             }
         ],
-        'translations': [UNTRANSLATED]
+        'translated': ['media::image'],
+        'translations': [UNTRANSLATED],
+        'schema': SCHEMA_VERSION,
         }
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
@@ -58,6 +77,39 @@ def test_expand_media():
         'media::image': 'ugh.jpg',
       }],
     }
+
+
+def test_graceful_double_expand():
+    s1 = {'survey': [{'type': 'note',
+                      'label::English': 'english',
+                      'hint::English': 'hint',
+                      }]}
+    content = expand_content(s1)
+    assert content['translations'] == ['English']
+    assert content['translated'] == ['hint', 'label']
+
+    content = expand_content(content)
+    assert content['translations'] == ['English']
+    assert content['translated'] == ['hint', 'label']
+
+
+def test_get_translated_cols():
+    x1 = {'survey': [
+          {'type': 'text', 'something::a': 'something-a', 'name': 'q1',
+           'something_else': 'x'}
+          ],
+          'choices': [
+          {'list_name': 'x', 'name': 'x1', 'something': 'something',
+           'something_else::b': 'something_else::b'}
+          ],
+          'translations': [None]}
+    expanded = expand_content(x1)
+    assert expanded['translated'] == ['something', 'something_else']
+    assert expanded['translations'] == [None, 'a', 'b']
+    assert type(expanded['choices'][0]['something']) == list
+    assert expanded['survey'][0]['something'] == [None, 'something-a', None]
+    assert expanded['survey'][0]['something_else'] == ['x', None, None]
+    assert expanded['choices'][0]['something'] == ['something', None, None]
 
 
 def test_expand_translated_media():
@@ -70,13 +122,15 @@ def test_expand_translated_media():
                 'media::image': ['eng.jpg']
              }
         ],
+        'translated': ['media::image'],
+        'schema': SCHEMA_VERSION,
         'translations': ['English']}
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
         'type': 'note',
         'media::image::English': 'eng.jpg',
       }],
-      'translations': ['English']}
+      }
 
 
 def test_expand_translated_media_with_no_translated():
@@ -91,6 +145,8 @@ def test_expand_translated_media_with_no_translated():
                 'media::image': ['eng.jpg', 'nolang.jpg']
              }
         ],
+        'schema': SCHEMA_VERSION,
+        'translated': ['media::image'],
         'translations': ['English', UNTRANSLATED]}
     flatten_content(s1, in_place=True)
     assert s1 == {'survey': [{
@@ -98,7 +154,7 @@ def test_expand_translated_media_with_no_translated():
         'media::image': 'nolang.jpg',
         'media::image::English': 'eng.jpg',
       }],
-      'translations': ['English', UNTRANSLATED]}
+      }
 
 
 def test_convert_select_objects():
@@ -107,12 +163,13 @@ def test_convert_select_objects():
                      {'type': {'select_multiple': 'xyz'}}
                      ]}
     expand_content(s1, in_place=True)
+    # print('_row', _row)
     _row = s1['survey'][0]
     assert _row['type'] == 'select_one'
     assert _row['select_from_list_name'] == 'xyz'
 
     _row = s1['survey'][1]
-    assert _row['type'] == 'select_one_or_other'
+    assert _row['type'] == 'select_one'
     assert _row['select_from_list_name'] == 'xyz'
 
     _row = s1['survey'][2]
@@ -129,7 +186,7 @@ def test_expand_translated_choice_sheets():
                        'name': 'y',
                        'label::En': 'En Y',
                        'label::Fr': 'Fr Y',
-                      },
+                       },
                       {
                        'list_name': 'yn',
                        'name': 'n',
@@ -152,6 +209,8 @@ def test_expand_translated_choice_sheets():
                                'name': 'n',
                                'label': ['En N', 'Fr N'],
                                }],
+                  'schema': SCHEMA_VERSION,
+                  'translated': ['label'],
                   'translations': ['En', 'Fr']}
 
 
@@ -183,7 +242,7 @@ def _s(rows):
 
 
 def test_ordered_dict_preserves_order():
-    (special, t) = _get_special_survey_cols({
+    (special, t, tc) = _get_special_survey_cols({
             'survey': [
                 OrderedDict([
                         ('label::A', 'A'),
@@ -193,7 +252,7 @@ def test_ordered_dict_preserves_order():
             ]
         })
     assert t == ['A', 'B', 'C']
-    (special, t) = _get_special_survey_cols({
+    (special, t, tc) = _get_special_survey_cols({
             'survey': [
                 OrderedDict([
                         ('label::C', 'C'),
@@ -206,7 +265,7 @@ def test_ordered_dict_preserves_order():
 
 
 def test_get_special_survey_cols():
-    (special, t) = _get_special_survey_cols(_s([
+    (special, t, tc) = _get_special_survey_cols(_s([
             'type',
             'media::image',
             'media::image::English',
@@ -248,7 +307,7 @@ def test_not_special_cols():
         'body::acuracyThreshold',
         'body:accuracyThreshold',
     ]
-    (not_special, _t) = _get_special_survey_cols(_s(not_special))
+    (not_special, _t, tc) = _get_special_survey_cols(_s(not_special))
     assert not_special.keys() == []
 
 
@@ -260,6 +319,7 @@ def test_expand_constraint_message():
                       'constraint_message::XX': 'X: . > 3',
                       'constraint_message::YY': 'Y: . > 3',
                       }],
+          'translated': ['constraint_message', 'label'],
           'translations': ['XX', 'YY']}
     s1_copy = copy.deepcopy(s1)
     x1 = {'survey': [{'type': 'integer',
@@ -267,11 +327,15 @@ def test_expand_constraint_message():
                       'label': ['X number', 'Y number'],
                       'constraint_message': ['X: . > 3', 'Y: . > 3'],
                       }],
+          'schema': SCHEMA_VERSION,
+          'translated': ['constraint_message', 'label'],
           'translations': ['XX', 'YY'],
           }
     expand_content(s1, in_place=True)
     assert s1 == x1
     flatten_content(x1, in_place=True)
+    s1_copy.pop('translated')
+    s1_copy.pop('translations')
     assert x1 == s1_copy
 
 
@@ -281,6 +345,8 @@ def test_expand_translations():
                       'label::Français': 'OK!'}]}
     x1 = {'survey': [{'type': 'text',
                       'label': ['OK?', 'OK!']}],
+          'schema': SCHEMA_VERSION,
+          'translated': ['label'],
           'translations': ['English', 'Français']}
     expand_content(s1, in_place=True)
     assert s1 == x1
@@ -288,21 +354,27 @@ def test_expand_translations():
     assert s1 == {'survey': [{'type': 'text',
                               'label::English': 'OK?',
                               'label::Français': 'OK!'}],
-                  'translations': ['English', 'Français']}
+                  }
 
 
 def test_expand_translations_null_lang():
     s1 = {'survey': [{'type': 'text',
                       'label': 'NoLang',
                       'label::English': 'EnglishLang'}],
+          'translated': ['label'],
           'translations': [UNTRANSLATED, 'English']}
     x1 = {'survey': [{'type': 'text',
                       'label': ['NoLang', 'EnglishLang']}],
+          'schema': SCHEMA_VERSION,
+          'translated': ['label'],
           'translations': [UNTRANSLATED, 'English']}
     s1_copy = copy.deepcopy(s1)
     expand_content(s1, in_place=True)
     assert s1.get('translations') == x1.get('translations')
+    assert s1.get('translated') == ['label']
     assert s1.get('survey')[0] == x1.get('survey')[0]
     assert s1 == x1
     flatten_content(s1, in_place=True)
+    s1_copy.pop('translated')
+    s1_copy.pop('translations')
     assert s1 == s1_copy

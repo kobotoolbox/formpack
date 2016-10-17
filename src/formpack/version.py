@@ -28,8 +28,11 @@ class LabelStruct(object):
 
     def __init__(self, labels=[], translations=[]):
         if len(labels) != len(translations):
-            raise TranslationError('Mismatched labels and translations: '
-                                   '%d %d' % (len(labels), len(translations)))
+            errmsg = 'Mismatched labels and translations: [{}] [{}] ' \
+                '{}!={}'.format(', '.join(labels),
+                                ', '.join(translations), len(labels),
+                                len(translations))
+            raise TranslationError(errmsg)
         self._labels = labels
         self._translations = translations
         self._vals = dict(zip(translations, labels))
@@ -58,7 +61,7 @@ class FormVersion(object):
         self.form_pack = form_pack
 
         # slug of title
-        self.root_node_name = schema.get('root_node_name', 'data')
+        self.root_node_name = self._get_root_node_name()
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
@@ -208,11 +211,8 @@ class FormVersion(object):
         return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
                                _stats.keys()))
 
-    def to_dict(self, remove_fields=[]):
-        flattened_schema = flatten_content(self.schema['content'])
-        for field in remove_fields:
-            flattened_schema.pop(field, None)
-        return flattened_schema
+    def to_dict(self, **opts):
+        return flatten_content(self.schema['content'], **opts)
 
     # TODO: find where to move that
     def _load_submission_xml(self, xml):
@@ -272,8 +272,12 @@ class FormVersion(object):
 
         return all_labels
 
-    def to_xml(self):
-        survey = formversion_pyxform(self.to_dict(remove_fields=['translations']))
+    def to_xml(self, warnings=None):
+        # todo: collect warnings from pyxform compilation when a list is passed
+        survey = formversion_pyxform(
+            self.to_dict(remove_sheets=['translations', 'translated'],
+                         )
+                                     )
         title = self._get_title()
 
         if title is None:
