@@ -18,7 +18,7 @@ from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 REMOVE_EMPTY_STRINGS = True
 # this will be used to check which version of formpack was used to compile the
 # asset content
-SCHEMA_VERSION = "1.3"
+SCHEMA_VERSION = "1"
 
 
 def _expand_translatable_content(content, row, col_shortname,
