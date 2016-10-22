@@ -117,6 +117,8 @@ class FormChoice(FormDataDef):
                 _label = choice_definition.get('image')
             if isinstance(_label, basestring):
                 _label = [_label]
+            elif _label is None and len(translation_list) == 1:
+                _label = [None]
             option['labels'] = OrderedDict(zip(translation_list, _label))
             option['name'] = choice_name
         return all_choices
