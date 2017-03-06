@@ -5,105 +5,158 @@ from __future__ import (unicode_literals, print_function,
 
 from .pack import FormPack
 
-import os
 import json
 import errno
 import requests
-
 from urlparse import urlparse
+from argparse import Namespace as Ns
+from os import (path, makedirs, unlink)
+
+FORMPACK_DATA_DIR = path.join(path.expanduser('~'),
+                              '.formpack')
 
 
-def mkdir_p(path):
+def mkdir_p(_path):
     try:
-        os.makedirs(path)
+        makedirs(_path)
     except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
+        if exc.errno == errno.EEXIST and path.isdir(_path):
             pass
         else:
             raise
 
 
-def _get_kobo_environ_vars():
-    for env_var in [
-            'KOBO_API_TOKEN',
-            'KOBO_API_URL',
-        ]:
-        if not env_var in os.environ:
-            raise ValueError('Configuration value not present: {}'.format(env_var))
-    _data_dir = os.environ.get('FORMPACK_DATA_DIRECTORY', None)
-    if not _data_dir:
-        _data_dir = os.path.join(os.path.expanduser('~'),
-                                 '.formpack')
-        mkdir_p(_data_dir)
-    return (
-        os.environ['KOBO_API_TOKEN'],
-        os.environ['KOBO_API_URL'],
-        _data_dir,
-        )
-
-
 class RemoteFormPack:
-    def __init__(self, uid):
+    def __init__(self, uid,
+                 token,
+                 api_url,
+                 data_dir=None):
         self.uid = uid
-        (self.api_token,
-            self.api_url,
-            self._data_dir) = _get_kobo_environ_vars()
+        self.api_token = token
+        self.api_url = api_url
+        self._data_dir = data_dir or FORMPACK_DATA_DIR
 
-        self.data_dir = os.path.join(self._data_dir, self.uid)
+        self.data_dir = path.join(self._data_dir, self.uid)
         mkdir_p(self.data_dir)
-        self._versions_dir = os.path.join(self.data_dir, 'versions')
-        self._data_path = os.path.join(self.data_dir, 'data.json')
-        mkdir_p(self._versions_dir)
+        self.paths = {
+            'versions/': self.path('versions'),
+            'data': self.path('data.json'),
+            'context': self.path('context.json'),
+            'asset': self.path('asset.json'),
+        }
+        self._versions_dir = self.path('versions')
+        self._data_path = self.path('data.json')
+        self._context_path = self.path('context.json')
+        mkdir_p(self.path('versions'))
+        self._asset_url = '{}{}'.format(self.api_url, self.uid)
+        self.asset = Ns(**self._query_asset())
+        self.context = Ns(**self._query_kcform())
 
-        _url = '{}{}/?format=json'.format(self.api_url, self.uid)
-        r1 = requests.get(_url,
-                          headers=self._headers(),
-                          ).json()
-        self._deployment_identifier = r1['deployment__identifier']
-        version_id = r1['version_id']
-        _version_file_path = self._version_file_path(version_id)
+    def path(self, *args):
+        return path.join(self.data_dir, *args)
 
-        if not os.path.exists(_version_file_path):
-            with open(_version_file_path, 'w') as ff:
-                ff.write(json.dumps(resp_data['content'], indent=4))
+    def _query_asset(self):
+        if not path.exists(self.path('asset.json')):
+            ad = requests.get('{}/?format=json'.format(self._asset_url),
+                              headers=self._headers(),
+                              ).json()
+            if 'detail' in ad and ad['detail'] == 'Invalid token.':
+                raise ValueError('Invalid token. Is it the correct server?')
+            elif 'detail' in ad:
+                raise ValueError("Error querying API: {}".format(
+                                 ad['detail']))
+            with open(self.path('asset.json'), 'w') as ff:
+                ff.write(json.dumps(ad))
+            return ad
+        else:
+            with open(self.path('asset.json'), 'r') as ff:
+                return json.loads(ff.read())
 
-        _deployment = urlparse(self._deployment_identifier)
-        self._kc_api_url = '{}://{}/api/v1'.format(_deployment.scheme,
-                                                   _deployment.netloc)
-        r2 = requests.get('{}/forms?id_string={}'.format(self._kc_api_url, self.uid),
-                          headers=self._headers()).json()
-        self.kc_formid = r2[0]['formid']
+    def _query_kcform(self):
+        asset = self.asset
+        if not path.exists(self.path('context.json')):
+            _deployment_identifier = asset.deployment__identifier
+            _deployment = urlparse(_deployment_identifier)
+            ctx = {
+                'kc_api_url': '{}://{}/api/v1'.format(_deployment.scheme,
+                                                      _deployment.netloc),
+            }
+            _url = '{}/forms?id_string={}'.format(ctx['kc_api_url'],
+                                                  self.uid)
+            r2 = requests.get(_url, headers=self._headers()).json()
+            ctx['kc_formid'] = r2[0]['formid']
+            with open(self.path('context.json'), 'w') as ff:
+                ff.write(json.dumps(ctx))
+            return ctx
+        else:
+            with open(self.path('context.json'), 'r') as ff:
+                return json.loads(ff.read())
 
     def pull(self):
-        _data_url = '{}/data/{}'.format(self._kc_api_url, self.kc_formid)
-        resp = requests.get('{}{}'.format(_data_url, '?format=json'),
-                            headers=self._headers())
-        with open(self._data_path, 'w') as ff:
-            ff.write(resp.content)
-        _version_ids = set([i['__version__'] for i in resp.json()])
-        for _version_id in _version_ids:
-            self._ensure_version(_version_id)
+        if not path.exists(self.path('data.json')):
+            _data_url = '{}/data/{}?{}'.format(self.context.kc_api_url,
+                                               self.context.kc_formid,
+                                               'format=json',
+                                               )
+            _data = requests.get(_data_url, headers=self._headers()).json()
+            with open(self.path('data.json'), 'w') as ff:
+                ff.write(json.dumps(_data))
+            _version_ids = set([i['__version__'] for i in _data])
+            for version_id in _version_ids:
+                self.load_version(version_id)
 
-    def _ensure_version(self, version_id):
-        _f = self._version_file_path(version_id)
-        if not os.path.exists(_f):
-            raise Exception('version content not found. please write'
-                            ' content to file and rerun script\n{}'.format(_f))
-
-    def _version_file_path(self, version_id):
-        return os.path.join(self._versions_dir, '{}.json'.format(version_id))
+    def load_version(self, version_id):
+        _version_path = path.join(self.path('versions'),
+                                  '{}.json'.format(version_id)
+                                  )
+        if not path.exists(_version_path):
+            _version_url = '{}/{}/{}/?format=json'.format(
+                self._asset_url,
+                'versions',
+                version_id)
+            vd = requests.get(_version_url, headers=self._headers()).json()
+            with open(_version_path, 'w') as ff:
+                ff.write(json.dumps(vd))
+            return vd
+        else:
+            with open(_version_path, 'r') as ff:
+                return json.loads(ff.read())
 
     def _headers(self, upd={}):
         return dict({'Content-Type': 'application/json',
                     'Authorization': 'Token {}'.format(self.api_token),
-                    }, **upd)
+                     }, **upd)
 
-    def pack(self):
-        with open(self._data_path, 'r') as ff:
-            self.submissions = json.loads(ff.read())
+    def create_pack(self):
+        if not path.exists(self._data_path):
+            raise Exception('cannot generate formpack without running '
+                            'remote_pack.pull()')
         _version_ids = set([s['__version__'] for s in self.submissions])
         self.versions = []
         for version_id in _version_ids:
-            with open(self._version_file_path(version_id), 'r') as ff:
-                self.versions.append({'content': json.loads(ff.read())})
-        return FormPack(versions=self.versions, id_string=self.uid)
+            _v = self.load_version(version_id)
+            _v['version'] = version_id
+            _v['date'] = _v.pop('date_deployed', None)
+            self.versions.append(_v)
+        return FormPack(versions=self.versions, id_string=self.uid,
+                        title=self.asset.name, ellipsize_title=False,
+                        )
+
+    def stats(self):
+        pck = self.create_pack()
+        _stats = pck._stats()
+        return _stats
+
+    def _submissions(self):
+        with open(self.path('data.json'), 'r') as ff:
+            return json.loads(ff.read())
+
+    def clear_submissions(self):
+        _data_path = self.path('data.json')
+        if path.exists(_data_path):
+            unlink(_data_path)
+
+    @property
+    def submissions(self):
+        for submission in self._submissions():
+            yield submission

@@ -21,36 +21,20 @@ from ..constants import UNTRANSLATED
 class FormDataDef(object):
     """ Any object composing a form. It's only used with a subclass. """
 
-    def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
+    def __init__(self, name, labels=None,
+                 has_stats=False, src=None,
+                 *args, **kwargs):
         self.name = name
         self.labels = labels or {}
         self.value_names = self.get_value_names()
         self.has_stats = has_stats
+        self.src = src
 
     def __repr__(self):
         return "<%s name='%s'>" % (self.__class__.__name__, self.name)
 
     def get_value_names(self):
         return [self.name]
-
-    @classmethod
-    def from_json_definition(cls, definition):
-        labels = cls._extract_json_labels(definition)
-        return cls(definition['name'], labels)
-
-    @classmethod
-    def _extract_json_labels(cls, definition):
-        """ Extract translation labels from the JSON data definition """
-        labels = OrderedDict()
-        if "label" in definition:
-            labels[UNTRANSLATED] = definition['label']
-
-        for key, val in definition.items():
-            if key.startswith('label:'):
-                # sometime the label can be separated with 2 ::
-                _, lang = re.split(r'::?', key, maxsplit=1, flags=re.U)
-                labels[lang] = val
-        return labels
 
 
 class FormGroup(FormDataDef):  # useful to get __repr__
@@ -76,10 +60,18 @@ class FormSection(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
-    @classmethod
-    def from_json_definition(cls, definition, hierarchy=(None,), parent=None):
-        labels = cls._extract_json_labels(definition)
-        return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
+    @property
+    def rows(self, include_groups=False):
+        for (name, field) in self.fields.items():
+            if include_groups and hasattr(self, 'begin_rows'):
+                for row in self.begin_rows:
+                    yield row.src
+
+            yield field.src
+
+            if include_groups and hasattr(self, 'end_rows'):
+                for row in self.end_rows:
+                    yield row.src
 
     def get_label(self, lang=UNTRANSLATED):
         return [self.labels.get(lang) or self.name]
@@ -91,38 +83,9 @@ class FormSection(FormDataDef):
 
 class FormChoice(FormDataDef):
     def __init__(self, name, *args, **kwargs):
-        super(FormChoice, self).__init__(name, *args, **kwargs)
         self.name = name
-        self.options = OrderedDict()
-
-    @classmethod
-    def all_from_json_definition(cls, definition, translation_list):
-        all_choices = {}
-        for choice_definition in definition:
-            choice_name = choice_definition.get('name')
-            choice_key = choice_definition.get('list_name')
-            if not choice_name or not choice_key:
-                continue
-
-            if choice_key not in all_choices:
-                all_choices[choice_key] = FormChoice(choice_key)
-            choices = all_choices[choice_key]
-
-            option = choices.options[choice_name] = {}
-
-            # apparently choices dont need a label if they have an image
-            if 'label' in choice_definition:
-                _label = choice_definition['label']
-            else:
-                _label = choice_definition.get('image')
-            if isinstance(_label, basestring):
-                _label = [_label]
-            elif _label is None and len(translation_list) == 1:
-                _label = [None]
-            option['labels'] = OrderedDict(zip(translation_list, _label))
-            option['name'] = choice_name
-        return all_choices
-
+        self.options = kwargs.pop('options', OrderedDict())
+        super(FormChoice, self).__init__(name, *args, **kwargs)
 
     @property
     def translations(self):

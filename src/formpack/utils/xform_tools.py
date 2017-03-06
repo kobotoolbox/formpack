@@ -11,6 +11,7 @@ from pyxform.builder import create_survey_element_from_dict
 from pyquery import PyQuery
 
 
+# made obsolete by replace_aliases
 DATA_TYPE_ALIASES = (
     ("add select one prompt using", 'select_one'),
     ("select one from", 'select_one'),
@@ -20,7 +21,7 @@ DATA_TYPE_ALIASES = (
     ("select all that apply from", 'select_multiple'),
     ("select multiple", 'select_multiple'),
     ("select all that apply", 'select_multiple'),
-    ("select_one_external", "select one external"),
+    ("select one external", "select_one_external"),
     ('cascading select', 'cascading_select'),
     ('location', 'geopoint'),
     ("begin lgroup", 'begin_repeat'),
@@ -79,8 +80,12 @@ def parse_xml_to_data(xml_str):
 
 
 def normalize_data_type(data_type):
-    """ Normalize spaces and aliases for field data types """
+    """
+    Normalize spaces and aliases for field data types
 
+    note: this method is made obsolete by the pre-processing
+    "replace_aliases" step.
+    """
     # normalize spaces
     data_type = ' '.join(data_type.split())
 
