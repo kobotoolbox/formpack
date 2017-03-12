@@ -23,12 +23,11 @@ from copy import deepcopy
 
 
 class FormPack(object):
-
-    # TODO: make a clear signature for __init__
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
                  root_node_name='data',
+                 submissions=None,
                  asset_type=None, submissions_xml=None, ellipsize_title=True):
 
         if not versions:
@@ -45,6 +44,8 @@ class FormPack(object):
 
         self.id_string = id_string
         self.root_node_name = root_node_name
+
+        self.submissions = submissions
 
         self.title = title
 
