@@ -3,6 +3,7 @@ from formpack.remote_pack import RemoteFormPack, FORMPACK_DATA_DIR
 import os
 import json
 import argparse
+import importlib
 
 
 parser = argparse.ArgumentParser(description='Initialize RemoteFormPack.')
@@ -26,6 +27,11 @@ parser.add_argument('--print-submissions',
                     dest='print_submissions',
                     help='print submissions from the dataset',
                     action='store_true')
+
+parser.add_argument('--run-module',
+                    dest='run_module',
+                    help='import and run a module',
+                    action='store')
 
 parser.add_argument('--account',
                     dest='account',
@@ -77,6 +83,14 @@ def run(args):
 
     if args.print_submissions:
         print(json.dumps(list(rpack.submissions), indent=2))
+
+    if args.run_module:
+        _mod = importlib.import_module(args.run_module)
+        if not hasattr(_mod, 'run') and hasattr(_mod.run, '__call__'):
+            _mod.run(formpk, submissions=rpack.submissions)
+        else:
+            raise ValueError('run-module parameter must be an importable '
+                             'module with a method "run"')
 
 if __name__ == '__main__':
     run(parser.parse_args())
