@@ -65,8 +65,10 @@ class RemoteFormPack:
             elif 'detail' in ad:
                 raise ValueError("Error querying API: {}".format(
                                  ad['detail']))
+            # content is ultimately pulled form the "version" file
+            del ad['content']
             with open(self.path('asset.json'), 'w') as ff:
-                ff.write(json.dumps(ad))
+                ff.write(json.dumps(ad, indent=2))
             return ad
         else:
             with open(self.path('asset.json'), 'r') as ff:
@@ -86,7 +88,7 @@ class RemoteFormPack:
             r2 = requests.get(_url, headers=self._headers()).json()
             ctx['kc_formid'] = r2[0]['formid']
             with open(self.path('context.json'), 'w') as ff:
-                ff.write(json.dumps(ctx))
+                ff.write(json.dumps(ctx, indent=2))
             return ctx
         else:
             with open(self.path('context.json'), 'r') as ff:
@@ -100,7 +102,7 @@ class RemoteFormPack:
                                                )
             _data = requests.get(_data_url, headers=self._headers()).json()
             with open(self.path('data.json'), 'w') as ff:
-                ff.write(json.dumps(_data))
+                ff.write(json.dumps(_data, indent=2))
             _version_ids = set([i['__version__'] for i in _data])
             for version_id in _version_ids:
                 self.load_version(version_id)
@@ -116,7 +118,7 @@ class RemoteFormPack:
                 version_id)
             vd = requests.get(_version_url, headers=self._headers()).json()
             with open(_version_path, 'w') as ff:
-                ff.write(json.dumps(vd))
+                ff.write(json.dumps(vd, indent=2))
             return vd
         else:
             with open(_version_path, 'r') as ff:
@@ -136,7 +138,7 @@ class RemoteFormPack:
         for version_id in _version_ids:
             _v = self.load_version(version_id)
             _v['version'] = version_id
-            _v['date'] = _v.pop('date_deployed', None)
+            _v['date_deployed'] = _v.pop('date_deployed', None)
             self.versions.append(_v)
         return FormPack(versions=self.versions, id_string=self.uid,
                         title=self.asset.name, ellipsize_title=False,
