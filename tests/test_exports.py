@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 import json
+import xlrd
 
 from textwrap import dedent
 
@@ -231,7 +232,7 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'rgv1'}
         export = fp.export(**options).to_dict(submissions)
         self.assertEqual(export, OrderedDict([
-                            ('Household survey with repeat...',
+                            ('Household survey with repeatable groups',
                                 {
                                     'fields': [
                                         'start',
@@ -288,67 +289,67 @@ class TestFormPackExport(unittest.TestCase):
                                     'data': [
                                         [
                                             'peter',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             1
                                         ],
                                         [
                                             'kyle',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             2
                                         ],
                                         [
                                             'linda',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             2
                                         ],
                                         [
                                             'morty',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             3
                                         ],
                                         [
                                             'tony',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             4
                                         ],
                                         [
                                             'mary',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             4
                                         ],
                                         [
                                             'emma',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             5
                                         ],
                                         [
                                             'parker',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             5
                                         ],
                                         [
                                             'amadou',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'esteban',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'suzie',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'fiona',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'phillip',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ]
                                     ]
@@ -689,6 +690,30 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
+
+    def test_xlsx_sheet_name_limit(self):
+        '''
+        PyExcelerate will raise the following if any sheet name exceeds 31
+        characters:
+            Exception: Excel does not permit worksheet names longer than 31
+            characters. Set force_name=True to disable this restriction.
+        '''
+        title, schemas, submissions = build_fixture('long_names')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
+                               '_over_the_lazy_dog_v1'}
+
+        with tempdir() as d:
+            xls = d / 'foo.xlsx'
+            fp.export(**options).to_xlsx(xls, submissions)
+            assert xls.isfile()
+            book = xlrd.open_workbook(xls)
+            assert book.sheet_names() == [
+                u'long survey name: the quick,...',
+                u'long_group_name__Victor_jagt...',
+                u'long_group_name__Victor_... (1)'
+            ]
+
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
