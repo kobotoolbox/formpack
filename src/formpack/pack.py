@@ -35,9 +35,6 @@ class FormPack(object):
 
         self.title = title
 
-        if len(self.title) > 31: # excel sheet name size limit
-            self.title = self.title[:28] + '...'
-
         self.asset_type = asset_type
 
         self.load_all_versions(versions)

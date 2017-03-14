@@ -13,7 +13,7 @@ from pyexcelerate import Workbook
 
 from ..submission import FormSubmission
 from ..schema import CopyField
-from ..utils.string import unicode
+from ..utils.string import unicode, unique_name_for_xls
 
 
 class Export(object):
@@ -402,15 +402,23 @@ class Export(object):
 
         sheets = {}
 
+        sheet_name_mapping = {}
+
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
 
                 try:
-                    cursor = sheets[section_name]
+                    sheet_name = sheet_name_mapping[section_name]
+                except KeyError:
+                    sheet_name = unique_name_for_xls(
+                        section_name, sheet_name_mapping.values())
+                    sheet_name_mapping[section_name] = sheet_name
+                try:
+                    cursor = sheets[sheet_name]
                     current_sheet = cursor['sheet']
                 except KeyError:
-                    current_sheet = workbook.new_sheet(section_name)
-                    cursor = sheets[section_name] = {
+                    current_sheet = workbook.new_sheet(sheet_name)
+                    cursor = sheets[sheet_name] = {
                         "sheet": current_sheet,
                         "row": 2,
                     }

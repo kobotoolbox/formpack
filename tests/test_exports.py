@@ -227,7 +227,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(**options).to_dict(submissions)
 
         self.assertEqual(export, OrderedDict ([
-                            ('Household survey with repeat...',
+                            ('Household survey with repeatable groups',
                                 {
                                     'fields': [
                                         'household_location',
@@ -284,67 +284,67 @@ class TestFormPackExport(unittest.TestCase):
                                     'data': [
                                         [
                                             'peter',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             1
                                         ],
                                         [
                                             'kyle',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             2
                                         ],
                                         [
                                             'linda',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             2
                                         ],
                                         [
                                             'morty',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             3
                                         ],
                                         [
                                             'tony',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             4
                                         ],
                                         [
                                             'mary',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             4
                                         ],
                                         [
                                             'emma',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             5
                                         ],
                                         [
                                             'parker',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             5
                                         ],
                                         [
                                             'amadou',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'esteban',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'suzie',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'fiona',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ],
                                         [
                                             'phillip',
-                                            'Household survey with repeat...',
+                                            'Household survey with repeatable groups',
                                             6
                                         ]
                                     ]
