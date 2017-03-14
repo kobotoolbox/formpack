@@ -3,7 +3,7 @@
   "content": {
     "survey": [
       {
-        "type": "begin repeat",
+        "type": "begin_repeat",
         "name": "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich",
         "label": "long group name: Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich"
       },
@@ -15,10 +15,10 @@
         "select_from_list_name": "long_choice_list_name__jackdaws_love_my_big_sphinx_of_quartz"
       },
       {
-        "type": "end repeat"
+        "type": "end_repeat"
       },
       {
-        "type": "begin repeat",
+        "type": "begin_repeat",
         "name": "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2",
         "label": "long group name: Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich 2"
       },
@@ -30,7 +30,7 @@
         "select_from_list_name": "long_choice_list_name__jackdaws_love_my_big_sphinx_of_quartz_2"
       },
       {
-        "type": "end repeat"
+        "type": "end_repeat"
       },
       {
         "type": "start",
