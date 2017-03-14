@@ -8,4 +8,4 @@ from .xform_tools import (parse_xmljson_to_data,
                           get_version_identifiers,
                           normalize_data_type,
                           )  # noqa
-from .string import slugify, randstr, str_types  # noqa
+from .string import slugify, randstr, str_types, unique_name_for_xls  # noqa

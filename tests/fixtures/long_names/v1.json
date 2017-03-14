@@ -1,0 +1,95 @@
+{
+  "version": "long_survey_name__the_quick__brown_fox_jumps_over_the_lazy_dog_v1",
+  "content": {
+    "survey": [
+      {
+        "type": "begin_repeat",
+        "name": "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich",
+        "label": "long group name: Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich"
+      },
+      {
+        "required": "true",
+        "type": "select_one",
+        "name": "long_question_name__how_vexingly_quick__daft_zebras_jump",
+        "label": "long question name: how vexingly quick, daft zebras jump",
+        "select_from_list_name": "long_choice_list_name__jackdaws_love_my_big_sphinx_of_quartz"
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "begin_repeat",
+        "name": "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2",
+        "label": "long group name: Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich 2"
+      },
+      {
+        "required": "true",
+        "type": "select_one",
+        "name": "long_question_name__how_vexingly_quick__daft_zebras_jump_2",
+        "label": "long question name: how vexingly quick, daft zebras jump 2",
+        "select_from_list_name": "long_choice_list_name__jackdaws_love_my_big_sphinx_of_quartz_2"
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "start",
+        "name": "start"
+      },
+      {
+        "type": "end",
+        "name": "end"
+      }
+    ],
+    "choices": [
+      {
+        "label": "long option name: Pack my box with five dozen liquor jugs",
+        "name": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs",
+        "list_name": "long_choice_list_name__jackdaws_love_my_big_sphinx_of_quartz"
+      },
+      {
+        "label": "long option name: Pack my box with five dozen liquor jugs 2",
+        "name": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs_2",
+        "list_name": "long_choice_list_name__jackdaws_love_my_big_sphinx_of_quartz_2"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich": [
+        {
+          "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich/long_question_name__how_vexingly_quick__daft_zebras_jump": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs"
+        },
+        {
+          "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich/long_question_name__how_vexingly_quick__daft_zebras_jump": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs"
+        }
+      ],
+      "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2": [
+        {
+          "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2/long_question_name__how_vexingly_quick__daft_zebras_jump_2": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs_2"
+        },
+        {
+          "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2/long_question_name__how_vexingly_quick__daft_zebras_jump_2": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs_2"
+        }
+      ],
+      "start": "2017-03-13T11:25:31.707-04",
+      "end": "2017-03-13T11:26:10.638-04",
+      "meta/instanceID": "uuid:296c2960-c910-474b-b4cc-e2917cd29926"
+    },
+    {
+      "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich": [
+        {
+          "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich/long_question_name__how_vexingly_quick__daft_zebras_jump": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs"
+        }
+      ],
+      "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2": [
+        {
+          "long_group_name__Victor_jagt_zw_lf_Boxk_mpfer_quer__ber_den_gro_en_Sylter_Deich_2/long_question_name__how_vexingly_quick__daft_zebras_jump_2": "long_option_name__Pack_my_box_with_five_dozen_liquor_jugs_2"
+        }
+      ],
+      "start": "2017-03-13T11:26:15.317-04",
+      "end": "2017-03-13T11:26:27.332-04",
+      "meta/instanceID": "uuid:63c6bb42-6bd8-41e3-a2c3-41ef952c288e"
+    }
+  ]
+}
