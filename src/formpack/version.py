@@ -113,7 +113,8 @@ class FormVersion(object):
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
-        self.date = schema.get('date')
+        self.date = schema.get('date_deployed')
+
         self.version_id_key = schema.get('version_id_key',
                                          form_pack.default_version_id_key)
 
@@ -207,8 +208,8 @@ class FormVersion(object):
                 continue
 
             if data_type == 'end_repeat':
-                # We go up in one level of nesting, so we set the current section
-                # to be what used to be the parent section
+                # We go up in one level of nesting, so we set the current
+                # section to be what used to be the parent section
                 hierarchy.pop()
                 section = section_stack.pop()
                 continue
@@ -222,7 +223,7 @@ class FormVersion(object):
                 group_stack.append(group)
 
                 labels = extract_json_labels(data_definition, 'label',
-                                              self.translations)
+                                             self.translations)
                 group = FormGroup(data_definition['name'], labels,
                                   src=data_definition)
 
@@ -237,8 +238,8 @@ class FormVersion(object):
                 parent_section = section
 
                 labels = extract_json_labels(data_definition,
-                                              'label',
-                                              self.translations)
+                                             'label',
+                                             self.translations)
                 _repeat_name = data_definition.get('$autoname', data_definition.get('name'))
                 section = FormSection(_repeat_name,
                                       labels,
