@@ -1,0 +1,172 @@
+{
+    "ancestors": null,
+    "asset_type": "survey",
+    "content": {
+        "choices": [
+            {
+                "$autovalue": "abc",
+                "$kuid": "PUZnD5Px0",
+                "label": [
+                    "abc"
+                ],
+                "list_name": "fk0qe22",
+                "name": "abc"
+            },
+            {
+                "$autovalue": "def",
+                "$kuid": "X9jdBm9fA",
+                "label": [
+                    "def"
+                ],
+                "list_name": "fk0qe22",
+                "name": "def"
+            }
+        ],
+        "schema": "1",
+        "settings": {},
+        "survey": [
+            {
+                "$autoname": "s1",
+                "$kuid": "8090e251",
+                "_or_other": true,
+                "label": [
+                    "s1"
+                ],
+                "required": true,
+                "select_from_list_name": "fk0qe22",
+                "type": "select_one"
+            }
+        ],
+        "translated": [
+            "label"
+        ],
+        "translations": [
+            null
+        ]
+    },
+    "date_created": "2017-03-14T18:48:29.768758Z",
+    "date_modified": "2017-03-14T20:20:41.558845Z",
+    "deployed_version_id": "vSdCWi7ko3cXb5dCe5d3YE",
+    "deployed_versions": [
+        {
+            "date_deployed": "2017-03-14T20:20:13.644Z",
+            "date_modified": "2017-03-14 20:20:13.644439+00:00",
+            "uid": "vSdCWi7ko3cXb5dCe5d3YE",
+            "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/versions/vSdCWi7ko3cXb5dCe5d3YE/?format=json"
+        }
+    ],
+    "deployment__active": true,
+    "deployment__data_download_links": {
+        "analyser_legacy": "https://kc.kobotoolbox.org/dorey_kobo/exports/aCEAnFKpjHqc427aKfB7Kj/analyser/",
+        "csv": "https://kc.kobotoolbox.org/dorey_kobo/reports/aCEAnFKpjHqc427aKfB7Kj/export.csv",
+        "csv_legacy": "https://kc.kobotoolbox.org/dorey_kobo/exports/aCEAnFKpjHqc427aKfB7Kj/csv/",
+        "kml_legacy": "https://kc.kobotoolbox.org/dorey_kobo/exports/aCEAnFKpjHqc427aKfB7Kj/kml/",
+        "spss_labels": "https://kc.kobotoolbox.org/dorey_kobo/forms/aCEAnFKpjHqc427aKfB7Kj/spss_labels.zip",
+        "xls": "https://kc.kobotoolbox.org/dorey_kobo/reports/aCEAnFKpjHqc427aKfB7Kj/export.xlsx",
+        "xls_legacy": "https://kc.kobotoolbox.org/dorey_kobo/exports/aCEAnFKpjHqc427aKfB7Kj/xls/",
+        "zip_legacy": "https://kc.kobotoolbox.org/dorey_kobo/exports/aCEAnFKpjHqc427aKfB7Kj/zip/"
+    },
+    "deployment__identifier": "https://kc.kobotoolbox.org/dorey_kobo/forms/aCEAnFKpjHqc427aKfB7Kj",
+    "deployment__links": {
+        "iframe_url": "https://ee.kobotoolbox.org/i/::YKHP",
+        "offline_url": "https://ee.kobotoolbox.org/x/#YKHP",
+        "preview_url": "https://ee.kobotoolbox.org/preview/::YKHP",
+        "single_iframe_url": "https://ee.kobotoolbox.org/single/i/::YKHP",
+        "single_once_iframe_url": "https://ee.kobotoolbox.org/single/i/::47a6177b139d1efd5b3103f65b3229dc",
+        "single_once_url": "https://ee.kobotoolbox.org/single/::47a6177b139d1efd5b3103f65b3229dc",
+        "single_url": "https://ee.kobotoolbox.org/single/::YKHP",
+        "url": "https://ee.kobotoolbox.org/::YKHP"
+    },
+    "deployment__submission_count": 4,
+    "downloads": [
+        {
+            "format": "xls",
+            "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/?format=json.xls"
+        },
+        {
+            "format": "xml",
+            "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/?format=json.xml"
+        }
+    ],
+    "embeds": [
+        {
+            "format": "xls",
+            "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/xls/?format=json"
+        },
+        {
+            "format": "xform",
+            "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/xform/?format=json"
+        }
+    ],
+    "has_deployment": true,
+    "kind": "asset",
+    "koboform_link": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/koboform/?format=json",
+    "name": "select_x_or_other",
+    "owner": "https://kf.kobotoolbox.org/forms/users/dorey_kobo/?format=json",
+    "owner__username": "dorey_kobo",
+    "parent": null,
+    "permissions": [
+        {
+            "content_object": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/?format=json",
+            "deny": false,
+            "inherited": true,
+            "kind": "objectpermission",
+            "permission": "change_asset",
+            "uid": "pKFpa8n3DS6WYs3Fnc5Di3",
+            "url": "https://kf.kobotoolbox.org/forms/permissions/pKFpa8n3DS6WYs3Fnc5Di3/?format=json",
+            "user": "https://kf.kobotoolbox.org/forms/users/dorey_kobo/?format=json"
+        },
+        {
+            "content_object": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/?format=json",
+            "deny": false,
+            "inherited": true,
+            "kind": "objectpermission",
+            "permission": "view_asset",
+            "uid": "po3xk3fXa2nXkJeM4LFXHv",
+            "url": "https://kf.kobotoolbox.org/forms/permissions/po3xk3fXa2nXkJeM4LFXHv/?format=json",
+            "user": "https://kf.kobotoolbox.org/forms/users/dorey_kobo/?format=json"
+        }
+    ],
+    "report_styles": {
+        "default": {},
+        "kuid_names": {
+            "8090e251": "8090e251",
+            "cfe99341": "cfe99341"
+        },
+        "specified": {
+            "8090e251": {},
+            "cfe99341": {}
+        }
+    },
+    "settings": {
+        "country": "",
+        "description": "",
+        "sector": "",
+        "share-metadata": false
+    },
+    "summary": {
+        "columns": [
+            "select_from_list_name",
+            "_or_other",
+            "required",
+            "label",
+            "type"
+        ],
+        "default_translation": null,
+        "geo": false,
+        "labels": [
+            "s1"
+        ],
+        "languages": [
+            null
+        ],
+        "row_count": 1
+    },
+    "tag_string": "",
+    "uid": "aCEAnFKpjHqc427aKfB7Kj",
+    "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/?format=json",
+    "version_count": 3,
+    "version_id": "vSdCWi7ko3cXb5dCe5d3YE",
+    "xform_link": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/xform/?format=json",
+    "xls_link": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/xls/?format=json"
+}

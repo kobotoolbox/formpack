@@ -1,0 +1,49 @@
+{
+    "content": {
+        "choices": [
+            {
+                "$autovalue": "abc",
+                "$kuid": "PUZnD5Px0",
+                "label": [
+                    "abc"
+                ],
+                "list_name": "fk0qe22",
+                "name": "abc"
+            },
+            {
+                "$autovalue": "def",
+                "$kuid": "X9jdBm9fA",
+                "label": [
+                    "def"
+                ],
+                "list_name": "fk0qe22",
+                "name": "def"
+            }
+        ],
+        "schema": "1",
+        "settings": {},
+        "survey": [
+            {
+                "$autoname": "s1",
+                "$kuid": "8090e251",
+                "_or_other": true,
+                "label": [
+                    "s1"
+                ],
+                "required": true,
+                "select_from_list_name": "fk0qe22",
+                "type": "select_one"
+            }
+        ],
+        "translated": [
+            "label"
+        ],
+        "translations": [
+            null
+        ]
+    },
+    "date_deployed": "2017-03-14T20:20:13.644Z",
+    "date_modified": "2017-03-14 20:20:13.644439+00:00",
+    "uid": "vSdCWi7ko3cXb5dCe5d3YE",
+    "url": "https://kf.kobotoolbox.org/forms/assets/aCEAnFKpjHqc427aKfB7Kj/versions/vSdCWi7ko3cXb5dCe5d3YE/?format=json"
+}

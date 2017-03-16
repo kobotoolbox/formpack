@@ -17,7 +17,11 @@ from .utils.xform_tools import formversion_pyxform
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .errors import SchemaError
 from .utils.flatten_content import flatten_content
-from .schema import (FormField, FormGroup, FormSection, FormChoice)
+from .schema import (FormField,
+                     FormGroup,
+                     FormSection,
+                     OrOtherField,
+                     FormChoice)
 from .translated_item import TranslatedItem
 from .schema import _field_from_dict
 
@@ -251,6 +255,18 @@ class FormVersion(object):
     def rows(self, include_groups=False):
         for row in self._main_section.rows:
             yield row
+
+    def columns(self, **opts):
+        _orother = opts.pop('expand_custom_other_fields', None)
+        fields = OrderedDict()
+        for section in self.sections.itervalues():
+            for field in section.fields.itervalues():
+                if field.name not in fields:
+                    fields[field.name] = field
+                    if _orother and field.src.get('_or_other'):
+                        _f = OrOtherField(related_field=field)
+                        fields[_f.name] = _f
+        return fields.values()
 
     def _stats(self):
         _stats = OrderedDict()

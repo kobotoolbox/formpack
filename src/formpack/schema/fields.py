@@ -24,6 +24,7 @@ import statistics
 from ..utils.xform_tools import normalize_data_type
 from ..constants import UNSPECIFIED_TRANSLATION
 from .datadef import FormDataDef, FormChoice
+from ..translated_item import TranslatedItem
 
 
 class FormField(FormDataDef):
@@ -674,3 +675,30 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     def parse_values(self, raw_values):
         for x in raw_values.split():
             yield x
+
+
+class VirtualField(object):
+    '''
+    this could conceivably subclass from FormField, but in order
+    to understand how Fields work, I'm subclassing object and carrying
+    over minor features as needed.
+    '''
+    def __init__(self, related_field):
+        self.related_field = related_field
+        self.hierarchy = self.related_field.hierarchy[:-1] + [self]
+
+
+class OrOtherField(VirtualField):
+    def __init__(self, *args, **kwargs):
+        super(OrOtherField, self).__init__(*args, **kwargs)
+        self.name = '{}_other'.format(self.related_field.name)
+        self.labels = self._modify_labels()
+
+    def _modify_labels(self):
+        translations = OrderedDict()
+        _related_tx = self.related_field.labels._translations
+        for (translation, val) in _related_tx.items():
+            if val is None:
+                val = ''
+            translations[translation] = '{} [other]'.format(val)
+        return TranslatedItem(translations.values(), translations=translations.keys())
