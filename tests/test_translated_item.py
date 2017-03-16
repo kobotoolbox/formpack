@@ -4,16 +4,24 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 import json
 import pytest
+from collections import OrderedDict
 
 from formpack.translated_item import TranslatedItem
 from formpack.errors import TranslationError
 
 
 def test_simple_translated():
-    labels = TranslatedItem(['x', 'y'],
-                            translations=['langx', 'langy'])
+    t1 = TranslatedItem(['x', 'y'],
+                        translations=['langx', 'langy'])
     expected = '{"langx": "x", "langy": "y"}'
-    assert json.dumps(labels._translations) == expected
+    assert json.dumps(t1._translations) == expected
+
+    # an OrderedDict can also be used to initialize a TranslatedItem
+    t2 = TranslatedItem(OrderedDict([
+            ('langx', 'x'),
+            ('langy', 'y'),
+        ]))
+    assert json.dumps(t1._translations) == json.dumps(t2._translations)
 
 
 def test_invalid_translateds():

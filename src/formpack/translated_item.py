@@ -9,6 +9,10 @@ from .errors import TranslationError
 
 class TranslatedItem(object):
     def __init__(self, values=[], translations=[], strict=False, context=''):
+        if isinstance(values, OrderedDict):
+            translations = values.keys()
+            values = values.values()
+
         if len(translations) == 1 and translations[0] is None and \
                 len(values) == 0:
             values = [None]
