@@ -8,6 +8,7 @@ from functools import partial
 
 from .fields import *  # noqa
 from .datadef import *  # noqa
+from ..translated_item import TranslatedItem
 
 
 def _field_from_dict(definition, hierarchy=None,
@@ -32,11 +33,12 @@ def _field_from_dict(definition, hierarchy=None,
               The FormField instance matching this definiton.
     """
     name = definition.get('$autoname', definition.get('name'))
-    label = definition.get('label')
-    if label:
-        labels = OrderedDict(zip(translations, label))
+    labels = definition.get('label')
+    if labels:
+        labels = TranslatedItem(labels,
+                                translations=translations)
     else:
-        labels = {}
+        labels = TranslatedItem()
 
     # normalize spaces
     data_type = definition['type']

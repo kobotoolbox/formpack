@@ -18,28 +18,8 @@ from .utils import parse_xml_to_xmljson, normalize_data_type
 from .errors import SchemaError
 from .utils.flatten_content import flatten_content
 from .schema import (FormField, FormGroup, FormSection, FormChoice)
+from .translated_item import TranslatedItem
 from .schema import _field_from_dict
-from .errors import TranslationError
-
-
-class LabelStruct(object):
-    '''
-    LabelStruct stores labels + translations assigned to `field.labels`
-    '''
-
-    def __init__(self, labels=[], translations=[]):
-        if len(labels) != len(translations):
-            errmsg = 'Mismatched labels and translations: [{}] [{}] ' \
-                '{}!={}'.format(', '.join(labels),
-                                ', '.join(translations), len(labels),
-                                len(translations))
-            raise TranslationError(errmsg)
-        self._labels = labels
-        self._translations = translations
-        self._vals = dict(zip(translations, labels))
-
-    def get(self, key, default=None):
-        return self._vals.get(key, default)
 
 
 def get_labels(choice_definition, translation_list):
@@ -79,17 +59,6 @@ def choices_from_structures(definition, translation_list):
             'name': choice_name,
         }
     return all_choices.items()
-
-
-def extract_json_labels(definition, column, translations):
-    _ld = OrderedDict()
-    labels = definition.get(column, [])
-    for (i, translation) in enumerate(translations):
-        if i < len(labels):
-            _ld[translation] = labels[i]
-        else:
-            continue
-    return _ld
 
 
 class FormVersion(object):
@@ -222,8 +191,10 @@ class FormVersion(object):
             if data_type == 'begin_group':
                 group_stack.append(group)
 
-                labels = extract_json_labels(data_definition, 'label',
-                                             self.translations)
+                labels = TranslatedItem(data_definition.get('label', []),
+                                        translations=self.translations,
+                                        )
+
                 group = FormGroup(data_definition['name'], labels,
                                   src=data_definition)
 
@@ -237,9 +208,9 @@ class FormVersion(object):
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
 
-                labels = extract_json_labels(data_definition,
-                                             'label',
-                                             self.translations)
+                labels = TranslatedItem(data_definition.get('label', []),
+                                        translations=self.translations,
+                                        )
                 _repeat_name = data_definition.get('$autoname', data_definition.get('name'))
                 section = FormSection(_repeat_name,
                                       labels,
@@ -263,13 +234,13 @@ class FormVersion(object):
             section.fields[field.name] = field
 
             _f = fields_by_name[field.name]
-            _labels = LabelStruct()
+            _labels = TranslatedItem()
 
             if 'label' in _f:
                 if not isinstance(_f['label'], list):
                     _f['label'] = [_f['label']]
-                _labels = LabelStruct(labels=_f['label'],
-                                      translations=self.translations)
+                _labels = TranslatedItem(_f['label'],
+                                         translations=self.translations)
 
             field.labels = _labels
             assert 'labels' not in _f

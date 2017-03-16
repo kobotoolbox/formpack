@@ -32,7 +32,7 @@ class FormField(FormDataDef):
     def __init__(self, name, labels, data_type, hierarchy=None,
                  section=None, can_format=True, has_stats=None,
                  *args, **kwargs):
-
+        # assert not isinstance(labels, dict):
         self.data_type = data_type
         self.section = section
         self.can_format = can_format

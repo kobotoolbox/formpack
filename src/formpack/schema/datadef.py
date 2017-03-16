@@ -16,6 +16,7 @@ except ImportError:
     from collections import OrderedDict
 
 from ..constants import UNTRANSLATED
+from ..translated_item import TranslatedItem
 
 
 class FormDataDef(object):
@@ -25,7 +26,8 @@ class FormDataDef(object):
                  has_stats=False, src=None,
                  *args, **kwargs):
         self.name = name
-        self.labels = labels or {}
+        # assert labels is None or isinstance(labels, TranslatedItem)
+        self.labels = labels or TranslatedItem()
         self.value_names = self.get_value_names()
         self.has_stats = has_stats
         self.src = src
@@ -49,11 +51,11 @@ class FormSection(FormDataDef):
                  *args, **kwargs):
 
         if labels is None:
-            labels = {UNTRANSLATED: 'submissions'}
+            labels = TranslatedItem()
 
+        self.parent = parent
         super(FormSection, self).__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
-        self.parent = parent
         self.children = list(children)
 
         self.hierarchy = list(hierarchy) + [self]
