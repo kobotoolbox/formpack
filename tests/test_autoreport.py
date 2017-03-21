@@ -46,7 +46,7 @@ class TestAutoReport(unittest.TestCase):
 
         expected = [
             (
-                "<TextField name='restaurant_name' type='text'>",
+                "TextField <restaurant_name>",
                 'nom du restaurant',
                 {'frequency': [('Taco Truck', 1),
                                ('Harvest', 1),
@@ -62,7 +62,7 @@ class TestAutoReport(unittest.TestCase):
                  'total_count': 4}
             ),
             (
-                "<FormGPSField name='location' type='geopoint'>",
+                "FormGPSField <location>",
                 'lieu',
                 {'not_provided': 0,
                  'provided': 4,
@@ -70,7 +70,7 @@ class TestAutoReport(unittest.TestCase):
                  'total_count': 4}
             ),
             (
-                "<FormChoiceFieldWithMultipleSelect name='eatery_type' type='select_multiple'>",
+                "FormChoiceFieldWithMultipleSelect <eatery_type>",
                 'type de restaurant',
                 {'frequency': [('traditionnel', 2), ('avec vente \xe0 emporter', 1)],
                  'not_provided': 1,
@@ -97,7 +97,7 @@ class TestAutoReport(unittest.TestCase):
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
-            ("<TextField name='restaurant_name' type='text'>",
+            ("TextField <restaurant_name>",
                 'restaurant_name',
                 {'frequency': [('Felipes', 2),
                                ('The other one', 2),
@@ -109,13 +109,13 @@ class TestAutoReport(unittest.TestCase):
                  'provided': 5,
                  'show_graph': False,
                  'total_count': 6}),
-            ("<FormGPSField name='location' type='geopoint'>",
+            ("FormGPSField <location>",
                 'location',
                 {'not_provided': 1,
                  'provided': 5,
                  'show_graph': False,
                  'total_count': 6}),
-            ("<DateField name='when' type='date'>",
+            ("DateField <when>",
                 'when',
                 {'frequency': [('2001-01-01', 2),
                                ('2002-01-01', 2),
@@ -128,7 +128,7 @@ class TestAutoReport(unittest.TestCase):
                  'provided': 5,
                  'show_graph': True,
                  'total_count': 6}),
-            ("<NumField name='howmany' type='integer'>",
+            ("NumField <howmany>",
                 'howmany',
                 {'mean': 1.6,
                  'median': 2,
@@ -156,7 +156,7 @@ class TestAutoReport(unittest.TestCase):
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
-            ("<TextField name='restaurant_name' type='text'>",
+            ("TextField <restaurant_name>",
              'restaurant_name',
              {'not_provided': 1,
               'provided': 5,
@@ -183,13 +183,13 @@ class TestAutoReport(unittest.TestCase):
                            'percentage': [('2001-01-01', 0.00),
                                           ('2002-01-01', 0.00),
                                           ('2003-01-01', 16.67)]})]}),
-            ("<FormGPSField name='location' type='geopoint'>",
+            ("FormGPSField <location>",
              'location',
              {'not_provided': 1,
               'provided': 5,
               'show_graph': False,
               'total_count': 6}),
-            ("<NumField name='howmany' type='integer'>",
+            ("NumField <howmany>",
              'howmany',
              {'not_provided': 1,
               'provided': 5,

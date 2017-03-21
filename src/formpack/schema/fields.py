@@ -102,10 +102,6 @@ class FormField(FormDataDef):
 
         return self.labels.get(lang, self.name)
 
-    def __repr__(self):
-        args = (self.__class__.__name__, self.name, self.data_type)
-        return "<%s name='%s' type='%s'>" % args
-
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
         return {self.name: val}
 
@@ -641,10 +637,6 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             for option_name in self.choice.options.keys():
                 names.append(self.name + '/' + option_name)
         return names
-
-    def __repr__(self):
-        data = (self.name, self.data_type)
-        return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
 
     # maybe try to cache those
     def format(self, val, lang=UNSPECIFIED_TRANSLATION,

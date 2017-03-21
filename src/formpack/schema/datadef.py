@@ -33,7 +33,7 @@ class FormDataDef(object):
         self.src = src
 
     def __repr__(self):
-        return "<%s name='%s'>" % (self.__class__.__name__, self.name)
+        return "{} <{}>".format(self.__class__.__name__, self.name)
 
     def get_value_names(self):
         return [self.name]
