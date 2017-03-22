@@ -13,6 +13,7 @@ from ..translated_item import TranslatedItem
 
 def _field_from_dict(definition, hierarchy=None,
                      section=None, field_choices={},
+                     parent=None,
                      translations=None):
     """Return an instance of a Field class matching this JSON field def
 
@@ -78,5 +79,6 @@ def _field_from_dict(definition, hierarchy=None,
                hierarchy=hierarchy,
                section=section,
                choice=choice,
+               parent=parent,
                src=definition,
                )

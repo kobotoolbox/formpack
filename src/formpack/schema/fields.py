@@ -37,9 +37,10 @@ class FormField(FormDataDef):
         self.data_type = data_type
         self.section = section
         self.can_format = can_format
+        _parent = kwargs['parent']
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
-        self.hierarchy = hierarchy + [self]
+        self._hierarchy = hierarchy + [self]
 
         # warning: the order of the super() call matters
         super(FormField, self).__init__(name, labels, *args, **kwargs)
@@ -52,7 +53,13 @@ class FormField(FormDataDef):
         self.empty_result = self.format('', lang=UNSPECIFIED_TRANSLATION)
 
         # do not include the root section in the path
-        self.path = '/'.join(info.name for info in self.hierarchy[1:])
+        self._parent = _parent
+
+        self.path = '/'.join(info.name for info in self._hierarchy[1:])
+
+    @property
+    def hierarchy(self):
+        return self._hierarchy
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                    hierarchy_in_labels=False, multiple_select="both"):
@@ -395,11 +402,9 @@ class NumField(FormField):
 
 class CopyField(FormField):
     """ Just copy the data over. No translation. No manipulation """
-    def __init__(self, name, hierarchy=(None,), section=None, *args, **kwargs):
+    def __init__(self, name, *args, **kwargs):
         super(CopyField, self).__init__(name, labels=None,
                                         data_type=name,
-                                        hierarchy=(None,),
-                                        section=section,
                                         can_format=True,
                                         has_stats=False,
                                         *args, **kwargs)

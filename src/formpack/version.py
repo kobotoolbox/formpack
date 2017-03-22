@@ -201,6 +201,7 @@ class FormVersion(object):
 
                 group = FormGroup(data_definition['name'], labels,
                                   src=data_definition)
+                group.set_parent(hierarchy[-1])
 
                 # We go down in one level on nesting, so save the parent group.
                 # Parent maybe None, in that case we are at the top level.
@@ -220,7 +221,7 @@ class FormVersion(object):
                                       labels,
                                       hierarchy=hierarchy,
                                       src=data_definition,
-                                      parent=parent_section,
+                                      parent=hierarchy[-1],
                                       )
 
                 self.sections[section.name] = section
@@ -234,6 +235,7 @@ class FormVersion(object):
             field = _field_from_dict(data_definition,
                                      hierarchy, section,
                                      field_choices,
+                                     parent=hierarchy[-1],
                                      translations=self.translations)
             section.fields[field.name] = field
 

@@ -40,7 +40,10 @@ class Export(object):
             first_version = next(iter(form_versions.values()))
             first_section = next(iter(first_version.sections.values()))
             for name in copy_fields:
-                dumb_field = CopyField(name, section=first_section)
+                dumb_field = CopyField(name,
+                                       section=first_section,
+                                       hierarchy=first_section.hierarchy[:1],
+                                       parent=first_section)
                 first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
@@ -140,7 +143,7 @@ class Export(object):
             if section.children or self.force_index:
                 auto_field_names.append('_index')
 
-            if section.parent:
+            if section._parent:
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
 
@@ -339,7 +342,7 @@ class Export(object):
                 row['_index'] = _indexes[_section_name]
 
             if '_parent_table_name' in row:
-                row['_parent_table_name'] = current_section.parent.name
+                row['_parent_table_name'] = current_section.parent_section.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
 
             rows.append(list(row.values()))

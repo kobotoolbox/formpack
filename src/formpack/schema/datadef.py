@@ -38,9 +38,22 @@ class FormDataDef(object):
     def get_value_names(self):
         return [self.name]
 
+    @property
+    def ancestors(self):
+        # assert that return value == self._hierarchy
+        if self._parent is None:
+            return [self]
+        return self._parent.ancestors + [self]
+
 
 class FormGroup(FormDataDef):  # useful to get __repr__
-    pass
+    def set_parent(self, item):
+        # a workaround to ensure parent can be set consistently
+        self._group_parent = item
+
+    @property
+    def _parent(self):
+        return self._group_parent
 
 
 class FormSection(FormDataDef):
@@ -53,14 +66,30 @@ class FormSection(FormDataDef):
         if labels is None:
             labels = TranslatedItem()
 
-        self.parent = parent
+        self._parent = parent
         super(FormSection, self).__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
         self.children = list(children)
 
-        self.hierarchy = list(hierarchy) + [self]
+        self._hierarchy = list(hierarchy) + [self]
+
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
+
+    @property
+    def parent_section(self):
+        try:
+            return next(anc for anc in self.ancestors[:-1][::-1]
+                        if isinstance(anc, FormSection))
+        except StopIteration:
+            return None
+
+    @property
+    def hierarchy(self):
+        _ancestors = self.ancestors
+        if len(_ancestors) == 1:
+            return [None] + _ancestors
+        return self._hierarchy
 
     @property
     def rows(self, include_groups=False):
@@ -77,10 +106,6 @@ class FormSection(FormDataDef):
 
     def get_label(self, lang=UNTRANSLATED):
         return [self.labels.get(lang) or self.name]
-
-    def __repr__(self):
-        parent_name = getattr(self.parent, 'name', None)
-        return "<FormSection name='%s' parent='%s'>" % (self.name, parent_name)
 
 
 class FormChoice(FormDataDef):
