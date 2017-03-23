@@ -19,6 +19,7 @@ from .errors import SchemaError
 from .utils.flatten_content import flatten_content
 from .schema import (FormField,
                      FormGroup,
+                     FormRoot,
                      FormSection,
                      OrOtherField,
                      FormChoice)
@@ -145,8 +146,8 @@ class FormVersion(object):
 
         # Extract fields data
         group = None
-        section = FormSection(name=form_pack.title, src=False)
-        self._main_section = section
+        section = FormRoot(name=form_pack.title, src=False)
+        self._root_section = section
         self.sections[form_pack.title] = section
 
         # Those will keep track of were we are while traversing the
@@ -255,7 +256,7 @@ class FormVersion(object):
         return '<FormVersion %s>' % self._stats_str()
 
     def rows(self, include_groups=False):
-        for row in self._main_section.rows:
+        for row in self._root_section.rows:
             yield row
 
     def columns(self, **opts):

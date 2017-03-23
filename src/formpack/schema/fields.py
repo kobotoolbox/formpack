@@ -37,13 +37,14 @@ class FormField(FormDataDef):
         self.data_type = data_type
         self.section = section
         self.can_format = can_format
-        _parent = kwargs['parent']
+        self._parent = kwargs['parent']
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self._hierarchy = hierarchy + [self]
 
         # warning: the order of the super() call matters
         super(FormField, self).__init__(name, labels, *args, **kwargs)
+        self.type = self.src.get('type')
 
         if has_stats is not None:
             self.has_stats = has_stats
@@ -53,8 +54,6 @@ class FormField(FormDataDef):
         self.empty_result = self.format('', lang=UNSPECIFIED_TRANSLATION)
 
         # do not include the root section in the path
-        self._parent = _parent
-
         self.path = '/'.join(info.name for info in self._hierarchy[1:])
 
     @property
@@ -688,6 +687,9 @@ class VirtualField(object):
 class OrOtherField(VirtualField):
     def __init__(self, *args, **kwargs):
         super(OrOtherField, self).__init__(*args, **kwargs)
+        self._parent = self.related_field._parent
+        self.src = {}
+        self.type = 'text'
         self.name = '{}_other'.format(self.related_field.name)
         self.labels = self._modify_labels()
 
@@ -699,3 +701,10 @@ class OrOtherField(VirtualField):
                 val = ''
             translations[translation] = '{} [other]'.format(val)
         return TranslatedItem(translations.values(), translations=translations.keys())
+
+    @property
+    def ancestors(self):
+        # assert that return value == self._hierarchy
+        if self._parent is None:
+            return [self]
+        return self._parent.ancestors + [self]
