@@ -261,16 +261,12 @@ class FormVersion(object):
             yield row
 
     def columns(self, **opts):
-        _orother = opts.pop('expand_custom_other_fields', None)
-        fields = OrderedDict()
-        for section in self.sections.itervalues():
-            for field in section.fields.itervalues():
-                if field.name not in fields:
-                    fields[field.name] = field
-                    if _orother and field.src.get('_or_other'):
-                        _f = OrOtherField(related_field=field)
-                        fields[_f.name] = _f
-        return fields.values()
+        _orother = opts.pop('expand_custom_other_fields', False)
+        for field in self._root_section.iterfields(**opts):
+            yield field
+
+            if _orother and field.src.get('_or_other'):
+                yield OrOtherField(related_field=field)
 
     def _stats(self):
         _stats = OrderedDict()

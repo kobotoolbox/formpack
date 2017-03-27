@@ -681,17 +681,33 @@ class VirtualField(object):
     '''
     def __init__(self, related_field):
         self.related_field = related_field
-        self.hierarchy = self.related_field.hierarchy[:-1] + [self]
+        # self.hierarchy = self.related_field.hierarchy[:-1] + [self]
 
 
-class OrOtherField(VirtualField):
+class SiblingVirtualField(VirtualField):
+    def __init__(self, *args, **kwargs):
+        super(SiblingVirtualField, self).__init__(*args, **kwargs)
+        self._parent = self.related_field._parent
+
+    @property
+    def ancestors(self):
+        # assert that return value == self._hierarchy
+        if self._parent is None:
+            return [self]
+        return self._parent.ancestors + [self]
+
+    @property
+    def path(self):
+        return '/'.join(info.name for info in self.ancestors[1:])
+
+
+class OrOtherField(SiblingVirtualField):
     def __init__(self, *args, **kwargs):
         super(OrOtherField, self).__init__(*args, **kwargs)
         self._parent = self.related_field._parent
         self.src = {}
         self.type = 'text'
         self.name = '{}_other'.format(self.related_field.name)
-        self.path = '/'.join(info.name for info in self.ancestors)
         self.labels = self._modify_labels()
 
     def _modify_labels(self):
@@ -703,9 +719,12 @@ class OrOtherField(VirtualField):
             translations[translation] = '{} [other]'.format(val)
         return TranslatedItem(translations.values(), translations=translations.keys())
 
+
+class GroupEnd(SiblingVirtualField):
     @property
-    def ancestors(self):
-        # assert that return value == self._hierarchy
-        if self._parent is None:
-            return [self]
-        return self._parent.ancestors + [self]
+    def name(self):
+        return '~{}'.format(self.related_field.name)
+
+    @property
+    def type(self):
+        return 'group_end'
