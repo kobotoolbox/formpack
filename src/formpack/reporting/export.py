@@ -44,7 +44,7 @@ class Export(object):
                                        section=first_section,
                                        hierarchy=first_section.hierarchy[:1],
                                        parent=first_section)
-                first_section.fields[name] = dumb_field
+                first_section._children[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
         params = (lang, group_sep, hierarchy_in_labels, multiple_select)
@@ -140,7 +140,7 @@ class Export(object):
 
             # Append optional additional fields
             auto_field_names = auto_fields[section_name] = []
-            if section.children or self.force_index:
+            if section.child_sections or self.force_index:
                 auto_field_names.append('_index')
 
             if section._parent:
@@ -348,7 +348,7 @@ class Export(object):
             rows.append(list(row.values()))
 
             # Process all repeat groups of this level
-            for child_section in current_section.children:
+            for child_section in current_section.child_sections:
                 # Because submissions are nested, we flatten them out by reading
                 # the whole submission tree recursively, formatting the entries,
                 # and adding the results to the list of rows for this section.

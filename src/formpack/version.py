@@ -203,6 +203,7 @@ class FormVersion(object):
                 group = FormGroup(data_definition['name'], labels,
                                   src=data_definition)
                 group.set_parent(hierarchy[-1])
+                section._children[group.name] = group
 
                 # We go down in one level on nesting, so save the parent group.
                 # Parent maybe None, in that case we are at the top level.
@@ -226,9 +227,9 @@ class FormVersion(object):
                                       )
 
                 self.sections[section.name] = section
+                parent_section._children[section.name] = section
                 hierarchy.append(section)
                 section_stack.append(parent_section)
-                parent_section.children.append(section)
                 continue
 
             # If we are here, it's a regular field
@@ -238,7 +239,7 @@ class FormVersion(object):
                                      field_choices,
                                      parent=hierarchy[-1],
                                      translations=self.translations)
-            section.fields[field.name] = field
+            section._children[field.name] = field
 
             _f = fields_by_name[field.name]
             _labels = TranslatedItem()

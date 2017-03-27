@@ -54,6 +54,7 @@ class FormGroup(FormDataDef):  # useful to get __repr__
     def set_parent(self, item):
         # a workaround to ensure parent can be set consistently
         self._group_parent = item
+        self.path = '/'.join([item.name for item in self.ancestors[1:]])
 
     @property
     def _parent(self):
@@ -75,14 +76,34 @@ class FormSection(FormDataDef):
             labels = TranslatedItem()
 
         self._parent = parent
+        self._children = OrderedDict()
         super(FormSection, self).__init__(name, labels, *args, **kwargs)
-        self.fields = fields or OrderedDict()
-        self.children = list(children)
 
         self._hierarchy = list(hierarchy) + [self]
 
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
+
+    @property
+    def fields(self):
+        '''
+        Note: CopyField does not get put in the "fields"  list until export()
+        is created.
+        '''
+        return OrderedDict([
+            items
+            for items in self._children.items()
+            if not isinstance(items[1], (FormGroup, FormSection,))
+        ])
+
+    @property
+    def fields_and_groups(self):
+        return OrderedDict(self._children.items())
+
+    @property
+    def child_sections(self):
+        return filter(lambda x: isinstance(x, FormSection),
+                      self._children.itervalues())
 
     @property
     def type(self):

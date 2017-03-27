@@ -691,6 +691,7 @@ class OrOtherField(VirtualField):
         self.src = {}
         self.type = 'text'
         self.name = '{}_other'.format(self.related_field.name)
+        self.path = '/'.join(info.name for info in self.ancestors)
         self.labels = self._modify_labels()
 
     def _modify_labels(self):
