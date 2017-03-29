@@ -1,6 +1,26 @@
 # coding: utf-8
 
-class FormTreeRoot(object):
+
+class Iterfielded:
+    def iterfields(self,
+                   include_groups=False,
+                   include_group_ends=None,
+                   ):
+        for kid in self._children:
+            _is_group = isinstance(kid, FormTreeGroupSection)
+            if (_is_group and include_groups) or not _is_group:
+                yield kid
+            if _is_group:
+                for subkid in kid.iterfields(
+                       include_groups=include_groups,
+                       include_group_ends=include_group_ends,
+                       ):
+                    yield subkid
+                if include_group_ends:
+                    yield FormTreeGroupEnd(kid)
+
+
+class FormTreeRoot(object, Iterfielded):
     def __init__(self, version):
         self._version = version
         self._children = []
@@ -8,23 +28,6 @@ class FormTreeRoot(object):
 
     def __repr__(self):
         return '* FormTreeRoot'
-
-    def iterfields(self,
-                   include_sections=False,
-                   include_groups=False,
-                   include_group_ends=None,
-                   ):
-        for kid in self._children:
-            _is_group = isinstance(kid, FormTreeGroupSection)
-            if _is_group and include_groups:
-                yield kid
-            elif not _is_group:
-                yield kid
-            if _is_group:
-                for subkid in kid._children:
-                    yield subkid
-                if include_group_ends:
-                    yield FormTreeGroupEnd(kid)
 
     @property
     def _current(self):
@@ -36,11 +39,12 @@ class FormTreeRoot(object):
     def push_group(self, grp, repeat=False):
         item = FormTreeRepeat(grp) if repeat else FormTreeGroup(grp)
         item._next_ancestor = self._current
+        self._current._children.append(item)
         self._group_stack.append(item)
-        self._children.append(item)
 
-    def pop_group(self):
-        self._group_stack.pop()
+    def pop_group(self, repeat=False):
+        ppd = self._group_stack.pop()
+        assert ppd.type == 'repeat' if repeat else 'group'
 
     def push_field(self, field):
         self._current.append_kid(field)
@@ -50,7 +54,8 @@ class FormTreeRoot(object):
         kid._next_ancestor = self
 
 
-class FormTreeGroupSection(object):
+class FormTreeGroupSection(object, Iterfielded):
+
     def __init__(self, origin):
         self._children = []
         self._origin = origin
@@ -63,7 +68,8 @@ class FormTreeGroupSection(object):
         kid._next_ancestor = self
 
     def __repr__(self):
-        return '*{ {} }'.format(repr(self._origin))
+        return ':'.join([self.__class__.__name__,
+                         repr(self._origin)])
 
     @property
     def type(self):
@@ -96,7 +102,7 @@ class FormTreeGroupEnd(object):
 
     @property
     def type(self):
-        return '{}_end'.format(self.related_group.type)
+        return 'end_{}'.format(self.related_group.type)
 
     @property
     def ancestors(self):
