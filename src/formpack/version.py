@@ -17,14 +17,20 @@ from .utils.xform_tools import formversion_pyxform
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .errors import SchemaError
 from .utils.flatten_content import flatten_content
+from .schema import _field_from_dict
 from .schema import (FormField,
                      FormGroup,
                      FormRoot,
                      FormSection,
                      OrOtherField,
-                     FormChoice)
+                     FormChoice,
+                     )
+from .schema.tree import (FormTreeRoot,
+                          FormTreeRepeat,
+                          FormTreeGroup)
+
 from .translated_item import TranslatedItem
-from .schema import _field_from_dict
+
 
 
 def get_labels(choice_definition, translation_list):
@@ -147,6 +153,7 @@ class FormVersion(object):
         # Extract fields data
         group = None
         section = FormRoot(name=form_pack.title, src=False)
+        _tree = FormTreeRoot(self)
         self._root_section = section
         self.sections[form_pack.title] = section
 
@@ -179,6 +186,7 @@ class FormVersion(object):
                 # level in the hierarchy.
                 hierarchy.pop()
                 group = group_stack.pop()
+                _tree.pop_group(repeat=False)
                 continue
 
             if data_type == 'end_repeat':
@@ -186,6 +194,7 @@ class FormVersion(object):
                 # section to be what used to be the parent section
                 hierarchy.pop()
                 section = section_stack.pop()
+                _tree.pop_group(repeat=True)
                 continue
 
             # parse defintinitions of stuff having a name such as fields
@@ -203,6 +212,7 @@ class FormVersion(object):
                 group = FormGroup(data_definition['name'], labels,
                                   src=data_definition)
                 group.set_parent(hierarchy[-1])
+                _tree.push_group(group)
                 section._children[group.name] = group
 
                 # We go down in one level on nesting, so save the parent group.
@@ -229,6 +239,7 @@ class FormVersion(object):
                 self.sections[section.name] = section
                 parent_section._children[section.name] = section
                 hierarchy.append(section)
+                _tree.push_group(section, True)
                 section_stack.append(parent_section)
                 continue
 
@@ -239,6 +250,7 @@ class FormVersion(object):
                                      field_choices,
                                      parent=hierarchy[-1],
                                      translations=self.translations)
+            _tree.push_field(field)
             section._children[field.name] = field
 
             _f = fields_by_name[field.name]
@@ -252,6 +264,7 @@ class FormVersion(object):
 
             field.labels = _labels
             assert 'labels' not in _f
+        self._tree = _tree
 
     def __repr__(self):
         return '<FormVersion %s>' % self._stats_str()
@@ -262,7 +275,7 @@ class FormVersion(object):
 
     def columns(self, **opts):
         _orother = opts.pop('expand_custom_other_fields', False)
-        for field in self._root_section.iterfields(**opts):
+        for field in self._tree.iterfields(**opts):
             yield field
 
             if _orother and field.src.get('_or_other'):
