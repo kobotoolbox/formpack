@@ -273,13 +273,53 @@ class FormVersion(object):
         for row in self._root_section.rows:
             yield row
 
-    def columns(self, **opts):
+    def columns(self,
+                start=None,
+                count=None,
+                names=None,
+                **opts):
         _orother = opts.pop('expand_custom_other_fields', False)
-        for field in self._tree.iterfields(**opts):
+
+        # allow filtering of gigantic surveys
+        if names is not None:
+            _gen = self._columns_filtered_by_name(names, **opts)
+        elif start is not None:
+            _gen = self._columns_filtered_by_index(start, count, **opts)
+        else:
+            _gen = self._tree.iterfields(**opts)
+
+        for field in _gen:
             yield field
 
             if _orother and field.src.get('_or_other'):
                 yield OrOtherField(related_field=field)
+
+    def _columns_filtered_by_name(self, names, **opts):
+        for field in self._tree.iterfields(**opts):
+            if field.name in names:
+                yield field
+
+    def _columns_filtered_by_index(self, start, count, **opts):
+        _started = False
+        _finished = False
+        _start_index = isinstance(start, int)
+        if not isinstance(count, int) or count < 1:
+            # force count to be a positive int
+            count = 1
+
+        for (n, field) in enumerate(self._tree.iterfields(**opts)):
+            if _start_index and n >= start:
+                # "start" index has been reached
+                _started = True
+            elif not _start_index and field.name == start:
+                # "start" name has been reached"
+                _started = True
+
+            if _started and not _finished:
+                yield field
+                count -= 1
+                if count < 1:
+                    _finished = True
 
     def _stats(self):
         _stats = OrderedDict()
