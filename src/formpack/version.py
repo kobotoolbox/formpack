@@ -30,7 +30,8 @@ from .schema.tree import (FormTreeRoot,
                           FormTreeGroup)
 
 from .translated_item import TranslatedItem
-
+from collections import (defaultdict, Counter)
+from argparse import Namespace as Ns
 
 
 def get_labels(choice_definition, translation_list):
@@ -72,6 +73,42 @@ def choices_from_structures(definition, translation_list):
     return all_choices.items()
 
 
+class FieldMapping:
+    def __init__(self, _from, _to):
+        self._from = _from
+        self._to = _to
+
+
+class ParseContext:
+    def __init__(self, _level, parent_context=None):
+        self._counter = Counter()
+        self._level = _level
+        self.index = None
+        self.index_chain = []
+        if parent_context:
+            parent_context._counter[_level] += 1
+            self.index = parent_context._counter[_level] - 1
+            ptr = parent_context
+            self.index_chain = parent_context.index_chain + [self.index]
+
+from pprint import pprint
+
+class SubmittedValue:
+    def __init__(self, **kwargs):
+        self.category = kwargs.pop('category')
+        self.field = kwargs.pop('_cur', False)
+        if self.field:
+            self.kuid = self.field.src.get('$kuid')
+        self.value = kwargs.pop('val', None)
+        self.ctx = kwargs.pop('context', None)
+        self._kw = Ns(**kwargs)
+
+    def _stick_it_in(self, submission):
+        indeces = self.ctx.index_chain
+        submission.append(
+                [self.kuid, indeces, self.value, self.field._full_path]
+            )
+
 class FormVersion(object):
     @classmethod
     def verify_schema_structure(cls, struct):
@@ -80,6 +117,59 @@ class FormVersion(object):
         if 'survey' not in struct['content']:
             raise SchemaError('version content must have "survey"')
         validate_content(struct['content'])
+
+    def format_submission(self, json_submission, **opts):
+        submission = []
+        paths = {}
+        caught = {
+            '_geolocation': True,
+        }
+        for field in self.columns(include_groups=True):
+            paths[field.path] = field
+
+        fields_sorted = {
+            'caught': [],
+            'found': [],
+            'lost': [],
+        }
+
+        def _save(category, **kwargs):
+            fields_sorted[category].append(
+                    SubmittedValue(category=category, **kwargs)
+                )
+
+        def _parse(key, val, context):
+            _cur = paths.get(key, False)
+            category = None
+            if key in caught:
+                category = 'caught'
+            elif isinstance(val, list):
+                for subitem in val:
+                    _ccc = ParseContext(_cur, parent_context=context)
+                    for (subkey, subval) in subitem.items():
+                        _parse(subkey, subval, _ccc)
+            elif _cur:
+                category = 'found'
+            else:
+                category = 'lost'
+
+            if category:
+
+                _save(category=category,
+                      context=context,
+                      _cur=_cur,
+                      key=key,
+                      val=val,
+                      )
+
+        for (key, val) in json_submission.iteritems():
+            _parse(key, val, ParseContext(self))
+
+        fields_sorted = Ns(**fields_sorted)
+        for found in fields_sorted.found:
+            found._stick_it_in(submission)
+
+        return submission
 
     def __init__(self, form_pack, schema):
         if 'name' in schema:
@@ -279,6 +369,8 @@ class FormVersion(object):
                 names=None,
                 **opts):
         _orother = opts.pop('expand_custom_other_fields', False)
+        _split_gps = opts.pop('split_gps', False)
+        _split_select_multiple = opts.pop('split_select_multiple', False)
 
         # allow filtering of gigantic surveys
         if names is not None:
@@ -289,7 +381,14 @@ class FormVersion(object):
             _gen = self._tree.iterfields(**opts)
 
         for field in _gen:
-            yield field
+            if _split_gps and field.type == 'geopoint':
+                for subfield in field.split_gps():
+                    yield subfield
+            if _split_select_multiple and field.type == 'select_multiple':
+                for subfield in field.split_select_multiple():
+                    yield subfield
+            else:
+                yield field
 
             if _orother and field.src.get('_or_other'):
                 yield OrOtherField(related_field=field)

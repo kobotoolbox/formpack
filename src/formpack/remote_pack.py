@@ -66,6 +66,7 @@ class RemoteFormPack:
                 raise ValueError("Error querying API: {}".format(
                                  ad['detail']))
             # content is ultimately pulled form the "version" file
+            ad['id_string'] = ad['content'].get('settings', {}).get('id_string', None)
             del ad['content']
             with open(self.path('asset.json'), 'w') as ff:
                 ff.write(json.dumps(ad, indent=2))
@@ -83,8 +84,9 @@ class RemoteFormPack:
                 'kc_api_url': '{}://{}/api/v1'.format(_deployment.scheme,
                                                       _deployment.netloc),
             }
+            id_string = self.uid
             _url = '{}/forms?id_string={}'.format(ctx['kc_api_url'],
-                                                  self.uid)
+                                                  id_string)
             r2 = requests.get(_url, headers=self._headers()).json()
             ctx['kc_formid'] = r2[0]['formid']
             with open(self.path('context.json'), 'w') as ff:

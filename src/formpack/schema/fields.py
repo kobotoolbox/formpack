@@ -54,7 +54,7 @@ class FormField(FormDataDef):
         self.empty_result = self.format('', lang=UNSPECIFIED_TRANSLATION)
 
         # do not include the root section in the path
-        self.path = '/'.join(info.name for info in self._hierarchy[1:])
+        self._full_path = '/'.join(info._full_name for info in self._hierarchy[1:])
 
     @property
     def hierarchy(self):
@@ -413,12 +413,27 @@ class CopyField(FormField):
         return [self.name]
 
 
+class SubGPSField(object):
+    def __init__(self, field, subname):
+        self._field = field
+        self._subname = subname
+        self.path = '_{}_{}'.format(field.path, subname)
+
 class FormGPSField(FormField):
 
     def __init__(self, name, labels, data_type, hierarchy=None,
                  section=None, choice=None, *args, **kwargs):
         super(FormGPSField, self).__init__(name, labels, data_type,
                                            hierarchy, section, *args, **kwargs)
+
+    def split_gps(self):
+        for subname in [
+            'latitude',
+            'longitude',
+            'precision',
+            'altitude',
+        ]:
+            yield SubGPSField(self, subname)
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
@@ -594,6 +609,11 @@ class FormChoiceField(FormField):
 
         return stats
 
+class MultiselectOption(object):
+    def __init__(self, field, option_value, option):
+        self._field = field
+        self.path = '{}/{}'.format(field.path, option_value)
+
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
@@ -602,6 +622,11 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
         # reset empty result so it doesn't contain '0'
         self.empty_result = dict.fromkeys(self.empty_result, '')
+
+    def split_select_multiple(self):
+        yield self
+        for (option_value, option) in self.choice.options.iteritems():
+            yield MultiselectOption(self, option_value, option)
 
     def _get_option_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                           hierarchy_in_labels=False, option=None):
@@ -688,6 +713,9 @@ class SiblingVirtualField(VirtualField):
     def __init__(self, *args, **kwargs):
         super(SiblingVirtualField, self).__init__(*args, **kwargs)
         self._parent = self.related_field._parent
+        self._full_name = self.name
+        self._full_path = '/'.join(info._full_name for info in self.ancestors[1:])
+        self.path = self._full_path.replace('[]', '')
 
     @property
     def ancestors(self):
@@ -696,18 +724,15 @@ class SiblingVirtualField(VirtualField):
             return [self]
         return self._parent.ancestors + [self]
 
-    @property
-    def path(self):
-        return '/'.join(info.name for info in self.ancestors[1:])
-
 
 class OrOtherField(SiblingVirtualField):
     def __init__(self, *args, **kwargs):
+        self.name = '{}_other'.format(kwargs.get('related_field').name)
         super(OrOtherField, self).__init__(*args, **kwargs)
         self._parent = self.related_field._parent
         self.src = {}
         self.type = 'text'
-        self.name = '{}_other'.format(self.related_field.name)
+        self._full_name = self.name
         self.labels = self._modify_labels()
 
     def _modify_labels(self):
@@ -723,8 +748,8 @@ class OrOtherField(SiblingVirtualField):
 class GroupEnd(SiblingVirtualField):
     @property
     def name(self):
-        return '~{}'.format(self.related_field.name)
+        return None
 
     @property
     def type(self):
-        return 'group_end'
+        return 'end_group'

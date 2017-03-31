@@ -11,7 +11,7 @@ from .fixtures import build_fixture
 
 def _build_pack(key):
     title, schemas, submissions = build_fixture(key)
-    return FormPack(schemas, title)
+    return FormPack(schemas, title, submissions=submissions)
 
 
 def _fixture_iterator(fix_name):
@@ -212,8 +212,8 @@ def test_iterfields():
 
 
 # This does work, but could be moved somewhere else as a CLI utility
-'''
 def print_fixture_table(fixture_name, path=False, _type=False,
+                        kuid=False,
                         names=None,
                         start=None,
                         count=None):
@@ -243,6 +243,9 @@ def print_fixture_table(fixture_name, path=False, _type=False,
             arr.append(labeled.type)
         if path:
             arr.append(labeled.path)
+        if kuid:
+            _kuid = labeled.src.get('$kuid', None)
+            arr.append(_kuid)
         trows.append(arr)
 
     cols = ['item']
@@ -250,5 +253,157 @@ def print_fixture_table(fixture_name, path=False, _type=False,
         cols.append('type')
     if path:
         cols.append('path')
+    if kuid:
+        cols.append('kuid')
     print('\n' + tabulate(trows, cols))
-'''
+
+import yaml
+from copy import deepcopy
+from pprint import pprint
+import json
+
+def test_xyz():
+    print_fixture_table('repeat_repeat', path=True, kuid=True)
+    fp = _build_pack('repeat_repeat')
+    v1 = fp.versions.values()[0]
+    outt = []
+    subs = []
+
+    expected = [[u'e6b3a76c', [0], u'xx'],
+                [u'53c4140e', [0, 0], u'aa'],
+                [u'116d1cd6', [0, 0], u'bb'],
+                [u'53c4140e', [0, 1], u'cc'],
+                [u'116d1cd6', [0, 1], u'dd'],
+                [u'53c4140e', [0, 2], u'ee'],
+                [u'116d1cd6', [0, 2], u'ff'],
+                [u'e6b3a76c', [1], u'gg'],
+                [u'53c4140e', [1, 0], u'hh'],
+                [u'116d1cd6', [1, 0], u'ii'],
+                [u'53c4140e', [1, 1], u'jj'],
+                [u'116d1cd6', [1, 1], u'kk'],
+                [u'53c4140e', [1, 2], u'll'],
+                [u'116d1cd6', [1, 2], u'mm'],
+                [u'53c4140e', [1, 3], u'nn'],
+                [u'116d1cd6', [1, 3], u'oo'],
+                [u'e6b3a76c', [2], u'pp'],
+                [u'53c4140e', [2, 0], u'qq'],
+                [u'116d1cd6', [2, 0], u'rr'],
+                [u'53c4140e', [2, 1], u'ss'],
+                [u'116d1cd6', [2, 1], u'tt'],
+                [u'42a69d1b', [], u'pickles tomatoes'],
+                [u'77a73545', [], u'other'],
+                [u'db77bd6f', [], u'2017-03-29T18:14:08.000-05:00'],
+                [u'729cd22d', [], u'aa'],
+                [u'd48216e8', [], u'2017-03-29T18:13:02.000-05:00']]
+
+    expected = [[u'e6b3a76c',
+                [0],
+                u'xx',
+                u'household_visit/houshold_member_name[]/household_member_name'],
+                [u'53c4140e',
+                [0, 0],
+                u'aa',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [0, 0],
+                u'bb',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'53c4140e',
+                [0, 1],
+                u'cc',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [0, 1],
+                u'dd',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'53c4140e',
+                [0, 2],
+                u'ee',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [0, 2],
+                u'ff',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'e6b3a76c',
+                [1],
+                u'gg',
+                u'household_visit/houshold_member_name[]/household_member_name'],
+                [u'53c4140e',
+                [1, 0],
+                u'hh',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [1, 0],
+                u'ii',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'53c4140e',
+                [1, 1],
+                u'jj',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [1, 1],
+                u'kk',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'53c4140e',
+                [1, 2],
+                u'll',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [1, 2],
+                u'mm',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'53c4140e',
+                [1, 3],
+                u'nn',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [1, 3],
+                u'oo',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'e6b3a76c',
+                [2],
+                u'pp',
+                u'household_visit/houshold_member_name[]/household_member_name'],
+                [u'53c4140e',
+                [2, 0],
+                u'qq',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [2, 0],
+                u'rr',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'53c4140e',
+                [2, 1],
+                u'ss',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/what_is_an_example_of_a_nice_word'],
+                [u'116d1cd6',
+                [2, 1],
+                u'tt',
+                u'household_visit/houshold_member_name[]/group_fv0pt65[]/why_is_this_word_nice'],
+                [u'42a69d1b', [], u'pickles tomatoes', u'select_mult'],
+                [u'77a73545', [], u'other', u'did_it_go_well'],
+                [u'db77bd6f', [], u'2017-03-29T18:14:08.000-05:00', u'end'],
+                [u'729cd22d', [], u'aa', u'household_visit/household_address'],
+                [u'd48216e8', [], u'2017-03-29T18:13:02.000-05:00', u'start']]
+
+    for (n, submission) in enumerate(fp.submissions):
+        subs.append(deepcopy(submission))
+        xxxyz = v1.format_submission(submission)
+        if n == 0:
+            # import pdb
+            # pdb.set_trace()
+            # for (nn, qq) in enumerate(xxxyz):
+            #     assert expected[nn] == qq
+            outt.append(xxxyz)
+    pprint(outt[0])
+    assert outt[0] == expected
+    # for (n, _outtie) in enumerate(outt[0]):
+    #     # pprint(_outtie)
+    #     try:
+    #         assert expected[0][n] == _outtie
+    #     except IndexError:
+    #         print(json.dumps(subs[n], indent=2))
+    #         raise Exception('fail')
+
+    # assert outt[0] == 
+    # print(json.dumps(fp.submissions, indent=2))

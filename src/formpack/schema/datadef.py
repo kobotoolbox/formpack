@@ -31,6 +31,9 @@ class FormDataDef(object):
         self.value_names = self.get_value_names()
         self.has_stats = has_stats
         self.src = src or {}
+        self._full_name = self.name
+        if self.src.get('type', None) == 'begin_repeat':
+            self._full_name += '[]'
 
     def __repr__(self):
         return "{} <{}>".format(self.__class__.__name__, self.name)
@@ -46,6 +49,10 @@ class FormDataDef(object):
         return self._parent.ancestors + [self]
 
     @property
+    def path(self):
+        return self._full_path.replace('[]', '')
+
+    @property
     def is_root(self):
         return False
 
@@ -54,7 +61,8 @@ class FormGroup(FormDataDef):  # useful to get __repr__
     def set_parent(self, item):
         # a workaround to ensure parent can be set consistently
         self._group_parent = item
-        self.path = '/'.join([item.name for item in self.ancestors[1:]])
+        self._full_path = '/'.join([item._full_name for item in self.ancestors[1:]])
+        # self.path = '/'.join([item.name for item in self.ancestors[1:]])
 
     @property
     def _parent(self):
@@ -82,7 +90,8 @@ class FormSection(FormDataDef):
         self._hierarchy = list(hierarchy) + [self]
 
         # do not include the root section in the path
-        self.path = '/'.join(info.name for info in self.hierarchy[1:])
+        self._full_path = '/'.join([item._full_name for item in self.ancestors[1:]])
+        # self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     @property
     def fields(self):
