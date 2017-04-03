@@ -93,19 +93,24 @@ class ParseContext:
 
 from pprint import pprint
 
+
 class SubmittedValue:
     def __init__(self, **kwargs):
         self.category = kwargs.pop('category')
-        self.field = kwargs.pop('_cur', False)
+        self.field = kwargs.pop('_cur', None)
         self.kuid = self.field.src.get('$kuid') if self.field else None
         self.value = kwargs.pop('val', None)
         self.ctx = kwargs.pop('context', None)
+        self.key = kwargs.pop('key', None)
         self._kw = Ns(**kwargs)
 
     def __repr__(self):
-        return '<SubmittedValue {} {}>'.format(self.kuid, self.value)
+        if self.field:
+            return '<SubmittedValue "{}" {}={}>'.format(self.category, self.field._full_path, self.value)
+        else:
+            return '<SubmittedValue "{}" {}={}>'.format(self.category, self.key, self.value)
 
-    def _stick_it_in(self, submission):
+    def append_to(self, submission):
         indeces = self.ctx.index_chain
         submission.append(
                 [self.kuid, indeces, self.value, self.field._full_path]
@@ -124,11 +129,13 @@ class FormVersion(object):
         submission = []
         for item in self.format_submission_iterator(json_submission):
             if item.category == 'found':
-                item._stick_it_in(submission)
+                item.append_to(submission)
         return submission
 
     def format_submission_iterator(self, json_submission, **opts):
         paths = {}
+        ignore = opts.get('ignore', [])
+        field_mapped = opts.get('field_mapped', {})
         caught = {
             '_geolocation': True,
         }
@@ -138,8 +145,14 @@ class FormVersion(object):
         def _parse(key, val, context):
             _cur = paths.get(key, False)
             category = None
+            _constructor = SubmittedValue
             if key in caught:
                 category = 'caught'
+            elif key in ignore:
+                category = 'ignored'
+            elif key in field_mapped:
+                _constructor = field_mapped[key]
+                category = 'found'
             elif isinstance(val, list):
                 for subitem in val:
                     _ccc = ParseContext(_cur, parent_context=context)
@@ -151,13 +164,13 @@ class FormVersion(object):
             else:
                 category = 'lost'
 
-            if category:
-                yield SubmittedValue(category=category,
-                                     context=context,
-                                     _cur=_cur,
-                                     key=key,
-                                     val=val,
-                                     )
+            if category != 'ignored':
+                yield _constructor(category=category,
+                                   context=context,
+                                   _cur=_cur,
+                                   key=key,
+                                   val=val,
+                                   )
 
         for (key, val) in json_submission.iteritems():
             for item in _parse(key, val, ParseContext(self)):

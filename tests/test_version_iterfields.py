@@ -262,7 +262,70 @@ from copy import deepcopy
 from pprint import pprint
 import json
 
-def test_xyz():
+import copy
+
+
+class Handler:
+    def __init__(self, *args, **kwargs):
+        self._kwargs = kwargs
+        _cur = kwargs.pop('_cur', None)
+        if _cur:
+            raise Exception('cur is not none')
+
+    def __repr__(self):
+        kw = copy.deepcopy(self._kwargs)
+        category = kw.pop('category')
+        return '<Handler "{}" {}>'.format(category, repr(kw))
+
+
+class FieldMapping:
+    def input_key(self):
+        return self.INPUT_KEY
+
+    def output_key(self):
+        return self.OUTPUT_KEY
+
+    def transformation(self, value):
+        return value
+
+
+class FormhubUUID(FieldMapping):
+    INPUT_KEY = '_uuid'
+    OUTPUT_KEY = 'UUID'
+
+
+class SubmissionTime(Handler):
+    pass
+
+def test_iterate_through_simple_survey():
+    fp = _build_pack('four_simp_questions')
+    v1 = fp.versions.values()[0]
+    opts = {
+        'ignore': [
+            '_notes',
+            '_bamboo_dataset_id',
+            '_tags',
+            '_attachments',
+            '_submitted_by',
+            '_geolocation',
+            '_id',
+            '__version__',
+            '_uuid',
+            '_xform_id_string',
+        ],
+        'field_mapped': {
+            'meta/instanceID': Handler,
+            'formhub/uuid': Handler,
+            '_status': Handler,
+            '_submission_time': SubmissionTime,
+        },
+    }
+    for submission in [fp.submissions[0]]:
+        for field_submission in v1.format_submission_iterator(submission, **opts):
+            print(field_submission)
+
+
+def test_iterate_through_nested_repeat_submission():
     print_fixture_table('repeat_repeat', path=True, kuid=True)
     fp = _build_pack('repeat_repeat')
     v1 = fp.versions.values()[0]
