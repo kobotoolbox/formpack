@@ -106,10 +106,6 @@ class FormSection(FormDataDef):
         ])
 
     @property
-    def fields_and_groups(self):
-        return OrderedDict(self._children.items())
-
-    @property
     def child_sections(self):
         return filter(lambda x: isinstance(x, FormSection),
                       self._children.itervalues())
