@@ -58,11 +58,12 @@ class FormDataDef(object):
 
 
 class FormGroup(FormDataDef):  # useful to get __repr__
-    def set_parent(self, item):
+    def set_parent(self, _par):
         # a workaround to ensure parent can be set consistently
-        self._group_parent = item
-        self._full_path = '/'.join([item._full_name for item in self.ancestors[1:]])
-        # self.path = '/'.join([item.name for item in self.ancestors[1:]])
+        self._group_parent = _par
+        self._full_path = '/'.join([
+            item._full_name for item in self.ancestors[1:]
+            ])
 
     @property
     def _parent(self):
@@ -91,7 +92,6 @@ class FormSection(FormDataDef):
 
         # do not include the root section in the path
         self._full_path = '/'.join([item._full_name for item in self.ancestors[1:]])
-        # self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     @property
     def fields(self):
