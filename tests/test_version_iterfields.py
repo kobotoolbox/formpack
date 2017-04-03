@@ -390,13 +390,10 @@ def test_xyz():
         subs.append(deepcopy(submission))
         xxxyz = v1.format_submission(submission)
         if n == 0:
-            # import pdb
-            # pdb.set_trace()
-            # for (nn, qq) in enumerate(xxxyz):
-            #     assert expected[nn] == qq
             outt.append(xxxyz)
     pprint(outt[0])
     assert outt[0] == expected
+
     # for (n, _outtie) in enumerate(outt[0]):
     #     # pprint(_outtie)
     #     try:

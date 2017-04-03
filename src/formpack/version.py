@@ -97,11 +97,13 @@ class SubmittedValue:
     def __init__(self, **kwargs):
         self.category = kwargs.pop('category')
         self.field = kwargs.pop('_cur', False)
-        if self.field:
-            self.kuid = self.field.src.get('$kuid')
+        self.kuid = self.field.src.get('$kuid') if self.field else None
         self.value = kwargs.pop('val', None)
         self.ctx = kwargs.pop('context', None)
         self._kw = Ns(**kwargs)
+
+    def __repr__(self):
+        return '<SubmittedValue {} {}>'.format(self.kuid, self.value)
 
     def _stick_it_in(self, submission):
         indeces = self.ctx.index_chain
@@ -118,25 +120,20 @@ class FormVersion(object):
             raise SchemaError('version content must have "survey"')
         validate_content(struct['content'])
 
-    def format_submission(self, json_submission, **opts):
+    def format_submission(self, json_submission):
         submission = []
+        for item in self.format_submission_iterator(json_submission):
+            if item.category == 'found':
+                item._stick_it_in(submission)
+        return submission
+
+    def format_submission_iterator(self, json_submission, **opts):
         paths = {}
         caught = {
             '_geolocation': True,
         }
         for field in self.columns(include_groups=True):
             paths[field.path] = field
-
-        fields_sorted = {
-            'caught': [],
-            'found': [],
-            'lost': [],
-        }
-
-        def _save(category, **kwargs):
-            fields_sorted[category].append(
-                    SubmittedValue(category=category, **kwargs)
-                )
 
         def _parse(key, val, context):
             _cur = paths.get(key, False)
@@ -147,29 +144,24 @@ class FormVersion(object):
                 for subitem in val:
                     _ccc = ParseContext(_cur, parent_context=context)
                     for (subkey, subval) in subitem.items():
-                        _parse(subkey, subval, _ccc)
+                        for subitem in _parse(subkey, subval, _ccc):
+                            yield subitem
             elif _cur:
                 category = 'found'
             else:
                 category = 'lost'
 
             if category:
-
-                _save(category=category,
-                      context=context,
-                      _cur=_cur,
-                      key=key,
-                      val=val,
-                      )
+                yield SubmittedValue(category=category,
+                                     context=context,
+                                     _cur=_cur,
+                                     key=key,
+                                     val=val,
+                                     )
 
         for (key, val) in json_submission.iteritems():
-            _parse(key, val, ParseContext(self))
-
-        fields_sorted = Ns(**fields_sorted)
-        for found in fields_sorted.found:
-            found._stick_it_in(submission)
-
-        return submission
+            for item in _parse(key, val, ParseContext(self)):
+                yield item
 
     def __init__(self, form_pack, schema):
         if 'name' in schema:
