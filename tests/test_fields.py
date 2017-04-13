@@ -3,7 +3,7 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 from formpack import FormPack
-from .fixtures import build_fixture
+from .fixtures import build_pack
 
 from formpack.utils.submission_utils import (
     flatten_kobocat_submission_dict,
@@ -13,13 +13,8 @@ from formpack.utils.submission_utils import (
 )
 
 
-def _build_pack(key):
-    title, schemas, submissions = build_fixture(key)
-    return FormPack(schemas, title, submissions=submissions)
-
-
 def test_field_paths():
-    fp = _build_pack('grouped_questions')
+    fp = build_pack('grouped_questions')
     v1 = fp.versions.values()[0]
     s1 = v1.sections.values()[0]
     fields = s1.fields
