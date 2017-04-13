@@ -5,12 +5,15 @@ class Iterfielded:
     def iterfields(self,
                    include_groups=False,
                    include_group_ends=None,
+                   traverse_repeats=True,
                    ):
         for kid in self._children:
             _is_group = isinstance(kid, FormTreeGroupSection)
+            _is_repeat = _is_group and kid.type == "repeat"
             if (_is_group and include_groups) or not _is_group:
                 yield kid
-            if _is_group:
+            _traverse_this = False if (_is_repeat and not traverse_repeats) else _is_group
+            if _traverse_this:
                 for subkid in kid.iterfields(
                        include_groups=include_groups,
                        include_group_ends=include_group_ends,
@@ -59,8 +62,10 @@ class FormTreeGroupSection(object, Iterfielded):
     def __init__(self, origin):
         self._children = []
         self._origin = origin
+        origin._intree = self
         self.name = origin.name
         self.path = origin.path
+        self._full_path = origin._full_path
         self.src = origin.src
 
     def append_kid(self, kid):

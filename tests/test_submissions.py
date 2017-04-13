@@ -5,16 +5,15 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 from formpack import FormPack
-from .fixtures import build_fixture
+from .fixtures import build_fixture, build_pack
 
 
 def test_submission_counts_match():
-    title, schemas, submissions = build_fixture('restaurant_profile')
-    fp = FormPack(schemas, title)
+    fp = build_pack('restaurant_profile')
 
     report = fp.autoreport(versions=fp.versions.keys())
-    stats = report.get_stats(submissions)
-    assert stats.submissions_count == len(submissions)
+    stats = report.get_stats(fp.submissions)
+    assert stats.submissions_count == len(fp.submissions)
     assert stats.submission_counts_by_version == {
         u'rpv1': 1,
         u'rpV2': 1,

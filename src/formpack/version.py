@@ -97,24 +97,62 @@ from pprint import pprint
 class SubmittedValue:
     def __init__(self, **kwargs):
         self.category = kwargs.pop('category')
-        self.field = kwargs.pop('_cur', None)
+        self.field = kwargs.pop('field', None)
         self.kuid = self.field.src.get('$kuid') if self.field else None
         self.value = kwargs.pop('val', None)
         self.ctx = kwargs.pop('context', None)
+        self.type = self.field.type if self.field else None
         self.key = kwargs.pop('key', None)
         self._kw = Ns(**kwargs)
+        if hasattr(self, 'post_init'):
+            self.post_init()
 
     def __repr__(self):
+        klsname = self.__class__.__name__
         if self.field:
-            return '<SubmittedValue "{}" {}={}>'.format(self.category, self.field._full_path, self.value)
+            return '<{} "{}" {}={}>'.format(klsname, self.category, self.field._full_path, self.value)
         else:
-            return '<SubmittedValue "{}" {}={}>'.format(self.category, self.key, self.value)
+            return '<{} "{}" {}={}>'.format(klsname, self.category, self.key, self.value)
 
-    def append_to(self, submission):
+    def append_to(self, submission, **opts):
         indeces = self.ctx.index_chain
         submission.append(
-                [self.kuid, indeces, self.value, self.field._full_path]
+                [
+                    self.field._full_path,
+                    indeces,
+                    self.value,
+                ]
             )
+
+    @property
+    def indeces(self):
+        '''
+        In a repeat group, we have
+          /root/repeat_group[3]/question
+        the indeces would be:
+          [3]
+        '''
+        return self.ctx.index_chain
+
+    @property
+    def xpath(self):
+        '''
+        e.g. /root/repeat_group[3]/question
+        '''
+        return self.field._full_path.replace('[]', '[{}]').format(
+            *self.indeces
+            )
+
+
+class SelectMultipleValue(SubmittedValue):
+    def post_init(self):
+        if isinstance(self.value, basestring):
+            self._value = self.value.split()
+
+    @property
+    def available_choices(self):
+        return self.field.choice.options.keys()
+
 
 class FormVersion(object):
     @classmethod
@@ -125,56 +163,61 @@ class FormVersion(object):
             raise SchemaError('version content must have "survey"')
         validate_content(struct['content'])
 
-    def format_submission(self, json_submission):
+    def format_submission(self, json_submission, **opts):
         submission = []
-        for item in self.format_submission_iterator(json_submission):
-            if item.category == 'found':
-                item.append_to(submission)
+        for item in self.format_submission_iterator(json_submission, **opts):
+            item.append_to(submission)
         return submission
 
     def format_submission_iterator(self, json_submission, **opts):
-        paths = {}
+        paths = OrderedDict()
+        ordered_submission = OrderedDict()
         ignore = opts.get('ignore', [])
         field_mapped = opts.get('field_mapped', {})
-        caught = {
-            '_geolocation': True,
-        }
+        iterate_through = opts.get('iterate_through', None)
+
         for field in self.columns(include_groups=True):
-            paths[field.path] = field
+            _field_path = field.path
+            paths[_field_path] = field
+            if _field_path in json_submission:
+                ordered_submission[_field_path] = json_submission.pop(_field_path)
 
         def _parse(key, val, context):
-            _cur = paths.get(key, False)
+            _field = paths.get(key, False)
             category = None
             _constructor = SubmittedValue
-            if key in caught:
-                category = 'caught'
-            elif key in ignore:
+            if _field and _field.type == 'select_multiple':
+                _constructor = SelectMultipleValue
+
+            if key in ignore:
                 category = 'ignored'
             elif key in field_mapped:
                 _constructor = field_mapped[key]
-                category = 'found'
+                category = 'mapped'
             elif isinstance(val, list):
                 for subitem in val:
-                    _ccc = ParseContext(_cur, parent_context=context)
+                    _ccc = ParseContext(_field, parent_context=context)
                     for (subkey, subval) in subitem.items():
                         for subitem in _parse(subkey, subval, _ccc):
                             yield subitem
-            elif _cur:
+            elif _field:
                 category = 'found'
             else:
                 category = 'lost'
 
             if category != 'ignored':
-                yield _constructor(category=category,
-                                   context=context,
-                                   _cur=_cur,
-                                   key=key,
-                                   val=val,
-                                   )
+                if not (iterate_through and category not in iterate_through):
+                    yield _constructor(category=category,
+                                       context=context,
+                                       field=_field,
+                                       key=key,
+                                       val=val,
+                                       )
 
-        for (key, val) in json_submission.iteritems():
-            for item in _parse(key, val, ParseContext(self)):
-                yield item
+        for _submission_dict in (ordered_submission, json_submission):
+            for (key, val) in _submission_dict.iteritems():
+                for item in _parse(key, val, ParseContext(self)):
+                    yield item
 
     def __init__(self, form_pack, schema):
         if 'name' in schema:
@@ -359,7 +402,20 @@ class FormVersion(object):
 
             field.labels = _labels
             assert 'labels' not in _f
+
         self._tree = _tree
+
+        self.path_mapping = OrderedDict([
+            (col._full_path, col) for col in
+            self.columns(include_groups=True)
+        ])
+        self.full_paths_nogroups = [
+            col._full_path for col in self.columns(include_groups=False)
+        ]
+        self._paths_to_full_paths = OrderedDict([
+            (_path.replace('[]', ''), _path) for (_path, col) in
+            self.path_mapping.items()
+        ])
 
     def __repr__(self):
         return '<FormVersion %s>' % self._stats_str()

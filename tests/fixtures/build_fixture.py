@@ -5,7 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import importlib
 from copy import deepcopy
-
+from formpack import FormPack
 
 def build_fixture(modulename):
     fixtures = deepcopy(importlib.import_module('..%s' % modulename, __name__).DATA)
@@ -27,3 +27,7 @@ def build_fixture(modulename):
         # TODO: generalize this ?
         # it's an xml schme json fixture
         return fixtures
+
+def build_pack(key):
+    title, schemas, submissions = build_fixture(key)
+    return FormPack(schemas, title, submissions=submissions)
