@@ -27,3 +27,8 @@ UNTRANSLATED = None
 OR_OTHER_COLUMN = '_or_other'
 # in the long run, the "select_one x or_other" syntax should be deprecated
 # because the or_other strings are not translatable
+
+# The Excel format supports worksheet names as long as 255 characters, but in
+# practice the Excel application has a 31-character limit.
+# http://stackoverflow.com/a/3681908
+EXCEL_SHEET_NAME_SIZE_LIMIT = 31

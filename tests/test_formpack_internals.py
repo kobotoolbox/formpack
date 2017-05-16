@@ -18,14 +18,6 @@ def test_fixture_has_translations():
     assert len(fp[1].translations) == 2
 
 
-def test_ellipsize_title():
-    title, schemas, submissions = build_fixture('grouped_repeatable')
-    fp = FormPack(schemas, title)
-    assert fp.title == 'Household survey with repeat...'
-    fp = FormPack(schemas, title, ellipsize_title=False)
-    assert fp.title == 'Household survey with repeatable groups'
-
-
 def test_to_dict():
     schema = build_fixture('restaurant_profile')[1][2]
     _copy = deepcopy(schema)

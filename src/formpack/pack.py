@@ -27,8 +27,7 @@ class FormPack(object):
                  default_version_id_key='__version__',
                  strict_schema=False,
                  root_node_name='data',
-                 submissions=None,
-                 asset_type=None, submissions_xml=None, ellipsize_title=True):
+                 asset_type=None, submissions_xml=None):
 
         if not versions:
             versions = []
@@ -50,10 +49,6 @@ class FormPack(object):
         self.title = title
 
         self.strict_schema = strict_schema
-
-        # excel sheet name size limit
-        if ellipsize_title and len(self.title) > 31:
-            self.title = self.title[:28] + '...'
 
         self.asset_type = asset_type
         self.load_all_versions(versions)
