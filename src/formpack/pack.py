@@ -139,6 +139,8 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
+        if 'content' not in schema:
+            raise ValueError('''"content" is not an available key: {}'''.format(schema.keys()))
         replace_aliases(schema['content'], in_place=True)
         expand_content(schema['content'], in_place=True)
 

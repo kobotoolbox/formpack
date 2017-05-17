@@ -117,6 +117,8 @@ class RemoteFormPack:
                 'versions',
                 version_id)
             vd = requests.get(_version_url, headers=self._headers()).json()
+            if vd.get('detail') == 'Not found.':
+                raise Exception('Version not found')
             with open(_version_path, 'w') as ff:
                 ff.write(json.dumps(vd, indent=2))
             return vd
