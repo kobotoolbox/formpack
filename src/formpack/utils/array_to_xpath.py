@@ -18,6 +18,9 @@ SPACE_PADDING = {
 
 
 def _case_fn(args):
+    if len(args) < 1:
+        raise ValueError('empty @case expression')
+
     def _pop_arg():
         return False if len(args) is 0 else args.pop()
 

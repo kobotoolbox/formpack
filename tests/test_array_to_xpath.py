@@ -2,6 +2,8 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+import pytest
+
 from formpack.utils.array_to_xpath import array_to_xpath, DEFAULT_FNS
 
 _fns = {}
@@ -297,6 +299,30 @@ def test_case_expression():
     '''.strip()
 
 
+def test_case_invalid_params():
+    '''
+    the @case function receives an array
+    '''
+    def _case(*items):
+        return array_to_xpath([
+            {'@case': list(items)}
+        ])
+    _case('default')
+
+    with pytest.raises(ValueError):
+        # needs at least the default value
+        _case()
+
+    # array.length must be 2
+    with pytest.raises(ValueError):
+        _case(['too', 'many', 'items'],
+              'default')
+
+    with pytest.raises(ValueError):
+        _case(['toofew'],
+              'default')
+
+
 def test_comma_parens():
     assert array_to_xpath([
         {'@comma_parens': [
@@ -343,3 +369,13 @@ def test_all_transformation_fns_covered():
     associated test defined.
     '''
     assert set(default_fn_tests.keys()) == set(DEFAULT_FNS.keys())
+
+def test_invalid_transformation_fn():
+    with pytest.raises(ValueError):
+        array_to_xpath([
+            {
+                '@never_defined_transform_fn': [
+                    'abc', 'def',
+                ]
+            }
+        ])
