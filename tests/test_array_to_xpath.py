@@ -156,6 +156,166 @@ def test_not_multiselected():
     assert array_to_xpath([{'@not_multiselected': ['abc', 'xyz']}]) == 'not(selected(${abc}, xyz))'
 
 
+def test_case_struct():
+    inner_case_fn = DEFAULT_FNS['@case']
+
+    def _case_fn(args):
+        return inner_case_fn(args[0]['@case'])
+
+    assert _case_fn([
+        {
+          "@case": [
+            'xxx',
+          ]
+        }
+    ]) == [
+        'xxx'
+    ]
+
+    assert _case_fn([
+        {
+          "@case": [
+            ['zzz', "'green'"],
+            '',
+          ]
+        }
+    ]) == [
+        {
+            '@if': [
+                'zzz',
+                "'green'",
+                ''
+            ]
+        }
+    ]
+
+    assert _case_fn([
+        {
+          "@case": [
+            ['zzz', "'green'"],
+            {'@lookup': 'defaultval'}
+          ]
+        }
+    ]) == [
+        {
+            '@if': [
+                'zzz',
+                "'green'",
+                {
+                    '@lookup': 'defaultval',
+                }
+            ]
+        }
+    ]
+
+    assert _case_fn([
+        {
+          "@case": [
+            ['zzz', "'green'"],
+            'somedefault'
+          ]
+        }
+    ]) == [
+        {
+            '@if': [
+                'zzz',
+                "'green'",
+                'somedefault',
+            ]
+        }
+    ]
+
+    assert _case_fn([
+        {
+          "@case": [
+            ['s1', "'red'"],
+            ['s2', "'yellow'"],
+            'green'
+          ]
+        }
+    ]) == [
+        {
+            '@if': [
+                's1',
+                "'red'",
+                {
+                    '@if': [
+                        's2',
+                        "'yellow'",
+                        'green',
+                    ]
+                }
+            ]
+        }
+    ]
+
+    assert _case_fn([
+        {
+          "@case": [
+            ['s1', "'red'"],
+            ['s2', "'yellow'"],
+            ['s3', "'green'"],
+            'blinkred'
+          ]
+        }
+    ]) == [
+        {
+            '@if': [
+                's1',
+                "'red'",
+                {
+                    '@if': [
+                        's2',
+                        "'yellow'",
+                        {
+                            '@if': [
+                                's3',
+                                "'green'",
+                                'blinkred'
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+
+
+def test_case_expression():
+    inp = [
+        {
+          "@case": [
+            ['s1', "'red'"],
+            ['s2', "'yellow'"],
+            ['s3', "'green'"],
+            "'blinkred'",
+          ]
+        }
+    ]
+    assert array_to_xpath(inp) == '''
+        if(s1, 'red', if(s2, 'yellow', if(s3, 'green', 'blinkred')))
+    '''.strip()
+
+
+def test_comma_parens():
+    assert array_to_xpath([
+        {'@comma_parens': [
+            ['a', 'b'],
+        ]}
+    ]) == '(a, b)'
+
+
+def test_if_expr():
+    assert array_to_xpath([
+        {
+            '@if': [
+                'condition',
+                "'val1'",
+                "'val2'",
+            ]
+        }
+    ]) == "if(condition, 'val1', 'val2')"
+
 default_fn_tests = {
     u'@lookup': test_lookup,
     u'@response_not_equal': test_response_not_equal,
@@ -171,6 +331,9 @@ default_fn_tests = {
     u'@count_selected': test_count_selected,
     u'@multiselected': test_multiselected,
     u'@not_multiselected': test_not_multiselected,
+    u'@case': test_case_expression,
+    u'@comma_parens': test_comma_parens,
+    u'@if': test_if_expr,
 }
 
 
