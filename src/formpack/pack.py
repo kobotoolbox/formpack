@@ -44,8 +44,6 @@ class FormPack(object):
         self.id_string = id_string
         self.root_node_name = root_node_name
 
-        self.submissions = submissions
-
         self.title = title
 
         self.strict_schema = strict_schema
