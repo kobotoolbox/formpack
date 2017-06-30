@@ -71,6 +71,34 @@ class TestFormPackFixtures(unittest.TestCase):
         #                                 u'id_string': u'restaurant_profile',
         #                                 u'versions': schemas})
 
+    def test_site_inspection(self):
+        title, schemas, submissions = build_fixture('site_inspection')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 5)
+        v0 = fp[0]
+        self.assertEqual(
+            list(v0.sections['Site inspection'].fields.keys()), [
+                u'inspector',
+                u'did_you_find_the_site',
+                u'was_there_damage_to_the_site',
+                u'was_there_damage_to_the_site_dupe',
+                u'ping',
+                u'rssi',
+                u'is_the_gate_secure',
+                u'is_plant_life_encroaching',
+                u'please_rate_the_impact_of_any_defects_observed',
+            ]
+        )
+
+        self.assertEqual(sorted(fp.to_dict().keys()),
+                         sorted([u'id_string', u'title', u'versions']))
+
+        self.assertEqual(fp.to_dict(), {
+            u'title': u'Site inspection',
+            u'id_string': u'site_inspection',
+            u'versions': [s['content'] for s in schemas]
+        })
+
     # TODO: update this test, it doesn't test anything anymore.
     def test_xml_instances_loaded(self):
         '''
