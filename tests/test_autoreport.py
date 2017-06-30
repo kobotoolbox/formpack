@@ -32,6 +32,42 @@ class TestAutoReport(unittest.TestCase):
         assert ' '.join(field_types) == ' '.join(['TextField', 'FormGPSField',
                                                   'FormChoiceFieldWithMultipleSelect'])
 
+    def test_list_fields_from_many_versions_on_packs(self):
+
+        title, schemas, submissions = build_fixture('site_inspection')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 5)
+
+        fields = {
+            field.name: field for field in fp.get_fields_for_versions(
+                fp.versions.keys())
+        }
+        field_names = sorted(fields.keys())
+        self.assertListEqual(field_names, [
+            'did_you_find_the_site',
+            'inspector',
+            'is_plant_life_encroaching',
+            'is_the_gate_secure',
+            'ping',
+            'please_rate_the_impact_of_any_defects_observed',
+            'rssi',
+            'was_there_damage_to_the_site',
+            'was_there_damage_to_the_site_dupe',
+        ])
+        field_types = [fields[name].__class__.__name__ for name in field_names]
+        self.assertListEqual(field_types, [
+            'FormChoiceField',
+            'TextField',
+            'FormChoiceField',
+            'FormChoiceField',
+            'NumField',
+            'FormChoiceField',
+            'NumField',
+            'FormChoiceField',
+            'FormChoiceField',
+        ])
+
+
     def test_simple_report(self):
 
         title, schemas, submissions = build_fixture('restaurant_profile')
@@ -83,6 +119,120 @@ class TestAutoReport(unittest.TestCase):
         ]
         for (i, stat) in enumerate(stats):
             assert stat == expected[i]
+
+    @unittest.skip('TODO: fix the autoreport so this test passes')
+    def test_simple_multi_version_report(self):
+        title, schemas, submissions = build_fixture('site_inspection')
+        fp = FormPack(schemas, title)
+
+        report = fp.autoreport(versions=fp.versions.keys())
+        stats = report.get_stats(submissions)
+
+        self.assertEqual(stats.submissions_count, 10)
+
+        stats = [(repr(f), n, d) for f, n, d in stats]
+
+        self.assertListEqual(stats, [
+            (
+               "<TextField name='inspector' type='text'>",
+                u'inspector',
+                   {u'frequency': [(u'burger', 5), (u'clouseau', 5)],
+                    u'not_provided': 0,
+                    u'percentage': [(u'burger', 50.0), (u'clouseau', 50.0)],
+                    u'provided': 10,
+                    u'show_graph': False,
+                    u'total_count': 10}
+            ),
+            (
+               "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
+                u'did_you_find_the_site',
+                   {u'frequency': [(0, 4), (1, 4), (u'yes', 1), (u'no', 1)],
+                    u'not_provided': 0,
+                    u'percentage': [(0, 40.0),
+                                    (1, 40.0),
+                                    (u'yes', 10.0),
+                                    (u'no', 10.0)],
+                    u'provided': 10,
+                    u'show_graph': True,
+                    u'total_count': 10}
+            ),
+            (
+               "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
+                u'was_there_damage_to_the_site',
+                   {u'frequency': [(0, 2), (1, 2), (u'yes', 1)],
+                    u'not_provided': 5,
+                    u'percentage': [(0, 40.0), (1, 40.0), (u'yes', 20.0)],
+                    u'provided': 5,
+                    u'show_graph': True,
+                    u'total_count': 10}
+            ),
+            (
+               "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
+                u'was_there_damage_to_the_site_dupe',
+                   {u'frequency': [(1, 1), (u'yes', 1)],
+                    u'not_provided': 8,
+                    u'percentage': [(1, 50.0), (u'yes', 50.0)],
+                    u'provided': 2,
+                    u'show_graph': True,
+                    u'total_count': 10}
+            ),
+            (
+               "<NumField name='ping' type='integer'>",
+                u'ping',
+                   {u'mean': 238.4,
+                    u'median': 123,
+                    u'mode': u'*',
+                    u'not_provided': 5,
+                    u'provided': 5,
+                    u'show_graph': False,
+                    u'stdev': 255.77392361224003,
+                    u'total_count': 10}
+            ),
+            (
+               "<NumField name='rssi' type='integer'>",
+                u'rssi',
+                   {u'mean': 63.8,
+                    u'median': u'65',
+                    u'mode': u'*',
+                    u'not_provided': 5,
+                    u'provided': 5,
+                    u'show_graph': False,
+                    u'stdev': 35.22357165308481,
+                    u'total_count': 10}
+            ),
+            (
+               "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
+                u'is_the_gate_secure',
+                   {u'frequency': [(0, 2), (1, 2), (u'no', 1)],
+                    u'not_provided': 5,
+                    u'percentage': [(0, 40.0), (1, 40.0), (u'no', 20.0)],
+                    u'provided': 5,
+                    u'show_graph': True,
+                    u'total_count': 10}
+            ),
+            (
+               "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
+                u'is_plant_life_encroaching',
+                   {u'frequency': [(0, 1), (1, 3), (u'yes', 1)],
+                    u'not_provided': 5,
+                    u'percentage': [(0, 20.0), (1, 60.0), (u'yes', 20.0)],
+                    u'provided': 5,
+                    u'show_graph': True,
+                    u'total_count': 10}
+            ),
+            (
+               "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
+                u'please_rate_the_impact_of_any_defects_observed',
+                   {u'frequency': [(u'moderate', 4), (u'severe', 3), (u'low', 3)],
+                    u'not_provided': 0,
+                    u'percentage': [(u'moderate', 40.0),
+                                    (u'severe', 30.0),
+                                    (u'low', 30.0)],
+                    u'provided': 10,
+                    u'show_graph': True,
+                    u'total_count': 10}
+            )
+        ])
 
     def test_rich_report(self):
 

@@ -859,3 +859,20 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
+    @unittest.skip('TODO: fix exports so this test passes')
+    def test_headers_of_multi_version_exports(self):
+        title, schemas, submissions = build_fixture('site_inspection')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
+        headers = export['Site inspection']['fields']
+        self.assertListEqual(headers, [
+            'inspector',
+            'did_you_find_the_site',
+            'was_there_damage_to_the_site',
+            'was_there_damage_to_the_site_dupe',
+            'ping',
+            'rssi',
+            'is_the_gate_secure',
+            'is_plant_life_encroaching',
+            'please_rate_the_impact_of_any_defects_observed',
+        ])
