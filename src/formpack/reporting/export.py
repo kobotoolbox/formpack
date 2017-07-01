@@ -19,12 +19,13 @@ from ..constants import UNSPECIFIED_TRANSLATION
 
 class Export(object):
 
-    def __init__(self, form_versions, lang=UNSPECIFIED_TRANSLATION,
+    def __init__(self, formpack, form_versions, lang=UNSPECIFIED_TRANSLATION,
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions"):
 
+        self.formpack = formpack
         self.lang = lang
         self.group_sep = group_sep
         self.title = title
@@ -105,36 +106,28 @@ class Export(object):
             Field are used to create rows of data from submission.
         """
 
-        # TODO: refactor this to use FormPack.get_fields_for_versions
-
         section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
         section_labels = OrderedDict()  # {section: [field_label, field_label]}
-        processed_fields = {}  # Used to avoid expensive lookups
 
-        versions = list(self.versions.values())
+        all_fields = self.formpack.get_fields_for_versions(self.versions)
+        all_sections = {}
 
         # List of fields we generate ourself to add at the very ends
         # of the field list
         auto_fields = OrderedDict()
 
-        # Create the initial field mappings from the first form version
-        for section_name, section in versions[0].sections.items():
+        for field in all_fields:
+            section_fields.setdefault(field.section.name, []).append(
+                (field.name, field)
+            )
+            section_labels.setdefault(field.section.name, []).append(
+                field.get_labels(lang, group_sep,
+                                 hierarchy_in_labels,
+                                 multiple_select)
+            )
+            all_sections[field.section.name] = field.section
 
-            # Field mapping to the section containing them
-            section_fields[section_name] = list(section.fields.items())
-
-            # Field labels list mapping to the section containing them
-            one_section_labels = section_labels[section_name] = []
-            for field in section.fields.values():
-                labels = field.get_labels(lang, group_sep,
-                                          hierarchy_in_labels,
-                                          multiple_select)
-                one_section_labels.append(labels)
-
-            # Set of processed field names for fast lookup
-            field_names = section_fields[section_name]
-            processed_fields[section_name] = set(field_names)
-
+        for section_name, section in all_sections.items():
             # Append optional additional fields
             auto_field_names = auto_fields[section_name] = []
             if section.children or self.force_index:
@@ -143,74 +136,6 @@ class Export(object):
             if section.parent:
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
-
-        # Process any new field added in the next versions
-        # The hard part is to insert it at a position that makes sense
-        for version in versions[1:]:
-            for section_name, section in version.sections.items():
-
-                # List of fields and labels we already got for this section
-                # from all previous versions
-                base_fields_list = section_fields[section_name]
-                processed_field_names = processed_fields[section_name]
-                base_fields_labels = section_labels[section_name]
-
-                # Potential new fields we want to add
-                new_fields = list(section.fields.keys())
-
-                for i, new_field_name in enumerate(new_fields):
-                    # Extract the labels for this field, language, group
-                    # separator and muliple_select policy
-                    labels = field.get_labels(lang, group_sep,
-                                              hierarchy_in_labels,
-                                              multiple_select)
-                    # WARNING, labels is a list of labels for this field
-                    # since multiple select answers can span on several columns
-
-                    # We already processed that field and don't need to add it
-                    # But we replace the labels for it by the last
-                    # version available
-                    if new_field_name in processed_field_names:
-                        base_labels = enumerate(list(base_fields_labels))
-                        for i, _labels in base_labels:
-                            if len(_labels) != 2:
-                                # e.g. [u'location', u'_location_latitude',...]
-                                continue
-                            (name, field) = _labels
-                            if name == new_field_name:
-                                base_fields_labels[i] = labels
-                                break
-                        continue
-
-                    # If the field appear at the start, append it at the
-                    # begining of the lists
-                    if i == 0:
-                        base_fields_list.insert(0, new_field_name)
-                        base_fields_labels.insert(0, labels)
-                        continue
-
-                    # For any other field, we need a more advanced position
-                    # logic.
-                    # We take this new field, and look for all new fields after
-                    # it to find the first one that is already in the base
-                    # fields. Then we get its index, so we can insert our fresh
-                    # new field right before it. This gives us a coherent
-                    # order of fields so that they are always, at worst,
-                    # adjacent to the last field they used to be to.
-                    for following_new_field in new_fields[i+1:]:
-                        if following_new_field in processed_field_names:
-                            base_fields = list(base_fields_list)
-                            for y, (name, field) in enumerate(base_fields):
-                                if name == following_new_field:
-                                    base_fields_list.insert(y, new_field)
-                                    base_fields_labels.insert(y, labels)
-                                    break
-                            break
-                    else:  # We could not find one, so ad it at the end
-                        base_fields_list.append(new_field_name)
-                        base_fields_labels.append(labels)
-
-                    processed_field_names.add(new_field_name)
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
