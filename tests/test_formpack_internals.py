@@ -55,3 +55,25 @@ def test_to_xml_fails_when_null_labels():
                    'translated': ['label'],
                    }}, id_string='sdf')
     fp[0].to_xml()
+
+
+def test_get_fields_for_versions_returns_unique_fields():
+    '''
+    As described in #127, `get_field_for_versions()` would return identical
+    fields multiple times. This is a (soon-to-be-fixed) failing test to
+    reproduce that issue
+    '''
+    fp = FormPack(
+        [{'content': {u'survey': [{u'name': u'hey', u'type': u'image'},
+                                  {u'name': u'two', u'type': u'image'}]},
+          'version': u'vRR7hH6SxTupvtvCqu7n5d'},
+         {'content': {u'survey': [{u'name': u'one', u'type': u'image'},
+                                  {u'name': u'two', u'type': u'image'}]},
+          'version': u'vA8xs9JVi8aiSfypLgyYW2'},
+         {'content': {u'survey': [{u'name': u'one', u'type': u'image'},
+                                  {u'name': u'two', u'type': u'image'}]},
+          'version': u'vNqgh8fJqyjFk6jgiCk4rn'}]
+    )
+    fields = fp.get_fields_for_versions(fp.versions)
+    field_names = [field.name for field in fields]
+    assert sorted(field_names) == [u'hey', u'one', u'two']

@@ -246,7 +246,7 @@ class FormPack(object):
                         # so ad it at the end
                         all_fields.append(new_field_obj)
 
-                    processed_field_names.add(new_field_obj)
+                    processed_field_names.add(new_field_name)
 
         if data_types:
             for dt in data_types:
