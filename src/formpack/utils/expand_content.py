@@ -41,14 +41,14 @@ def _expand_translatable_content(content, row, col_shortname,
             del row[col_shortname]
 
 
-def _get_translations_from_special_cols(special_cols, translations):
+def _get_translations_from_special_cols(special_cols, translation_names):
     translated_cols = []
     for (colname, parsedvals) in special_cols.iteritems():
         if 'translation' in parsedvals:
             translated_cols.append(parsedvals['column'])
-            if parsedvals['translation'] not in translations:
-                translations.append(parsedvals['translation'])
-    return (translations, set(translated_cols))
+            if parsedvals['translation'] not in translation_names:
+                translation_names.append(parsedvals['translation'])
+    return (translation_names, set(translated_cols))
 
 
 def expand_content_in_place(content):
@@ -193,11 +193,17 @@ def _get_special_survey_cols(content):
                               column=column_shortname,
                               translation=UNTRANSLATED)
             continue
-    (translations,
+
+    _translation_names = content.get('translations')
+    _translation_list = content.get('translation_list', [])
+    if _translation_names is None:
+        _translation_names = map(lambda tt: tt.get('name'),
+                                 _translation_list)
+    (translation_names,
      translated_cols) = _get_translations_from_special_cols(special,
-                        content.get('translations', []))
+                        _translation_names)
     translated_cols.update(known_translated_cols)
-    return (special, translations, sorted(translated_cols))
+    return (special, translation_names, sorted(translated_cols))
 
 
 def _expand_type_to_dict(type_str):

@@ -86,10 +86,12 @@ def test_graceful_double_expand():
                       }]}
     content = expand_content(s1)
     assert content['translations'] == ['English']
+    assert content['translation_list'][0] == {'name': 'English'}
     assert content['translated'] == ['hint', 'label']
 
     content = expand_content(content)
     assert content['translations'] == ['English']
+    assert content['translation_list'][0] == {'name': 'English'}
     assert content['translated'] == ['hint', 'label']
 
 
