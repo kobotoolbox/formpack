@@ -1,5 +1,5 @@
 from jsonschema import validate
-from .utils.replace_aliases import (
+from .utils.aliases import (
     LABEL_OPTIONAL_TYPES,
     MAIN_TYPES,
     SELECT_TYPES,

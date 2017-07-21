@@ -12,7 +12,7 @@ from collections import OrderedDict
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
-from .replace_aliases import META_TYPES
+from .aliases import META_TYPES
 from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
 REMOVE_EMPTY_STRINGS = True

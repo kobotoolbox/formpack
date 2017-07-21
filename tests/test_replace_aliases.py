@@ -5,9 +5,11 @@ from __future__ import (unicode_literals, print_function,
 import json
 import pytest
 
+from formpack.utils.aliases import SETTINGS_RENAMES as settings_header_columns
+from formpack.utils.aliases import SURVEY_RENAMES as survey_header_columns
+
 from formpack.utils.replace_aliases import (replace_aliases, dealias_type,
-                                            settings_header_columns,
-                                            survey_header_columns,
+                                            get_survey_columns_to_rename,
                                             )
 
 
@@ -144,3 +146,24 @@ def test_survey_header_replaced():
     _assert_column_converted_to('required', 'required')
     _assert_column_converted_to('bind::required', 'required')
     _assert_column_converted_to('bind::relevant', 'relevant')
+    _assert_column_converted_to('image::en', 'media::image::en')
+    _assert_column_converted_to('caption', 'label')
+
+
+def test_get_survey_columns_to_rename():
+    replacements = get_survey_columns_to_rename([
+                  {'type': 'text', 'caption': 'caption'},
+                ], set(['type', 'caption']))
+    assert replacements['caption'] == 'label'
+
+    replacements = get_survey_columns_to_rename([
+                  {'type': 'text', 'caption': 'c1', 'caption::en': 'c2'},
+                ], set(['type', 'caption', 'caption::en']))
+    assert replacements['caption'] == 'label'
+    assert replacements['caption::en'] == 'label::en'
+
+    replacements = get_survey_columns_to_rename([
+                  {'image': 'nolang.jpg', 'image::en': 'en.jpg'},
+                ], set(['image', 'image::en']))
+    assert replacements['image'] == 'media::image'
+    assert replacements['image::en'] == 'media::image::en'
