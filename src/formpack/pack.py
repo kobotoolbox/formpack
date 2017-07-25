@@ -23,8 +23,6 @@ from copy import deepcopy
 
 
 class FormPack(object):
-
-    # TODO: make a clear signature for __init__
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
@@ -47,14 +45,14 @@ class FormPack(object):
         self.root_node_name = root_node_name
 
         self.title = title
+
         self.strict_schema = strict_schema
 
         self.asset_type = asset_type
-
         self.load_all_versions(versions)
 
     def __repr__(self):
-        return '<FormPack %s>' % self._stats()
+        return '<FormPack %s>' % self._stats_str
 
     def version_id_keys(self, _versions=None):
         # if no parameter is passed, default to 'all'
@@ -67,6 +65,12 @@ class FormPack(object):
                 _id_keys.append(_id_key)
         return _id_keys
 
+    @property
+    def latest_version(self):
+        if len(self.versions) > 0:
+            return self.versions.values()[-1]
+        else:
+            raise ValueError('No versions available.')
 
     @property
     def available_translations(self):
@@ -93,15 +97,27 @@ class FormPack(object):
         except IndexError:
             raise IndexError('version at index %d is not available' % index)
 
+    @property
     def _stats(self):
         _stats = OrderedDict()
+        _stats['title'] = self.title
         _stats['id_string'] = self.id_string
-        _stats['versions'] = len(self.versions)
-        # _stats['submissions'] = self.submissions_count()
-        _stats['row_count'] = len(self[-1].schema.get('content', {})
-                                                 .get('survey', []))
+        _vs = self.versions.values()
+        if len(_vs) > 0:
+            _content = _vs[-1].schema.get('content', {})
+            _survey = _content.get('survey', [])
+            _stats['row_count'] = len(_survey)
+
+        _versions = []
+        for (vid, version) in self.versions.items():
+            _versions.append(version._stats())
+        _stats['versions'] = _versions
+        return _stats
+
+    @property
+    def _stats_str(self):
         # returns stats in the format [ key="value" ]
-        return '\n\t'.join('%s="%s"' % item for item in _stats.items())
+        return '\n\t'.join('%s="%s"' % item for item in self._stats.items())
 
     def load_all_versions(self, versions):
         for schema in versions:
@@ -123,6 +139,8 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
+        if 'content' not in schema:
+            raise ValueError('''"content" is not an available key: {}'''.format(schema.keys()))
         replace_aliases(schema['content'], in_place=True)
         expand_content(schema['content'], in_place=True)
 
@@ -160,6 +178,14 @@ class FormPack(object):
             self.title = form_version.version_title
 
         self.versions[form_version.id] = form_version
+
+    def _latest_change(self):
+        _lvs = len(self.versions)
+        _keys = self.versions.keys()
+        if _lvs > 1:
+            v1 = _keys[_lvs - 2]
+            v2 = _keys[_lvs - 1]
+        return self.version_diff(v1, v2)
 
     def version_diff(self, vn1, vn2):
         v1 = self.versions[vn1]
@@ -265,6 +291,11 @@ class FormPack(object):
         if self.asset_type is not None:
             out[u'asset_type'] = self.asset_type
         return out
+
+    def get_survey(self):
+        return [
+            row for row in self.latest_version.rows(include_groups=True)
+        ]
 
     def to_json(self, **kwargs):
         return json.dumps(self.to_dict(), **kwargs)

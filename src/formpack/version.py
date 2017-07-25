@@ -18,27 +18,47 @@ from .utils import parse_xml_to_xmljson, normalize_data_type
 from .errors import SchemaError
 from .utils.flatten_content import flatten_content
 from .schema import (FormField, FormGroup, FormSection, FormChoice)
-from .errors import TranslationError
+from .translated_item import TranslatedItem
+from .schema import _field_from_dict
 
 
-class LabelStruct(object):
-    '''
-    LabelStruct stores labels + translations assigned to `field.labels`
-    '''
+def get_labels(choice_definition, translation_list):
+    # choices dont need a label if they have an image
+    if 'label' in choice_definition:
+        _label = choice_definition['label']
+    elif 'image' in choice_definition:
+        _label = choice_definition['image']
+    else:
+        _label = None
 
-    def __init__(self, labels=[], translations=[]):
-        if len(labels) != len(translations):
-            errmsg = 'Mismatched labels and translations: [{}] [{}] ' \
-                '{}!={}'.format(', '.join(labels),
-                                ', '.join(translations), len(labels),
-                                len(translations))
-            raise TranslationError(errmsg)
-        self._labels = labels
-        self._translations = translations
-        self._vals = dict(zip(translations, labels))
+    if isinstance(_label, basestring):
+        _label = [_label]
+    elif _label is None and len(translation_list) == 1:
+        _label = [None]
 
-    def get(self, key, default=None):
-        return self._vals.get(key, default)
+    return OrderedDict(zip(translation_list, _label))
+
+
+def choices_from_structures(definition, translation_list):
+    all_choices = {}
+    for choice_definition in definition:
+        choice_name = choice_definition.get('$autovalue',
+                                            choice_definition.get('name'))
+        choice_key = choice_definition.get('list_name')
+        if not choice_name or not choice_key:
+            continue
+
+        if choice_key not in all_choices:
+            all_choices[choice_key] = {
+                'name': choice_key,
+                'options': OrderedDict(),
+            }
+
+        all_choices[choice_key]['options'][choice_name] = {
+            'labels': get_labels(choice_definition, translation_list),
+            'name': choice_name,
+        }
+    return all_choices.items()
 
 
 class FormVersion(object):
@@ -50,10 +70,7 @@ class FormVersion(object):
             raise SchemaError('version content must have "survey"')
         validate_content(struct['content'])
 
-    # QUESTION FOR ALEX: get rid off _root_node_name ? What is it for ?
     def __init__(self, form_pack, schema):
-
-        # QUESTION FOR ALEX: why this check ?
         if 'name' in schema:
             raise ValueError('FormVersion should not have a name parameter. '
                              'consider using "title" or "id_string"')
@@ -65,6 +82,8 @@ class FormVersion(object):
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
+        self.date = schema.get('date_deployed')
+
         self.version_id_key = schema.get('version_id_key',
                                          form_pack.default_version_id_key)
 
@@ -98,7 +117,12 @@ class FormVersion(object):
 
         # TODO: put those parts in a separate method and unit test it
         survey = content.get('survey', [])
-        fields_by_name = dict(map(lambda row: (row.get('name'), row), survey))
+
+        fields_by_name = dict(map(lambda row:
+                                  (row.get('$autoname', row.get('name')),
+                                   row,
+                                   ),
+                                  survey))
 
         # Analyze the survey schema and extract the informations we need
         # to build the export: the sections, the choices, the fields
@@ -108,12 +132,17 @@ class FormVersion(object):
         # Choices are the list of values you can choose from to answer a
         # specific question. They can have translatable labels.
         choices_definition = content.get('choices', ())
-        field_choices = FormChoice.all_from_json_definition(choices_definition,
-                                                            self.translations)
+
+        field_choices = dict([
+            (key, FormChoice(key, options=itm['options']))
+            for (key, itm) in choices_from_structures(choices_definition,
+                                                      list(self.translations))
+        ])
 
         # Extract fields data
         group = None
-        section = FormSection(name=form_pack.title)
+        section = FormSection(name=form_pack.title, src=False)
+        self._main_section = section
         self.sections[form_pack.title] = section
 
         # Those will keep track of were we are while traversing the
@@ -131,6 +160,8 @@ class FormVersion(object):
                 continue
 
             data_type = normalize_data_type(data_type)
+            if '$autoname' in data_definition:
+                data_definition['name'] = data_definition.get('$autoname')
             name = data_definition.get('name')
 
             # parse closing groups and repeat
@@ -146,8 +177,8 @@ class FormVersion(object):
                 continue
 
             if data_type == 'end_repeat':
-                # We go up in one level of nesting, so we set the current section
-                # to be what used to be the parent section
+                # We go up in one level of nesting, so we set the current
+                # section to be what used to be the parent section
                 hierarchy.pop()
                 section = section_stack.pop()
                 continue
@@ -159,7 +190,14 @@ class FormVersion(object):
 
             if data_type == 'begin_group':
                 group_stack.append(group)
-                group = FormGroup.from_json_definition(data_definition)
+
+                labels = TranslatedItem(data_definition.get('label', []),
+                                        translations=self.translations,
+                                        )
+
+                group = FormGroup(data_definition['name'], labels,
+                                  src=data_definition)
+
                 # We go down in one level on nesting, so save the parent group.
                 # Parent maybe None, in that case we are at the top level.
                 hierarchy.append(group)
@@ -170,9 +208,17 @@ class FormVersion(object):
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
 
-                section = FormSection.from_json_definition(data_definition,
-                                                           hierarchy,
-                                                           parent=parent_section)
+                labels = TranslatedItem(data_definition.get('label', []),
+                                        translations=self.translations,
+                                        )
+                _repeat_name = data_definition.get('$autoname', data_definition.get('name'))
+                section = FormSection(_repeat_name,
+                                      labels,
+                                      hierarchy=hierarchy,
+                                      src=data_definition,
+                                      parent=parent_section,
+                                      )
+
                 self.sections[section.name] = section
                 hierarchy.append(section)
                 section_stack.append(parent_section)
@@ -181,33 +227,42 @@ class FormVersion(object):
 
             # If we are here, it's a regular field
             # Get the the data name and type
-            field = FormField.from_json_definition(data_definition,
-                                                   hierarchy, section,
-                                                   field_choices,
-                                                   translations=self.translations)
+            field = _field_from_dict(data_definition,
+                                     hierarchy, section,
+                                     field_choices,
+                                     translations=self.translations)
             section.fields[field.name] = field
 
             _f = fields_by_name[field.name]
-            _labels = LabelStruct()
+            _labels = TranslatedItem()
 
             if 'label' in _f:
                 if not isinstance(_f['label'], list):
                     _f['label'] = [_f['label']]
-                _labels = LabelStruct(labels=_f['label'],
-                                      translations=self.translations)
+                _labels = TranslatedItem(_f['label'],
+                                         translations=self.translations)
 
             field.labels = _labels
             assert 'labels' not in _f
 
     def __repr__(self):
-        return '<FormVersion %s>' % self._stats()
+        return '<FormVersion %s>' % self._stats_str()
+
+    def rows(self, include_groups=False):
+        for row in self._main_section.rows:
+            yield row
 
     def _stats(self):
         _stats = OrderedDict()
         _stats['id_string'] = self._get_id_string()
         _stats['version'] = self.id
+        _stats['date'] = self.date
         _stats['row_count'] = len(self.schema.get('content', {}).get('survey', []))
         # returns stats in the format [ key="value" ]
+        return _stats
+
+    def _stats_str(self):
+        _stats = self._stats()
         return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
                                _stats.keys()))
 
