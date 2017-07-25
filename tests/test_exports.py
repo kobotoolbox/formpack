@@ -859,7 +859,6 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
-    @unittest.skip('TODO: fix exports so this test passes')
     def test_headers_of_multi_version_exports(self):
         title, schemas, submissions = build_fixture('site_inspection')
         fp = FormPack(schemas, title)

@@ -276,7 +276,7 @@ class FormPack(object):
 
         versions = self._get_versions(versions)
         title = title or self.title
-        return Export(versions, lang=lang, group_sep=group_sep,
+        return Export(self, versions, lang=lang, group_sep=group_sep,
                       hierarchy_in_labels=hierarchy_in_labels,
                       version_id_keys=self.version_id_keys(versions),
                       title=title, multiple_select=multiple_select,
