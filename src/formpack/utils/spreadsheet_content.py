@@ -3,6 +3,7 @@ from copy import deepcopy, copy
 from collections import OrderedDict, defaultdict
 
 from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
+                              _flatten_tags,
                               translated_col_list)
 
 # xlsform specific ordering preferences
@@ -52,7 +53,6 @@ def flatten_to_spreadsheet_content(content,
         content['settings'] = [content['settings']]
     sheet_names = _order_sheet_names(filter(lambda x: x not in remove_sheets,
                                             content.keys()))
-
     def _row_to_ordered_dict(row, dest):
         _flatten_translated_fields(row, translations, translated_cols,
                                    col_order=dest.keys(),
@@ -79,7 +79,6 @@ def flatten_to_spreadsheet_content(content,
         mids = list(filter(lambda x: x not in _not_mids, _all_cols))
 
         ordered_cols = translated_col_list((firsts + mids + lasts), translations, translated_cols)
-
         return [
             _row_to_ordered_dict(row, OrderedDict.fromkeys(ordered_cols)) for row in rows
         ]
@@ -92,6 +91,9 @@ def flatten_to_spreadsheet_content(content,
     all_sheets = content.keys()
     for sheet_name in sheet_names:
         rows = content.pop(sheet_name)
+        for row in rows:
+            if 'tags' in row:
+                _flatten_tags(row, tag_cols=['hxl'])
         if sheet_name in all_sheets:
             all_sheets.remove(sheet_name)
         _od[sheet_name] = _sheet_to_ordered_dicts(sheet_name, rows)
