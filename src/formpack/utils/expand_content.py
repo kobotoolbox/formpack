@@ -41,6 +41,28 @@ def _expand_translatable_content(content, row, col_shortname,
             del row[col_shortname]
 
 
+def _expand_tags(row, tag_cols=None):
+    if tag_cols is None:
+        tag_cols = []
+    tags = []
+    main_tags = row.pop('tags', None)
+    if main_tags:
+        if isinstance(main_tags, basestring):
+            tags = tags + main_tags.split()
+        elif isinstance(main_tags, list):
+            # carry over any tags listed here
+            tags = main_tags
+
+    for tag_col in tag_cols:
+        tags_str = row.get(tag_col)
+        if tags_str and isinstance(tags_str, basestring):
+            for tag in re.findall('([\#\+][a-zA-Z][a-zA-Z0-9]*)', tags_str):
+                tags.append('hxl:%s' % tag)
+    if len(tags) > 0:
+        row['tags'] = tags
+    return row
+
+
 def _get_translations_from_special_cols(special_cols, translations):
     translated_cols = []
     for (colname, parsedvals) in special_cols.iteritems():
@@ -77,6 +99,9 @@ def expand_content_in_place(content):
                 _list_name = _type.values()[0]
                 row.update({u'type': _type_str,
                             u'select_from_list_name': _list_name})
+
+        _expand_tags(row, tag_cols=['hxl'])
+
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], basestring):
                 row[key] = _expand_xpath_to_list(row[key])

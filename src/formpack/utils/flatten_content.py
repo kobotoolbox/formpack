@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import re
 from copy import deepcopy
+from collections import defaultdict, OrderedDict
 from array_to_xpath import array_to_xpath
 from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
 
@@ -73,6 +75,39 @@ def _stringify_type__depr(json_qtype):
             return '{} {}'.format(try_key, json_qtype[try_key])
     if 'select_one_or_other' in json_qtype:
         return 'select_one %s or_other' % json_qtype['select_one_or_other']
+
+
+def _flatten_tags(row, tag_cols=[]):
+    '''
+    takes a "tags" column with an array of tags and
+    reassigns them to the tag column in which they appear
+    on import of xls
+    '''
+    for col in ['tags'] + tag_cols:
+        if col in row and isinstance(row[col], basestring):
+            return
+
+    tag_list = row.pop('tags', [])
+    tag_res = OrderedDict()
+    for tag_col in tag_cols:
+        tag_res[tag_col] = r'^%s:(\S+)$' % tag_col
+
+    additionals = defaultdict(list)
+
+    for tag in tag_list:
+        matched = False
+        for (col, re_str) in tag_res.items():
+            mtch = re.match(re_str, tag)
+            if mtch:
+                additionals[col].append(mtch.groups()[0])
+                matched = True
+        if not matched:
+            additionals['tags'].append(tag)
+
+    for (col, items) in additionals.items():
+        row[col] = ' '.join(items)
+
+    return row
 
 
 def translated_col_list(columns, translations, translated):
@@ -158,6 +193,8 @@ def _flatten_survey_row(row):
     for key in row:
         if isinstance(row[key], (list, tuple)):
             row[key] = array_to_xpath(row[key])
+    if 'tags' in row:
+        _flatten_tags(row, tag_cols=['hxl'])
     if 'type' in row:
         _type = row['type']
         if isinstance(row.get('required'), bool):
