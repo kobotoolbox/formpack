@@ -817,6 +817,122 @@ class TestFormPackExport(unittest.TestCase):
             fp.export().to_xlsx(xls, submissions)
             assert xls.isfile()
 
+    def test_copy_fields_multiple_versions(self):
+        title, schemas, submissions = restaurant_profile
+
+        forms = FormPack(schemas, title)
+        export = forms.export(
+            versions=forms.versions,
+            copy_fields=('_uuid',)
+        )
+        exported = export.to_dict(submissions)
+        expected = OrderedDict({
+            'Restaurant profile': {
+                'fields': ['restaurant_name', 'location', '_location_latitude',
+                           '_location_longitude', '_location_altitude',
+                           '_location_precision', '_uuid', 'eatery_type'],
+                'data': [
+                    [
+                        'Felipes',
+                        '12.34 -23.45',
+                        '12.34',
+                        '-23.45',
+                        '',
+                        '',
+                        '5dd6ecda-b993-42fc-95c2-7856a8940acf',
+                        ''
+                    ],
+
+                    [
+                        'Felipes',
+                        '12.34 -23.45',
+                        '12.34',
+                        '-23.45',
+                        '',
+                        '',
+                        'd6dee2e1-e0e6-4d08-9ad4-d78d77079f85',
+                        ''
+                    ],
+
+                    [
+                        'Taco Truck',
+                        '13.42 -25.43',
+                        '13.42',
+                        '-25.43',
+                        '',
+                        '',
+                        '3f2ac742-305a-4b0d-b7ef-f7f57fcd14dc',
+                        'takeaway'
+                    ],
+
+                    [
+                        'Harvest',
+                        '12.43 -24.53',
+                        '12.43',
+                        '-24.53',
+                        '',
+                        '',
+                        '3195b926-1578-4bac-80fc-735129a34090',
+                        'sit_down'
+                    ],
+
+                    [
+                        'Taco Truck',
+                        '13.42 -25.43',
+                        '13.42',
+                        '-25.43',
+                        '',
+                        '',
+                        '04cbcf32-ecbd-4801-829b-299463dcd125',
+                        'takeaway sit_down',
+                        '1',
+                        '1'
+                    ],
+
+                    [
+                        'Harvest',
+                        '12.43 -24.53',
+                        '12.43',
+                        '-24.53',
+                        '',
+                        '',
+                        '1f21b881-db1d-4629-9b82-f4111630187d',
+                        'sit_down',
+                        '1',
+                        '0'
+                    ],
+
+                    [
+                        'Wololo',
+                        '12.43 -24.54 1 0',
+                        '12.43',
+                        '-24.54',
+                        '1',
+                        '0',
+                        'fda7e49b-6c84-4cfe-b1a8-3de997ac0880',
+                        '',
+                        '0',
+                        '0'
+                    ],
+
+                    [
+                        'Los pollos hermanos',
+                        '12.43 -24.54 1',
+                        '12.43',
+                        '-24.54',
+                        '1',
+                        '',
+                        'a4277940-c8f3-4564-ad3b-14e28532a976',
+                        '',
+                        '',
+                        ''
+                    ]
+                ]
+            }
+        })
+
+        self.assertDictEquals(exported, expected)
+
     def test_choices_external_as_text_field(self):
         title, schemas, submissions = build_fixture('sanitation_report_external')
 

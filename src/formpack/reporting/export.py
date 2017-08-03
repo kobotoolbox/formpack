@@ -38,11 +38,11 @@ class Export(object):
         # If some fields need to be arbitrarly copied, add them
         # to the first section
         if copy_fields:
-            first_version = next(iter(form_versions.values()))
-            first_section = next(iter(first_version.sections.values()))
-            for name in copy_fields:
-                dumb_field = CopyField(name, section=first_section)
-                first_section.fields[name] = dumb_field
+            for version in iter(form_versions.values()):
+                first_section = next(iter(version.sections.values()))
+                for name in copy_fields:
+                    dumb_field = CopyField(name, section=first_section)
+                    first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
         params = (lang, group_sep, hierarchy_in_labels, multiple_select)
