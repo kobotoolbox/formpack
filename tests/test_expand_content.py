@@ -362,6 +362,7 @@ def test_expand_hxl_tags():
     s1 = {'survey': [{'type': 'text',
                       'hxl': '#tag+attr'}]}
     expand_content(s1, in_place=True)
+    assert 'hxl' not in s1['survey'][0]
     assert s1['survey'][0]['tags'] == ['hxl:#tag', 'hxl:+attr']
 
 

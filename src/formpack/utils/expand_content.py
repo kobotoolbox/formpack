@@ -54,7 +54,7 @@ def _expand_tags(row, tag_cols=None):
             tags = main_tags
 
     for tag_col in tag_cols:
-        tags_str = row.get(tag_col)
+        tags_str = row.pop(tag_col, None)
         if tags_str and isinstance(tags_str, basestring):
             for tag in re.findall('([\#\+][a-zA-Z][a-zA-Z0-9]*)', tags_str):
                 tags.append('hxl:%s' % tag)
