@@ -77,6 +77,14 @@ def _stringify_type__depr(json_qtype):
         return 'select_one %s or_other' % json_qtype['select_one_or_other']
 
 
+def flatten_tag_list(tag_list, tag_cols=[]):
+    '''
+    takes a list of tags and reassigns them to the tag column in which they
+    appear on import of xls
+    '''
+    return _flatten_tags({'tags': tag_list}, tag_cols)
+
+
 def _flatten_tags(row, tag_cols=[]):
     '''
     takes a "tags" column with an array of tags and

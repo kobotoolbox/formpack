@@ -8,7 +8,9 @@ import pytest
 from collections import OrderedDict
 from formpack.constants import OR_OTHER_COLUMN
 from formpack.utils.xls_to_ss_structure import _parsed_sheet
-from formpack.utils.flatten_content import flatten_content, translated_col_list
+from formpack.utils.flatten_content import (flatten_content,
+                                            flatten_tag_list,
+                                            translated_col_list)
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import (flatten_to_spreadsheet_content,
                                                 _order_cols,
@@ -358,6 +360,27 @@ def test_flatten_tags_util_method():
 
     assert _flatten_tags(
         {'tags': ['a', 'hxl:b', 'hxl:c', 'd']}, tag_cols=['hxl']
+        ) == {'tags': 'a d', 'hxl': 'b c'}
+
+
+def test_flatten_tag_list_util_method():
+    assert flatten_tag_list(['a'])['tags'] == 'a'
+    assert flatten_tag_list(['a', 'b'])['tags'] == 'a b'
+
+    assert flatten_tag_list(
+        ['a', 'zz:b'], tag_cols=['zz']
+        ) == {'tags': 'a', 'zz': 'b'}
+
+    assert flatten_tag_list(
+        ['a', 'hxl:b'], tag_cols=['hxl']
+        ) == {'tags': 'a', 'hxl': 'b'}
+
+    assert flatten_tag_list(
+        ['a', 'hxl:b', 'hxl:c'], tag_cols=['hxl']
+        ) == {'tags': 'a', 'hxl': 'b c'}
+
+    assert flatten_tag_list(
+        ['a', 'hxl:b', 'hxl:c', 'd'], tag_cols=['hxl']
         ) == {'tags': 'a d', 'hxl': 'b c'}
 
 
