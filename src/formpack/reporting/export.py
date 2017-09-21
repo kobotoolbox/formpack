@@ -16,6 +16,16 @@ from ..schema import CopyField
 from ..utils.string import unicode, unique_name_for_xls
 
 
+# Copied from onadata/apps/viewer/models/parsed_instance.py; see HACK below
+import base64, re
+def _decode_from_mongo(key):
+    re_dollar = re.compile(r"^%s" % base64.b64encode("$"))
+    re_dot = re.compile(r"\%s" % base64.b64encode("."))
+    return reduce(lambda s, c: c[0].sub(c[1], s),
+                  [(re_dollar, '$'), (re_dot, '.')], key)
+# End copy from onadata/apps/viewer/models/parsed_instance.py
+
+
 class Export(object):
 
     def __init__(self, form_versions, lang=None,
@@ -284,6 +294,12 @@ class Export(object):
         # arbitrary number of entries depending of the user input.
 
         for entry in submission:
+            # HACK: Deal with KC's base64 encoding of characters illegal in
+            # Mongo key names. This should not remain in formpack; the grotty
+            # submission data should be cleaned before it arrives here
+            entry = {
+                _decode_from_mongo(key): val for key, val in entry.items()
+            }
 
             # Format one entry and add it to the rows for this section
 
