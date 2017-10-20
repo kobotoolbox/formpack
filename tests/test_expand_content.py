@@ -7,6 +7,7 @@ import copy
 from collections import OrderedDict
 
 from formpack.utils.expand_content import expand_content, _expand_type_to_dict
+from formpack.utils.expand_content import _expand_tags
 from formpack.utils.expand_content import _get_special_survey_cols
 from formpack.utils.expand_content import SCHEMA_VERSION
 from formpack.utils.flatten_content import flatten_content
@@ -355,6 +356,26 @@ def test_expand_translations():
                               'label::English': 'OK?',
                               'label::Français': 'OK!'}],
                   }
+
+
+def test_expand_hxl_tags():
+    s1 = {'survey': [{'type': 'text',
+                      'hxl': '#tag+attr'}]}
+    expand_content(s1, in_place=True)
+    assert 'hxl' not in s1['survey'][0]
+    assert s1['survey'][0]['tags'] == ['hxl:#tag', 'hxl:+attr']
+
+
+def test_expand_tags_method():
+    def _expand(tag_str, existing_tags=None):
+        row = {'hxl': tag_str}
+        if existing_tags:
+            row['tags'] = existing_tags
+        return sorted(_expand_tags(row, tag_cols=['hxl'])['tags'])
+    expected = sorted(['hxl:#tag1', 'hxl:+attr1', 'hxl:+attr2'])
+    assert expected == _expand('#tag1+attr1+attr2')
+    assert expected == _expand(' #tag1 +attr1 +attr2 ')
+    assert expected == _expand(' #tag1 +attr1 ', ['hxl:+attr2'])
 
 
 def test_expand_translations_null_lang():

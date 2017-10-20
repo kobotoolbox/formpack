@@ -37,6 +37,7 @@ class FormField(FormDataDef):
         self.data_type = data_type
         self.section = section
         self.can_format = can_format
+        self.tags = kwargs.get('tags', [])
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -129,6 +130,7 @@ class FormField(FormDataDef):
                   The FormField instance matching this definiton.
         """
         name = definition['name']
+        tags = definition.get('tags', [])
         label = definition.get('label')
         if label:
             labels = OrderedDict(zip(translations, label))
@@ -169,6 +171,7 @@ class FormField(FormDataDef):
         args = {
             'name': name,
             'labels': labels,
+            'tags': tags,
             'data_type': data_type,
             'hierarchy': hierarchy,
             'section': section,

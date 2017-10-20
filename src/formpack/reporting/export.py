@@ -14,6 +14,7 @@ from pyexcelerate import Workbook
 from ..submission import FormSubmission
 from ..schema import CopyField
 from ..utils.string import unicode, unique_name_for_xls
+from ..utils.flatten_content import flatten_tag_list
 from ..constants import UNSPECIFIED_TRANSLATION
 
 
@@ -23,7 +24,7 @@ class Export(object):
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions"):
+                 title="submissions", tag_cols_for_header=[]):
 
         self.formpack = formpack
         self.lang = lang
@@ -34,6 +35,7 @@ class Export(object):
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
+        self.tag_cols_for_header = tag_cols_for_header
 
         # If some fields need to be arbitrarly copied, add them
         # to the first section
@@ -45,9 +47,12 @@ class Export(object):
                 first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
-        params = (lang, group_sep, hierarchy_in_labels, multiple_select)
-        res = self.get_fields_and_labels_for_all_versions(*params)
-        self.sections, self.labels = res
+        params = (
+            lang, group_sep, hierarchy_in_labels, multiple_select,
+            tag_cols_for_header,
+        )
+        res = self.get_fields_labels_tags_for_all_versions(*params)
+        self.sections, self.labels, self.tags = res
 
         self.reset()
 
@@ -90,24 +95,31 @@ class Export(object):
         self._indexes = {n: 1 for n in self.sections}
         # N.B: indexes are not affected by form versions
 
-    def get_fields_and_labels_for_all_versions(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
+    def get_fields_labels_tags_for_all_versions(self,
+                                                lang=UNSPECIFIED_TRANSLATION,
+                                                group_sep="/",
                                                 hierarchy_in_labels=False,
-                                                multiple_select="both"):
-        """ Return 2 mappings containing field and labels by section
+                                                multiple_select="both",
+                                                tag_cols_for_header=[]):
+        """ Return 3 mappings containing field, labels, and tags by section
 
             This is needed because when making an export for several
             versions of the same form, fields get added, removed, and
-            edited. Hence we pre-generate mappings containing labels
-            and fields for all versions so we can use them later as a
+            edited. Hence we pre-generate mappings containing labels,
+            fields, and tags for all versions so we can use them later as a
             canvas to keep the export coherent.
 
             Labels are used as column headers.
 
             Field are used to create rows of data from submission.
+
+            Tags specified by `tag_cols_for_header` are included as additional
+            column headers (in CSV and XLSX exports only).
         """
 
         section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
         section_labels = OrderedDict()  # {section: [field_label, field_label]}
+        section_tags = OrderedDict()  # {section: [{column_name: tag_string, ...}, ...]}
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_sections = {}
@@ -145,6 +157,7 @@ class Export(object):
         # Flatten all the names for all the value of all the fields
         for section, fields in list(section_fields.items()):
             name_lists = []
+            tags = []
             for _field_data in fields:
                 if len(_field_data) != 2:
                     # e.g. [u'location', u'_location_latitude',...]
@@ -152,12 +165,22 @@ class Export(object):
                 (field_name, field) = _field_data
                 name_lists.append(field.value_names)
 
+                # Add the tags for this field. If the field has multiple
+                # labels, add the tags once for each label
+                tags.extend(
+                    [flatten_tag_list(field.tags, tag_cols_for_header)] *
+                        len(field.value_names)
+                )
+
+
             names = [name for name_list in name_lists for name in name_list]
 
             # add auto fields:
             names.extend(auto_fields[section])
+            tags.extend([{}] * len(auto_fields[section]))
 
             section_fields[section] = names
+            section_tags[section] = tags
 
         # Flatten all the labels for all the headers of all the fields
         for section, labels in list(section_labels.items()):
@@ -168,7 +191,7 @@ class Export(object):
 
             section_labels[section] = labels
 
-        return section_fields, section_labels
+        return section_fields, section_labels, section_tags
 
     def format_one_submission(self, submission, current_section):
 
@@ -284,6 +307,26 @@ class Export(object):
 
         return chunks
 
+    def get_header_rows_for_tag_cols(self, section_name):
+        rows = []
+        for tag_col in self.tag_cols_for_header:
+            row = []
+            found_tag = False
+            for field_tags in self.tags[section_name]:
+                try:
+                    row.append(field_tags[tag_col])
+                except KeyError:
+                    # Perfectly acceptable for a field not to have
+                    # a particular tag
+                    row.append('')
+                else:
+                    found_tag = True
+
+            if found_tag:
+                rows.append(row)
+
+        return rows
+
     def to_dict(self, submissions):
         '''
             This defeats the purpose of using generators, but it's useful for tests
@@ -319,6 +362,11 @@ class Export(object):
 
         section, labels = sections[0]
         yield format_line(labels, sep, quote)
+
+        # Include specified tag columns as extra header rows
+        tag_rows = self.get_header_rows_for_tag_cols(section)
+        for tag_row in tag_rows:
+            yield format_line(tag_row, sep, quote)
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
@@ -367,6 +415,14 @@ class Export(object):
 
                     for i, label in enumerate(self.labels[section_name], 1):
                         current_sheet.set_cell_value(1, i, label)
+
+                    # Include specified tag columns as extra header rows
+                    tag_rows = self.get_header_rows_for_tag_cols(section_name)
+                    for tag_row in tag_rows:
+                        for i, tag_cell in enumerate(tag_row, 1):
+                            current_sheet.set_cell_value(
+                                cursor["row"], i, tag_cell)
+                        cursor["row"] += 1
 
                 for row in rows:
                     y = cursor["row"]

@@ -4,18 +4,16 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 '''
-dietary_needs:
-
- * has a select_multiple (described in a different syntax)
+hxl_grouped_repeatable
 
 '''
 
 from ..load_fixture_json import load_fixture_json
 
 DATA = {
-    u'title': u'Dietary needs',
-    u'id_string': 'dietary_needs',
+    u'title': u'Household survey with HXL and repeatable groups',
+    u'id_string': 'hxl_grouped_repeatable',
     u'versions': [
-        load_fixture_json('dietary_needs/v1'),
+        load_fixture_json('hxl_grouped_repeatable/v1'),
     ],
 }
