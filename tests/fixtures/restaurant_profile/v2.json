@@ -22,7 +22,8 @@
     "submissions": [
         {
             "location": "12.34 -23.45",
-            "restaurant_name": "Felipes"
+            "restaurant_name": "Felipes",
+            "_uuid": "d6dee2e1-e0e6-4d08-9ad4-d78d77079f85"
         }
     ]
 }
