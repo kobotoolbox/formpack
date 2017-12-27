@@ -301,7 +301,11 @@ class Export(object):
                 if nested_data:
                     chunk = self.format_one_submission(entry[child_section.path],
                                                        child_section)
-                    chunks.update(chunk)
+                    for key, value in chunk.iteritems():
+                        if key in chunks:
+                            chunks[key].extend(value)
+                        else:
+                            chunks[key] = value
 
             _indexes[_section_name] += 1
 
