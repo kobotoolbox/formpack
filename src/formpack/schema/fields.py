@@ -131,11 +131,7 @@ class FormField(FormDataDef):
         """
         name = definition['name']
         tags = definition.get('tags', [])
-        label = definition.get('label')
-        if label:
-            labels = OrderedDict(zip(translations, label))
-        else:
-            labels = {}
+        labels = cls._extract_json_labels(definition, translations)
 
         # normalize spaces
         data_type = definition['type']

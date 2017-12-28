@@ -180,6 +180,44 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
                                     'g1q2', 'g2q1', 'qz'])
 
+    def test_headers_of_translated_group_exports(self):
+        title, schemas, submissions = build_fixture('grouped_translated')
+        fp = FormPack(schemas, title)
+        options = {
+            'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
+        english_export = fp.export(lang='English', **options).to_dict(
+            submissions)
+        self.assertEquals(
+            english_export[title]['fields'],
+            [
+                'start',
+                'end',
+                'External Characteristics/What kind of symmetry do you have?',
+                'External Characteristics/What kind of symmetry do you have?/Spherical',
+                'External Characteristics/What kind of symmetry do you have?/Radial',
+                'External Characteristics/What kind of symmetry do you have?/Bilateral',
+                'External Characteristics/How many segments does your body have?',
+                'Do you have body fluids that occupy intracellular space?',
+                'Do you descend from an ancestral unicellular organism?',
+            ]
+        )
+        spanish_export = fp.export(lang='Español', **options).to_dict(
+            submissions)
+        self.assertEquals(
+            spanish_export[title]['fields'],
+            [
+                'start',
+                'end',
+                'Características externas/¿Qué tipo de simetría tiene?',
+                'Características externas/¿Qué tipo de simetría tiene?/Esférico',
+                'Características externas/¿Qué tipo de simetría tiene?/Radial',
+                'Características externas/¿Qué tipo de simetría tiene?/Bilateral',
+                'Características externas/¿Cuántos segmentos tiene tu cuerpo?',
+                '¿Tienes fluidos corporales que ocupan espacio intracelular?',
+                '¿Desciende de un organismo unicelular ancestral?',
+            ]
+        )
+
     def assertDictEquals(self, arg1, arg2):
         _j = lambda arg: json.dumps(arg, indent=4, sort_keys=True)
         assert _j(arg1) == _j(arg2)
