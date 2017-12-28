@@ -1,0 +1,177 @@
+{
+    "version": "grouped_translated_v1",
+    "content": {
+        "translations": [
+            "English",
+            "Español"
+        ],
+        "choices": [
+            {
+                "list_name": "symmetry",
+                "name": "spherical",
+                "label": [
+                    "Spherical",
+                    "Esférico"
+                ]
+            },
+            {
+                "list_name": "symmetry",
+                "name": "radial",
+                "label": [
+                    "Radial",
+                    "Radial"
+                ]
+            },
+            {
+                "list_name": "symmetry",
+                "name": "bilateral",
+                "label": [
+                    "Bilateral",
+                    "Bilateral"
+                ]
+            },
+            {
+                "list_name": "fluids",
+                "name": "yes",
+                "label": [
+                    "Yes",
+                    "Sí"
+                ]
+            },
+            {
+                "list_name": "fluids",
+                "name": "yes__and_some_",
+                "label": [
+                    "Yes, and some extracellular space",
+                    "Sí, y algún espacio extracelular"
+                ]
+            },
+            {
+                "list_name": "fluids",
+                "name": "no___unsure",
+                "label": [
+                    "No / Unsure",
+                    "No / Inseguro"
+                ]
+            },
+            {
+                "list_name": "yes_no",
+                "name": "yes",
+                "label": [
+                    "Yes",
+                    "Sí"
+                ]
+            },
+            {
+                "list_name": "yes_no",
+                "name": "no",
+                "label": [
+                    "No",
+                    "No"
+                ]
+            }
+        ],
+        "survey": [
+            {
+                "type": "start",
+                "name": "start"
+            },
+            {
+                "type": "end",
+                "name": "end"
+            },
+            {
+                "type": "begin_group",
+                "name": "external_characteristics",
+                "label": [
+                    "External Characteristics",
+                    "Características externas"
+                ]
+            },
+            {
+                "select_from_list_name": "symmetry",
+                "name": "What_kind_of_symmetry_do_you_have",
+                "required": false,
+                "label": [
+                    "What kind of symmetry do you have?",
+                    "¿Qué tipo de simetría tiene?"
+                ],
+                "type": "select_multiple"
+            },
+            {
+                "name": "How_many_segments_does_your_body_have",
+                "required": false,
+                "label": [
+                    "How many segments does your body have?",
+                    "¿Cuántos segmentos tiene tu cuerpo?"
+                ],
+                "type": "integer"
+            },
+            {
+                "type": "end_group"
+            },
+            {
+                "select_from_list_name": "fluids",
+                "name": "Do_you_have_body_flu_intracellular_space",
+                "required": false,
+                "label": [
+                    "Do you have body fluids that occupy intracellular space?",
+                    "¿Tienes fluidos corporales que ocupan espacio intracelular?"
+                ],
+                "type": "select_one"
+            },
+            {
+                "select_from_list_name": "yes_no",
+                "name": "Do_you_descend_from_unicellular_organism",
+                "required": false,
+                "label": [
+                    "Do you descend from an ancestral unicellular organism?",
+                    "¿Desciende de un organismo unicelular ancestral?"
+                ],
+                "type": "select_one"
+            }
+        ],
+        "translated": [
+            "label"
+        ],
+        "schema": "1"
+    },
+    "submissions": [
+      {
+          "__version__": "grouped_translated_v1",
+          "meta/instanceID": "uuid:6d1b903a-6d50-4504-bd7b-76c1a5098ed9",
+          "end": "2017-12-28T10:01:57.000-05:00",
+          "external_characteristics/What_kind_of_symmetry_do_you_have": "spherical radial bilateral",
+          "_submission_time": "2017-12-28T15:02:02",
+          "_uuid": "6d1b903a-6d50-4504-bd7b-76c1a5098ed9",
+          "Do_you_descend_from_unicellular_organism": "no",
+          "start": "2017-12-28T10:01:27.000-05:00",
+          "Do_you_have_body_flu_intracellular_space": "yes__and_some_",
+          "external_characteristics/How_many_segments_does_your_body_have": "7",
+          "formhub/uuid": "dd1cc93f2ac54837a559477e2cdb81b2"
+      },
+      {
+          "__version__": "grouped_translated_v1",
+          "meta/instanceID": "uuid:d314118a-17c2-4ba4-aac3-634930535ad6",
+          "end": "2017-12-28T10:02:19.000-05:00",
+          "external_characteristics/What_kind_of_symmetry_do_you_have": "bilateral",
+          "_submission_time": "2017-12-28T15:02:25",
+          "_uuid": "d314118a-17c2-4ba4-aac3-634930535ad6",
+          "Do_you_descend_from_unicellular_organism": "no",
+          "start": "2017-12-28T10:01:57.000-05:00",
+          "Do_you_have_body_flu_intracellular_space": "yes",
+          "external_characteristics/How_many_segments_does_your_body_have": "1",
+          "formhub/uuid": "dd1cc93f2ac54837a559477e2cdb81b2"
+      },
+      {
+          "meta/instanceID": "uuid:f4b838c8-7253-47fe-9627-c47830b7dc9b",
+          "end": "2017-12-28T10:02:42.000-05:00",
+          "_submission_time": "2017-12-28T15:02:48",
+          "_uuid": "f4b838c8-7253-47fe-9627-c47830b7dc9b",
+          "start": "2017-12-28T10:02:19.000-05:00",
+          "Do_you_have_body_flu_intracellular_space": "no___unsure",
+          "__version__": "grouped_translated_v1",
+          "formhub/uuid": "dd1cc93f2ac54837a559477e2cdb81b2"
+      }
+    ]
+}
