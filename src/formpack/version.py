@@ -159,7 +159,10 @@ class FormVersion(object):
 
             if data_type == 'begin_group':
                 group_stack.append(group)
-                group = FormGroup.from_json_definition(data_definition)
+                group = FormGroup.from_json_definition(
+                    data_definition,
+                    translations=self.translations,
+                )
                 # We go down in one level on nesting, so save the parent group.
                 # Parent maybe None, in that case we are at the top level.
                 hierarchy.append(group)
@@ -170,9 +173,12 @@ class FormVersion(object):
                 # Parent maybe None, in that case we are at the top level.
                 parent_section = section
 
-                section = FormSection.from_json_definition(data_definition,
-                                                           hierarchy,
-                                                           parent=parent_section)
+                section = FormSection.from_json_definition(
+                    data_definition,
+                    hierarchy,
+                    parent=parent_section,
+                    translations=self.translations,
+                )
                 self.sections[section.name] = section
                 hierarchy.append(section)
                 section_stack.append(parent_section)

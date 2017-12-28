@@ -34,22 +34,18 @@ class FormDataDef(object):
         return [self.name]
 
     @classmethod
-    def from_json_definition(cls, definition):
-        labels = cls._extract_json_labels(definition)
+    def from_json_definition(cls, definition, translations=None):
+        labels = cls._extract_json_labels(definition, translations)
         return cls(definition['name'], labels)
 
     @classmethod
-    def _extract_json_labels(cls, definition):
+    def _extract_json_labels(cls, definition, translations):
         """ Extract translation labels from the JSON data definition """
-        labels = OrderedDict()
-        if "label" in definition:
-            labels[UNTRANSLATED] = definition['label']
-
-        for key, val in definition.items():
-            if key.startswith('label:'):
-                # sometime the label can be separated with 2 ::
-                _, lang = re.split(r'::?', key, maxsplit=1, flags=re.U)
-                labels[lang] = val
+        label = definition.get('label')
+        if label:
+            labels = OrderedDict(zip(translations, label))
+        else:
+            labels = {}
         return labels
 
 
@@ -77,8 +73,9 @@ class FormSection(FormDataDef):
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     @classmethod
-    def from_json_definition(cls, definition, hierarchy=(None,), parent=None):
-        labels = cls._extract_json_labels(definition)
+    def from_json_definition(cls, definition, hierarchy=(None,), parent=None,
+                             translations=None):
+        labels = cls._extract_json_labels(definition, translations)
         return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
 
     def get_label(self, lang=UNTRANSLATED):
