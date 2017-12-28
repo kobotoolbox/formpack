@@ -13,6 +13,7 @@ from formpack.utils.expand_content import SCHEMA_VERSION
 from formpack.utils.flatten_content import flatten_content
 from formpack.constants import UNTRANSLATED
 from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
+from formpack import FormPack
 
 
 
@@ -111,6 +112,55 @@ def test_get_translated_cols():
     assert expanded['survey'][0]['something'] == [None, 'something-a', None]
     assert expanded['survey'][0]['something_else'] == ['x', None, None]
     assert expanded['choices'][0]['something'] == ['something', None, None]
+
+
+def test_translated_label_hierarchy():
+    survey = {'survey': [
+            {
+                'type': 'begin_group',
+                'name': 'group',
+                'label::English': 'Group',
+                'label::Español': 'Grupo',
+            },
+            {
+                'type': 'text',
+                'name': 'question',
+                'label::English': 'Question',
+                'label::Español': 'Pregunta',
+            },
+            {
+                'type': 'begin_repeat',
+                'name': 'repeat',
+                'label::English': 'Repeat',
+                'label::Español': 'Repetición',
+            },
+            {
+                'type': 'text',
+                'name': 'repeated_question',
+                'label::English': 'Repeated Question',
+                'label::Español': 'Pregunta con repetición',
+            },
+            {'type': 'end_repeat'},
+            {'type': 'end_group'},
+        ]
+    }
+    schema = {'content': expand_content(survey), 'version': 1}
+    version = FormPack([schema], 'title').versions[1]
+
+    assert version.sections['title'].fields['question'].get_labels(
+        hierarchy_in_labels=True, lang='English') == ['Group/Question']
+    assert version.sections['title'].fields['question'].get_labels(
+        hierarchy_in_labels=True, lang='Español') == ['Grupo/Pregunta']
+    assert(
+        version.sections['repeat'].fields['repeated_question'].get_labels(
+            hierarchy_in_labels=True, lang='English') ==
+                ['Group/Repeat/Repeated Question']
+    )
+    assert(
+        version.sections['repeat'].fields['repeated_question'].get_labels(
+            hierarchy_in_labels=True, lang='Español') ==
+                ['Grupo/Repetición/Pregunta con repetición']
+    )
 
 
 def test_expand_translated_media():
