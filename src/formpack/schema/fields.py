@@ -677,7 +677,9 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """ Return the label for this field and this option in particular """
 
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
-        option_label = option['labels'].get(lang, option['name'])
+        option_label = option['labels'].get(lang)
+        if not option_label:
+            option_label = option['name']
         group_sep = group_sep or "/"
         return label + group_sep + option_label
 
@@ -730,9 +732,10 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ("both", "summary"):
             res = []
             for v in val.split():
-                try:
-                    res.append(self.choice.options[v]['labels'][lang])
-                except:
+                label = self.choice.options[v]['labels'].get(lang)
+                if label:
+                    res.append(label)
+                else:
                     res.append(v)
             cells[self.name] = " ".join(res)
 
