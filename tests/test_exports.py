@@ -668,6 +668,172 @@ class TestFormPackExport(unittest.TestCase):
                             ])
         )
 
+    def test_substitute_xml_names_for_missing_labels(self):
+        title, schemas, submissions = build_fixture('grouped_translated')
+
+        # Remove a choice's labels
+        self.assertEqual(
+            schemas[0]['content']['choices'][0]['label'],
+            ['Spherical', 'Esférico'],
+        )
+        del schemas[0]['content']['choices'][0]['label']
+
+        # Remove a group's labels
+        self.assertEqual(
+            schemas[0]['content']['survey'][2]['label'],
+            ['External Characteristics', 'Características externas'],
+        )
+        del schemas[0]['content']['survey'][2]['label']
+
+        # Remove a grouped question's labels
+        self.assertEqual(
+            schemas[0]['content']['survey'][4]['label'],
+            ['How many segments does your body have?',
+             '¿Cuántos segmentos tiene tu cuerpo?'],
+        )
+        del schemas[0]['content']['survey'][4]['label']
+
+        # Remove a non-grouped question's labels
+        self.assertEqual(
+            schemas[0]['content']['survey'][6]['label'],
+            ['Do you have body fluids that occupy intracellular space?',
+             '¿Tienes fluidos corporales que ocupan espacio intracelular?'],
+        )
+        del schemas[0]['content']['survey'][6]['label']
+
+        fp = FormPack(schemas, title)
+        options = {
+            'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
+
+        # Missing labels should be replaced with XML names
+        english_export = fp.export(lang='English', **options).to_dict(
+            submissions)
+        self.assertEqual(
+            english_export[title]['fields'],
+            [
+                'start',
+                'end',
+                'external_characteristics/What kind of symmetry do you have?',
+                'external_characteristics/What kind of symmetry do you have?/spherical',
+                'external_characteristics/What kind of symmetry do you have?/Radial',
+                'external_characteristics/What kind of symmetry do you have?/Bilateral',
+                'external_characteristics/How_many_segments_does_your_body_have',
+                'Do_you_have_body_flu_intracellular_space',
+                'Do you descend from an ancestral unicellular organism?',
+            ]
+        )
+        self.assertEqual(
+            english_export[title]['data'][0][2],
+            'spherical Radial Bilateral'
+        )
+        spanish_export = fp.export(lang='Español', **options).to_dict(
+            submissions)
+        self.assertEqual(
+            spanish_export[title]['fields'],
+            [
+                'start',
+                'end',
+                'external_characteristics/¿Qué tipo de simetría tiene?',
+                'external_characteristics/¿Qué tipo de simetría tiene?/spherical',
+                'external_characteristics/¿Qué tipo de simetría tiene?/Radial',
+                'external_characteristics/¿Qué tipo de simetría tiene?/Bilateral',
+                'external_characteristics/How_many_segments_does_your_body_have',
+                'Do_you_have_body_flu_intracellular_space',
+                '¿Desciende de un organismo unicelular ancestral?',
+            ]
+        )
+        self.assertEqual(
+            spanish_export[title]['data'][0][2],
+            'spherical Radial Bilateral'
+        )
+
+    def test_substitute_xml_names_for_missing_translations(self):
+        title, schemas, submissions = build_fixture('grouped_translated')
+
+        # Remove a choice's translation
+        self.assertEqual(
+            schemas[0]['content']['choices'][0]['label'],
+            ['Spherical', 'Esférico'],
+        )
+        schemas[0]['content']['choices'][0]['label'] = [
+            'Spherical', UNTRANSLATED]
+
+        # Remove a group's translation
+        self.assertEqual(
+            schemas[0]['content']['survey'][2]['label'],
+            ['External Characteristics', 'Características externas'],
+        )
+        schemas[0]['content']['survey'][2]['label'] = [
+            'External Characteristics', UNTRANSLATED]
+
+        # Remove a grouped question's translation
+        self.assertEqual(
+            schemas[0]['content']['survey'][4]['label'],
+            ['How many segments does your body have?',
+             '¿Cuántos segmentos tiene tu cuerpo?'],
+        )
+        schemas[0]['content']['survey'][4]['label'] = [
+            'How many segments does your body have?', UNTRANSLATED]
+
+        # Remove a non-grouped question's translation
+        self.assertEqual(
+            schemas[0]['content']['survey'][6]['label'],
+            ['Do you have body fluids that occupy intracellular space?',
+             '¿Tienes fluidos corporales que ocupan espacio intracelular?'],
+        )
+        schemas[0]['content']['survey'][6]['label'] = [
+            'Do you have body fluids that occupy intracellular space?',
+            UNTRANSLATED
+        ]
+
+        fp = FormPack(schemas, title)
+        options = {
+            'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
+
+        # All the English translations should still be present
+        english_export = fp.export(lang='English', **options).to_dict(
+            submissions)
+        self.assertEqual(
+            english_export[title]['fields'],
+            [
+                'start',
+                'end',
+                'External Characteristics/What kind of symmetry do you have?',
+                'External Characteristics/What kind of symmetry do you have?/Spherical',
+                'External Characteristics/What kind of symmetry do you have?/Radial',
+                'External Characteristics/What kind of symmetry do you have?/Bilateral',
+                'External Characteristics/How many segments does your body have?',
+                'Do you have body fluids that occupy intracellular space?',
+                'Do you descend from an ancestral unicellular organism?',
+            ]
+        )
+        self.assertEqual(
+            english_export[title]['data'][0][2],
+            'Spherical Radial Bilateral'
+        )
+
+        # Missing Spanish translations should be replaced with XML names
+        spanish_export = fp.export(lang='Español', **options).to_dict(
+            submissions)
+        self.assertEqual(
+            spanish_export[title]['fields'],
+            [
+                'start',
+                'end',
+                'external_characteristics/¿Qué tipo de simetría tiene?',
+                'external_characteristics/¿Qué tipo de simetría tiene?/spherical',
+                'external_characteristics/¿Qué tipo de simetría tiene?/Radial',
+                'external_characteristics/¿Qué tipo de simetría tiene?/Bilateral',
+                'external_characteristics/How_many_segments_does_your_body_have',
+                'Do_you_have_body_flu_intracellular_space',
+                '¿Desciende de un organismo unicelular ancestral?',
+            ]
+        )
+        self.assertEqual(
+            spanish_export[title]['data'][0][2],
+            'spherical Radial Bilateral'
+        )
+
     def test_csv(self):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
