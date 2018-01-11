@@ -1,0 +1,386 @@
+{
+  "version": "literacy_test_v1",
+  "content": {
+    "choices": [
+      {
+        "list_name": "russian_words",
+        "name": "1",
+        "label": [
+          "Гуляла"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "2",
+        "label": [
+          "курочка"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "3",
+        "label": [
+          "с"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "4",
+        "label": [
+          "цыплятами"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "5",
+        "label": [
+          "по"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "6",
+        "label": [
+          "двору."
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "7",
+        "label": [
+          "Вдруг"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "8",
+        "label": [
+          "пошёл"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "9",
+        "label": [
+          "дождик."
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "10",
+        "label": [
+          "Курочка"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "11",
+        "label": [
+          "быстро"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "12",
+        "label": [
+          "на"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "13",
+        "label": [
+          "землю"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "14",
+        "label": [
+          "присела,"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "15",
+        "label": [
+          "перья"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "16",
+        "label": [
+          "растопырила,"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "17",
+        "label": [
+          "громко"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "18",
+        "label": [
+          "закудахтала."
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "19",
+        "label": [
+          "Это"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "20",
+        "label": [
+          "означало:"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "21",
+        "label": [
+          "прячьтесь"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "22",
+        "label": [
+          "скорей."
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "23",
+        "label": [
+          "Детки"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "24",
+        "label": [
+          "поспешили"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "25",
+        "label": [
+          "к"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "26",
+        "label": [
+          "маме"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "27",
+        "label": [
+          "под"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "28",
+        "label": [
+          "крылья."
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "29",
+        "label": [
+          "Двое"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "30",
+        "label": [
+          "цыплят"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "31",
+        "label": [
+          "не"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "32",
+        "label": [
+          "послушались"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "33",
+        "label": [
+          "её,"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "34",
+        "label": [
+          "не"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "35",
+        "label": [
+          "спрятались."
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "36",
+        "label": [
+          "Бегают,"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "37",
+        "label": [
+          "пищат"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "38",
+        "label": [
+          "и"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "39",
+        "label": [
+          "удивляются:"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "40",
+        "label": [
+          "что"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "41",
+        "label": [
+          "это"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "42",
+        "label": [
+          "такое"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "43",
+        "label": [
+          "им"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "44",
+        "label": [
+          "на"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "45",
+        "label": [
+          "голову"
+        ]
+      },
+      {
+        "list_name": "russian_words",
+        "name": "46",
+        "label": [
+          "капает?"
+        ]
+      }
+    ],
+    "survey": [
+      {
+        "select_from_list_name": "russian_words",
+        "name": "russian_passage_1",
+        "appearance": "literacy",
+        "label": [
+          "Reading test 1 (flash at 10)"
+        ],
+        "body::kb:flash": "10",
+        "type": "select_multiple"
+      },
+      {
+        "select_from_list_name": "russian_words",
+        "name": "russian_passage_2",
+        "appearance": "literacy",
+        "label": [
+          "Reading test 2 (flash at 5)"
+        ],
+        "body::kb:flash": "5",
+        "type": "select_multiple"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "meta/instanceID": "uuid:7e1d7b7f-8aa1-41aa-b5a8-c8f0ab1a1473",
+      "russian_passage_1": "22 16 46 null null null null null null null 1 2 4 8 10 19 20 21 29 30 33 39 46",
+      "_submission_time": "2018-01-09T03:21:40",
+      "_uuid": "7e1d7b7f-8aa1-41aa-b5a8-c8f0ab1a1473",
+      "russian_passage_2": "21 9 46 null null null null null null null 1 5 14 16 30 32 39",
+      "_status": "submitted_via_web",
+      "_id": 3281043,
+      "__version__": "literacy_test_v1",
+      "formhub/uuid": "1a7f6fc38dd64c128b173539e728d00c"
+    },
+    {
+      "meta/instanceID": "uuid:1eb23383-3c3e-43c6-bd45-359f30f82db4",
+      "russian_passage_1": "46 14 46 null null null null null null null 1 2 3 4 5 6 7 8 9",
+      "_submission_time": "2018-01-09T05:40:54",
+      "_uuid": "1eb23383-3c3e-43c6-bd45-359f30f82db4",
+      "russian_passage_2": "45 7 46 null null null null null null null 1 11 29 46",
+      "_status": "submitted_via_web",
+      "_id": 3281044,
+      "__version__": "literacy_test_v1",
+      "formhub/uuid": "1a7f6fc38dd64c128b173539e728d00c"
+    },
+    {
+      "meta/instanceID": "uuid:563408aa-b3c8-4c46-ba46-62e58f9d8a56",
+      "russian_passage_1": "9 12 46 null null null null null null null 1 2 3 4 6 7 8",
+      "_submission_time": "2018-01-09T05:41:33",
+      "_uuid": "563408aa-b3c8-4c46-ba46-62e58f9d8a56",
+      "russian_passage_2": "33 7 36 null null null null null null null 1 11 20 30 32",
+      "_status": "submitted_via_web",
+      "_id": 3281045,
+      "__version__": "literacy_test_v1",
+      "formhub/uuid": "1a7f6fc38dd64c128b173539e728d00c"
+    }
+  ]
+}

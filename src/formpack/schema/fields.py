@@ -132,6 +132,7 @@ class FormField(FormDataDef):
         name = definition['name']
         tags = definition.get('tags', [])
         labels = cls._extract_json_labels(definition, translations)
+        appearance = definition.get('appearance')
 
         # normalize spaces
         data_type = definition['type']
@@ -173,6 +174,10 @@ class FormField(FormDataDef):
             'section': section,
             'choice': choice
         }
+
+        if data_type == 'select_multiple' and appearance == 'literacy':
+            return FormLiteracyTestField(**args)
+
         return data_type_classes.get(data_type, cls)(**args)
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
@@ -747,3 +752,73 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     def parse_values(self, raw_values):
         for x in raw_values.split():
             yield x
+
+
+class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
+    '''
+    Like a FormChoiceFieldWithMultipleSelect, but with extra parameters
+    prepended that do not correspond to choice values. In the submission, the
+    parameters are submitted as a space-separated list of integers, nulls and
+    word values, e.g.
+        5 45 99 null null null null null null null 1 4 5 6
+    The fields are:
+        1    Word attempted at flash point
+        2    Time taken for whole exercise
+        3    Total words attempted
+        4-10 Reserved for possible future parameters (set to null until then)
+        11-  Values of words read incorrectly (as in a typical multiple select)
+    '''
+
+    PREPENDED_PARAMETERS = [
+        # Tuples of (name, label)
+        ('word_at_flash', 'Word at flash'),
+        ('duration_of_exercise', 'Duration of exercise'),
+        ('total_words_attempted', 'Total words attempted'),
+        # Reserved parameters must be listed at the end and labeled `None`
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+
+    def __init__(self, *args, **kwargs):
+        self.parameters_in_use = [
+            param for param in self.PREPENDED_PARAMETERS if param is not None]
+        return super(FormChoiceFieldWithMultipleSelect, self).__init__(
+            *args, **kwargs)
+
+    @property
+    def parameter_value_names(self):
+        # Value names must be unique across the entire form!
+        return [
+            self.name + '/' + name
+                for name, label in self.parameters_in_use
+        ]
+
+    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
+                   hierarchy_in_labels=False, multiple_select="both"):
+        question_label = self._get_label(lang, group_sep, hierarchy_in_labels)
+        parameter_labels = [
+            question_label + group_sep + label
+                for name, label in self.parameters_in_use
+        ]
+        word_labels = super(FormLiteracyTestField, self).get_labels(
+            lang, group_sep, hierarchy_in_labels, multiple_select)
+        return parameter_labels + word_labels
+
+    def get_value_names(self, *args, **kwargs):
+        word_value_names = super(FormLiteracyTestField, self).get_value_names(
+            *args, **kwargs)
+        return self.parameter_value_names + word_value_names
+
+    def format(self, val, *args, **kwargs):
+        all_values = val.split()
+        prepended_cells = dict(zip(self.parameter_value_names, all_values))
+        word_values = all_values[len(self.PREPENDED_PARAMETERS):]
+        cells = super(FormLiteracyTestField, self).format(
+            ' '.join(word_values), *args, **kwargs)
+        cells.update(prepended_cells)
+        return cells
