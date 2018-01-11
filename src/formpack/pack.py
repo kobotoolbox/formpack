@@ -98,8 +98,9 @@ class FormPack(object):
         _stats['id_string'] = self.id_string
         _stats['versions'] = len(self.versions)
         # _stats['submissions'] = self.submissions_count()
-        _stats['row_count'] = len(self[-1].schema.get('content', {})
-                                                 .get('survey', []))
+        if self.versions:
+            _stats['row_count'] = len(self[-1].schema.get('content', {})
+                                                     .get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join('%s="%s"' % item for item in _stats.items())
 
