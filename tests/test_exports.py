@@ -1363,3 +1363,73 @@ class TestFormPackExport(unittest.TestCase):
             'is_plant_life_encroaching',
             'please_rate_the_impact_of_any_defects_observed',
         ])
+
+    def test_literacy_test_export(self):
+        title, schemas, submissions = build_fixture('literacy_test')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
+        headers = export['Literacy test']['fields']
+        expected_headers = (
+            [
+                 'russian_passage_1/Word at flash',
+                 'russian_passage_1/Duration of exercise',
+                 'russian_passage_1/Total words attempted',
+                 'russian_passage_1',
+            ] + ['russian_passage_1/' + str(i) for i in range(1, 47)] + [
+                 'russian_passage_2/Word at flash',
+                 'russian_passage_2/Duration of exercise',
+                 'russian_passage_2/Total words attempted',
+                 'russian_passage_2',
+            ] + ['russian_passage_2/' + str(i) for i in range(1, 47)]
+        )
+        self.assertListEqual(headers, expected_headers)
+        expected_data = [
+            [
+                # Word at flash, duration of exercise, total words attempted
+                '22', '16', '46',
+                # Incorrect words as list in single column
+                '1 2 4 8 10 19 20 21 29 30 33 39 46',
+                # Incorrect words as binary values in separate columns
+                '1', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0',
+                '0', '0', '0', '0', '0', '0', '1', '1', '1', '0', '0', '0',
+                '0', '0', '0', '0', '1', '1', '0', '0', '1', '0', '0', '0',
+                '0', '0', '1', '0', '0', '0', '0', '0', '0', '1',
+                # All the same for the  second literacy test question
+                '21', '9', '46',
+                '1 5 14 16 30 32 39',
+                '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0',
+                '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0',
+                '0', '0', '1', '0', '0', '0', '0', '0', '0', '0',
+            ], [
+                '46', '14', '46',
+                '1 2 3 4 5 6 7 8 9',
+                '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '45', '7', '46',
+                '1 11 29 46',
+                '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '1',
+            ], [
+                '9', '12', '46',
+                '1 2 3 4 6 7 8',
+                '1', '1', '1', '1', '0', '1', '1', '1', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+                '33', '7', '36',
+                '1 11 20 30 32',
+                '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0',
+                '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0',
+                '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+            ],
+        ]
+        self.assertListEqual(
+            export['Literacy test']['data'],
+            expected_data
+        )

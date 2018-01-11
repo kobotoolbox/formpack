@@ -770,10 +770,10 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
     '''
 
     PREPENDED_PARAMETERS = [
-        # FIXME: what's the exact wording that STC wants here?
-        'Word at flash',
-        'Duration of exercise',
-        'Total words attempted',
+        # Tuples of (name, label)
+        ('word_at_flash', 'Word at flash'),
+        ('duration_of_exercise', 'Duration of exercise'),
+        ('total_words_attempted', 'Total words attempted'),
         # Reserved parameters must be listed at the end and labeled `None`
         None,
         None,
@@ -786,23 +786,37 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
 
     def __init__(self, *args, **kwargs):
         self.parameters_in_use = [
-            label for label in self.PREPENDED_PARAMETERS if label is not None]
+            param for param in self.PREPENDED_PARAMETERS if param is not None]
         return super(FormChoiceFieldWithMultipleSelect, self).__init__(
             *args, **kwargs)
 
-    def get_labels(self, *args, **kwargs):
+    @property
+    def parameter_value_names(self):
+        # Value names must be unique across the entire form!
+        return [
+            self.name + '/' + name
+                for name, label in self.parameters_in_use
+        ]
+
+    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
+                   hierarchy_in_labels=False, multiple_select="both"):
+        question_label = self._get_label(lang, group_sep, hierarchy_in_labels)
+        parameter_labels = [
+            question_label + group_sep + label
+                for name, label in self.parameters_in_use
+        ]
         word_labels = super(FormLiteracyTestField, self).get_labels(
-            *args, **kwargs)
-        return self.parameters_in_use + word_labels
+            lang, group_sep, hierarchy_in_labels, multiple_select)
+        return parameter_labels + word_labels
 
     def get_value_names(self, *args, **kwargs):
         word_value_names = super(FormLiteracyTestField, self).get_value_names(
             *args, **kwargs)
-        return self.parameters_in_use + word_value_names
+        return self.parameter_value_names + word_value_names
 
     def format(self, val, *args, **kwargs):
         all_values = val.split()
-        prepended_cells = dict(zip(self.parameters_in_use, all_values))
+        prepended_cells = dict(zip(self.parameter_value_names, all_values))
         word_values = all_values[len(self.PREPENDED_PARAMETERS):]
         cells = super(FormLiteracyTestField, self).format(
             ' '.join(word_values), *args, **kwargs)
