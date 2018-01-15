@@ -583,8 +583,7 @@ class FormChoiceField(FormField):
             return val
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
-        if lang:
-            val = self.get_translation(val, lang)
+        val = self.get_translation(val, lang)
         return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
