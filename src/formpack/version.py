@@ -11,7 +11,7 @@ except ImportError:
 
 from .validators import validate_content
 
-from .constants import UNTRANSLATED, UNSPECIFIED_TRANSLATION
+from .constants import UNTRANSLATED
 from .submission import FormSubmission
 from .utils.xform_tools import formversion_pyxform
 from .utils import parse_xml_to_xmljson, normalize_data_type

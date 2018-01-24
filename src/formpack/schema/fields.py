@@ -681,9 +681,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """ Return the label for this field and this option in particular """
 
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
-        option_label = option['labels'].get(lang)
-        if not option_label:
-            option_label = option['name']
+        option_label = option['labels'].get(lang) or option['name']
         group_sep = group_sep or "/"
         return label + group_sep + option_label
 

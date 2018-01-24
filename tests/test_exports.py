@@ -49,6 +49,28 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(export, expected)
 
+    def test_generator_export_labels_without_translations(self):
+
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+
+        self.assertEqual(len(fp[0].translations), 1)
+
+        export = fp.export(lang=UNTRANSLATED).to_dict(submissions)
+        expected = OrderedDict({
+                    "Customer Satisfaction": {
+                        'fields': ["Restaurant name",
+                                   "Did you enjoy your dining experience?"],
+                        'data': [
+                            ["Felipes", "Yes"],
+                            ["Dunkin Donuts", "No"],
+                            ["McDonalds", "No"]
+                        ]
+                    }
+               })
+
+        self.assertDictEqual(export, expected)
+
     def test_generator_export_translation_headers(self):
 
         title, schemas, submissions = restaurant_profile
