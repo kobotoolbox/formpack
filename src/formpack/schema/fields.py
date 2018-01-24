@@ -583,8 +583,7 @@ class FormChoiceField(FormField):
             return val
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
-        if lang:
-            val = self.get_translation(val, lang)
+        val = self.get_translation(val, lang)
         return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -682,9 +681,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """ Return the label for this field and this option in particular """
 
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
-        option_label = option['labels'].get(lang)
-        if not option_label:
-            option_label = option['name']
+        option_label = option['labels'].get(lang) or option['name']
         group_sep = group_sep or "/"
         return label + group_sep + option_label
 

@@ -15,7 +15,7 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from ..constants import UNTRANSLATED
+from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
 
 
 class FormDataDef(object):
@@ -78,7 +78,7 @@ class FormSection(FormDataDef):
         labels = cls._extract_json_labels(definition, translations)
         return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
 
-    def get_label(self, lang=UNTRANSLATED):
+    def get_label(self, lang=UNSPECIFIED_TRANSLATION):
         return [self.labels.get(lang) or self.name]
 
     def __repr__(self):
