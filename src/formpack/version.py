@@ -205,8 +205,11 @@ class FormVersion(object):
             field.labels = _labels
             assert 'labels' not in _f
 
-    def __repr__(self):
-        return '<FormVersion %s>' % self._stats()
+    # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
+    # to fix https://github.com/kobotoolbox/formpack/issues/150
+    #
+    #def __repr__(self):
+    #    return '<FormVersion %s>' % self._stats()
 
     def _stats(self):
         _stats = OrderedDict()

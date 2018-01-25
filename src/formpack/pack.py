@@ -53,8 +53,11 @@ class FormPack(object):
 
         self.load_all_versions(versions)
 
-    def __repr__(self):
-        return '<FormPack %s>' % self._stats()
+    # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
+    # to fix https://github.com/kobotoolbox/formpack/issues/150
+    #
+    #def __repr__(self):
+    #    return '<FormPack %s>' % self._stats()
 
     def version_id_keys(self, _versions=None):
         # if no parameter is passed, default to 'all'
@@ -199,6 +202,8 @@ class FormPack(object):
 
         versions = list(self._get_versions(versions).values())
 
+        # FIXME: you say that this is a list of tuples, but really, it's just a
+        # list of field objects, right?
         all_fields = []  # [(name, field), (name...))]
         processed_field_names = set()  # avoid expensive look ups
 
@@ -223,6 +228,9 @@ class FormPack(object):
                         final_list_copy = enumerate(list(all_fields))
                         for y, _field in final_list_copy:
                             if _field.name == new_field_name:
+                                # FIXME: replace the old field with itself?
+                                # Huh? Proposed solution:
+                                # all_fields[y] = new_field_obj
                                 all_fields[y] = _field
                                 break
                         continue
@@ -234,11 +242,19 @@ class FormPack(object):
                     # new field right before it. This gives us a coherent
                     # order of fields so that they are always, at worst,
                     # adjacent to the last field they used to be to.
+                    # FIXME: this loop never runs, because
+                    # `following_new_field` is a tuple of (name, field_obj) and
+                    # `processed_field_names` is just a set of strings
                     for following_new_field in new_fields[i+1:]:
                         if following_new_field in processed_field_names:
                             final_list_copy = enumerate(list(all_fields))
+                            # FIXME: cannot work since final_list_copy contains
+                            # field objects, not tuples
                             for y, (name, field) in final_list_copy:
                                 if name == following_new_field:
+                                    # FIXME: set the field to itself? What's
+                                    # the point? Again, this code never runs
+                                    # and has no tests
                                     all_fields[y] = field
                                     break
                             break
