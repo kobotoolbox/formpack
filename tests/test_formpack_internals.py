@@ -76,3 +76,53 @@ def test_get_fields_for_versions_returns_unique_fields():
     fields = fp.get_fields_for_versions(fp.versions)
     field_names = [field.name for field in fields]
     assert sorted(field_names) == [u'hey', u'one', u'two']
+
+
+def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
+    schemas = [
+        {
+            'version': 'v1',
+            'content': {
+                'survey': [
+                    {
+                        'name': 'constant_question_name',
+                        'type': 'select_one choice',
+                        'label': 'first version question label',
+                        'hxl': '#first_version_hxl'
+                    },
+                ],
+                'choices': [
+                    {
+                        'list_name': 'choice',
+                        'name': 'constant_choice_name',
+                        'label': 'first version choice label',
+                    },
+                ],
+            }
+        },
+        {
+            'version': 'v2',
+            'content': {
+                'survey': [
+                    {
+                        'name': 'constant_question_name',
+                        'type': 'select_one choice',
+                        'label': 'second version question label',
+                        'hxl': '#second_version_hxl'
+                    },
+                ],
+                'choices': [
+                    {
+                        'list_name': 'choice',
+                        'name': 'constant_choice_name',
+                        'label': 'second version choice label',
+                    }
+                ],
+            }
+        }
+    ]
+    fp = FormPack(schemas)
+    fields = fp.get_fields_for_versions(fp.versions)
+    # The first and only field returned should be the first field of the first
+    # section of the last version
+    assert fields[0] == fp[-1].sections.values()[0].fields.values()[0]

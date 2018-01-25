@@ -228,10 +228,7 @@ class FormPack(object):
                         final_list_copy = enumerate(list(all_fields))
                         for y, _field in final_list_copy:
                             if _field.name == new_field_name:
-                                # FIXME: replace the old field with itself?
-                                # Huh? Proposed solution:
-                                # all_fields[y] = new_field_obj
-                                all_fields[y] = _field
+                                all_fields[y] = new_field_obj
                                 break
                         continue
 
