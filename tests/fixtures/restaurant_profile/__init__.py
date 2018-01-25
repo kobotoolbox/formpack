@@ -8,6 +8,8 @@ restaurant_profile:
 
  * v1 is single language
  * v2 is in 2 languages
+ * v3 adds `select_one eatery_types`
+ * v4 changes `eatery_types` to `select_multiple`
 
 '''
 

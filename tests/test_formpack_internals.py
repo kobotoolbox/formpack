@@ -60,8 +60,7 @@ def test_to_xml_fails_when_null_labels():
 def test_get_fields_for_versions_returns_unique_fields():
     '''
     As described in #127, `get_field_for_versions()` would return identical
-    fields multiple times. This is a (soon-to-be-fixed) failing test to
-    reproduce that issue
+    fields multiple times. This is was a failing test to reproduce that issue
     '''
     fp = FormPack(
         [{'content': {u'survey': [{u'name': u'hey', u'type': u'image'},
