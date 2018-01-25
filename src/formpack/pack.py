@@ -183,6 +183,23 @@ class FormPack(object):
             out.append(line)
         return ''.join(out)
 
+    @staticmethod
+    def _combine_field_choices(old_field, new_field):
+        """ Update `new_field.choice` so that it contains everything from
+            `old_field.choice`. In the event of a conflict, `new_field.choice`
+            wins. If either field does not have a `choice` attribute, do
+            nothing
+        """
+        try:
+            old_choice = old_field.choice
+            new_choice = new_field.choice
+        except AttributeError:
+            return
+        combined_options = old_choice.options.copy()
+        combined_options.update(new_choice.options)
+        new_choice.options = combined_options
+
+
     def get_fields_for_versions(self, versions=-1, data_types=None):
         """ Return a mapping containing fields
 
@@ -228,6 +245,8 @@ class FormPack(object):
                         final_list_copy = enumerate(list(all_fields))
                         for y, _field in final_list_copy:
                             if _field.name == new_field_name:
+                                self._combine_field_choices(
+                                    _field, new_field_obj)
                                 all_fields[y] = new_field_obj
                                 break
                         continue
