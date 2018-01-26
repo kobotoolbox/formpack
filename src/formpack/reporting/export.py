@@ -15,7 +15,7 @@ from ..submission import FormSubmission
 from ..schema import CopyField
 from ..utils.string import unicode, unique_name_for_xls
 from ..utils.flatten_content import flatten_tag_list
-from ..constants import UNSPECIFIED_TRANSLATION
+from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 
 
 class Export(object):
@@ -24,7 +24,7 @@ class Export(object):
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=[]):
+                 title="submissions", tag_cols_for_header=None):
 
         self.formpack = formpack
         self.lang = lang
@@ -35,6 +35,8 @@ class Export(object):
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
+        if tag_cols_for_header is None:
+            tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
 
         # If some fields need to be arbitrarly copied, add them
@@ -100,7 +102,7 @@ class Export(object):
                                                 group_sep="/",
                                                 hierarchy_in_labels=False,
                                                 multiple_select="both",
-                                                tag_cols_for_header=[]):
+                                                tag_cols_for_header=None):
         """ Return 3 mappings containing field, labels, and tags by section
 
             This is needed because when making an export for several
@@ -116,6 +118,17 @@ class Export(object):
             Tags specified by `tag_cols_for_header` are included as additional
             column headers (in CSV and XLSX exports only).
         """
+
+        if tag_cols_for_header is None:
+            tag_cols_for_header = []
+        try:
+            tag_cols_and_seps = {
+                col: TAG_COLUMNS_AND_SEPARATORS[col]
+                    for col in tag_cols_for_header
+            }
+        except KeyError as e:
+            raise RuntimeError(
+                '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
 
         section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
         section_labels = OrderedDict()  # {section: [field_label, field_label]}
@@ -168,7 +181,7 @@ class Export(object):
                 # Add the tags for this field. If the field has multiple
                 # labels, add the tags once for each label
                 tags.extend(
-                    [flatten_tag_list(field.tags, tag_cols_for_header)] *
+                    [flatten_tag_list(field.tags, tag_cols_and_seps)] *
                         len(field.value_names)
                 )
 

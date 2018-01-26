@@ -5,7 +5,8 @@ import re
 from copy import deepcopy
 from collections import defaultdict, OrderedDict
 from array_to_xpath import array_to_xpath
-from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
+from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
+                         TAG_COLUMNS_AND_SEPARATORS)
 
 
 def flatten_content_in_place(survey_content,
@@ -77,27 +78,30 @@ def _stringify_type__depr(json_qtype):
         return 'select_one %s or_other' % json_qtype['select_one_or_other']
 
 
-def flatten_tag_list(tag_list, tag_cols=[]):
+def flatten_tag_list(tag_list, tag_cols_and_seps=None):
     '''
     takes a list of tags and reassigns them to the tag column in which they
     appear on import of xls
     '''
-    return _flatten_tags({'tags': tag_list}, tag_cols)
+    return _flatten_tags({'tags': tag_list}, tag_cols_and_seps)
 
 
-def _flatten_tags(row, tag_cols=[]):
+def _flatten_tags(row, tag_cols_and_seps=None):
     '''
     takes a "tags" column with an array of tags and
     reassigns them to the tag column in which they appear
     on import of xls
     '''
-    for col in ['tags'] + tag_cols:
+    if tag_cols_and_seps is None:
+        tag_cols_and_seps = {}
+
+    for col in ['tags'] + tag_cols_and_seps.keys():
         if col in row and isinstance(row[col], basestring):
             return
 
     tag_list = row.pop('tags', [])
     tag_res = OrderedDict()
-    for tag_col in tag_cols:
+    for tag_col in tag_cols_and_seps.keys():
         tag_res[tag_col] = r'^%s:(\S+)$' % tag_col
 
     additionals = defaultdict(list)
@@ -113,7 +117,8 @@ def _flatten_tags(row, tag_cols=[]):
             additionals['tags'].append(tag)
 
     for (col, items) in additionals.items():
-        row[col] = ' '.join(items)
+        separator = tag_cols_and_seps.get(col, ' ')
+        row[col] = separator.join(items)
 
     return row
 
@@ -202,7 +207,7 @@ def _flatten_survey_row(row):
         if isinstance(row[key], (list, tuple)):
             row[key] = array_to_xpath(row[key])
     if 'tags' in row:
-        _flatten_tags(row, tag_cols=['hxl'])
+        _flatten_tags(row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
     if 'type' in row:
         _type = row['type']
         if isinstance(row.get('required'), bool):

@@ -13,7 +13,8 @@ import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .replace_aliases import META_TYPES
-from ..constants import UNTRANSLATED, OR_OTHER_COLUMN
+from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
+                         TAG_COLUMNS_AND_SEPARATORS)
 
 REMOVE_EMPTY_STRINGS = True
 # this will be used to check which version of formpack was used to compile the
@@ -41,9 +42,9 @@ def _expand_translatable_content(content, row, col_shortname,
             del row[col_shortname]
 
 
-def _expand_tags(row, tag_cols=None):
-    if tag_cols is None:
-        tag_cols = []
+def _expand_tags(row, tag_cols_and_seps=None):
+    if tag_cols_and_seps is None:
+        tag_cols_and_seps = {}
     tags = []
     main_tags = row.pop('tags', None)
     if main_tags:
@@ -53,7 +54,7 @@ def _expand_tags(row, tag_cols=None):
             # carry over any tags listed here
             tags = main_tags
 
-    for tag_col in tag_cols:
+    for tag_col in tag_cols_and_seps.keys():
         tags_str = row.pop(tag_col, None)
         if tags_str and isinstance(tags_str, basestring):
             for tag in re.findall('([\#\+][a-zA-Z][a-zA-Z0-9]*)', tags_str):
@@ -100,7 +101,7 @@ def expand_content_in_place(content):
                 row.update({u'type': _type_str,
                             u'select_from_list_name': _list_name})
 
-        _expand_tags(row, tag_cols=['hxl'])
+        _expand_tags(row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
 
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], basestring):
