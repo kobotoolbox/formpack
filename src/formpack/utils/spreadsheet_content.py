@@ -2,6 +2,7 @@ import re
 from copy import deepcopy, copy
 from collections import OrderedDict, defaultdict
 
+from ..constants import TAG_COLUMNS_AND_SEPARATORS
 from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
                               _flatten_tags,
                               translated_col_list)
@@ -93,7 +94,8 @@ def flatten_to_spreadsheet_content(content,
         rows = content.pop(sheet_name)
         for row in rows:
             if 'tags' in row:
-                _flatten_tags(row, tag_cols=['hxl'])
+                _flatten_tags(
+                    row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
         if sheet_name in all_sheets:
             all_sheets.remove(sheet_name)
         _od[sheet_name] = _sheet_to_ordered_dicts(sheet_name, rows)

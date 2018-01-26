@@ -347,20 +347,20 @@ def test_flatten_tags_util_method():
     assert _flatten_tags({'tags': ['a', 'b']})['tags'] == 'a b'
 
     assert _flatten_tags(
-        {'tags': ['a', 'zz:b']}, tag_cols=['zz']
+        {'tags': ['a', 'zz:b']}, tag_cols_and_seps={'zz': ' '}
         ) == {'tags': 'a', 'zz': 'b'}
 
     assert _flatten_tags(
-        {'tags': ['a', 'hxl:b']}, tag_cols=['hxl']
+        {'tags': ['a', 'hxl:b']}, tag_cols_and_seps={'hxl': ''}
         ) == {'tags': 'a', 'hxl': 'b'}
 
     assert _flatten_tags(
-        {'tags': ['a', 'hxl:b', 'hxl:c']}, tag_cols=['hxl']
-        ) == {'tags': 'a', 'hxl': 'b c'}
+        {'tags': ['a', 'hxl:b', 'hxl:c']}, tag_cols_and_seps={'hxl': ''}
+        ) == {'tags': 'a', 'hxl': 'bc'}
 
     assert _flatten_tags(
-        {'tags': ['a', 'hxl:b', 'hxl:c', 'd']}, tag_cols=['hxl']
-        ) == {'tags': 'a d', 'hxl': 'b c'}
+        {'tags': ['a', 'hxl:b', 'hxl:c', 'd']}, tag_cols_and_seps={'hxl': ''}
+        ) == {'tags': 'a d', 'hxl': 'bc'}
 
 
 def test_flatten_tag_list_util_method():
@@ -368,20 +368,20 @@ def test_flatten_tag_list_util_method():
     assert flatten_tag_list(['a', 'b'])['tags'] == 'a b'
 
     assert flatten_tag_list(
-        ['a', 'zz:b'], tag_cols=['zz']
+        ['a', 'zz:b'], tag_cols_and_seps={'zz': ' '}
         ) == {'tags': 'a', 'zz': 'b'}
 
     assert flatten_tag_list(
-        ['a', 'hxl:b'], tag_cols=['hxl']
+        ['a', 'hxl:b'], tag_cols_and_seps={'hxl': ''}
         ) == {'tags': 'a', 'hxl': 'b'}
 
     assert flatten_tag_list(
-        ['a', 'hxl:b', 'hxl:c'], tag_cols=['hxl']
-        ) == {'tags': 'a', 'hxl': 'b c'}
+        ['a', 'hxl:b', 'hxl:c'], tag_cols_and_seps={'hxl': ''}
+        ) == {'tags': 'a', 'hxl': 'bc'}
 
     assert flatten_tag_list(
-        ['a', 'hxl:b', 'hxl:c', 'd'], tag_cols=['hxl']
-        ) == {'tags': 'a d', 'hxl': 'b c'}
+        ['a', 'hxl:b', 'hxl:c', 'd'], tag_cols_and_seps={'hxl': ''}
+        ) == {'tags': 'a d', 'hxl': 'bc'}
 
 
 def test_flatten_tags():
@@ -394,7 +394,7 @@ def test_flatten_tags():
         ],
     }
     _c = flatten_to_spreadsheet_content(_e)
-    assert _c['survey'][0]['hxl'] == 'x y z'
+    assert _c['survey'][0]['hxl'] == 'xyz'
 
 
 def test_col_order():

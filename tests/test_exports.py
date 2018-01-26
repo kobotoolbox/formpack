@@ -910,9 +910,9 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
         rows = list(fp.export(**options).to_csv(submissions))
-        assert rows[1] == (u'"#loc +name";"#indicator +diet";'
-                           u'"#indicator +diet";"#indicator +diet";'
-                           u'"#indicator +diet";"#indicator +diet"')
+        assert rows[1] == (u'"#loc+name";"#indicator+diet";'
+                           u'"#indicator+diet";"#indicator+diet";'
+                           u'"#indicator+diet";"#indicator+diet"')
 
     # disabled for now
     # @raises(RuntimeError)
@@ -1103,7 +1103,7 @@ class TestFormPackExport(unittest.TestCase):
             sheet = book.sheet_by_name('Household survey with HXL an...')
             row_values = [cell.value for cell in sheet.row(1)]
             assert row_values == [
-                u'#date +start', u'#date +end', u'#loc +name', u'']
+                u'#date+start', u'#date+end', u'#loc+name', u'']
             # Verify repeating group
             sheet = book.sheet_by_name('houshold_member_repeat')
             row_values = [cell.value for cell in sheet.row(1)]

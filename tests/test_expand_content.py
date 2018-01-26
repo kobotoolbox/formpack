@@ -421,7 +421,7 @@ def test_expand_tags_method():
         row = {'hxl': tag_str}
         if existing_tags:
             row['tags'] = existing_tags
-        return sorted(_expand_tags(row, tag_cols=['hxl'])['tags'])
+        return sorted(_expand_tags(row, tag_cols_and_seps={'hxl': ''})['tags'])
     expected = sorted(['hxl:#tag1', 'hxl:+attr1', 'hxl:+attr2'])
     assert expected == _expand('#tag1+attr1+attr2')
     assert expected == _expand(' #tag1 +attr1 +attr2 ')

@@ -32,3 +32,18 @@ OR_OTHER_COLUMN = '_or_other'
 # practice the Excel application has a 31-character limit.
 # http://stackoverflow.com/a/3681908
 EXCEL_SHEET_NAME_SIZE_LIMIT = 31
+
+# Tag columns are tags that have their own columns when expanding and
+# flattening. Internally, they are stored as tags prefixed with their column
+# name and a colon, e.g.
+#
+#   name           | hxl       | tags
+#   ---------------+-----------+-----------------
+#   family_members | #affected | urban population
+#
+# is stored internally as tags ['hxl:affected', 'urban', 'population']
+TAG_COLUMNS_AND_SEPARATORS = {
+    # Separators are used when flattening tags into a single column. Keys are
+    # column names, values are separators.
+    'hxl': '',
+}
