@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import re
+import sys
 from setuptools import setup, find_packages
 
 
@@ -35,6 +36,10 @@ def get_requirements(path):
 requirements, dep_links = get_requirements('requirements.txt')
 dev_requirements, dev_dep_links = get_requirements('dev-requirements.txt')
 
+if 'develop' in sys.argv:
+    requirements += dev_requirements
+    dep_links += dev_dep_links
+
 setup(name='formpack',
       version='1.4',
       description='Manipulation tools for kobocat forms',
@@ -44,9 +49,6 @@ setup(name='formpack',
       packages=[str(pkg) for pkg in find_packages('src')],
       package_dir={'': b'src'},
       install_requires=requirements,
-      extras_require={
-          'dev': dev_requirements
-      },
       include_package_data=True,
       zip_safe=False,
       )

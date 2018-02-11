@@ -1,9 +1,9 @@
 begins==0.9
 cyordereddict==1.0.0
-jsonschema==2.5.1
-lxml==2.3.4
-path.py==8.1.2
-PyExcelerate==0.6.7
-pyquery==1.2.11
-pyxform==0.9.22
+jsonschema==2.6.0
+lxml==4.1.1
+path.py==10.5
+openpyxl==2.5.0
+pyquery==1.4.0
+pyxform==0.10.0
 statistics==1.0.3.5
