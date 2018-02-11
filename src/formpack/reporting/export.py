@@ -9,7 +9,7 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-from pyexcelerate import Workbook
+import openpyxl
 
 from ..submission import FormSubmission
 from ..schema import CopyField
@@ -406,7 +406,7 @@ class Export(object):
 
     def to_xlsx(self, filename, submissions):
 
-        workbook = Workbook()
+        workbook = openpyxl.Workbook(write_only=True)
 
         sheets = {}
 
@@ -421,31 +421,20 @@ class Export(object):
                         section_name, sheet_name_mapping.values())
                     sheet_name_mapping[section_name] = sheet_name
                 try:
-                    cursor = sheets[sheet_name]
-                    current_sheet = cursor['sheet']
+                    current_sheet = sheets[sheet_name]
                 except KeyError:
-                    current_sheet = workbook.new_sheet(sheet_name)
-                    cursor = sheets[sheet_name] = {
-                        "sheet": current_sheet,
-                        "row": 2,
-                    }
+                    current_sheet = workbook.create_sheet(title=sheet_name)
+                    sheets[sheet_name] = current_sheet
 
-                    for i, label in enumerate(self.labels[section_name], 1):
-                        current_sheet.set_cell_value(1, i, label)
+                    current_sheet.append(self.labels[section_name])
 
                     # Include specified tag columns as extra header rows
                     tag_rows = self.get_header_rows_for_tag_cols(section_name)
                     for tag_row in tag_rows:
-                        for i, tag_cell in enumerate(tag_row, 1):
-                            current_sheet.set_cell_value(
-                                cursor["row"], i, tag_cell)
-                        cursor["row"] += 1
+                        current_sheet.append(tag_row)
 
                 for row in rows:
-                    y = cursor["row"]
-                    for i, cell in enumerate(row, 1):
-                        current_sheet.set_cell_value(y, i, cell)
-                    cursor["row"] += 1
+                    current_sheet.append(row)
 
         workbook.save(filename)
 
