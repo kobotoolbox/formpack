@@ -1066,13 +1066,7 @@ class TestFormPackExport(unittest.TestCase):
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
 
-    def test_xlsx_sheet_name_limit(self):
-        '''
-        PyExcelerate will raise the following if any sheet name exceeds 31
-        characters:
-            Exception: Excel does not permit worksheet names longer than 31
-            characters. Set force_name=True to disable this restriction.
-        '''
+    def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
         fp = FormPack(schemas, title)
         options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
@@ -1084,7 +1078,7 @@ class TestFormPackExport(unittest.TestCase):
             assert xls.isfile()
             book = xlrd.open_workbook(xls)
             assert book.sheet_names() == [
-                u'long survey name: the quick,...',
+                u'long survey name_ the quick,...',
                 u'long_group_name__Victor_jagt...',
                 u'long_group_name__Victor_... (1)'
             ]

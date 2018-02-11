@@ -33,6 +33,9 @@ OR_OTHER_COLUMN = '_or_other'
 # http://stackoverflow.com/a/3681908
 EXCEL_SHEET_NAME_SIZE_LIMIT = 31
 
+# Some characters are forbidden from worksheet names
+EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS = r'[]*?:\/'
+
 # Tag columns are tags that have their own columns when expanding and
 # flattening. Internally, they are stored as tags prefixed with their column
 # name and a colon, e.g.
