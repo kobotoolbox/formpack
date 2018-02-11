@@ -8,7 +8,9 @@ import re
 import unicodedata
 import string
 import random
-from ..constants import EXCEL_SHEET_NAME_SIZE_LIMIT
+from ..constants import (
+    EXCEL_SHEET_NAME_SIZE_LIMIT, EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
+)
 
 try:
     unicode = unicode
@@ -81,6 +83,8 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
     r"""
     Return a sheet name that does not collide with any string in the iterable
     `other_sheet_names` and does not exceed the Excel sheet name length limit.
+    Characters that are not allowed in sheet names are replaced with
+    underscores.
     :Example:
         >>> unique_name_for_xls(
         ...     'This string has more than 31 characters!',
@@ -88,6 +92,10 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
         ... )
         u'This string has more tha... (1)'
     """
+
+    sheet_name = sheet_name.translate({
+        ord(c): '_' for c in EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
+    })
 
     candidate = ellipsize(
         sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, base_ellipsis)
