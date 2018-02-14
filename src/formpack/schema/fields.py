@@ -214,8 +214,51 @@ class FormField(FormDataDef):
     def parse_values(self, raw_values):
         yield raw_values
 
+class ExtendedFormField(FormField):
+    """
+    This class does the same thing as FormField.
+    It only adds two "protected" methods which can be called
+    in classes that extend it to avoid redundant code.
+    """
 
-class TextField(FormField):
+    def _get_percentage(self, value, total):
+        """
+        Calculate value percentage according to total
+        :param value: integer
+        :param total: integer
+        :return: float
+        """
+        if total:  # avoid ZeroDivisionError
+            return round((value * 100 / total), 2)
+        return 0
+
+    def _add_ellipsis(self, process, counter, total, top, percentage):
+        """
+        Adds ellipsis to top & percentage lists to group
+        all other fields that are not part of 'top_splitters'
+
+        :param process: boolean
+        :param counter: Counter
+        :param total: integer
+        :param top: list
+        :param percentage: list
+        :return: tuple
+        """
+        # add a summary for all other values
+        # @todo check if ellipsis should be added when counter has 5 fields.
+        if process:
+            if counter:
+                sum_ = sum(counter.values())
+                top.append(('...', sum_))
+                percentage.append(('...', self._get_percentage(sum_, total)))
+            else:
+                top.append(('...', 0))
+                percentage.append(('...', 0))
+
+        return top, percentage
+
+
+class TextField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -250,7 +293,6 @@ class TextField(FormField):
         substats = defaultdict(dict)
         add_ellipsis = len(top_splitters) == 5
         for field_value, counter in metrics.items():
-
             # do not display None answer in disaggregation
             if field_value is None:
                 continue
@@ -258,23 +300,11 @@ class TextField(FormField):
             top = []
             percentage = []
             for splitter, trans in top_splitters:
-
                 val = counter.pop(splitter, 0)
                 top.append((trans, val))
+                percentage.append((trans, self._get_percentage(val, total)))
 
-                if total: # avoid ZeroDivisionError
-                    val = round((val * 100 / total), 2)
-                else:
-                    val = 0
-
-                percentage.append((trans, val))
-
-            # add a summary for all other values
-            if add_ellipsis:
-                if counter:
-                    top.append(('...', sum(counter.values())))
-                else:
-                    top.append(('...', 0))
+            top, percentage = self._add_ellipsis(add_ellipsis, counter, total, top, percentage)
 
             substats[field_value] = {
                 'frequency': top,
@@ -294,7 +324,8 @@ class TextField(FormField):
         return stats
 
 
-class DateField(FormField):
+class DateField(ExtendedFormField):
+
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
         """ Return total count for all, and freq and % for 'date' date types
 
@@ -312,6 +343,8 @@ class DateField(FormField):
 
         percentage = []
         for key, val in top:
+            print("KEY {}".format(key))
+            print("VAL {}".format(val))
             if total:
                 percentage.append((key, round((val * 100 / total), 2)))
             else:
@@ -350,20 +383,9 @@ class DateField(FormField):
             for splitter, trans in top_splitters:
                 val = counter.pop(splitter, 0)
                 top.append((trans, val))
+                percentage.append((trans, self._get_percentage(val, total)))
 
-                if total: # avoid ZeroDivisionError
-                    val = round((val * 100 / total), 2)
-                else:
-                    val = 0
-
-                percentage.append((trans, val))
-
-            # add a summary for all other values
-            if add_ellipsis:
-                if counter:
-                    top.append(('...', sum(counter.values())))
-                else:
-                    top.append(('...', 0))
+            top, percentage = self._add_ellipsis(add_ellipsis, counter, total, top, percentage)
 
             substats[field_value] = {
                 'frequency': top,
@@ -566,7 +588,7 @@ class FormGPSField(FormField):
         return dict(zip(self.value_names, values))
 
 
-class FormChoiceField(FormField):
+class FormChoiceField(ExtendedFormField):
     """  Same as FormField, but link the data to a FormChoice """
 
     def __init__(self, name, labels, data_type, hierarchy=None,
@@ -624,7 +646,6 @@ class FormChoiceField(FormField):
         add_ellipsis = len(top_splitters) == 5
 
         for field_value, counter in metrics.items():
-
             # do not display None answer in disaggregation
             if field_value is None:
                 continue
@@ -634,20 +655,9 @@ class FormChoiceField(FormField):
             for splitter, trans in top_splitters:
                 val = counter.pop(splitter, 0)
                 top.append((trans, val))
+                percentage.append((trans, self._get_percentage(val, total)))
 
-                if total: # avoid ZeroDivisionError
-                    val = round((val * 100 / total), 2)
-                else:
-                    val = 0
-
-                percentage.append((trans, val))
-
-            # add a summary for all other values
-            if add_ellipsis:
-                if counter:
-                    top.append(('...', sum(counter.values())))
-                else:
-                    top.append(('...', 0))
+            top, percentage = self._add_ellipsis(add_ellipsis, counter, total, top, percentage)
 
             substats[self.get_translation(field_value, lang)] = {
                 'frequency': top,

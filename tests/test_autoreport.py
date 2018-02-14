@@ -296,6 +296,7 @@ class TestAutoReport(unittest.TestCase):
     def test_disaggregate(self):
 
         title, schemas, submissions = build_fixture('auto_report')
+
         fp = FormPack(schemas, title)
 
         report = fp.autoreport()
@@ -359,3 +360,21 @@ class TestAutoReport(unittest.TestCase):
                                    'stdev': u'*'}))})]
         for (i, stat) in enumerate(stats):
             assert stat == expected[i]
+
+    def test_disaggregate_extended_fields(self):
+
+        title, schemas, submissions = build_fixture('auto_report_extended_fields')
+        fp = FormPack(schemas, title)
+
+        report = fp.autoreport()
+        stats = report.get_stats(submissions, split_by="when")
+
+        assert stats.submissions_count == 22
+
+        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+
+        for stat in stats:
+            dict_values = dict(stat[2])
+            for value in dict_values.get("values"):
+                value_list = value[1]
+                assert len(value_list.get("percentage")) == len(value_list.get("frequency"))
