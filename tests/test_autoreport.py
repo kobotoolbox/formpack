@@ -371,10 +371,14 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 22
 
-        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(unicode(repr(field)), field_name, stats_dict) for field, field_name, stats_dict in stats]
 
         for stat in stats:
-            dict_values = dict(stat[2])
-            for value in dict_values.get("values"):
+            stats_dict = dict(stat[2])
+            for value in stats_dict.get("values"):
                 value_list = value[1]
-                assert len(value_list.get("percentage")) == len(value_list.get("frequency"))
+                percentage_responses = [x[0] for x in value_list.get("percentage")]
+                frequency_responses = [x[0] for x in value_list.get("frequency")]
+                assert percentage_responses == frequency_responses
+                assert percentage_responses[-1] == "..."
+
