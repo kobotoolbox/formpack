@@ -66,6 +66,27 @@ class FormField(FormDataDef):
         args = lang, group_sep, hierarchy_in_labels, multiple_select
         return [self._get_label(*args)]
 
+    def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
+        """
+        This method should be overridden for fields where the form author
+        provides predetermined choices.
+        Otherwise returns `val` as-is
+
+        For example:
+
+            TextField, DateField, NumField, etc...: some fields receive raw input
+            from the user and therefore don't have translations for their values.
+
+            FormChoiceField, FormChoiceFieldWithMultipleSelect: the choices are predetermined
+            by the form author and each value could have a translation
+
+
+        :param val: string
+        :param lang: string
+        :return: string
+        """
+        return val
+
     # TODO: remove multiple_select ?
     def _get_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both",
@@ -214,6 +235,7 @@ class FormField(FormDataDef):
     def parse_values(self, raw_values):
         yield raw_values
 
+
 class ExtendedFormField(FormField):
     """
     This class does the same thing as FormField.
@@ -232,30 +254,82 @@ class ExtendedFormField(FormField):
             return round((value * 100 / total), 2)
         return 0
 
-    def _add_ellipsis(self, process, counter, total, top, percentage):
+    def get_substats(self, stats, metrics, top_splitters, lang=UNSPECIFIED_TRANSLATION):
         """
-        Adds ellipsis to top & percentage lists to group
-        all other fields that are not part of 'top_splitters'
+        Calculate substats for disaggregated stats
 
-        :param process: boolean
-        :param counter: Counter
-        :param total: integer
-        :param top: list
-        :param percentage: list
-        :return: tuple
+        It uses parameters passed to `get_disaggregated_stats` method.
+
+        It should return a dict like:
+
+            {
+                'field name 1': {
+                    'frequency': [('value1', 4),
+                                  ('value1', 3),
+                                  ('value3', 2),
+                                  ('value4', 1),
+                                  ('value5', 1),
+                                  ('...', 2)],
+                    'percentage': [('value1', 25),
+                                   ('value2', 18.75),
+                                   ('value3', 12.5),
+                                   ('value4', 6.25),
+                                   ('value5', 6.25),
+                                   ('...', 12.5)],
+                },...
+                'field name N': {
+                    'frequency': [('value1', 1),
+                                  ('value2', 1),
+                                  ('value3', 1)],
+                    'percentage': [('value1', 6.25),
+                                   ('value2', 6.25),
+                                   ('value3', 6.25)]
+                }
+            }
+
+
+        :param stats: dict {'total_count': <int>, 'provided': <int>, 'show_graph': <bool>, 'not_provided': <int>}
+        :param metrics: defaultdict {'field value': Counter('value1', 'value2', ..., 'value3')}
+        :param top_splitters: list 5 most commons values among Counter collections
+        :param lang: string
+        :return: defaultdict
+
         """
-        # add a summary for all other values
-        # @todo check if ellipsis should be added when counter has 5 fields.
-        if process:
-            if counter:
-                sum_ = sum(counter.values())
-                top.append(('...', sum_))
-                percentage.append(('...', self._get_percentage(sum_, total)))
-            else:
-                top.append(('...', 0))
-                percentage.append(('...', 0))
+        total = stats.get("total_count", 0)
 
-        return top, percentage
+        substats = defaultdict(dict)
+
+        # FIXME. Ellipsis will be added (with a zero value) even if counter contains 5 values.
+        add_ellipsis = len(top_splitters) == 5
+
+        for field_value, counter in metrics.items():
+            # do not display None answer in disaggregation
+            if field_value is None:
+                continue
+
+            top = []
+            percentage = []
+            for splitter, trans in top_splitters:
+                val = counter.pop(splitter, 0)
+                top.append((trans, val))
+                percentage.append((trans, self._get_percentage(val, total)))
+
+            # add a summary for all other values
+            if add_ellipsis:
+                if counter:
+                    sum_ = sum(counter.values())
+                    top.append(('...', sum_))
+                    percentage.append(('...', self._get_percentage(sum_, total)))
+                else:
+                    top.append(('...', 0))
+                    percentage.append(('...', 0))
+
+            substats[self.get_translation(field_value, lang)] = {
+                'frequency': top,
+                'percentage': percentage
+            }
+
+        return substats
 
 
 class TextField(ExtendedFormField):
@@ -269,11 +343,7 @@ class TextField(ExtendedFormField):
 
         percentage = []
         for key, val in top:
-
-            if total: # avoid ZeroDivisionError
-                percentage.append((key, round((val * 100 / total), 2)))
-            else:
-                percentage.append((key, 0))
+            percentage.append((key, self._get_percentage(val, total)))
 
         stats.update({
             'frequency': top,
@@ -288,28 +358,7 @@ class TextField(ExtendedFormField):
         parent = super(TextField, self)
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
-        total = stats['total_count']
-
-        substats = defaultdict(dict)
-        add_ellipsis = len(top_splitters) == 5
-        for field_value, counter in metrics.items():
-            # do not display None answer in disaggregation
-            if field_value is None:
-                continue
-
-            top = []
-            percentage = []
-            for splitter, trans in top_splitters:
-                val = counter.pop(splitter, 0)
-                top.append((trans, val))
-                percentage.append((trans, self._get_percentage(val, total)))
-
-            top, percentage = self._add_ellipsis(add_ellipsis, counter, total, top, percentage)
-
-            substats[field_value] = {
-                'frequency': top,
-                'percentage': percentage,
-            }
+        substats = self.get_substats(stats, metrics, top_splitters, lang)
 
         # sort values by total frequency
         def sum_frequencies(element):
@@ -343,12 +392,7 @@ class DateField(ExtendedFormField):
 
         percentage = []
         for key, val in top:
-            print("KEY {}".format(key))
-            print("VAL {}".format(val))
-            if total:
-                percentage.append((key, round((val * 100 / total), 2)))
-            else:
-                percentage.append((key, 0))
+            percentage.append((key, self._get_percentage(val, total)))
 
         stats.update({
             'frequency': top,
@@ -368,29 +412,7 @@ class DateField(ExtendedFormField):
         if self.data_type != "date":
             return stats
 
-        total = stats['total_count']
-
-        substats = defaultdict(dict)
-        add_ellipsis = len(top_splitters) == 5
-        for field_value, counter in metrics.items():
-
-            # do not display None answer in disaggregation
-            if field_value is None:
-                continue
-
-            top = []
-            percentage = []
-            for splitter, trans in top_splitters:
-                val = counter.pop(splitter, 0)
-                top.append((trans, val))
-                percentage.append((trans, self._get_percentage(val, total)))
-
-            top, percentage = self._add_ellipsis(add_ellipsis, counter, total, top, percentage)
-
-            substats[field_value] = {
-                'frequency': top,
-                'percentage': percentage,
-            }
+        substats = self.get_substats(stats, metrics, top_splitters, lang)
 
         # sort date from old to new
         values = sorted(substats.items(), key=itemgetter(0))[:limit]
@@ -618,13 +640,7 @@ class FormChoiceField(ExtendedFormField):
 
         percentage = []
         for val, freq in top:
-
-            if total: # avoid ZeroDivisionError
-                res = round((freq * 100 / total), 2)
-            else:
-                res = 0
-
-            percentage.append((val, res))
+            percentage.append((val, self._get_percentage(freq, total)))
 
         stats.update({
             'frequency': top,
@@ -640,29 +656,8 @@ class FormChoiceField(ExtendedFormField):
         parent = super(FormChoiceField, self)
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
-        total = stats['total_count']
 
-        substats = defaultdict(dict)
-        add_ellipsis = len(top_splitters) == 5
-
-        for field_value, counter in metrics.items():
-            # do not display None answer in disaggregation
-            if field_value is None:
-                continue
-
-            top = []
-            percentage = []
-            for splitter, trans in top_splitters:
-                val = counter.pop(splitter, 0)
-                top.append((trans, val))
-                percentage.append((trans, self._get_percentage(val, total)))
-
-            top, percentage = self._add_ellipsis(add_ellipsis, counter, total, top, percentage)
-
-            substats[self.get_translation(field_value, lang)] = {
-                'frequency': top,
-                'percentage': percentage
-            }
+        substats = self.get_substats(stats, metrics, top_splitters, lang)
 
         # sort values by frequency
         def sum_frequencies(element):
