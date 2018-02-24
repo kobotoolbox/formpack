@@ -1,0 +1,75 @@
+{
+  "version": "fpmv_3",
+  "content": {
+    "choices": [
+      {
+        "list_name": "kd0ep51",
+        "name": "male",
+        "label": [
+          "Male"
+        ]
+      },
+      {
+        "list_name": "kd0ep51",
+        "name": "female",
+        "label": [
+          "Female"
+        ]
+      }
+    ],
+    "survey": [
+      {
+        "type": "begin_repeat",
+        "name": "group_wy15q80",
+        "label": [
+          "Person"
+        ]
+      },
+      {
+        "name": "Firstname",
+        "required": false,
+        "type": "text",
+        "label": [
+          "Firstname"
+        ]
+      },
+      {
+        "name": "Lastname",
+        "required": false,
+        "type": "text",
+        "label": [
+          "Lastname"
+        ]
+      },
+      {
+        "select_from_list_name": "kd0ep51",
+        "name": "Gender",
+        "required": false,
+        "label": [
+          "Gender"
+        ],
+        "type": "select_one"
+      },
+      {
+        "name": "Age",
+        "required": false,
+        "type": "date",
+        "label": [
+          "Age"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "name": "City",
+        "required": false,
+        "type": "text",
+        "label": [
+          "City"
+        ]
+      }
+    ]
+  },
+  "submissions": []
+}

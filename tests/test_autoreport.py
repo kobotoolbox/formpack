@@ -382,3 +382,20 @@ class TestAutoReport(unittest.TestCase):
                 assert percentage_responses == frequency_responses
                 assert percentage_responses[-1] == "..."
 
+    def test_field_position_with_multiple_versions(self):
+
+        title, schemas, submissions = build_fixture('field_position_with_multiple_versions')
+        fp = FormPack(schemas, title)
+
+        all_fields = fp.get_fields_for_versions(fp.versions.keys())
+        expected = [
+            u'City',
+            u'Firstname',
+            u'Fullname',
+            u'Lastname',
+            u'Gender',
+            u'Age',
+        ]
+        field_names = [field.name for field in all_fields]
+        assert len(all_fields) == 6
+        assert field_names == expected
