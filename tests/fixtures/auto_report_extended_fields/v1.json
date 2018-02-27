@@ -1,0 +1,167 @@
+{
+    "id_string": "auto_report",
+    "version": "rpfrv2",
+    "content": {
+        "survey": [
+            {
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "Restaurant name"
+            },
+            {
+                "type": "select_one restaurant_type",
+                "name": "restaurant_type",
+                "label": "Type of restaurant"
+            },
+            {
+                "type": "date",
+                "name": "when",
+                "label": "When"
+            }
+        ],
+        "choices": [
+            {
+                "list_name": "restaurant_type",
+                "name": "italian",
+                "label": "Italian"
+            },
+            {
+                "list_name": "restaurant_type",
+                "name": "french",
+                "label": "French"
+            },
+            {
+                "list_name": "restaurant_type",
+                "name": "vietnamese",
+                "label": "Vietnamese"
+            },
+            {
+                "list_name": "restaurant_type",
+                "name": "chinese",
+                "label": "Chinese"
+            },
+            {
+                "list_name": "restaurant_type",
+                "name": "thai",
+                "label": "Thai"
+            },
+            {
+                "list_name": "restaurant_type",
+                "name": "american",
+                "label": "American"
+            }
+        ]
+    },
+    "submissions": [
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-01"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-01"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-01"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-02"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-02"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-02"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-03"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-03"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-05"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-05"
+        },
+        {
+            "restaurant_name": "Chez Céline",
+            "restaurant_type": "french",
+            "when": "2001-01-06"
+        },
+        {
+            "restaurant_name": "Po Thaï",
+            "restaurant_type": "thai",
+            "when": "2001-01-01"
+        },
+        {
+            "restaurant_name": "Po Thaï",
+            "restaurant_type": "thai",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "Po Thaï",
+            "restaurant_type": "thai",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "La Bodega",
+            "restaurant_type": "italian",
+            "when": "2001-01-05"
+        },
+        {
+            "restaurant_name": "La Bodega",
+            "restaurant_type": "italian",
+            "when": "2001-01-02"
+        },
+        {
+            "restaurant_name": "Mc Donalds",
+            "restaurant_type": "american",
+            "when": "2001-01-04"
+        },
+        {
+            "restaurant_name": "Beijing Express",
+            "restaurant_type": "chinese",
+            "when": "2001-01-01"
+        }
+    ]
+}
