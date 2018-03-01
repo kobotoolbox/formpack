@@ -426,6 +426,9 @@ def test_expand_tags_method():
     assert expected == _expand('#tag1+attr1+attr2')
     assert expected == _expand(' #tag1 +attr1 +attr2 ')
     assert expected == _expand(' #tag1 +attr1 ', ['hxl:+attr2'])
+    test_underscores = ['#tag_underscore', '+attr_underscore']
+    expected = ['hxl:' + x for x in test_underscores]
+    assert expected == _expand(''.join(test_underscores))
 
 
 def test_expand_translations_null_lang():

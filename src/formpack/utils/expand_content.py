@@ -57,7 +57,7 @@ def _expand_tags(row, tag_cols_and_seps=None):
     for tag_col in tag_cols_and_seps.keys():
         tags_str = row.pop(tag_col, None)
         if tags_str and isinstance(tags_str, basestring):
-            for tag in re.findall('([\#\+][a-zA-Z][a-zA-Z0-9]*)', tags_str):
+            for tag in re.findall('([\#\+][a-zA-Z][a-zA-Z0-9_]*)', tags_str):
                 tags.append('hxl:%s' % tag)
     if len(tags) > 0:
         row['tags'] = tags
