@@ -208,7 +208,7 @@ class FormPack(object):
         combined_options.update(new_choice.options)
         new_choice.options = combined_options
 
-    def get_fields_for_versions(self, versions_asc=-1, data_types=None):
+    def get_fields_for_versions(self, versions=-1, data_types=None):
 
         """
             Return a mapping containing fields
@@ -221,7 +221,7 @@ class FormPack(object):
 
             Labels are used as column headers.
 
-        :param versions_asc: list
+        :param versions: list
         :param data_types: list
         :return: list
         """
@@ -250,7 +250,7 @@ class FormPack(object):
         positions = {}
 
         # Create the initial field mappings from the first form version
-        versions_desc = list(reversed(self._get_versions(versions_asc).values()))
+        versions_desc = list(reversed(self._get_versions(versions).values()))
 
         index = 0
         for section in versions_desc[0].sections.values():
