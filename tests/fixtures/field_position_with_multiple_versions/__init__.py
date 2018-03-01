@@ -10,8 +10,8 @@ DATA = {
     u'title': 'Field Position with Multiple Versions',
     u'id_string': 'field_position_with_multiple_versions',
     u'versions': [
-        load_fixture_json('field_position_with_multiple_versions/v3'),
-        load_fixture_json('field_position_with_multiple_versions/v2'),
         load_fixture_json('field_position_with_multiple_versions/v1'),
+        load_fixture_json('field_position_with_multiple_versions/v2'),
+        load_fixture_json('field_position_with_multiple_versions/v3'),
     ],
 }

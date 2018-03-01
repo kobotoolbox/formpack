@@ -24,12 +24,21 @@ from copy import deepcopy
 
 class FormPack(object):
 
-    # TODO: make a clear signature for __init__
+
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
                  root_node_name='data',
                  asset_type=None, submissions_xml=None):
+        """
+
+
+        :param versions: list. Versions of the asset. It must be sorted in ascending order. From oldest to newest.
+        :param title: string. The human readable name of the form.
+        :param id_string: The human readable id of the form.
+        :param default_version_id_key: string. The name of the field in submissions which stores the version ID
+        """
+        # @TODO: Complete the signature for __init__
 
         if not versions:
             versions = []
@@ -199,7 +208,7 @@ class FormPack(object):
         combined_options.update(new_choice.options)
         new_choice.options = combined_options
 
-    def get_fields_for_versions(self, versions=-1, data_types=None):
+    def get_fields_for_versions(self, versions_asc=-1, data_types=None):
 
         """
             Return a mapping containing fields
@@ -212,9 +221,7 @@ class FormPack(object):
 
             Labels are used as column headers.
 
-            Versions must be sorted by date in descending order
-
-        :param versions: list
+        :param versions_asc: list
         :param data_types: list
         :return: list
         """
@@ -241,24 +248,25 @@ class FormPack(object):
         #       `positions[field1.name]` would be `(0, 0)`
         #       `positions[field2.name]` would be `(0, 1)`
         positions = {}
+
         # Create the initial field mappings from the first form version
-        versions = list(self._get_versions(versions).values())
+        versions_desc = list(reversed(self._get_versions(versions_asc).values()))
 
         index = 0
-        for section in versions[0].sections.values():
+        for section in versions_desc[0].sections.values():
             for field_name, field_object in section.fields.items():
                 positions[field_name] = (index, 0)
                 tmp2d.append([field_object])
                 index += 1
 
-        for version in versions[1:]:
+        for version in versions_desc[1:]:
             index = 0
             for section_name, section in version.sections.items():
                 for field_name, field_object in section.fields.items():
                     if field_name in positions:
                         position = positions[field_name]
                         latest_field_object = tmp2d[position[0]][position[1]]
-                        # Because versions are ordered from latest to oldest,
+                        # Because versions_desc are ordered from latest to oldest,
                         # we use current field object as the old one and the one already
                         # in position as the latest one.
                         self._combine_field_choices(field_object, latest_field_object)
