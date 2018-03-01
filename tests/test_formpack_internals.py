@@ -174,3 +174,22 @@ def test_get_fields_for_versions_returns_all_choices():
     choice_names = fields[0].choice.options.keys()
     assert 'first_version_choice_name' in choice_names
     assert 'second_version_choice_name' in choice_names
+
+
+def test_field_position_with_multiple_versions():
+    title, schemas, submissions = build_fixture(
+        'field_position_with_multiple_versions')
+    fp = FormPack(schemas, title)
+
+    all_fields = fp.get_fields_for_versions(fp.versions.keys())
+    expected = [
+        u'City',
+        u'Firstname',
+        u'Fullname',
+        u'Lastname',
+        u'Gender',
+        u'Age',
+    ]
+    field_names = [field.name for field in all_fields]
+    assert len(all_fields) == 6
+    assert field_names == expected

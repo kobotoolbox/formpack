@@ -1,0 +1,37 @@
+{
+  "version": "fpmv_1",
+  "content": {
+    "translated": [
+      "label"
+    ],
+    "survey": [
+      {
+        "type": "begin_repeat",
+        "name": "group_wy15q80",
+        "label": [
+          "Person"
+        ]
+      },
+      {
+        "name": "Fullname",
+        "required": false,
+        "type": "text",
+        "label": [
+          "Fullname"
+        ]
+      },
+      {
+        "name": "Age",
+        "required": false,
+        "type": "date",
+        "label": [
+          "Age"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      }
+    ]
+  },
+  "submissions": []
+}

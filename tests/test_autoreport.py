@@ -381,4 +381,3 @@ class TestAutoReport(unittest.TestCase):
                 frequency_responses = [x[0] for x in value_list.get("frequency")]
                 assert percentage_responses == frequency_responses
                 assert percentage_responses[-1] == "..."
-

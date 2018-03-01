@@ -24,12 +24,21 @@ from copy import deepcopy
 
 class FormPack(object):
 
-    # TODO: make a clear signature for __init__
+
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
                  root_node_name='data',
                  asset_type=None, submissions_xml=None):
+        """
+
+
+        :param versions: list. Versions of the asset. It must be sorted in ascending order. From oldest to newest.
+        :param title: string. The human readable name of the form.
+        :param id_string: The human readable id of the form.
+        :param default_version_id_key: string. The name of the field in submissions which stores the version ID
+        """
+        # @TODO: Complete the signature for __init__
 
         if not versions:
             versions = []
@@ -199,9 +208,10 @@ class FormPack(object):
         combined_options.update(new_choice.options)
         new_choice.options = combined_options
 
-
     def get_fields_for_versions(self, versions=-1, data_types=None):
-        """ Return a mapping containing fields
+
+        """
+            Return a mapping containing fields
 
             This is needed because when making an report for several
             versions of the same form, fields get added, removed, and
@@ -211,79 +221,74 @@ class FormPack(object):
 
             Labels are used as column headers.
 
+        :param versions: list
+        :param data_types: list
+        :return: list
         """
-
+        # Cast data_types if it's not already a list
         if data_types is not None:
             if isinstance(data_types, str_types):
                 data_types = [data_types]
 
-        versions = list(self._get_versions(versions).values())
 
-        # FIXME: you say that this is a list of tuples, but really, it's just a
-        # list of field objects, right?
-        all_fields = []  # [(name, field), (name...))]
-        processed_field_names = set()  # avoid expensive look ups
+        # tmp2 is a 2 dimensions list of `field`.
+        # First dimension is the position of fields where they should be in the latest version
+        # Second dimension is their position in the stack at the same position.
+        # For example:
+        #      ```
+        #      latest_version = [field1, field3]
+        #      version_just_before = [field2, field3]
+        #      ```
+        #
+        # Index 0 of tmp2d will be `[field1, field2]`
+        tmp2d = []
+        # This dict is used to remember final position of each field.
+        # Its keys are field_names and values are tuples of coordinates in tmp2d
+        # Keeping example above:
+        #       `positions[field1.name]` would be `(0, 0)`
+        #       `positions[field2.name]` would be `(0, 1)`
+        positions = {}
 
         # Create the initial field mappings from the first form version
-        for section in versions[0].sections.values():
-            all_fields.extend(section.fields.values())
-            processed_field_names.update(section.fields.keys())
+        versions_desc = list(reversed(self._get_versions(versions).values()))
 
-        # Process any new field added in the next versions
-        # The hard part is to insert it at a position that makes sense
-        for version in versions[1:]:
+        index = 0
+        for section in versions_desc[0].sections.values():
+            for field_name, field_object in section.fields.items():
+                positions[field_name] = (index, 0)
+                tmp2d.append([field_object])
+                index += 1
+
+        for version in versions_desc[1:]:
+            index = 0
             for section_name, section in version.sections.items():
-
-                # Potential new fields we want to add
-                new_fields = section.fields.items()
-
-                for i, (new_field_name, new_field_obj) in enumerate(new_fields):
-
-                    # The field already exists, let's replace it with the
-                    # last version
-                    if new_field_name in processed_field_names:
-                        final_list_copy = enumerate(list(all_fields))
-                        for y, _field in final_list_copy:
-                            if _field.name == new_field_name:
-                                self._combine_field_choices(
-                                    _field, new_field_obj)
-                                all_fields[y] = new_field_obj
-                                break
-                        continue
-
-                    # The field needs to be inserted at the proper place.
-                    # We take this new field, and look for all new fields after
-                    # it to find the first one that is already in the base
-                    # fields. Then we get its index, so we can insert our fresh
-                    # new field right before it. This gives us a coherent
-                    # order of fields so that they are always, at worst,
-                    # adjacent to the last field they used to be to.
-                    # FIXME: this loop never runs, because
-                    # `following_new_field` is a tuple of (name, field_obj) and
-                    # `processed_field_names` is just a set of strings
-                    for following_new_field in new_fields[i+1:]:
-                        if following_new_field in processed_field_names:
-                            final_list_copy = enumerate(list(all_fields))
-                            # FIXME: cannot work since final_list_copy contains
-                            # field objects, not tuples
-                            for y, (name, field) in final_list_copy:
-                                if name == following_new_field:
-                                    # FIXME: set the field to itself? What's
-                                    # the point? Again, this code never runs
-                                    # and has no tests
-                                    all_fields[y] = field
-                                    break
-                            break
+                for field_name, field_object in section.fields.items():
+                    if field_name in positions:
+                        position = positions[field_name]
+                        latest_field_object = tmp2d[position[0]][position[1]]
+                        # Because versions_desc are ordered from latest to oldest,
+                        # we use current field object as the old one and the one already
+                        # in position as the latest one.
+                        self._combine_field_choices(field_object, latest_field_object)
                     else:
-                        # We could not find a following_new_field,
-                        # so ad it at the end
-                        all_fields.append(new_field_obj)
+                        if len(tmp2d) <= index:
+                            tmp2d.append([field_object])
+                        else:
+                            tmp2d[index].append(field_object)
 
-                    processed_field_names.add(new_field_name)
+                        positions[field_name] = (index, len(tmp2d[index]) - 1)
 
-        if data_types:
-            for dt in data_types:
-                all_fields = [f for f in all_fields if f.data_type == dt]
+                    index += 1
+
+        all_fields = []
+        # We need to flatten the 2d list before returning it.
+        for first_dimension in tmp2d:
+            for field in first_dimension:
+                if data_types:
+                    if field.data_type in data_types:
+                        all_fields.append(field)
+                else:
+                    all_fields.append(field)
 
         return all_fields
 
