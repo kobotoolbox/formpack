@@ -270,6 +270,10 @@ class FormPack(object):
                         # we use current field object as the old one and the one already
                         # in position as the latest one.
                         self._combine_field_choices(field_object, latest_field_object)
+
+                        # increase index only if we haven't reached
+                        # the upper bound the tmp2d list
+                        index += 1 if index < len(tmp2d) else 0
                     else:
                         if len(tmp2d) <= index:
                             tmp2d.append([field_object])
@@ -277,8 +281,7 @@ class FormPack(object):
                             tmp2d[index].append(field_object)
 
                         positions[field_name] = (index, len(tmp2d[index]) - 1)
-
-                    index += 1
+                        index += 1
 
         all_fields = []
         # We need to flatten the 2d list before returning it.
