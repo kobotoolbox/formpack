@@ -1,0 +1,16 @@
+{
+  "version": "ffvlioor_v2",
+  "content": {
+    "translated": [
+      "label"
+    ],
+    "survey": [
+      {
+        "label": ["one"],
+         "name": "one",
+         "type": "text"
+      }
+    ]
+  },
+  "submissions": []
+}
