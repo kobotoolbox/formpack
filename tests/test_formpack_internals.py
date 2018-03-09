@@ -195,9 +195,9 @@ def test_field_position_with_multiple_versions():
     assert field_names == expected
 
 
-def test_fields_for_version_list_index_out_of_range():
+def test_fields_for_versions_list_index_out_of_range():
     title, schemas, submissions = build_fixture(
-        'fields_for_version_list_index_out_of_range')
+        'fields_for_versions_list_index_out_of_range')
     fp = FormPack(schemas, title)
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
