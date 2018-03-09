@@ -193,3 +193,18 @@ def test_field_position_with_multiple_versions():
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 6
     assert field_names == expected
+
+
+def test_fields_for_versions_list_index_out_of_range():
+    title, schemas, submissions = build_fixture(
+        'fields_for_versions_list_index_out_of_range')
+    fp = FormPack(schemas, title)
+    all_fields = fp.get_fields_for_versions(fp.versions.keys())
+    expected = [
+        u'one',
+        u'first_but_not_one',
+        u'third',
+    ]
+    field_names = [field.name for field in all_fields]
+    assert len(all_fields) == 3
+    assert field_names == expected

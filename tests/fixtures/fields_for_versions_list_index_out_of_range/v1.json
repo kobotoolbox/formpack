@@ -1,0 +1,26 @@
+{
+  "version": "ffvlioor_v1",
+  "content": {
+    "translated": [
+      "label"
+    ],
+    "survey": [
+      {
+        "label": ["first but not one"],
+         "name": "first_but_not_one",
+         "type": "text"
+      },
+      {
+        "label": ["one"],
+         "name": "one",
+         "type": "text"
+      },
+      {
+        "label": ["third"],
+         "name": "third",
+         "type": "text"
+      }
+    ]
+  },
+  "submissions": []
+}
