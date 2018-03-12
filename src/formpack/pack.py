@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 import difflib
+from copy import deepcopy
 
 try:
     from cyordereddict import OrderedDict
@@ -17,9 +18,7 @@ from .reporting import Export, AutoReport
 from .utils.expand_content import expand_content
 from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
-
-
-from copy import deepcopy
+from formpack.schema.fields import CopyField
 
 
 class FormPack(object):
@@ -252,41 +251,60 @@ class FormPack(object):
         # Create the initial field mappings from the first form version
         versions_desc = list(reversed(self._get_versions(versions).values()))
 
+        # Copy fields need to be pushed at the end. So let's process them separately.
+        copy_fields = []
         index = 0
         for section in versions_desc[0].sections.values():
             for field_name, field_object in section.fields.items():
-                positions[field_name] = (index, 0)
-                tmp2d.append([field_object])
-                index += 1
+                if isinstance(field_object, CopyField):
+                    copy_fields.append(field_object)
+                else:
+                    positions[field_name] = (index, 0)
+                    tmp2d.append([field_object])
+                    index += 1
 
         for version in versions_desc[1:]:
             index = 0
             for section_name, section in version.sections.items():
                 for field_name, field_object in section.fields.items():
-                    if field_name in positions:
-                        position = positions[field_name]
-                        latest_field_object = tmp2d[position[0]][position[1]]
-                        # Because versions_desc are ordered from latest to oldest,
-                        # we use current field object as the old one and the one already
-                        # in position as the latest one.
-                        self._combine_field_choices(field_object, latest_field_object)
-                    else:
-                        try:
-                            current_index_list = tmp2d[index]
-                            current_index_list.append(field_object)
-                        except IndexError:
-                            tmp2d.append([field_object])
-                            # set index with upper bound of the tmp2d list
-                            # in case index is greater than it.
-                            # it can happen when current version has more items than newest one.
-                            index = len(tmp2d) - 1
+                    if not isinstance(field_object, CopyField):
+                        if field_name in positions:
+                            position = positions[field_name]
+                            latest_field_object = tmp2d[position[0]][position[1]]
+                            # Because versions_desc are ordered from latest to oldest,
+                            # we use current field object as the old one and the one already
+                            # in position as the latest one.
+                            self._combine_field_choices(field_object, latest_field_object)
+                        else:
+                            try:
+                                current_index_list = tmp2d[index]
+                                current_index_list.append(field_object)
+                            except IndexError:
+                                tmp2d.append([field_object])
+                                # set index with upper bound of the tmp2d list
+                                # in case index is greater than it.
+                                # it can happen when current version has more items than newest one.
+                                index = len(tmp2d) - 1
 
-                        positions[field_name] = (index, len(tmp2d[index]) - 1)
+                            positions[field_name] = (index, len(tmp2d[index]) - 1)
 
-                    index += 1
+                        index += 1
 
         all_fields = []
+
         # We need to flatten the 2d list before returning it.
+        # First, we want to show existing fields (index 0 of each dimension)
+        for first_dimension in tmp2d:
+            field = first_dimension[0]
+            if data_types:
+                if field.data_type in data_types:
+                    all_fields.append(field)
+                    first_dimension.pop(0)
+            else:
+                all_fields.append(field)
+                first_dimension.pop(0)
+
+        # Then flatten tmp2d
         for first_dimension in tmp2d:
             for field in first_dimension:
                 if data_types:
@@ -294,6 +312,9 @@ class FormPack(object):
                         all_fields.append(field)
                 else:
                     all_fields.append(field)
+
+        # Finally, add copy fields at the end
+        all_fields += copy_fields
 
         return all_fields
 

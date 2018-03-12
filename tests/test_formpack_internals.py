@@ -185,10 +185,10 @@ def test_field_position_with_multiple_versions():
     expected = [
         u'City',
         u'Firstname',
-        u'Fullname',
         u'Lastname',
         u'Gender',
         u'Age',
+        u'Fullname',
     ]
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 6
@@ -202,8 +202,8 @@ def test_fields_for_versions_list_index_out_of_range():
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
         u'one',
-        u'first_but_not_one',
         u'third',
+        u'first_but_not_one',
     ]
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 3
