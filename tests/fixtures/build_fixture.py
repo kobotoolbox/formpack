@@ -7,8 +7,8 @@ import importlib
 from copy import deepcopy
 
 
-def build_fixture(modulename):
-    fixtures = deepcopy(importlib.import_module('..%s' % modulename, __name__).DATA)
+def build_fixture(modulename, data_variable_name="DATA"):
+    fixtures = deepcopy(getattr(importlib.import_module('..%s' % modulename, __name__), data_variable_name))
 
     try:
         title = fixtures.get('title')

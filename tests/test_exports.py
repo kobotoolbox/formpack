@@ -1382,11 +1382,11 @@ class TestFormPackExport(unittest.TestCase):
             'did_you_find_the_site',
             'was_there_damage_to_the_site',
             'ping',
-            'was_there_damage_to_the_site_dupe',
             'rssi',
             'is_the_gate_secure',
             'is_plant_life_encroaching',
             'please_rate_the_impact_of_any_defects_observed',
+            'was_there_damage_to_the_site_dupe',
         ])
 
     def test_literacy_test_export(self):
@@ -1458,3 +1458,16 @@ class TestFormPackExport(unittest.TestCase):
             export['Literacy test']['data'],
             expected_data
         )
+
+    def test_headers_of_multi_version_exports_with_copy_fields(self):
+        title, schemas, submissions = build_fixture('site_inspection', "DATA_WITH_COPY_FIELDS")
+
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys(),
+                           copy_fields=('_id', '_uuid', '_submission_time')).to_dict(submissions)
+        headers = export['Site inspection']['fields'][-3:]
+        self.assertListEqual(headers, [
+            '_id',
+            '_uuid',
+            '_submission_time',
+        ])
