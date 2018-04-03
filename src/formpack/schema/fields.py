@@ -122,7 +122,10 @@ class FormField(FormDataDef):
                     path.append(level.name)
             return group_sep.join(path)
 
-        return self.labels.get(lang, self.name)
+        if lang is None:
+            return self.name
+        else:
+            return self.labels.get(lang, self.name)
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
@@ -688,7 +691,8 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
         option_label = option['labels'].get(lang) or option['name']
         group_sep = group_sep or "/"
-        return label + group_sep + option_label
+
+        return "{}{}{}".format(label,group_sep,option_label)
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
