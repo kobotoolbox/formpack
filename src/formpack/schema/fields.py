@@ -625,9 +625,14 @@ class FormChoiceField(ExtendedFormField):
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
         try:
-            return self.choice.options[val]['labels'][lang]
+            translation = self.choice.options[val]['labels'][lang]
         except KeyError:
             return val
+
+        if translation is None:
+            return val
+        else:
+            return translation
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
         val = self.get_translation(val, lang)
@@ -692,7 +697,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         option_label = option['labels'].get(lang) or option['name']
         group_sep = group_sep or "/"
 
-        return "{}{}{}".format(label,group_sep,option_label)
+        return "{}{}{}".format(label, group_sep, option_label)
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
