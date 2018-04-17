@@ -50,3 +50,8 @@ TAG_COLUMNS_AND_SEPARATORS = {
     # column names, values are separators.
     'hxl': '',
 }
+
+PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS = [
+    u"_id",
+    u"_uuid",
+]

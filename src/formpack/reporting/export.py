@@ -15,7 +15,8 @@ from ..submission import FormSubmission
 from ..schema import CopyField
 from ..utils.string import unicode, unique_name_for_xls
 from ..utils.flatten_content import flatten_tag_list
-from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
+from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS, \
+    PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS
 
 
 class Export(object):
@@ -35,10 +36,6 @@ class Export(object):
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
-
-        # These fields will be appended at the end of each child row
-        # when exporting a form with groups
-        self.__parent_extra_mapping_fields = [u'_id', u'_uuid']
         self.__parent_extra_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -169,7 +166,7 @@ class Export(object):
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
-                for extra_mapping_field in self.__parent_extra_mapping_fields:
+                for extra_mapping_field in PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS:
                     auto_field_names.append("_parent_{}".format(extra_mapping_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
@@ -296,7 +293,7 @@ class Export(object):
 
                         # save fields value if they match parent mapping fields.
                         # Useful to map children to their parent when flattening groups.
-                        if field.path in self.__parent_extra_mapping_fields:
+                        if field.path in PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS:
                             if _section_name not in self.__parent_extra_mapping_values:
                                 self.__parent_extra_mapping_values[_section_name] = {}
                             self.__parent_extra_mapping_values[_section_name].update(cells)
@@ -321,7 +318,7 @@ class Export(object):
                 row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
                 extra_mapping_values = self.__parent_extra_mapping_values.get(row['_parent_table_name'])
-                for extra_mapping_field in self.__parent_extra_mapping_fields:
+                for extra_mapping_field in PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS:
                     row[u"_parent_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field)
 
             rows.append(list(row.values()))
