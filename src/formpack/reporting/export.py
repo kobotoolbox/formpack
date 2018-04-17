@@ -35,6 +35,12 @@ class Export(object):
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
+
+        # These fields will be appended at the end of each child row
+        # when exporting a form with groups
+        self.__parent_extra_mapping_fields = [u'_id', u'_uuid']
+        self.__parent_extra_mapping_values = {}
+
         if tag_cols_for_header is None:
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
@@ -95,6 +101,7 @@ class Export(object):
         # where we are in the submission tree. This mean this class is NOT
         # thread safe.
         self._indexes = {n: 1 for n in self.sections}
+        self.__parent_extra_mapping_values = {}
         # N.B: indexes are not affected by form versions
 
     def get_fields_labels_tags_for_all_versions(self,
@@ -161,6 +168,9 @@ class Export(object):
             if section.parent:
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
+                # Add extra fields
+                for extra_mapping_field in self.__parent_extra_mapping_fields:
+                    auto_field_names.append("_parent_{}".format(extra_mapping_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -283,6 +293,14 @@ class Export(object):
                         val = entry[field.path]
                         # get a mapping of {"col_name": "val", ...}
                         cells = field.format(val, _lang)
+
+                        # save fields value if they match parent mapping fields.
+                        # Useful to map children to their parent when flattening groups.
+                        if field.path in self.__parent_extra_mapping_fields:
+                            if _section_name not in self.__parent_extra_mapping_values:
+                                self.__parent_extra_mapping_values[_section_name] = {}
+                            self.__parent_extra_mapping_values[_section_name].update(cells)
+
                     except KeyError:
                         cells = field.empty_result
 
@@ -302,6 +320,9 @@ class Export(object):
             if '_parent_table_name' in row:
                 row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
+                extra_mapping_values = self.__parent_extra_mapping_values.get(row['_parent_table_name'])
+                for extra_mapping_field in self.__parent_extra_mapping_fields:
+                    row[u"_parent_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field)
 
             rows.append(list(row.values()))
 
@@ -466,4 +487,3 @@ class Export(object):
         yield "</tbody>"
 
         yield "</table>"
-
