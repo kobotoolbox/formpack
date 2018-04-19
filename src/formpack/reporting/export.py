@@ -16,7 +16,7 @@ from ..schema import CopyField
 from ..utils.string import unicode, unique_name_for_xls
 from ..utils.flatten_content import flatten_tag_list
 from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS, \
-    PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS
+    REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS
 
 
 class Export(object):
@@ -36,7 +36,7 @@ class Export(object):
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
-        self.__parent_extra_mapping_values = {}
+        self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
             tag_cols_for_header = []
@@ -98,7 +98,7 @@ class Export(object):
         # where we are in the submission tree. This mean this class is NOT
         # thread safe.
         self._indexes = {n: 1 for n in self.sections}
-        self.__parent_extra_mapping_values = {}
+        self.__r_groups_submission_mapping_values = {}
         # N.B: indexes are not affected by form versions
 
     def get_fields_labels_tags_for_all_versions(self,
@@ -166,8 +166,8 @@ class Export(object):
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
-                for extra_mapping_field in PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS:
-                    auto_field_names.append("_parent_{}".format(extra_mapping_field))
+                for extra_mapping_field in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
+                    auto_field_names.append("_submission_{}".format(extra_mapping_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -293,10 +293,10 @@ class Export(object):
 
                         # save fields value if they match parent mapping fields.
                         # Useful to map children to their parent when flattening groups.
-                        if field.path in PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS:
-                            if _section_name not in self.__parent_extra_mapping_values:
-                                self.__parent_extra_mapping_values[_section_name] = {}
-                            self.__parent_extra_mapping_values[_section_name].update(cells)
+                        if field.path in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
+                            if _section_name not in self.__r_groups_submission_mapping_values:
+                                self.__r_groups_submission_mapping_values[_section_name] = {}
+                            self.__r_groups_submission_mapping_values[_section_name].update(cells)
 
                     except KeyError:
                         cells = field.empty_result
@@ -317,9 +317,10 @@ class Export(object):
             if '_parent_table_name' in row:
                 row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
-                extra_mapping_values = self.__parent_extra_mapping_values.get(row['_parent_table_name'])
-                for extra_mapping_field in PARENT_EXTRA_FIELDS_IN_REPEATING_GROUPS:
-                    row[u"_parent_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field)
+                extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
+                if extra_mapping_values:
+                    for extra_mapping_field in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
+                        row[u"_submission_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field)
 
             rows.append(list(row.values()))
 
@@ -484,3 +485,23 @@ class Export(object):
         yield "</tbody>"
 
         yield "</table>"
+
+    def __get_extra_mapping_values(self, section):
+        """
+        Tries to find a match within self.__r_groups_submission_mapping_values dict
+        with the name of parent section.
+        If there are no matches, it tries with the grandparent until a match is found
+        (or no grandparents are found)
+
+        :param section: FormSection
+        :return: dict
+        """
+
+        if section:
+            values = self.__r_groups_submission_mapping_values.get(section.name)
+            if values is None:
+                return self.__get_extra_mapping_values(getattr(section, "parent"))
+            else:
+                return values
+
+        return None

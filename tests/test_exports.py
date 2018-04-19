@@ -344,73 +344,101 @@ class TestFormPackExport(unittest.TestCase):
                                     'fields': [
                                         'household_member_name',
                                         '_parent_table_name',
-                                        '_parent_index'
+                                        '_parent_index',
+                                        '_submission__id',
+                                        '_submission__uuid'
                                     ],
                                     'data': [
                                         [
                                             'peter',
                                             'Household survey with repeatable groups',
-                                            1
+                                            1,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'kyle',
                                             'Household survey with repeatable groups',
-                                            2
+                                            2,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'linda',
                                             'Household survey with repeatable groups',
-                                            2
+                                            2,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'morty',
                                             'Household survey with repeatable groups',
-                                            3
+                                            3,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'tony',
                                             'Household survey with repeatable groups',
-                                            4
+                                            4,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'mary',
                                             'Household survey with repeatable groups',
-                                            4
+                                            4,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'emma',
                                             'Household survey with repeatable groups',
-                                            5
+                                            5,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'parker',
                                             'Household survey with repeatable groups',
-                                            5
+                                            5,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'amadou',
                                             'Household survey with repeatable groups',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'esteban',
                                             'Household survey with repeatable groups',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'suzie',
                                             'Household survey with repeatable groups',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'fiona',
                                             'Household survey with repeatable groups',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'phillip',
                                             'Household survey with repeatable groups',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ]
                                     ]
                                 })
@@ -448,26 +476,34 @@ class TestFormPackExport(unittest.TestCase):
                     'What_kind_of_tree_is_this',
                     '_index',
                     '_parent_table_name',
-                    '_parent_index'
+                    '_parent_index',
+                    '_submission__id',
+                    '_submission__uuid'
                 ],
                 'data': [
                     [
                         'pine',
                         1,
                         'Bird nest survey with nested repeatable groups',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         'spruce',
                         2,
                         'Bird nest survey with nested repeatable groups',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         'maple',
                         3,
                         'Bird nest survey with nested repeatable groups',
-                        2
+                        2,
+                        '',
+                        ''
                     ]
                 ]
             }),
@@ -477,7 +513,9 @@ class TestFormPackExport(unittest.TestCase):
                     'How_many_eggs_are_in_the_nest',
                     '_index',
                     '_parent_table_name',
-                    '_parent_index'
+                    '_parent_index',
+                    '_submission__id',
+                    '_submission__uuid'
                 ],
                 'data': [
                     [
@@ -485,28 +523,36 @@ class TestFormPackExport(unittest.TestCase):
                         '3',
                         1,
                         'group_tree',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         '15',
                         '1',
                         2,
                         'group_tree',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         '10',
                         '2',
                         3,
                         'group_tree',
-                        2
+                        2,
+                        '',
+                        ''
                     ],
                     [
                         '23',
                         '1',
                         4,
                         'group_tree',
-                        3
+                        3,
+                        '',
+                        ''
                     ]
                 ]
             }),
@@ -514,43 +560,59 @@ class TestFormPackExport(unittest.TestCase):
                 'fields': [
                     'Describe_the_egg',
                     '_parent_table_name',
-                    '_parent_index'
+                    '_parent_index',
+                    '_submission__id',
+                    '_submission__uuid'
                 ],
                 'data': [
                     [
                         'brown and speckled; medium',
                         'group_nest',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         'brown and speckled; large; cracked',
                         'group_nest',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         'light tan; small',
                         'group_nest',
-                        1
+                        1,
+                        '',
+                        ''
                     ],
                     [
                         'cream-colored',
                         'group_nest',
-                        2
+                        2,
+                        '',
+                        ''
                     ],
                     [
                         'reddish-brown; medium',
                         'group_nest',
-                        3
+                        3,
+                        '',
+                        ''
                     ],
                     [
                         'reddish-brown; small',
                         'group_nest',
-                        3
+                        3,
+                        '',
+                        ''
                     ],
                     [
                         'grey and speckled',
                         'group_nest',
-                        4
+                        4,
+                        '',
+                        ''
                     ]
                 ]
             })
@@ -617,73 +679,101 @@ class TestFormPackExport(unittest.TestCase):
                                     'fields': [
                                         'household_member_name',
                                         '_parent_table_name',
-                                        '_parent_index'
+                                        '_parent_index',
+                                        '_submission__id',
+                                        '_submission__uuid',
                                     ],
                                     'data': [
                                         [
                                             'peter',
                                             'Grouped Repeatable Alias',
-                                            1
+                                            1,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'kyle',
                                             'Grouped Repeatable Alias',
-                                            2
+                                            2,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'linda',
                                             'Grouped Repeatable Alias',
-                                            2
+                                            2,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'morty',
                                             'Grouped Repeatable Alias',
-                                            3
+                                            3,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'tony',
                                             'Grouped Repeatable Alias',
-                                            4
+                                            4,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'mary',
                                             'Grouped Repeatable Alias',
-                                            4
+                                            4,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'emma',
                                             'Grouped Repeatable Alias',
-                                            5
+                                            5,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'parker',
                                             'Grouped Repeatable Alias',
-                                            5
+                                            5,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'amadou',
                                             'Grouped Repeatable Alias',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'esteban',
                                             'Grouped Repeatable Alias',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'suzie',
                                             'Grouped Repeatable Alias',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'fiona',
                                             'Grouped Repeatable Alias',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ],
                                         [
                                             'phillip',
                                             'Grouped Repeatable Alias',
-                                            6
+                                            6,
+                                            '',
+                                            ''
                                         ]
                                     ]
                                 })
@@ -1101,7 +1191,7 @@ class TestFormPackExport(unittest.TestCase):
             # Verify repeating group
             sheet = book.sheet_by_name('houshold_member_repeat')
             row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == [u'#beneficiary', u'', u'']
+            assert row_values == [u'#beneficiary', u'', u'', u'', u'']
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
