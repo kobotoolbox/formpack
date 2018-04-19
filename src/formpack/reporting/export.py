@@ -320,7 +320,7 @@ class Export(object):
                 extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
                 if extra_mapping_values:
                     for extra_mapping_field in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
-                        row[u"_submission_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field)
+                        row[u"_submission_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field, "")
 
             rows.append(list(row.values()))
 
