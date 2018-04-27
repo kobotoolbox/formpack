@@ -50,8 +50,3 @@ TAG_COLUMNS_AND_SEPARATORS = {
     # column names, values are separators.
     'hxl': '',
 }
-
-REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS = [
-    u"_id",
-    u"_uuid",
-]

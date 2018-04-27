@@ -15,8 +15,7 @@ from ..submission import FormSubmission
 from ..schema import CopyField
 from ..utils.string import unicode, unique_name_for_xls
 from ..utils.flatten_content import flatten_tag_list
-from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS, \
-    REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS
+from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 
 
 class Export(object):
@@ -166,8 +165,9 @@ class Export(object):
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
-                for extra_mapping_field in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
-                    auto_field_names.append("_submission_{}".format(extra_mapping_field))
+                for copy_field in self.copy_fields:
+                    auto_field_names.append(
+                        "_submission_{}".format(copy_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -293,7 +293,7 @@ class Export(object):
 
                         # save fields value if they match parent mapping fields.
                         # Useful to map children to their parent when flattening groups.
-                        if field.path in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
+                        if field.path in self.copy_fields:
                             if _section_name not in self.__r_groups_submission_mapping_values:
                                 self.__r_groups_submission_mapping_values[_section_name] = {}
                             self.__r_groups_submission_mapping_values[_section_name].update(cells)
@@ -319,8 +319,10 @@ class Export(object):
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
                 extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
                 if extra_mapping_values:
-                    for extra_mapping_field in REPEATING_GROUPS_SUBMISSION_MAPPING_FIELDS:
-                        row[u"_submission_{}".format(extra_mapping_field)] = extra_mapping_values.get(extra_mapping_field, "")
+                    for extra_mapping_field in self.copy_fields:
+                        row[
+                            u"_submission_{}".format(extra_mapping_field)
+                        ] = extra_mapping_values.get(extra_mapping_field, "")
 
             rows.append(list(row.values()))
 
