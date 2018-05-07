@@ -122,10 +122,8 @@ class FormField(FormDataDef):
                     path.append(level.name)
             return group_sep.join(path)
 
-        if lang is None:
-            return self.name
-        else:
-            return self.labels.get(lang, self.name)
+        label = self.labels.get(lang, self.name)
+        return self.name if label is None else label
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
@@ -696,6 +694,9 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
         option_label = option['labels'].get(lang) or option['name']
         group_sep = group_sep or "/"
+
+        if label is None or option_label is None:
+            raise ValueError("label/option label can not be None")
 
         return "{}{}{}".format(label, group_sep, option_label)
 
