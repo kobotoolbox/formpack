@@ -23,7 +23,7 @@ except ImportError:
 import statistics
 
 from ..utils.xform_tools import normalize_data_type
-from ..constants import UNSPECIFIED_TRANSLATION
+from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
 from .datadef import FormDataDef, FormChoice
 
 
@@ -94,8 +94,8 @@ class FormField(FormDataDef):
         """Return the label for this field
 
         Args:
-            lang (str, optional): Lang to translte the label to if possible.
-            group_sep (str, optional): Group to seperate 2 levels of hierarchy
+            lang (str, optional): Lang to translate the label to if possible.
+            group_sep (str, optional): Group to separate 2 levels of hierarchy
             hierarchy_in_labels (bool, optional):
                 Label is the full hierarchy of the field
             multiple_select (str, optional):
@@ -122,7 +122,9 @@ class FormField(FormDataDef):
                     path.append(level.name)
             return group_sep.join(path)
 
+        # even if `lang` can be None, we don't want the `label` to be None.
         label = self.labels.get(lang, self.name)
+        # If `label` is None, no matches are found, so return `field` name.
         return self.name if label is None else label
 
     def __repr__(self):
