@@ -23,7 +23,7 @@ except ImportError:
 import statistics
 
 from ..utils.xform_tools import normalize_data_type
-from ..constants import UNSPECIFIED_TRANSLATION
+from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
 from .datadef import FormDataDef, FormChoice
 
 
@@ -94,8 +94,8 @@ class FormField(FormDataDef):
         """Return the label for this field
 
         Args:
-            lang (str, optional): Lang to translte the label to if possible.
-            group_sep (str, optional): Group to seperate 2 levels of hierarchy
+            lang (str, optional): Lang to translate the label to if possible.
+            group_sep (str, optional): Group to separate 2 levels of hierarchy
             hierarchy_in_labels (bool, optional):
                 Label is the full hierarchy of the field
             multiple_select (str, optional):
@@ -122,7 +122,10 @@ class FormField(FormDataDef):
                     path.append(level.name)
             return group_sep.join(path)
 
-        return self.labels.get(lang, self.name)
+        # even if `lang` can be None, we don't want the `label` to be None.
+        label = self.labels.get(lang, self.name)
+        # If `label` is None, no matches are found, so return `field` name.
+        return self.name if label is None else label
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
@@ -622,9 +625,14 @@ class FormChoiceField(ExtendedFormField):
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
         try:
-            return self.choice.options[val]['labels'][lang]
+            translation = self.choice.options[val]['labels'][lang]
         except KeyError:
             return val
+
+        if translation is None:
+            return val
+        else:
+            return translation
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
         val = self.get_translation(val, lang)
@@ -688,7 +696,11 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
         option_label = option['labels'].get(lang) or option['name']
         group_sep = group_sep or "/"
-        return label + group_sep + option_label
+
+        if label is None or option_label is None:
+            raise ValueError("label/option label can not be None")
+
+        return "{}{}{}".format(label, group_sep, option_label)
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):

@@ -2,9 +2,10 @@
 
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
+import json
 from copy import deepcopy
 
-from formpack import FormPack
+from formpack import FormPack, constants
 from .fixtures import build_fixture
 
 
@@ -56,6 +57,90 @@ def test_to_xml_fails_when_null_labels():
                    }}, id_string='sdf')
     fp[0].to_xml()
 
+def test_null_untranslated_labels():
+    content = json.loads('''
+        {
+          "translations": [
+            "arabic",
+            null
+          ],
+          "choices": [
+            {
+              "list_name": "aid_types",
+              "name": "1",
+              "label": [
+                "سلل غذائية",
+                null
+              ]
+            },
+            {
+              "list_name": "aid_types",
+              "name": "2",
+              "label": [
+                "سلل شتوية",
+                null
+              ]
+            },
+            {
+              "list_name": "aid_types",
+              "name": "3",
+              "label": [
+                "سلل زراعية",
+                null
+              ]
+            },
+            {
+              "list_name": "aid_types",
+              "name": "4",
+              "label": [
+                "قسائم",
+                null
+              ]
+            },
+            {
+              "list_name": "aid_types",
+              "name": "5",
+              "label": [
+                "أخرى",
+                null
+              ]
+            }
+          ],
+          "survey": [
+            {
+              "select_from_list_name": "aid_types",
+              "name": "what_aid_do_you_receive",
+              "required": true,
+              "label": [
+                "إذا كان نعم ماهي المساعدات التي تتلقاها؟",
+                null
+              ],
+              "type": "select_multiple"
+            }
+          ],
+          "translated": [
+            "hint",
+            "label"
+          ]
+        }
+    ''')
+    fp = FormPack({'content': content}, id_string='arabic_and_null')
+    fields = fp.get_fields_for_versions()
+    field = fields[0]
+    assert len(fields) == 1
+    expected_arabic_labels = [
+        'إذا كان نعم ماهي المساعدات التي تتلقاها؟',
+        'إذا كان نعم ماهي المساعدات التي تتلقاها؟/سلل غذائية',
+        'إذا كان نعم ماهي المساعدات التي تتلقاها؟/سلل شتوية',
+        'إذا كان نعم ماهي المساعدات التي تتلقاها؟/سلل زراعية',
+        'إذا كان نعم ماهي المساعدات التي تتلقاها؟/قسائم',
+        'إذا كان نعم ماهي المساعدات التي تتلقاها؟/أخرى',
+    ]
+    arabic_labels = field.get_labels('arabic')
+    assert arabic_labels == expected_arabic_labels
+    untranslated_labels = field.get_labels(constants.UNTRANSLATED)
+    question_names = field.get_labels(constants.UNSPECIFIED_TRANSLATION)
+    assert untranslated_labels == question_names
 
 def test_get_fields_for_versions_returns_unique_fields():
     '''
