@@ -16,6 +16,31 @@ SPACE_PADDING = {
     u'or': u' or ',
 }
 
+
+def _case_fn(args):
+    if len(args) < 1:
+        raise ValueError('empty @case expression')
+
+    def _pop_arg():
+        return False if len(args) is 0 else args.pop()
+
+    # last item in args specifies the default value
+    expr = _pop_arg()
+
+    arg = _pop_arg()
+    while arg:
+        if len(arg) != 2:
+            raise ValueError(
+                'Each item in a @case expression (except the default)'
+                ' must be an array with a lenth of 2.'
+            )
+        expr = {
+            '@if': arg + [expr]
+        }
+        arg = _pop_arg()
+    return [expr]
+
+
 DEFAULT_FNS = {
     u'@lookup': lambda x: "${%s}" % x,
     u'@response_not_equal': lambda args: [{'@lookup': args[0]}, '!=', args[1]],
@@ -23,15 +48,22 @@ DEFAULT_FNS = {
     u'@and': lambda args: {'@join': ['and', args]},
     u'@or': lambda args: {'@join': ['or', args]},
     u'@not': lambda args: ['not', {'@parens': args}],
+    u'@if': lambda args: ['if', {'@comma_parens': [args]}],
     u'@predicate': lambda args: ['[', args, ']'],
     u'@parens': lambda args: ['('] + args + [')'],
+    u'@comma_parens': lambda args: {
+        '@parens': reduce(
+                lambda arr, itm: arr + [itm, ','], args[0], []
+            )[:-1]
+    },
     u'@axis': lambda args: [args[0], '::', args[1]],
     u'@position': lambda args: ['position', {'@parens': [args]}],
-    u'@selected_at': lambda args: ['selected-at', {'@parens': [args[0], ',', args[1]]}],
+    u'@selected_at': lambda args: ['selected-at', {'@comma_parens': [args]}],
     u'@count_selected': lambda args: ['count-selected', {'@parens': args}],
     u'@multiselected': lambda args: [['selected', {'@parens': [
                                      {'@lookup': args[0]}, ',', args[1]]}]],
     u'@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
+    u'@case': _case_fn,
 }
 
 # this will be phased out shortly, since most fields are expandable in some way
