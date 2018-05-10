@@ -437,17 +437,17 @@ class Export(object):
         sheet_name_mapping = {}
 
         sheet_row_positions = defaultdict(lambda: 0)
-        def _append_row_to_sheet(current_sheet, data):
+        def _append_row_to_sheet(sheet_, data):
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
-            row_index = sheet_row_positions[current_sheet]
-            current_sheet.write_row(
+            row_index = sheet_row_positions[sheet_]
+            sheet_.write_row(
                 row=row_index,
                 col=0,
                 data=data
             )
             row_index += 1
-            sheet_row_positions[current_sheet] = row_index
+            sheet_row_positions[sheet_] = row_index
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
