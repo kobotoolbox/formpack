@@ -9,7 +9,9 @@ try:
 except ImportError:
     from collections import OrderedDict
 
-import openpyxl
+from collections import defaultdict
+
+import xlsxwriter
 
 from ..submission import FormSubmission
 from ..schema import CopyField
@@ -427,11 +429,25 @@ class Export(object):
 
     def to_xlsx(self, filename, submissions):
 
-        workbook = openpyxl.Workbook(write_only=True)
+        workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
+        workbook.use_zip64()
 
         sheets = {}
 
         sheet_name_mapping = {}
+
+        sheet_row_positions = defaultdict(lambda: 0)
+        def _append_row_to_sheet(current_sheet, data):
+            # XlsxWriter doesn't have a method like this built in, so we have
+            # to keep track of the current row for each sheet
+            row_index = sheet_row_positions[current_sheet]
+            current_sheet.write_row(
+                row=row_index,
+                col=0,
+                data=data
+            )
+            row_index += 1
+            sheet_row_positions[current_sheet] = row_index
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
@@ -444,20 +460,23 @@ class Export(object):
                 try:
                     current_sheet = sheets[sheet_name]
                 except KeyError:
-                    current_sheet = workbook.create_sheet(title=sheet_name)
+                    current_sheet = workbook.add_worksheet(sheet_name)
                     sheets[sheet_name] = current_sheet
 
-                    current_sheet.append(self.labels[section_name])
+                    _append_row_to_sheet(
+                        current_sheet,
+                        self.labels[section_name]
+                    )
 
                     # Include specified tag columns as extra header rows
                     tag_rows = self.get_header_rows_for_tag_cols(section_name)
                     for tag_row in tag_rows:
-                        current_sheet.append(tag_row)
+                        _append_row_to_sheet(current_sheet, tag_row)
 
                 for row in rows:
-                    current_sheet.append(row)
+                    _append_row_to_sheet(current_sheet, row)
 
-        workbook.save(filename)
+        workbook.close()
 
     def to_html(self, submissions):
         '''
