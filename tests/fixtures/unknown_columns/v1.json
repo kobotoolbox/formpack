@@ -1,0 +1,24 @@
+{
+  "id_string": "unknown_columns",
+  "version": "unk1",
+  "content": {
+    "survey": [
+      {
+        "type": "text",
+        "name": "question1",
+        "label": "Question1"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "question1": "S1 R1",
+      "uknown_question_2": "S1 R2 ?"
+    },
+    {
+      "question1": "S2 R1",
+      "uknown_question_2": "S2 R2 ?",
+      "uknown_question_3": "S2 R3 ?"
+    }
+  ]
+}

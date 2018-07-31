@@ -335,6 +335,7 @@ class FormPack(object):
 
     def export(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
+               retain_unmatched_values=False,
                force_index=False, copy_fields=(), title=None,
                tag_cols_for_header=None):
         '''Create an export for a given versions of the form'''
@@ -344,6 +345,7 @@ class FormPack(object):
         return Export(self, versions, lang=lang, group_sep=group_sep,
                       hierarchy_in_labels=hierarchy_in_labels,
                       version_id_keys=self.version_id_keys(versions),
+                      retain_unmatched_values=retain_unmatched_values,
                       title=title, multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields,
                       tag_cols_for_header=tag_cols_for_header)

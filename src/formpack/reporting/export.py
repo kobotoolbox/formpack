@@ -25,6 +25,7 @@ class Export(object):
     def __init__(self, formpack, form_versions, lang=UNSPECIFIED_TRANSLATION,
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
+                 retain_unmatched_values=False,
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions", tag_cols_for_header=None):
 
@@ -34,6 +35,11 @@ class Export(object):
         self.title = title
         self.versions = form_versions
         self.copy_fields = copy_fields
+        self.retain_unmatched_values = retain_unmatched_values
+        if self.retain_unmatched_values:
+            self._known_colunns = OrderedDict()
+            self._additional_columns = set()
+
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
@@ -255,7 +261,7 @@ class Export(object):
         _indexes = self._indexes
         row = self._row_cache[_section_name]
         _fields = tuple(current_section.fields.values())
-
+        _track_columns = self.retain_unmatched_values
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section
         # with a row of size one.
@@ -281,7 +287,17 @@ class Export(object):
 
             # We don't build a new dict everytime, instead, we reuse the
             # previous one, but we reset it, to gain some perfs.
+
             row.update(_empty_row)
+
+            if _track_columns:
+                entry_keys = set(entry.keys())
+                field_keys = set(field.name for field in _fields)
+                known_additional_keys = set(self._known_colunns.keys() + ['__version__'])
+                new_keys = entry_keys - field_keys - known_additional_keys
+                if len(new_keys) > 0:
+                    for key in new_keys:
+                        self._known_colunns[key] = None
 
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
@@ -305,6 +321,9 @@ class Export(object):
 
                     # fill in the canvas
                     row.update(cells)
+            if _track_columns:
+                for known_column in self._known_colunns:
+                    row[known_column] = entry.get(known_column, '')
 
             # Link between the parent and its children in a sub-section.
             # Indeed, with repeat groups, entries are nested. Since we flatten
