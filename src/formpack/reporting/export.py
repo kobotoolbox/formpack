@@ -530,42 +530,35 @@ class Export(object):
         return None
 
     def to_spss_labels(self, output_file):
+        '''
+        Write SPSS commands that set question and choice labels, creating a ZIP
+        file containing one SPSS file per translation. This includes *no* data!
+
+        :param output_file: a file-like object opened for writing
+        '''
         all_versions = self.formpack.versions.values()
         all_translations = set()
         map(all_translations.update, [v.translations for v in all_versions])
         all_fields = self.formpack.get_fields_for_versions()
-        '''
-        `all_translations` gives us the list of translation names, which
-            tells us how many files we need to write (they all get zipped
-            together in the end)
-        for each translation, we have to go through `all_fields` and pull out
-        the question names and corresponding labels.  for questions that have
-        associated choice lists, we have to pull out the value names and value
-        labels as well.
-
-        if the field has a `choice` attr, then it has choices :) and needs
-            value labels
-        '''
-
-        '''
-        We need to produce a dictionary like:
-            {
-                'question_name1': {
-                    'label': 'I am the label of question 1!',
-                    'values': {
-                        'option1': 'Label option 1',
-                        'option2': 'Label optoin 2'
-                    }
-                },
-                'question_name2': {
-                    'label': 'I am question 2, unconstrained by predetermined '
-                             'values!'
-                }
-            }
-        '''
 
         with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as z_out:
             for translation in all_translations:
+                '''
+                For each translation, we need to produce a dictionary like:
+                    {
+                        'question_name1': {
+                            'label': 'I am the label of question 1!',
+                            'values': {
+                                'option1': 'Label option 1',
+                                'option2': 'Label option 2'
+                            }
+                        },
+                        'question_name2': {
+                            'label': 'I am question 2, unconstrained by
+                                     'predetermined values!'
+                        }
+                    }
+                '''
                 question_dict = OrderedDict()
                 for field in all_fields:
                     # Even with `multiple_select='summary'`, we can still get

@@ -1652,7 +1652,7 @@ class TestFormPackExport(unittest.TestCase):
             '_submission_time',
         ])
 
-    def test_spss_playground(self):
+    def test_spss_labels(self):
         fixture_name = 'long_unicode_labels'
         title, schemas, submissions = build_fixture(fixture_name)
         fp = FormPack(schemas, title)
