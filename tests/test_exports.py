@@ -3,20 +3,19 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import unittest
 import json
 import xlrd
+import unittest
 
+from io import BytesIO
+from path import tempdir
 from textwrap import dedent
-
+from zipfile import ZipFile
+from nose.tools import raises
 from collections import OrderedDict
 
-from nose.tools import raises
-
-from path import tempdir
-
 from formpack import FormPack
-from .fixtures import build_fixture
+from .fixtures import build_fixture, open_fixture_file
 
 from formpack.constants import UNTRANSLATED
 
@@ -1652,3 +1651,27 @@ class TestFormPackExport(unittest.TestCase):
             '_uuid',
             '_submission_time',
         ])
+
+    def test_spss_playground(self):
+        fixture_name = 'long_unicode_labels'
+        title, schemas, submissions = build_fixture(fixture_name)
+        fp = FormPack(schemas, title)
+        options = {
+            'versions': 'long_unicode_labels_v1',
+        }
+        expected_label_file_names = [
+            'long unicode labels to test SPSS export - English - SPSS labels.sps',
+            'long unicode labels to test SPSS export - Français - SPSS labels.sps',
+            'long unicode labels to test SPSS export - Swahili - SPSS labels.sps',
+        ]
+        # Export to an in-memory ZIP file
+        raw_zip = BytesIO()
+        fp.export(**options).to_spss_labels(raw_zip)
+        raw_zip.seek(0)
+        zipped = ZipFile(raw_zip, 'r')
+        for name in expected_label_file_names:
+            with open_fixture_file(fixture_name, name, 'r') as expected:
+                actual = zipped.open(name, 'r')
+                assert actual.read() == expected.read()
+        zipped.close()
+        raw_zip.close()
