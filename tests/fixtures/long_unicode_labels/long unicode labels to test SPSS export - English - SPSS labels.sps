@@ -8,6 +8,12 @@
  /q_2243 'How did their separation occur?'
  /approval 'Hello, my name is ____ I am here as part of a study on security, protection and justice in Eastern Congo. I work with ----------. We are independent of any government, we conduct a series of interviews to better understand the context an'
  + 'd priorities in…'
+ /electronics_owned 'Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own?'
+ /electronics_owned_tv 'Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own? :: TV'
+ /electronics_owned_radio 'Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own? :: Radio'
+ /electronics_owned_laptop 'Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own? :: Laptop computer'
+ /electronics_owned_tamagotchi 'Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, inco… :: An electronic toy displaying a digital image of a creature, which has to be looked afte'
+ + 'r and responded to by the "owner" …'
  .
 VALUE LABELS
  What_is_your_name

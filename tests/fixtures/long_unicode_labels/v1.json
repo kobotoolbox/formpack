@@ -417,6 +417,42 @@
         "label": ["Wema Lukoo Raphael", "Wema Lukoo Raphael", "Wema Lukoo Raphael"],
         "list_name": "name",
         "name": "raphael_ulpgl"
+      },
+      {
+        "label": [
+            "Televisheni",
+            "TV",
+            "Télévision"
+        ],
+        "list_name": "electronics",
+        "name": "tv"
+      },
+      {
+        "label": [
+            "Radi",
+            "Radio",
+            "Radio"
+        ],
+        "list_name": "electronics",
+        "name": "radio"
+      },
+      {
+        "label": [
+            "Kompyuta ya kompyuta",
+            "Laptop computer",
+            "Ordinateur portable"
+        ],
+        "list_name": "electronics",
+        "name": "laptop"
+      },
+      {
+        "label": [
+            "Toy ya elektroniki inayoonyesha picha ya kiumbe ya kiumbe wa digital, ambayo inapaswa kuzingatiwa na kuitibiwa na \"mmiliki \" kama ni pet",
+            "An electronic toy displaying a digital image of a creature, which has to be looked after and responded to by the \"owner\" as if it were a pet",
+            "Un jouet électronique affichant une image numérique d'une créature, qui doit être soigné et auquel le \"propriétaire\" répond comme s'il s'agissait d'un animal de compagnie"
+        ],
+        "list_name": "electronics",
+        "name": "tamagotchi"
       }
     ],
     "translated": [
@@ -506,6 +542,16 @@
           "Bonjour, mon nom est ____ je suis ici dans le cadre d'une étude sur la sécurité, la protection et la justice à l’Est du Congo. Je travaille avec ----------. Nous sommes indépendants de tout gouvernement, Nous conduisons une série d'entretiens pour mieux comprendre le contexte et les priorités à l’Est du Congo. Les informations que nous collectons ici sont confidentielles et anonymes. Nous sommes indépendants et aucune personne ne sera identifiée dans la discussion des résultats. Il n'y a pas de bonne ou de mauvaise réponse. Nous vous demandons de participer volontairement à cette étude. Il n’y a pas de bénéfices directs pour vous, mais nous pensons que votre participation permettra d’améliorer la situation dans l’Est. Les résultats seront publiés et mis à disposition des acteurs dans l’Est. L’interview devrait durer à peu près 20 minutes. Est-ce que vous acceptez de participer à cette étude ?"
         ],
         "type": "select_one"
+      },
+      {
+        "select_from_list_name": "electronics",
+        "name": "electronics_owned",
+        "label": [
+          "Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo?",
+          "Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own?",
+          "Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous?"
+        ],
+        "type": "select_multiple"
       }
     ],
     "schema": "1"
