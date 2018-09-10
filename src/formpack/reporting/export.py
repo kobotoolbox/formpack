@@ -565,10 +565,10 @@ class Export(object):
                     # multiple names and labels per question for things like
                     # `FormGPSField` (`geopoint`)
                     xml_names = field.get_labels(lang=UNSPECIFIED_TRANSLATION,
-                                                 multiple_select='both')
+                                                 multiple_select='summary')
                     assert xml_names[0] == field.name
                     labels = field.get_labels(lang=translation,
-                                              multiple_select='both')
+                                              multiple_select='summary')
                     for name, label in zip(xml_names, labels):
                         question_dict[name] = {
                             'label': label,

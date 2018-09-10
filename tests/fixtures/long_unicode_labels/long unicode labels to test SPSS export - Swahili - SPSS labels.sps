@@ -8,6 +8,12 @@
  /q_2243 'Je! Kujitenga kwao kulikuwaje?'
  /approval 'Jambo, jina langu ni ____niko hapa kuuliza habari kuhusu amani, sheria na ujenzi mupya mashariki ya jamuhuri ya kidemokratia ya kongo. Natumika pamoja na -------. Atuna ushirika na serkali yoyote. Tunaendesha maongezi kamili juu ya kusik'
  + 'ia na kujuwa ha…'
+ /electronics_owned 'Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo?'
+ /electronics_owned_tv 'Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo? :: Televisheni'
+ /electronics_owned_radio 'Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo? :: Radi'
+ /electronics_owned_laptop 'Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo? :: Kompyuta ya kompyuta'
+ /electronics_owned_tamagotchi 'Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapindu… :: Toy ya elektroniki inayoonyesha picha ya kiumbe ya kiumbe wa digital, ambayo inapaswa '
+ + 'kuzingatiwa na kuitibiwa na "mmilik…'
  .
 VALUE LABELS
  What_is_your_name

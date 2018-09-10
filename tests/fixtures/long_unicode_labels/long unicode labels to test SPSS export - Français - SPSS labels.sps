@@ -8,6 +8,12 @@
  /q_2243 'Comment s''est passée leur séparation?'
  /approval 'Bonjour, mon nom est ____ je suis ici dans le cadre d''une étude sur la sécurité, la protection et la justice à l’Est du Congo. Je travaille avec ----------. Nous sommes indépendants de tout gouvernement, Nous conduisons une séri'
  + 'e d''entretiens p…'
+ /electronics_owned 'Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous?'
+ /electronics_owned_tv 'Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous? :: Télévision'
+ /electronics_owned_radio 'Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous? :: Radio'
+ /electronics_owned_laptop 'Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous? :: Ordinateur portable'
+ /electronics_owned_tamagotchi 'Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutio… :: Un jouet électronique affichant une image numérique d''une créature, qui doit être'
+ + ' soigné et auquel le "propriétaire…'
  .
 VALUE LABELS
  What_is_your_name

@@ -83,6 +83,50 @@ def spss_labels_from_variables_dict(variables):
         except KeyError:
             continue
 
+        # For select multiple questions, generate an additional variable
+        # label for each choice, using the format
+        #     question_name_choice_name 'question label :: choice label'
+        #                  ^ a literal underscore
+        # TODO: advise people to export using `_` as the group delimiter
+        SELECT_MULTIPLE_NAME_DELIMITER = '_'
+        SELECT_MULTIPLE_LABEL_DELIMITER = ' :: '
+        if variable['data_type'] == 'select_multiple':
+            for value_name, value_label in values.items():
+                label_format_string = '{variable_label}{delimiter}{value_label}'
+                output = label_format_string.format(
+                    variable_label=variable['label'],
+                    delimiter=SELECT_MULTIPLE_LABEL_DELIMITER,
+                    value_label=value_label
+                )
+                if utf8_len(output) > VARIABLE_LABEL_LIMIT_BYTES:
+                    variable_label = utf8_ellipsize(
+                        variable['label'], int(VARIABLE_LABEL_LIMIT_BYTES / 2)
+                    )
+                    value_label = utf8_ellipsize(
+                        value_label,
+                        VARIABLE_LABEL_LIMIT_BYTES - utf8_len(variable_label) -
+                            utf8_len(SELECT_MULTIPLE_LABEL_DELIMITER)
+                    )
+                    output = label_format_string.format(
+                        variable_label=variable_label,
+                        delimiter=SELECT_MULTIPLE_LABEL_DELIMITER,
+                        value_label=value_label
+                    )
+                assert utf8_len(output) <= VARIABLE_LABEL_LIMIT_BYTES
+                variable_section_lines.append(
+                    "{line_leader}{variable_name}{delimiter}{value_name} "
+                    "'{variable_label}'".format(
+                        line_leader=' /' if variable_count else ' ',
+                        variable_name=variable_name,
+                        delimiter=SELECT_MULTIPLE_NAME_DELIMITER,
+                        value_name=value_name,
+                        variable_label=spss_escape(output)
+                    )
+                )
+                variable_count += 1
+            # Don't add any SPSS value labels
+            continue
+
         value_section_lines.append(
             "{line_leader}{variable_name}".format(
                 line_leader=' /' if value_count else ' ',
