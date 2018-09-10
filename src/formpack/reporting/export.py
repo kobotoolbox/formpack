@@ -564,15 +564,16 @@ class Export(object):
                     # Even with `multiple_select='summary'`, we can still get
                     # multiple names and labels per question for things like
                     # `FormGPSField` (`geopoint`)
-                    # TODO: expose `multiple_select` options in the KPI user
-                    # interface
                     xml_names = field.get_labels(lang=UNSPECIFIED_TRANSLATION,
-                                                 multiple_select='summary')
+                                                 multiple_select='both')
                     assert xml_names[0] == field.name
                     labels = field.get_labels(lang=translation,
-                                              multiple_select='summary')
+                                              multiple_select='both')
                     for name, label in zip(xml_names, labels):
-                        question_dict[name] = {'label': label}
+                        question_dict[name] = {
+                            'label': label,
+                            'data_type': field.data_type,
+                        }
                     if hasattr(field, 'choice'):
                         choices = OrderedDict()
                         for option in field.choice.options.keys():
