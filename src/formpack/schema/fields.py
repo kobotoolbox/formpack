@@ -2,7 +2,6 @@
 
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-import json
 import re
 
 from operator import itemgetter
