@@ -8,6 +8,8 @@ from collections import OrderedDict
 LINE_LIMIT_BYTES = 251
 VARIABLE_LABEL_LIMIT_BYTES = 255
 VALUE_LABEL_LIMIT_BYTES = 120
+SELECT_MULTIPLE_NAME_DELIMITER = '_'
+SELECT_MULTIPLE_LABEL_DELIMITER = ' :: '
 ''' SPSS limits variable names to 64 bytes, but we'll create more problems for
 people if we try to change variable names here. Any change to them would
 require altering data exports as well; otherwise, the labels we generate would
@@ -87,9 +89,8 @@ def spss_labels_from_variables_dict(variables):
         # label for each choice, using the format
         #     question_name_choice_name 'question label :: choice label'
         #                  ^ a literal underscore
-        # TODO: advise people to export using `_` as the group delimiter
-        SELECT_MULTIPLE_NAME_DELIMITER = '_'
-        SELECT_MULTIPLE_LABEL_DELIMITER = ' :: '
+        # TODO: advise people to export data using `_` as the group delimiter,
+        # since the default, `/`, is not allowed by SPSS
         if variable['data_type'] == 'select_multiple':
             for value_name, value_label in values.items():
                 label_format_string = '{variable_label}{delimiter}{value_label}'
