@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+from importlib import import_module
 
 try:
     from cyordereddict import OrderedDict
@@ -43,13 +44,27 @@ class Export(object):
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
 
-        # If some fields need to be arbitrarly copied, add them
+        def snake_case_to_camel_case(str_):
+            """
+            my_variable -> MyVariable
+            :param str_: str
+            :return: str
+            """
+            words = str_.strip("_").split("_")
+            return "".join([word.lower().capitalize() for word in words])
+
+        # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
+            # import schema to load dynamically custom `CopyField` classes such as ValidationStationCopyField
+            schema_module = import_module("formpack.schema")
+
             for version in iter(form_versions.values()):
                 first_section = next(iter(version.sections.values()))
                 for name in copy_fields:
-                    dumb_field = CopyField(name, section=first_section)
+                    class_name = "{}CopyField".format(snake_case_to_camel_case(name))
+                    DynamicCopyField = getattr(schema_module, class_name, CopyField)
+                    dumb_field = DynamicCopyField(name, section=first_section)
                     first_section.fields[name] = dumb_field
 
         # this deals with merging all form versions headers and labels
@@ -428,7 +443,6 @@ class Export(object):
         return table
 
     def to_xlsx(self, filename, submissions):
-
         workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
         workbook.use_zip64()
 

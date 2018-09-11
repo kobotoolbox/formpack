@@ -2,7 +2,7 @@
 
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-
+import json
 import re
 
 from operator import itemgetter
@@ -532,6 +532,21 @@ class CopyField(FormField):
     def get_labels(self, *args, **kwargs):
         """ Labels are the just the value name. Groups are ignored """
         return [self.name]
+
+
+class ValidationStatusCopyField(CopyField):
+
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
+
+        if isinstance(val, dict):
+            if lang == UNTRANSLATED:
+                value = {self.name: val.get("label", "")}
+            else:
+                value = {self.name: val.get("uid", "")}
+        else:
+            value = super(CopyField, self).format(val=val, lang=lang, context=context)
+
+        return value
 
 
 class FormGPSField(FormField):
