@@ -22,7 +22,7 @@ except ImportError:
 import statistics
 
 from ..utils.xform_tools import normalize_data_type
-from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
+from ..constants import UNSPECIFIED_TRANSLATION, XML_VALUES_AND_HEADERS
 from .datadef import FormDataDef, FormChoice
 
 
@@ -538,10 +538,10 @@ class ValidationStatusCopyField(CopyField):
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
 
         if isinstance(val, dict):
-            if lang == UNTRANSLATED:
-                value = {self.name: val.get("label", "")}
-            else:
+            if lang == XML_VALUES_AND_HEADERS:
                 value = {self.name: val.get("uid", "")}
+            else:
+                value = {self.name: val.get("label", "")}
         else:
             value = super(CopyField, self).format(val=val, lang=lang, context=context)
 

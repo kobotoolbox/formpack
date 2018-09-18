@@ -50,3 +50,7 @@ TAG_COLUMNS_AND_SEPARATORS = {
     # column names, values are separators.
     'hxl': '',
 }
+
+# User can choose between each available language or xml representation when data is exported.
+# In that case, the language equals `xml`
+XML_VALUES_AND_HEADERS = "xml"
