@@ -11,10 +11,12 @@ except ImportError:
 
 from collections import defaultdict
 
+import zipfile
 import xlsxwriter
 
 from ..submission import FormSubmission
 from ..schema import CopyField
+from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
 from ..utils.flatten_content import flatten_tag_list
 from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
@@ -526,3 +528,88 @@ class Export(object):
                 return values
 
         return None
+
+    def to_spss_labels(self, output_file):
+        '''
+        Write SPSS commands that set question and choice labels, creating a ZIP
+        file containing one SPSS file per translation. This includes *no* data!
+
+        :param output_file: a file-like object opened for writing
+        '''
+        all_versions = self.formpack.versions.values()
+        all_translations = set()
+        map(all_translations.update, [v.translations for v in all_versions])
+        all_fields = self.formpack.get_fields_for_versions()
+
+        with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as z_out:
+            for translation in all_translations:
+                '''
+                For each translation, we need to produce a dictionary like:
+                    {
+                        'question_name1': {
+                            'label': 'I am the label of question 1!',
+                            'values': {
+                                'option1': 'Label option 1',
+                                'option2': 'Label option 2'
+                            }
+                        },
+                        'question_name2': {
+                            'label': 'I am question 2, unconstrained by
+                                     'predetermined values!'
+                        }
+                    }
+                '''
+                question_dict = OrderedDict()
+                for field in all_fields:
+                    # Even with `multiple_select='summary'`, we can still get
+                    # multiple names and labels per question for things like
+                    # `FormGPSField` (`geopoint`)
+                    xml_names = field.get_labels(lang=UNSPECIFIED_TRANSLATION,
+                                                 multiple_select='summary')
+                    assert xml_names[0] == field.name
+                    labels = field.get_labels(lang=translation,
+                                              multiple_select='summary')
+                    for name, label in zip(xml_names, labels):
+                        question_dict[name] = {
+                            'label': label,
+                            'data_type': field.data_type,
+                        }
+                    if hasattr(field, 'choice'):
+                        choices = OrderedDict()
+                        for option in field.choice.options.keys():
+                            choices[option] = field.get_translation(
+                                val=option, lang=translation
+                            )
+                        question_dict[field.name]['values'] = choices
+                # Convert the question/choice names and labels into SPSS
+                # commands
+                spss_label_commands = spss_labels_from_variables_dict(
+                    question_dict)
+                # Write the SPSS commands into a file for this particular
+                # language
+                title = self.formpack.title
+                if translation:
+                    rest_of_filename = ' - '.join(
+                        ('', translation, 'SPSS labels.sps')
+                    )
+                else:
+                    rest_of_filename = ' - '.join(
+                        ('', 'SPSS labels.sps')
+                    )
+                # TODO: move this constant
+                MAXIMUM_FILENAME_LENGTH = 240
+                overrun = (
+                    len(title)
+                        + len(rest_of_filename)
+                        - MAXIMUM_FILENAME_LENGTH
+                )
+                if overrun > 0:
+                    # TODO: trim the title in a right-to-left-friendly way
+                    # TODO: deal with excessively long language names
+                    title = ellipsize(title, len(title) - overrun)
+                filename = title + rest_of_filename
+                z_out.writestr(
+                    # `utf-8-sig` includes the BOM, which SPSS needs to
+                    # recognize the encoding
+                    filename, spss_label_commands.encode('utf-8-sig')
+                )
