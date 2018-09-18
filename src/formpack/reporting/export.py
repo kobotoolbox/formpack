@@ -588,9 +588,14 @@ class Export(object):
                 # Write the SPSS commands into a file for this particular
                 # language
                 title = self.formpack.title
-                rest_of_filename = ' - '.join(
-                    ('', translation, 'SPSS labels.sps')
-                )
+                if translation:
+                    rest_of_filename = ' - '.join(
+                        ('', translation, 'SPSS labels.sps')
+                    )
+                else:
+                    rest_of_filename = ' - '.join(
+                        ('', 'SPSS labels.sps')
+                    )
                 # TODO: move this constant
                 MAXIMUM_FILENAME_LENGTH = 240
                 overrun = (
