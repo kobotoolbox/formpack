@@ -3,7 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
-from importlib import import_module
+from inspect import isclass
 
 try:
     from cyordereddict import OrderedDict
@@ -28,6 +28,20 @@ class Export(object):
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions", tag_cols_for_header=None):
+        """
+
+        :param formpack: FormPack
+        :param form_versions: OrderedDict
+        :param lang: string or False.
+        :param group_sep: bool.
+        :param hierarchy_in_labels: bool.
+        :param version_id_keys: list.
+        :param multiple_select: string.
+        :param copy_fields: tuple. It can be a mixed of string or `schema.fields.*CopyFields` classes (e.g. `ValidationStatusCopyField)
+        :param force_index: bool.
+        :param title: string
+        :param tag_cols_for_header: list
+        """
 
         self.formpack = formpack
         self.lang = lang
@@ -44,28 +58,17 @@ class Export(object):
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
 
-        def snake_case_to_camel_case(str_):
-            """
-            my_variable -> MyVariable
-            :param str_: str
-            :return: str
-            """
-            words = str_.strip("_").split("_")
-            return "".join([word.lower().capitalize() for word in words])
-
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            # import schema to load dynamically custom `CopyField` classes such as ValidationStationCopyField
-            schema_module = import_module("formpack.schema")
-
             for version in iter(form_versions.values()):
                 first_section = next(iter(version.sections.values()))
-                for name in copy_fields:
-                    class_name = "{}CopyField".format(snake_case_to_camel_case(name))
-                    DynamicCopyField = getattr(schema_module, class_name, CopyField)
-                    dumb_field = DynamicCopyField(name, section=first_section)
-                    first_section.fields[name] = dumb_field
+                for copy_field in copy_fields:
+                    if isclass(copy_field):
+                        dumb_field = copy_field(section=first_section)
+                    else:
+                        dumb_field = CopyField(copy_field, section=first_section)
+                    first_section.fields[dumb_field.name] = dumb_field
 
         # this deals with merging all form versions headers and labels
         params = (
