@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+import os
 import importlib
 from copy import deepcopy
 
@@ -27,3 +28,10 @@ def build_fixture(modulename, data_variable_name="DATA"):
         # TODO: generalize this ?
         # it's an xml schme json fixture
         return fixtures
+
+def open_fixture_file(modulename, filename, *args, **kwargs):
+    fixture_dir = os.path.dirname(
+        os.path.abspath(
+            importlib.import_module('..%s' % modulename, __name__).__file__
+    ))
+    return open(os.path.join(fixture_dir, filename), *args, **kwargs)

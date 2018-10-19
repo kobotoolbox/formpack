@@ -1,0 +1,559 @@
+{
+  "version": "long_unicode_labels_v1",
+  "submissions": [],
+  "content": {
+    "translations": [
+      "Swahili",
+      "English",
+      "Français"
+    ],
+    "choices": [
+      {
+        "label": ["Ndiyo", "Yes", "Oui"],
+        "list_name": "yesno",
+        "name": "1"
+      },
+      {
+        "label": ["Hapana", "No", "Non"],
+        "list_name": "yesno",
+        "name": "2"
+      },
+      {
+        "label": ["Franck Mbuyu Ziaka", "Franck Mbuyu Ziaka", "Franck Mbuyu Ziaka"],
+        "list_name": "name",
+        "name": "Franck_M"
+      },
+      {
+        "label": ["Janvier Paluku Bwakyanakazi", "Janvier Paluku Bwakyanakazi", "Janvier Paluku Bwakyanakazi"],
+        "list_name": "name",
+        "name": "Janvier_P"
+      },
+      {
+        "label": ["Jeanette Longhi Faida", "Jeanette Longhi Faida", "Jeanette Longhi Faida"],
+        "list_name": "name",
+        "name": "Jeanette_L"
+      },
+      {
+        "label": ["Mariam Kalimasi Jamil", "Mariam Kalimasi Jamil", "Mariam Kalimasi Jamil"],
+        "list_name": "name",
+        "name": "mariam_K"
+      },
+      {
+        "label": ["Micheline Kitamuliko Masika", "Micheline Kitamuliko Masika", "Micheline Kitamuliko Masika"],
+        "list_name": "name",
+        "name": "Micheline_K"
+      },
+      {
+        "label": ["Thierry Katsongo Malikidogo", "Thierry Katsongo Malikidogo", "Thierry Katsongo Malikidogo"],
+        "list_name": "name",
+        "name": "thierry_K"
+      },
+      {
+        "label": ["Tite Nyangwibe Maneno", "Tite Nyangwibe Maneno", "Tite Nyangwibe Maneno"],
+        "list_name": "name",
+        "name": "Tite_N"
+      },
+      {
+        "label": ["Winnie Yaya", "Winnie Yaya", "Winnie Yaya"],
+        "list_name": "name",
+        "name": "Winnie_Y"
+      },
+      {
+        "label": ["Francine WINGI", "Francine WINGI", "Francine WINGI"],
+        "list_name": "name",
+        "name": "Francine_W"
+      },
+      {
+        "label": ["Gervais BAHOGWERHE BASHIZI", "Gervais BAHOGWERHE BASHIZI", "Gervais BAHOGWERHE BASHIZI"],
+        "list_name": "name",
+        "name": "Gervais_B"
+      },
+      {
+        "label": ["Gilardin BAGUMA", "Gilardin BAGUMA", "Gilardin BAGUMA"],
+        "list_name": "name",
+        "name": "Gilardin_B"
+      },
+      {
+        "label": ["Hortense BARHOLERE", "Hortense BARHOLERE", "Hortense BARHOLERE"],
+        "list_name": "name",
+        "name": "Hortense_B"
+      },
+      {
+        "label": ["Joseph Salumu Mwamba", "Joseph Salumu Mwamba", "Joseph Salumu Mwamba"],
+        "list_name": "name",
+        "name": "joseph_S"
+      },
+      {
+        "label": ["Lucien MUNYAKA", "Lucien MUNYAKA", "Lucien MUNYAKA"],
+        "list_name": "name",
+        "name": "Lucien_M"
+      },
+      {
+        "label": ["Minerve BASHIGE BYADUNIA", "Minerve BASHIGE BYADUNIA", "Minerve BASHIGE BYADUNIA"],
+        "list_name": "name",
+        "name": "Minerve_B"
+      },
+      {
+        "label": ["Prisca CHINOGERWA", "Prisca CHINOGERWA", "Prisca CHINOGERWA"],
+        "list_name": "name",
+        "name": "Prisca_C"
+      },
+      {
+        "label": ["Yusuf MOHAMMED", "Yusuf MOHAMMED", "Yusuf MOHAMMED"],
+        "list_name": "name",
+        "name": "Yusuf_M"
+      },
+      {
+        "label": ["Prince MUCINDI", "Prince MUCINDI", "Prince MUCINDI"],
+        "list_name": "name",
+        "name": "Prince_M"
+      },
+      {
+        "label": ["Benjamin Kasereba", "Benjamin Kasereba", "Benjamin Kasereba"],
+        "list_name": "name",
+        "name": "benjamin_K"
+      },
+      {
+        "label": ["Benjamin Muyeme Tabani", "Benjamin Muyeme Tabani", "Benjamin Muyeme Tabani"],
+        "list_name": "name",
+        "name": "benjamin_M"
+      },
+      {
+        "label": ["Clarice Akubese Masemande", "Clarice Akubese Nasemande Avuta Mbafele", "Clarice Akubese Masemande"],
+        "list_name": "name",
+        "name": "Clarice_A"
+      },
+      {
+        "label": ["Furaha Bahimbire", "Furaha Bahimbire", "Furaha Bahimbire"],
+        "list_name": "name",
+        "name": "Furaha_B"
+      },
+      {
+        "label": ["Gerard Cibinda", "Gerard Cibinda", "Gerard Cibinda"],
+        "list_name": "name",
+        "name": "Gerard_C"
+      },
+      {
+        "label": ["Jean-Christian Mukena", "Jean Christian Mukena Muntu", "Jean-Christian Mukena"],
+        "list_name": "name",
+        "name": "Jean-Christian_M"
+      },
+      {
+        "label": ["London M. Kalume", "London M. Kalume", "London M. Kalume"],
+        "list_name": "name",
+        "name": "London_M"
+      },
+      {
+        "label": ["Sylvain Medho Kalumbo", "Sylvain Medho Kalumbo", "Sylvain Medho Kalumbo"],
+        "list_name": "name",
+        "name": "Sylvain_M"
+      },
+      {
+        "label": ["Djulfa Djuma", "Djulfa Djuma", "Djulfa Djuma"],
+        "list_name": "name",
+        "name": "Djulfa_D"
+      },
+      {
+        "label": ["Christine Faida", "Christine Faida Kabino", "Christine Faida"],
+        "list_name": "name",
+        "name": "Christine_F"
+      },
+      {
+        "label": ["Clement Matembera", "Clement Matembera", "Clement Matembera"],
+        "list_name": "name",
+        "name": "Clement_M"
+      },
+      {
+        "label": ["Delphin Muhindo", "Delphin Muhindo", "Delphin Muhindo"],
+        "list_name": "name",
+        "name": "Delphin_M"
+      },
+      {
+        "label": ["Diego LunenoBwira", "Diego Luneno Bwira", "Diego LunenoBwira"],
+        "list_name": "name",
+        "name": "diego_L"
+      },
+      {
+        "label": ["Esperance Masika", "Esperance Masika", "Esperance Masika"],
+        "list_name": "name",
+        "name": "Esperance_M"
+      },
+      {
+        "label": ["Francine Ntambwe", "Francine Zalia Ntambwe", "Francine Ntambwe"],
+        "list_name": "name",
+        "name": "Francine_N"
+      },
+      {
+        "label": ["Francis Lenzo", "Francis Lenzo", "Francis Lenzo"],
+        "list_name": "name",
+        "name": "Francis_L"
+      },
+      {
+        "label": ["Gauthier Bisimwa", "Gauthier Bisimwa", "Gauthier Bisimwa"],
+        "list_name": "name",
+        "name": "Gauthier_B"
+      },
+      {
+        "label": ["Jacques Mubalama", "Jacques Mubalama Bishikwabo", "Jacques Mubalama"],
+        "list_name": "name",
+        "name": "Jacques_M"
+      },
+      {
+        "label": ["Julie Mujinga", "Julie Mujinga", "Julie Mujinga"],
+        "list_name": "name",
+        "name": "Julie_M"
+      },
+      {
+        "label": ["Patient Muhozi", "Patient Muhozi", "Patient Muhozi"],
+        "list_name": "name",
+        "name": "Patient_M"
+      },
+      {
+        "label": ["Sassou Mahatane", "Sassou Mahatane", "Sassou Mahatane"],
+        "list_name": "name",
+        "name": "Sassou_M"
+      },
+      {
+        "label": ["BAHATI Aline", "BAHATI Aline", "BAHATI Aline"],
+        "list_name": "name",
+        "name": "aline_ucb"
+      },
+      {
+        "label": ["BAHATI MITIMA Chance", "BAHATI MITIMA Chanceline", "BAHATI MITIMA Chance"],
+        "list_name": "name",
+        "name": "chance_ucb"
+      },
+      {
+        "label": ["BALYARMWABO MULAGANO Evelyne", "BALYARMWABO MULAGANO Evelyne", "BALYARMWABO MULAGANO Evelyne"],
+        "list_name": "name",
+        "name": "evelyne_ucb"
+      },
+      {
+        "label": ["BAZIRIA MIHIGO Grace", "BAZIRIA MIHIGO Grace", "BAZIRIA MIHIGO Grace"],
+        "list_name": "name",
+        "name": "grace_bm_ucb"
+      },
+      {
+        "label": ["BIRINDWA FLESI Etienne", "BIRINDWA FLESI Etienne", "BIRINDWA FLESI Etienne"],
+        "list_name": "name",
+        "name": "etienne_ucb"
+      },
+      {
+        "label": ["BUNANI BIRERE Barthelemy", "BUNANI BIRERE Barthelemy", "BUNANI BIRERE Barthelemy"],
+        "list_name": "name",
+        "name": "barthelemy_ucb"
+      },
+      {
+        "label": ["BWAMUCHUMA BILINGI Théo", "BWAMUCHUMA BILINGI Théo", "BWAMUCHUMA BILINGI Théo"],
+        "list_name": "name",
+        "name": "theo_ucb"
+      },
+      {
+        "label": ["Charles Muderhwa", "Charles Muderhwa", "Charles Muderhwa"],
+        "list_name": "name",
+        "name": "charles_ucb"
+      },
+      {
+        "label": ["Cirhibuka Aimee", "Cirhibuka Aimee", "Cirhibuka Aimee"],
+        "list_name": "name",
+        "name": "aimee_ucb"
+      },
+      {
+        "label": ["EKA MUKANIRE Yvette", "EKA MUKANIRE Yvette", "EKA MUKANIRE Yvette"],
+        "list_name": "name",
+        "name": "yvette_ucb"
+      },
+      {
+        "label": ["Mubagwa Vianney", "Mubagwa Musaka Vianney", "Mubagwa Vianney"],
+        "list_name": "name",
+        "name": "vianney_ucb"
+      },
+      {
+        "label": ["NYUNDA NKURU Jules", "NYUNDA NKURU Jules", "NYUNDA NKURU Jules"],
+        "list_name": "name",
+        "name": "jules_ucb"
+      },
+      {
+        "label": ["RANGA CINYEMA Grace", "RANGA CINYEMA Gracia", "RANGA CINYEMA Grace"],
+        "list_name": "name",
+        "name": "grace_rc_ucb"
+      },
+      {
+        "label": ["RIZIKI MAKELELE Solange", "RIZIKI MAKELELE Solange", "RIZIKI MAKELELE Solange"],
+        "list_name": "name",
+        "name": "solange_mak_ucb"
+      },
+      {
+        "label": ["RIZIKI MONGANE Solange", "RIZIKI MONGANE Solange", "RIZIKI MONGANE Solange"],
+        "list_name": "name",
+        "name": "solange_mon_ucb"
+      },
+      {
+        "label": ["Arlette Syambite", "Arlette Syambite", "Arlette Syambite"],
+        "list_name": "name",
+        "name": "arlette_ulpgl"
+      },
+      {
+        "label": ["Amida SIFA Plaisir", "Amida SIFA Plaisir", "Amida SIFA Plaisir"],
+        "list_name": "name",
+        "name": "plaisir_ulpgl"
+      },
+      {
+        "label": ["Christian Mpabwa", "Christian Mpabwa", "Christian Mpabwa"],
+        "list_name": "name",
+        "name": "christian_Mp_ulpgl"
+      },
+      {
+        "label": ["Christian Mwenyemali Milenge", "Christian Mwenyemali Milenge", "Christian Mwenyemali Milenge"],
+        "list_name": "name",
+        "name": "christian_ulpgl"
+      },
+      {
+        "label": ["Daniel BUTOKI KIRINDERA", "Daniel BUTOKI KIRINDERA", "Daniel BUTOKI KIRINDERA"],
+        "list_name": "name",
+        "name": "daniel_ulpgl"
+      },
+      {
+        "label": ["Eloise Nkuo Clarisse", "Eloise Nkuo Clarisse", "Eloise Nkuo Clarisse"],
+        "list_name": "name",
+        "name": "eloise_ulpgl"
+      },
+      {
+        "label": ["Joelle MUGHUMALEWA", "Joelle MUGHUMALEWA", "Joelle MUGHUMALEWA"],
+        "list_name": "name",
+        "name": "joelle_ulpgl"
+      },
+      {
+        "label": ["Kavira Mwendevya Mamy", "Kavira Mwendevya Mamy", "Kavira Mwendevya Mamy"],
+        "list_name": "name",
+        "name": "mamy_ulpgl"
+      },
+      {
+        "label": ["Levi Bouesi", "Levi Bouesi", "Levi Bouesi"],
+        "list_name": "name",
+        "name": "levi_ulpgl"
+      },
+      {
+        "label": ["Mapenzi Kissa Lucie", "Mapenzi Kissa Lucie", "Mapenzi Kissa Lucie"],
+        "list_name": "name",
+        "name": "lucie_ulpgl"
+      },
+      {
+        "label": ["Muyisa Tasakana", "Muyisa Tasakana", "Muyisa Tasakana"],
+        "list_name": "name",
+        "name": "muyisa_ulpgl"
+      },
+      {
+        "label": ["Mwadjuma Lubuto Nadine", "Mwadjuma Lubuto Nadine", "Mwadjuma Lubuto Nadine"],
+        "list_name": "name",
+        "name": "nadine_ulpgl"
+      },
+      {
+        "label": ["Namegabe Kubaburhanzi Georges", "Namegabe Kubaburhanzi Georges", "Namegabe Kubaburhanzi Georges"],
+        "list_name": "name",
+        "name": "georges_ulpgl"
+      },
+      {
+        "label": ["Nathalie Bishikwabo", "Nathalie Bishikwabo", "Nathalie Bishikwabo"],
+        "list_name": "name",
+        "name": "nathalie_ulpgl"
+      },
+      {
+        "label": ["Nzigire Kalegamire Renilde", "Nzigire Kalegamire Renilde", "Nzigire Kalegamire Renilde"],
+        "list_name": "name",
+        "name": "renilde_ulpgl"
+      },
+      {
+        "label": ["Obed MBUSA MULEMBERI", "Obed MBUSA MULEMBERI", "Obed MBUSA MULEMBERI"],
+        "list_name": "name",
+        "name": "obed_ulpgl"
+      },
+      {
+        "label": ["Olivier Kisamba", "Olivier Kisamba", "Olivier Kisamba"],
+        "list_name": "name",
+        "name": "olivier_ulpgl"
+      },
+      {
+        "label": ["Pyame Mushagalusa Balemirwe", "Pyame Mushagalusa Balemirwe", "Pyame Mushagalusa Balemirwe"],
+        "list_name": "name",
+        "name": "pyame_ulpgl"
+      },
+      {
+        "label": ["Thomas Tcheshe", "Thomas Tcheshe", "Thomas Tcheshe"],
+        "list_name": "name",
+        "name": "thomas_ulpgl"
+      },
+      {
+        "label": ["Kasereka Muyisa Jean Chrysostome", "Kasereka Muyisa Jean Chrysostome", "Kasereka Muyisa Jean Chrysostome"],
+        "list_name": "name",
+        "name": "chrysostome_ulpgl"
+      },
+      {
+        "label": ["David Kubuya Baroki", "David Kubuya Baroki", "David Kubuya Baroki"],
+        "list_name": "name",
+        "name": "david_ulpgl"
+      },
+      {
+        "label": ["Kasoki Wasunduku Safi", "Kasoki Wasunduku Safi", "Kasoki Wasunduku Safi"],
+        "list_name": "name",
+        "name": "safi_ulpgl"
+      },
+      {
+        "label": ["KAVUGHO SIBANZIRE Donatiane", "KAVUGHO SIBANZIRE Donatiane", "KAVUGHO SIBANZIRE Donatiane"],
+        "list_name": "name",
+        "name": "donatiane_ulpgl"
+      },
+      {
+        "label": ["Kanuni Buroko", "Kanuni Buroko", "Kanuni Buroko"],
+        "list_name": "name",
+        "name": "buroko_ulpgl"
+      },
+      {
+        "label": ["Mutongerwa Venge Annie", "Mutongerwa Venge Annie", "Mutongerwa Venge Annie"],
+        "list_name": "name",
+        "name": "annie_ulpgl"
+      },
+      {
+        "label": ["Wema Lukoo Raphael", "Wema Lukoo Raphael", "Wema Lukoo Raphael"],
+        "list_name": "name",
+        "name": "raphael_ulpgl"
+      },
+      {
+        "label": [
+            "Televisheni",
+            "TV",
+            "Télévision"
+        ],
+        "list_name": "electronics",
+        "name": "tv"
+      },
+      {
+        "label": [
+            "Radi",
+            "Radio",
+            "Radio"
+        ],
+        "list_name": "electronics",
+        "name": "radio"
+      },
+      {
+        "label": [
+            "Kompyuta ya kompyuta",
+            "Laptop computer",
+            "Ordinateur portable"
+        ],
+        "list_name": "electronics",
+        "name": "laptop"
+      },
+      {
+        "label": [
+            "Toy ya elektroniki inayoonyesha picha ya kiumbe ya kiumbe wa digital, ambayo inapaswa kuzingatiwa na kuitibiwa na \"mmiliki \" kama ni pet",
+            "An electronic toy displaying a digital image of a creature, which has to be looked after and responded to by the \"owner\" as if it were a pet",
+            "Un jouet électronique affichant une image numérique d'une créature, qui doit être soigné et auquel le \"propriétaire\" répond comme s'il s'agissait d'un animal de compagnie"
+        ],
+        "list_name": "electronics",
+        "name": "tamagotchi"
+      }
+    ],
+    "translated": [
+      "label"
+    ],
+    "survey": [
+      {
+        "type": "start",
+        "name": "start"
+      },
+      {
+        "type": "end",
+        "name": "end"
+      },
+      {
+        "name": "What_is_your_age",
+        "required": false,
+        "label": [
+          "Je! Umri wako ni wapi?",
+          "What is your age?",
+          "Quel âge avez-vous?"
+        ],
+        "type": "integer"
+      },
+      {
+        "select_from_list_name": "name",
+        "name": "What_is_your_name",
+        "required": false,
+        "label": [
+          "Jina lako nani?",
+          "What is your name?",
+          "Comment vous appelez-vous?"
+        ],
+        "type": "select_one"
+      },
+      {
+        "type": "begin_group",
+        "name": "group_separationquestions",
+        "label": [
+          "kujitenga",
+          "separation",
+          "séparation"
+        ]
+      },
+      {
+        "select_from_list_name": "yesno",
+        "name": "q_2241",
+        "required": false,
+        "label": [
+          "Je! Familia yako inakosa mtoto aliyeachwa na wewe wakati wa kuondoka kwako?",
+          "Is your family missing a child that was separated from you during your displacement?",
+          "Votre famille manque-t-elle un enfant qui a été séparé de vous pendant votre déplacement?"
+        ],
+        "type": "select_one"
+      },
+      {
+        "select_from_list_name": "yesno",
+        "name": "q_2242",
+        "required": false,
+        "label": [
+          "Je! Familia yako inahudumia mtoto kutengwa na familia yake wakati wa kuondoka?",
+          "Is your family hosting a child separated from his/her family during displacement?",
+          "Votre famille héberge-t-elle un enfant séparé de sa famille pendant le déplacement?"
+        ],
+        "type": "select_one"
+      },
+      {
+        "relevant": "${q_2242} = '1'",
+        "name": "q_2243",
+        "required": false,
+        "label": [
+          "Je! Kujitenga kwao kulikuwaje?",
+          "How did their separation occur?",
+          "Comment s'est passée leur séparation?"
+        ],
+        "type": "text"
+      },
+      {
+        "type": "end_group"
+      },
+      {
+        "select_from_list_name": "yesno",
+        "name": "approval",
+        "label": [
+          "Jambo, jina langu ni ____niko hapa kuuliza habari kuhusu amani, sheria na ujenzi mupya mashariki ya jamuhuri ya kidemokratia ya kongo. Natumika pamoja na -------. Atuna ushirika na serkali yoyote. Tunaendesha maongezi kamili juu ya kusikia na kujuwa hali na yale yanaofaa kuhusu kongo la kidemokrasiya. Maongezi ambayo tunaendesha ni kwa siri na bila kuchukuwa majina yoyote. Tuko huru na hakuna mutu yeyote ambaye atatambulishwa mahali pa kutolea habari kuhusu maongezi haya. Akuna jibu nzuri na hakuna lililo mbaya. Tuna kusihi kushiriki kwa utashi wako maongezi haya. Unaweza kataa kushiriki na kwakuto jibiya kwako kwa ulizo lolote. Hakuna malipo yoyote kwa ajili yako alakini tunafikiri ya kwamba kushiriki kwako ita rahisisha babadiliko mzuri ya hali ya mashariki mwa kongo la kidemokrasiya. Matokeo ya tajulishwa nayatatolewa kwa watumishi mbalimbali katika mashariki mwa kongo. Maongezi kwa kuuliza yatakamata muda wa dakika makumi mbili. Je unakubali kushiriki utafiti huu ao una maulizo?",
+          "Hello, my name is ____ I am here as part of a study on security, protection and justice in Eastern Congo. I work with ----------. We are independent of any government, we conduct a series of interviews to better understand the context and priorities in eastern Congo. The information we collect here is confidential and anonymous. We are independent and no one will be identified in the discussion of results. There is no right or wrong answer. We ask you to participate voluntarily in this study. There are no direct benefits for you, but we think your participation will help improve the situation in the East. The results will be published and made available to actors in the East. The interview should last about 20 minutes. Do you agree to participate in this study?",
+          "Bonjour, mon nom est ____ je suis ici dans le cadre d'une étude sur la sécurité, la protection et la justice à l’Est du Congo. Je travaille avec ----------. Nous sommes indépendants de tout gouvernement, Nous conduisons une série d'entretiens pour mieux comprendre le contexte et les priorités à l’Est du Congo. Les informations que nous collectons ici sont confidentielles et anonymes. Nous sommes indépendants et aucune personne ne sera identifiée dans la discussion des résultats. Il n'y a pas de bonne ou de mauvaise réponse. Nous vous demandons de participer volontairement à cette étude. Il n’y a pas de bénéfices directs pour vous, mais nous pensons que votre participation permettra d’améliorer la situation dans l’Est. Les résultats seront publiés et mis à disposition des acteurs dans l’Est. L’interview devrait durer à peu près 20 minutes. Est-ce que vous acceptez de participer à cette étude ?"
+        ],
+        "type": "select_one"
+      },
+      {
+        "select_from_list_name": "electronics",
+        "name": "electronics_owned",
+        "label": [
+          "Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo?",
+          "Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own?",
+          "Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous?"
+        ],
+        "type": "select_multiple"
+      }
+    ],
+    "schema": "1"
+  }
+}
