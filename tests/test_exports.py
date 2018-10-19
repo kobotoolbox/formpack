@@ -470,7 +470,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -480,7 +479,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -490,7 +488,6 @@ class TestFormPackExport(unittest.TestCase):
                         2,
                         124,
                         '790af158-7b24-4651-b584-27bf65b9e397',
-                        '',
                         ''
                     ]
                 ]
@@ -515,7 +512,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -526,7 +522,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -537,7 +532,6 @@ class TestFormPackExport(unittest.TestCase):
                         2,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -548,7 +542,6 @@ class TestFormPackExport(unittest.TestCase):
                         3,
                         124,
                         '790af158-7b24-4651-b584-27bf65b9e397',
-                        '',
                         ''
                     ]
                 ]
@@ -569,7 +562,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -578,7 +570,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -587,7 +578,6 @@ class TestFormPackExport(unittest.TestCase):
                         1,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -596,7 +586,6 @@ class TestFormPackExport(unittest.TestCase):
                         2,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -605,7 +594,6 @@ class TestFormPackExport(unittest.TestCase):
                         3,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -614,7 +602,6 @@ class TestFormPackExport(unittest.TestCase):
                         3,
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        '',
                         ''
                     ],
                     [
@@ -623,7 +610,6 @@ class TestFormPackExport(unittest.TestCase):
                         4,
                         124,
                         '790af158-7b24-4651-b584-27bf65b9e397',
-                        '',
                         ''
                     ]
                 ]
