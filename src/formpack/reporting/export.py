@@ -186,8 +186,13 @@ class Export(object):
                 auto_field_names.append('_parent_index')
                 # Add extra fields
                 for copy_field in self.copy_fields:
-                    auto_field_names.append(
-                        "_submission_{}".format(copy_field))
+                    if isclass(copy_field):
+                        auto_field_names.append(
+                            "_submission_{}".format(copy_field.FIELD_NAME))
+                    else:
+                        auto_field_names.append(
+                            "_submission_{}".format(copy_field))
+
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can

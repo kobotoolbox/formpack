@@ -535,9 +535,11 @@ class CopyField(FormField):
 
 class ValidationStatusCopyField(CopyField):
 
+    FIELD_NAME = "_validation_status"  # will be used for label in exports
+
     def __init__(self, section=None, *args, **kwargs):
         super(ValidationStatusCopyField, self).__init__(
-            "_validation_status",
+            self.FIELD_NAME,
             section=section,
             *args, **kwargs)
 
