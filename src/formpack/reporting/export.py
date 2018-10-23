@@ -34,12 +34,15 @@ class Export(object):
 
         :param formpack: FormPack
         :param form_versions: OrderedDict
-        :param lang: string or False.
+        :param lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
+            None (`constants.UNTRANSLATED`).
         :param group_sep: bool.
         :param hierarchy_in_labels: bool.
         :param version_id_keys: list.
         :param multiple_select: string.
-        :param copy_fields: tuple. It can be a mixed of string or `schema.fields.*CopyFields` classes (e.g. `ValidationStatusCopyField)
+        :param copy_fields: tuple. It can be a mix of strings and
+            `schema.fields.*CopyFields` classes (e.g.
+            `ValidationStatusCopyField`)
         :param force_index: bool.
         :param title: string
         :param tag_cols_for_header: list
