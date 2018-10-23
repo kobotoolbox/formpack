@@ -2,7 +2,6 @@
 
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-
 import re
 
 from operator import itemgetter
@@ -23,7 +22,7 @@ except ImportError:
 import statistics
 
 from ..utils.xform_tools import normalize_data_type
-from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
+from ..constants import UNSPECIFIED_TRANSLATION
 from .datadef import FormDataDef, FormChoice
 
 
@@ -532,6 +531,33 @@ class CopyField(FormField):
     def get_labels(self, *args, **kwargs):
         """ Labels are the just the value name. Groups are ignored """
         return [self.name]
+
+
+class ValidationStatusCopyField(CopyField):
+
+    # `FIELD_NAME` specifies both the name of the field in the source data and
+    # the label that will be appended to `_submission` and used in exports. For
+    # example, `_validation_status` will export as a column whose header is
+    # `_submission_validation_status`
+    FIELD_NAME = "_validation_status"
+
+    def __init__(self, section=None, *args, **kwargs):
+        super(ValidationStatusCopyField, self).__init__(
+            self.FIELD_NAME,
+            section=section,
+            *args, **kwargs)
+
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
+
+        if isinstance(val, dict):
+            if lang == UNSPECIFIED_TRANSLATION:
+                value = {self.name: val.get("uid", "")}
+            else:
+                value = {self.name: val.get("label", "")}
+        else:
+            value = super(CopyField, self).format(val=val, lang=lang, context=context)
+
+        return value
 
 
 class FormGPSField(FormField):

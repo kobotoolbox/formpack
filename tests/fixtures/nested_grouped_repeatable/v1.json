@@ -104,6 +104,13 @@
     },
     "submissions": [
       {
+        "_validation_status": {
+          "by_whom": "user1",
+          "timestamp": 1531158682,
+          "uid": "validation_status_approved",
+          "color": "#00ff00",
+          "label":"Approved"
+        },
         "meta/instanceID": "uuid:f16d9a3f-0892-413e-81d4-758ab188ea0b",
         "end": "2017-12-27T15:58:20.000-05:00",
         "_submission_time": "2017-12-27T20:58:25",
@@ -165,6 +172,13 @@
         "formhub/uuid": "ddd2f25ff0f5464a9f91ad65130f1460"
       },
       {
+        "_validation_status": {
+          "by_whom": "user1",
+          "timestamp": 1531158682,
+          "uid": "validation_status_not_approved",
+          "color": "#00ff00",
+          "label":"Not approved"
+        },
         "meta/instanceID": "uuid:790af158-7b24-4651-b584-27bf65b9e397",
         "end": "2017-12-27T15:58:50.000-05:00",
         "_submission_time": "2017-12-27T20:58:55",

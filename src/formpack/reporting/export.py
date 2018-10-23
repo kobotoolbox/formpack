@@ -3,6 +3,7 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+from inspect import isclass
 
 try:
     from cyordereddict import OrderedDict
@@ -29,6 +30,23 @@ class Export(object):
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
                  title="submissions", tag_cols_for_header=None):
+        """
+
+        :param formpack: FormPack
+        :param form_versions: OrderedDict
+        :param lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
+            None (`constants.UNTRANSLATED`).
+        :param group_sep: bool.
+        :param hierarchy_in_labels: bool.
+        :param version_id_keys: list.
+        :param multiple_select: string.
+        :param copy_fields: tuple. It can be a mix of strings and
+            `schema.fields.*CopyFields` classes (e.g.
+            `ValidationStatusCopyField`)
+        :param force_index: bool.
+        :param title: string
+        :param tag_cols_for_header: list
+        """
 
         self.formpack = formpack
         self.lang = lang
@@ -45,14 +63,17 @@ class Export(object):
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
 
-        # If some fields need to be arbitrarly copied, add them
+        # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
             for version in iter(form_versions.values()):
                 first_section = next(iter(version.sections.values()))
-                for name in copy_fields:
-                    dumb_field = CopyField(name, section=first_section)
-                    first_section.fields[name] = dumb_field
+                for copy_field in copy_fields:
+                    if isclass(copy_field):
+                        dumb_field = copy_field(section=first_section)
+                    else:
+                        dumb_field = CopyField(copy_field, section=first_section)
+                    first_section.fields[dumb_field.name] = dumb_field
 
         # this deals with merging all form versions headers and labels
         params = (
@@ -170,8 +191,13 @@ class Export(object):
                 auto_field_names.append('_parent_index')
                 # Add extra fields
                 for copy_field in self.copy_fields:
-                    auto_field_names.append(
-                        "_submission_{}".format(copy_field))
+                    if isclass(copy_field):
+                        auto_field_names.append(
+                            "_submission_{}".format(copy_field.FIELD_NAME))
+                    else:
+                        auto_field_names.append(
+                            "_submission_{}".format(copy_field))
+
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -324,9 +350,14 @@ class Export(object):
                 extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
                 if extra_mapping_values:
                     for extra_mapping_field in self.copy_fields:
-                        row[
-                            u"_submission_{}".format(extra_mapping_field)
-                        ] = extra_mapping_values.get(extra_mapping_field, "")
+                        if isclass(extra_mapping_field):
+                            row[
+                                u"_submission_{}".format(extra_mapping_field.FIELD_NAME)
+                            ] = extra_mapping_values.get(extra_mapping_field, "")
+                        else:
+                            row[
+                                u"_submission_{}".format(extra_mapping_field)
+                            ] = extra_mapping_values.get(extra_mapping_field, "")
 
             rows.append(list(row.values()))
 
@@ -430,7 +461,6 @@ class Export(object):
         return table
 
     def to_xlsx(self, filename, submissions):
-
         workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
         workbook.use_zip64()
 

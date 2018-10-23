@@ -8,7 +8,10 @@ from __future__ import (unicode_literals, print_function,
 # represent the untranslated value.
 
 # These two constants can be set to different values but they must
-# not be equal
+# not be equal.
+# User-specified translations would always be a string,
+# thus should never the boolean `False`.
+# When formpack cannot find a label for the requested translation, it returns the XML name instead.
 UNSPECIFIED_TRANSLATION = False
 
 # This `UNTRANSLATED` will correspond to `null` in the schema where

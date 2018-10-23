@@ -3,21 +3,23 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+from collections import OrderedDict
 import json
-import xlrd
-import unittest
-
 from io import BytesIO
 from path import tempdir
 from textwrap import dedent
-from zipfile import ZipFile
-from nose.tools import raises
-from collections import OrderedDict
+import unittest
+import xlrd
 
-from formpack import FormPack
+from nose.tools import raises
+from zipfile import ZipFile
+
 from .fixtures import build_fixture, open_fixture_file
+from formpack import FormPack
 
 from formpack.constants import UNTRANSLATED
+from formpack.schema.fields import ValidationStatusCopyField
+
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')
@@ -422,7 +424,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         export_dict = fp.export(
             versions='bird_nests_v1',
-            copy_fields=('_id', '_uuid')
+            copy_fields=('_id', '_uuid', ValidationStatusCopyField)
         ).to_dict(submissions)
         expected_dict = OrderedDict([
             ('Bird nest survey with nested repeatable groups', {
@@ -431,6 +433,7 @@ class TestFormPackExport(unittest.TestCase):
                     'end',
                     '_id',
                     '_uuid',
+                    '_validation_status',
                     '_index'
                 ],
                 'data': [
@@ -439,6 +442,7 @@ class TestFormPackExport(unittest.TestCase):
                         '2017-12-27T15:58:20.000-05:00',
                         123,
                         'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        'validation_status_approved',
                         1
                     ],
                     [
@@ -446,6 +450,7 @@ class TestFormPackExport(unittest.TestCase):
                         '2017-12-27T15:58:50.000-05:00',
                         124,
                         '790af158-7b24-4651-b584-27bf65b9e397',
+                        'validation_status_not_approved',
                         2
                     ]
                 ]
@@ -457,7 +462,8 @@ class TestFormPackExport(unittest.TestCase):
                     '_parent_table_name',
                     '_parent_index',
                     '_submission__id',
-                    '_submission__uuid'
+                    '_submission__uuid',
+                    '_submission__validation_status'
                 ],
                 'data': [
                     [
@@ -466,7 +472,8 @@ class TestFormPackExport(unittest.TestCase):
                         'Bird nest survey with nested repeatable groups',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'spruce',
@@ -474,7 +481,8 @@ class TestFormPackExport(unittest.TestCase):
                         'Bird nest survey with nested repeatable groups',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'maple',
@@ -482,7 +490,8 @@ class TestFormPackExport(unittest.TestCase):
                         'Bird nest survey with nested repeatable groups',
                         2,
                         124,
-                        '790af158-7b24-4651-b584-27bf65b9e397'
+                        '790af158-7b24-4651-b584-27bf65b9e397',
+                        ''
                     ]
                 ]
             }),
@@ -494,7 +503,8 @@ class TestFormPackExport(unittest.TestCase):
                     '_parent_table_name',
                     '_parent_index',
                     '_submission__id',
-                    '_submission__uuid'
+                    '_submission__uuid',
+                    '_submission__validation_status'
                 ],
                 'data': [
                     [
@@ -504,7 +514,8 @@ class TestFormPackExport(unittest.TestCase):
                         'group_tree',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         '15',
@@ -513,7 +524,8 @@ class TestFormPackExport(unittest.TestCase):
                         'group_tree',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         '10',
@@ -522,7 +534,8 @@ class TestFormPackExport(unittest.TestCase):
                         'group_tree',
                         2,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         '23',
@@ -531,7 +544,8 @@ class TestFormPackExport(unittest.TestCase):
                         'group_tree',
                         3,
                         124,
-                        '790af158-7b24-4651-b584-27bf65b9e397'
+                        '790af158-7b24-4651-b584-27bf65b9e397',
+                        ''
                     ]
                 ]
             }),
@@ -541,7 +555,8 @@ class TestFormPackExport(unittest.TestCase):
                     '_parent_table_name',
                     '_parent_index',
                     '_submission__id',
-                    '_submission__uuid'
+                    '_submission__uuid',
+                    '_submission__validation_status'
                 ],
                 'data': [
                     [
@@ -549,53 +564,61 @@ class TestFormPackExport(unittest.TestCase):
                         'group_nest',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'brown and speckled; large; cracked',
                         'group_nest',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'light tan; small',
                         'group_nest',
                         1,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'cream-colored',
                         'group_nest',
                         2,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'reddish-brown; medium',
                         'group_nest',
                         3,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'reddish-brown; small',
                         'group_nest',
                         3,
                         123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b'
+                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                        ''
                     ],
                     [
                         'grey and speckled',
                         'group_nest',
                         4,
                         124,
-                        '790af158-7b24-4651-b584-27bf65b9e397'
+                        '790af158-7b24-4651-b584-27bf65b9e397',
+                        ''
                     ]
                 ]
             })
         ])
+
         self.assertEqual(export_dict, expected_dict)
 
     def test_nested_repeats(self):
@@ -1306,32 +1329,35 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = customer_satisfaction
 
         forms = FormPack(schemas, title)
-        export = forms.export(copy_fields=('_uuid', '_submission_time'))
+        export = forms.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField))
         exported = export.to_dict(submissions)
         expected = OrderedDict({
                     "Customer Satisfaction": {
                         'fields': ["restaurant_name", "customer_enjoyment",
-                                   "_uuid", "_submission_time"],
+                                   "_uuid", "_submission_time", "_validation_status"],
                         'data': [
                             [
                                 "Felipes",
                                 "yes",
                                 "90dd7750f83011e590707c7a9125d07d",
-                                "2016-04-01 19:57:45.306805"
+                                "2016-04-01 19:57:45.306805",
+                                "validation_status_approved"
                             ],
 
                             [
                                 "Dunkin Donuts",
                                 "no",
                                 "90dd7750f83011e590707c7a9125d08d",
-                                "2016-04-02 19:57:45.306805"
+                                "2016-04-02 19:57:45.306805",
+                                "validation_status_approved"
                             ],
 
                             [
                                 "McDonalds",
                                 "no",
                                 "90dd7750f83011e590707c7a9125d09d",
-                                "2016-04-03 19:57:45.306805"
+                                "2016-04-03 19:57:45.306805",
+                                "validation_status_approved"
                             ]
                         ]
                     }
@@ -1343,19 +1369,20 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = customer_satisfaction
 
         fp = FormPack(schemas, 'رضا العملاء')
-        export = fp.export(copy_fields=('_uuid', '_submission_time'),
+        export = fp.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField),
                               force_index=True)
         exported = export.to_dict(submissions)
         expected = OrderedDict({
                     "رضا العملاء": {
                         'fields': ["restaurant_name", "customer_enjoyment",
-                                   "_uuid", "_submission_time", "_index"],
+                                   "_uuid", "_submission_time", "_validation_status", "_index"],
                         'data': [
                             [
                                 "Felipes",
                                 "yes",
                                 "90dd7750f83011e590707c7a9125d07d",
                                 "2016-04-01 19:57:45.306805",
+                                "validation_status_approved",
                                 1
                             ],
 
@@ -1364,6 +1391,7 @@ class TestFormPackExport(unittest.TestCase):
                                 "no",
                                 "90dd7750f83011e590707c7a9125d08d",
                                 "2016-04-02 19:57:45.306805",
+                                "validation_status_approved",
                                 2
                             ],
 
@@ -1372,6 +1400,7 @@ class TestFormPackExport(unittest.TestCase):
                                 "no",
                                 "90dd7750f83011e590707c7a9125d09d",
                                 "2016-04-03 19:57:45.306805",
+                                "validation_status_approved",
                                 3
                             ]
                         ]
@@ -1644,12 +1673,13 @@ class TestFormPackExport(unittest.TestCase):
 
         fp = FormPack(schemas, title)
         export = fp.export(versions=fp.versions.keys(),
-                           copy_fields=('_id', '_uuid', '_submission_time')).to_dict(submissions)
-        headers = export['Site inspection']['fields'][-3:]
+                           copy_fields=('_id', '_uuid', '_submission_time', ValidationStatusCopyField)).to_dict(submissions)
+        headers = export['Site inspection']['fields'][-4:]
         self.assertListEqual(headers, [
             '_id',
             '_uuid',
             '_submission_time',
+            '_validation_status'
         ])
 
     def test_spss_labels(self):
