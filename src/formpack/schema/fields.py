@@ -536,9 +536,7 @@ class CopyField(FormField):
 class ValidationStatusCopyField(CopyField):
 
     # `FIELD_NAME` specifies both the name of the field in the source data and
-    # the label that will be appended to `_submission` and used in exports. For
-    # example, `_validation_status` will export as a column whose header is
-    # `_submission_validation_status`
+    # the label to be used for the field in exports
     FIELD_NAME = "_validation_status"
 
     def __init__(self, section=None, *args, **kwargs):
