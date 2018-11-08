@@ -224,3 +224,13 @@ def _flatten_survey_row(row):
                 row['type'] = '{} {} or_other'.format(_type, _list_name)
             else:
                 row['type'] = '{} {}'.format(_type, _list_name)
+
+    # TODO: remove this once https://github.com/XLSForm/pyxform/issues/236 is
+    # fixed?
+    try:
+        _order = row['order']
+    except KeyError:
+        pass
+    else:
+        if not isinstance(_order, basestring):
+            row['order'] = '{}'.format(_order)
