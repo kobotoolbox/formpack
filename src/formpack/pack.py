@@ -202,10 +202,40 @@ class FormPack(object):
             old_choice = old_field.choice
             new_choice = new_field.choice
         except AttributeError:
-            return
+            return new_field
         combined_options = old_choice.options.copy()
         combined_options.update(new_choice.options)
         new_choice.options = combined_options
+
+        # Copy value_names as well. Even if some options have been deleted,
+        # renamed, reordered, we need to export the corresponding data.
+        try:
+            old_value_names = old_field.value_names
+            new_value_names = new_field.value_names
+        except AttributeError:
+            return new_field
+
+        # We need to get the names' position of their label counterpart.
+        # New choices are always appended at the end in each new form version
+        combined_value_names = list(old_value_names)
+        for name in new_value_names:
+            if name not in old_value_names:
+                combined_value_names.append(name)
+        new_field.value_names = combined_value_names
+
+        # We need also to merge empty results because we've just merged options
+        # and value_names
+        try:
+            old_empty_results = old_field.empty_results
+            new_empty_results = new_field.empty_results
+        except AttributeError:
+            return new_field
+
+        combined_empty_results = old_empty_results.copy()
+        combined_empty_results.update(new_empty_results)
+        new_field.empty_results = combined_empty_results
+
+        return new_field
 
     def get_fields_for_versions(self, versions=-1, data_types=None):
 
@@ -274,7 +304,9 @@ class FormPack(object):
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
                             # in position as the latest one.
-                            self._combine_field_choices(field_object, latest_field_object)
+                            new_object = self._combine_field_choices(
+                                field_object, latest_field_object)
+                            tmp2d[position[0]][position[1]] = new_object
                         else:
                             try:
                                 current_index_list = tmp2d[index]
