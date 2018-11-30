@@ -23,7 +23,6 @@ from formpack.schema.fields import CopyField
 
 class FormPack(object):
 
-
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
@@ -193,47 +192,22 @@ class FormPack(object):
 
     @staticmethod
     def _combine_field_choices(old_field, new_field):
-        """ Update `new_field.choice` so that it contains everything from
-            `old_field.choice`. In the event of a conflict, `new_field.choice`
-            wins. If either field does not have a `choice` attribute, do
-            nothing
+        """
+        Update `new_field.choice` so that it contains everything from
+        `old_field.choice`. In the event of a conflict, `new_field.choice`
+        wins. If either field does not have a `choice` attribute, do
+        nothing
+
+        :param old_field: FormField
+        :param new_field: FormField
+        :return: FormField. Updated new_field
         """
         try:
             old_choice = old_field.choice
             new_choice = new_field.choice
+            new_field.merge_choice(old_choice)
         except AttributeError:
-            return new_field
-        combined_options = old_choice.options.copy()
-        combined_options.update(new_choice.options)
-        new_choice.options = combined_options
-
-        # Copy value_names as well. Even if some options have been deleted,
-        # renamed, reordered, we need to export the corresponding data.
-        try:
-            old_value_names = old_field.value_names
-            new_value_names = new_field.value_names
-        except AttributeError:
-            return new_field
-
-        # We need to get the names' position of their label counterpart.
-        # New choices are always appended at the end in each new form version
-        combined_value_names = list(old_value_names)
-        for name in new_value_names:
-            if name not in old_value_names:
-                combined_value_names.append(name)
-        new_field.value_names = combined_value_names
-
-        # We need also to merge empty results because we've just merged options
-        # and value_names
-        try:
-            old_empty_results = old_field.empty_results
-            new_empty_results = new_field.empty_results
-        except AttributeError:
-            return new_field
-
-        combined_empty_results = old_empty_results.copy()
-        combined_empty_results.update(new_empty_results)
-        new_field.empty_results = combined_empty_results
+            pass
 
         return new_field
 
