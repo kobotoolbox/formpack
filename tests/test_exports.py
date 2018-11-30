@@ -191,7 +191,6 @@ class TestFormPackExport(unittest.TestCase):
                                              '',
                                              'traditionnel']])
 
-
     def test_headers_of_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
@@ -1746,3 +1745,34 @@ class TestFormPackExport(unittest.TestCase):
             assert actual.read() == expected.read()
         zipped.close()
         raw_zip.close()
+
+    def test_select_multiple_with_different_options_in_multiple_versions(self):
+        title, schemas, submissions = build_fixture('favorite_coffee')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
+
+        headers = export['Favorite coffee']['fields']
+        self.assertListEqual(headers, [
+            'favorite_coffee_type',
+            'favorite_coffee_type/french',
+            'favorite_coffee_type/italian',
+            'favorite_coffee_type/american',
+            'favorite_coffee_type/british',
+            'brand_of_coffee_machine'
+        ])
+
+        # Check length of each row
+        for row in export['Favorite coffee']['data']:
+            self.assertEqual(len(headers), len(row))
+
+        # Ensure latest submissions is not shifted
+        self.assertListEqual(export['Favorite coffee']['data'][-1], [
+            'american british',
+            '0',
+            '0',
+            '1',
+            '1',
+            'Keurig'
+        ])
