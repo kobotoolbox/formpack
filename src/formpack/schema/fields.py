@@ -520,7 +520,6 @@ class NumField(FormField):
         except ValueError as e:
             # TODO Remove try/except when https://github.com/kobotoolbox/formpack/issues/151 is fixed
             logging.warning(str(e), exc_info=True)
-        yield None
 
 
 class CopyField(FormField):
