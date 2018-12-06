@@ -229,7 +229,6 @@ class FormPack(object):
             if isinstance(data_types, str_types):
                 data_types = [data_types]
 
-
         # tmp2 is a 2 dimensions list of `field`.
         # First dimension is the position of fields where they should be in the latest version
         # Second dimension is their position in the stack at the same position.
