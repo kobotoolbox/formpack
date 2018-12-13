@@ -12,14 +12,24 @@ class FormDataDef:
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
         self.unique_name = name
+        self.use_unique_name = False
         self.labels = labels or {}
         self.has_stats = has_stats
 
     def __repr__(self):
-        return "<%s name='%s'>" % (self.__class__.__name__, self.name)
+        return "<%s name='%s'>" % (
+            self.__class__.__name__,
+            self.contextual_name,
+        )
+
+    @property
+    def contextual_name(self):
+        if self.use_unique_name:
+            return self.unique_name
+        return self.name
 
     def get_value_names(self):
-        return [self.name]
+        return [self.contextual_name]
 
     @classmethod
     def from_json_definition(cls, definition, translations=None):
@@ -85,11 +95,14 @@ class FormSection(FormDataDef):
         )
 
     def get_label(self, lang=UNSPECIFIED_TRANSLATION):
-        return [self.labels.get(lang) or self.name]
+        return [self.labels.get(lang) or self.contextual_name]
 
     def __repr__(self):
         parent_name = getattr(self.parent, 'name', None)
-        return "<FormSection name='%s' parent='%s'>" % (self.name, parent_name)
+        return "<FormSection name='%s' parent='%s'>" % (
+            self.contextual_name,
+            parent_name,
+        )
 
 
 class FormChoice(FormDataDef):

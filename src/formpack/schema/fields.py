@@ -156,12 +156,12 @@ class FormField(FormDataDef):
             return group_sep.join(path)
 
         # even if `lang` can be None, we don't want the `label` to be None.
-        label = self.labels.get(lang, self.name)
+        label = self.labels.get(lang, self.contextual_name)
         # If `label` is None, no matches are found, so return `field` name.
-        return label or self.name
+        return label or self.contextual_name
 
     def __repr__(self):
-        args = (self.__class__.__name__, self.name, self.data_type)
+        args = (self.__class__.__name__, self.contextual_name, self.data_type)
         return "<%s name='%s' type='%s'>" % args
 
     @classmethod
@@ -299,7 +299,7 @@ class FormField(FormDataDef):
         if val is None:
             val = ''
 
-        return {self.name: val}
+        return {self.contextual_name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -525,7 +525,7 @@ class TextField(ExtendedFormField):
         if val is None:
             val = ''
 
-        return {self.name: val}
+        return {self.contextual_name: val}
 
 
 class QualField(TextField):
@@ -573,9 +573,9 @@ class QualNumField(QualField):
             val = ''
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
-        return {self.name: self.try_get_number(val)}
+        return {self.contextual_name: self.try_get_number(val)}
 
 
 class QualSelectMultipleField(QualField):
@@ -603,11 +603,11 @@ class QualSelectMultipleField(QualField):
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         names = []
         if multiple_select in ('both', 'summary'):
-            names.append(self.name)
+            names.append(self.contextual_name)
 
         if multiple_select in ('both', 'details'):
             for choice in self.choices:
-                names.append(self.name + '/' + choice['uuid'])
+                names.append(self.contextual_name + '/' + choice['uuid'])
 
         return names
 
@@ -643,7 +643,7 @@ class QualSelectMultipleField(QualField):
             self.get_value_names(multiple_select=multiple_select), _zero
         )
         if multiple_select in ('both', 'summary'):
-            _empty[self.name] = ''
+            _empty[self.contextual_name] = ''
         if not val or not isinstance(val, list):
             return _empty.copy()
 
@@ -659,12 +659,12 @@ class QualSelectMultipleField(QualField):
                             choice['labels']['_default']
                         res.append(label)
                         break
-            cells[self.name] = ' '.join(res)
+            cells[self.contextual_name] = ' '.join(res)
 
         if multiple_select in ('both', 'details'):
             for choice_val in val:
                 if choice_val in known_uuids:
-                    cells[self.name + '/' + choice_val] = _one
+                    cells[self.contextual_name + '/' + choice_val] = _one
 
         return cells
 
@@ -800,8 +800,8 @@ class MediaField(TextField):
 
     def get_value_names(self, include_media_url=False, *args, **kwargs):
         if include_media_url:
-            return [self.name, f'{self.name}_URL']
-        return [self.name]
+            return [self.contextual_name, f'{self.contextual_name}_URL']
+        return [self.contextual_name]
 
     def format(
         self,
@@ -817,12 +817,12 @@ class MediaField(TextField):
         is_deleted = attachment.get('is_deleted', False)
 
         result = {
-            self.name: val
+            self.contextual_name: val
         }
 
         if include_media_url:
             download_url = attachment.get('download_url', '')
-            result[f'{self.name}_URL'] = (
+            result[f'{self.contextual_name}_URL'] = (
                 download_url if not is_deleted else 'Deleted'
             )
         return result
@@ -886,7 +886,7 @@ class DateField(ExtendedFormField):
             val = ''
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
         _date = val
         try:
@@ -896,7 +896,7 @@ class DateField(ExtendedFormField):
         else:
             _date = _date.date()
 
-        return {self.name: _date}
+        return {self.contextual_name: _date}
 
 
 class DateTimeField(DateField):
@@ -905,7 +905,7 @@ class DateTimeField(DateField):
             val = ''
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
         _date = val
         try:
@@ -913,7 +913,7 @@ class DateTimeField(DateField):
         except ValueError:
             pass
 
-        return {self.name: _date}
+        return {self.contextual_name: _date}
 
 
 class NumField(FormField):
@@ -1010,9 +1010,9 @@ class NumField(FormField):
             val = ''
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
-        return {self.name: self.try_get_number(val)}
+        return {self.contextual_name: self.try_get_number(val)}
 
 
 class CopyField(FormField):
@@ -1037,7 +1037,7 @@ class CopyField(FormField):
         """
         Labels are the just the value name. Groups are ignored
         """
-        return [self.name]
+        return [self.contextual_name]
 
 
 class IdCopyField(CopyField):
@@ -1057,9 +1057,9 @@ class IdCopyField(CopyField):
             val = ''
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
-        return {self.name: int(val)}
+        return {self.contextual_name: int(val)}
 
 
 class SubmissionTimeCopyField(CopyField):
@@ -1079,7 +1079,7 @@ class SubmissionTimeCopyField(CopyField):
             val = ''
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
         _date = val
         try:
@@ -1087,7 +1087,7 @@ class SubmissionTimeCopyField(CopyField):
         except ValueError:
             pass
 
-        return {self.name: _date}
+        return {self.contextual_name: _date}
 
 
 class NotesCopyField(CopyField):
@@ -1106,7 +1106,7 @@ class NotesCopyField(CopyField):
         if not val:
             val = ''
 
-        return {self.name: str(val)}
+        return {self.contextual_name: str(val)}
 
 
 class TagsCopyField(CopyField):
@@ -1127,7 +1127,7 @@ class TagsCopyField(CopyField):
         else:
             val_ = ''
 
-        return {self.name: val_}
+        return {self.contextual_name: val_}
 
 
 class ValidationStatusCopyField(CopyField):
@@ -1145,9 +1145,9 @@ class ValidationStatusCopyField(CopyField):
 
         if isinstance(val, dict):
             if lang == UNSPECIFIED_TRANSLATION:
-                value = {self.name: val.get('uid', '')}
+                value = {self.contextual_name: val.get('uid', '')}
             else:
-                value = {self.name: val.get('label', '')}
+                value = {self.contextual_name: val.get('label', '')}
         else:
             value = super().format(val=val, lang=lang, context=context)
 
@@ -1214,10 +1214,10 @@ class FormGPSField(FormField):
         Return the list of field identifiers used by this field
         """
         names = []
-        names.append(self.name)
+        names.append(self.contextual_name)
 
         for data_type in ('latitude', 'longitude', 'altitude', 'precision'):
-            names.append('_%s_%s' % (self.name, data_type))
+            names.append('_%s_%s' % (self.contextual_name, data_type))
 
         return names
 
@@ -1314,9 +1314,9 @@ class FormChoiceField(ExtendedFormField):
         val = self.get_translation(val, lang)
 
         if xls_types_as_text:
-            return {self.name: val}
+            return {self.contextual_name: val}
 
-        return {self.name: self.try_get_number(val)}
+        return {self.contextual_name: self.try_get_number(val)}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -1432,18 +1432,18 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """
         names = []
         if multiple_select in ('both', 'summary'):
-            names.append(self.name)
+            names.append(self.contextual_name)
 
         if multiple_select in ('both', 'details'):
             for option_name in self.choice.options.keys():
-                names.append(self.name + '/' + option_name)
+                names.append(self.contextual_name + '/' + option_name)
             if self.or_other:
-                names.append(f'{self.name}/other')
+                names.append(f'{self.contextual_name}/other')
 
         return names
 
     def __repr__(self):
-        data = (self.name, self.data_type)
+        data = (self.contextual_name, self.data_type)
         return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
 
     # maybe try to cache those
@@ -1493,11 +1493,11 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 _res = self.try_get_number(res[0])
             else:
                 _res = ' '.join(res)
-            cells[self.name] = _res
+            cells[self.contextual_name] = _res
 
         if multiple_select in ('both', 'details'):
             for choice in val.split():
-                cells[self.name + '/' + choice] = _one
+                cells[self.contextual_name + '/' + choice] = _one
 
         return cells
 
@@ -1546,7 +1546,8 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
     def parameter_value_names(self):
         # Value names must be unique across the entire form!
         return [
-            self.name + '/' + name for name, label in self.parameters_in_use
+            self.contextual_name + '/' + name
+            for name, label in self.parameters_in_use
         ]
 
     def get_labels(
