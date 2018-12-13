@@ -722,12 +722,37 @@ class FormChoiceField(ExtendedFormField):
 
         return stats
 
+    def merge_choice(self, choice):
+        """
+        Update `new_field.choice` so that it contains everything from
+        `old_field.choice`. In the event of a conflict, `new_field.choice`
+        wins. If either field does not have a `choice` attribute, do
+        nothing
+
+        :param choice: formpack.schema.datadef.FormChoice
+        """
+        combined_options = choice.options.copy()
+        combined_options.update(self.choice.options)
+        self.choice.options = combined_options
+
+        self._empty_result()
+        self.value_names = self.get_value_names()
+
+    def _empty_result(self):
+        """
+        Nothing to do here
+        """
+        pass
+
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
 
     def __init__(self, *args, **kwargs):
         super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
+        self._empty_result()
+
+    def _empty_result(self):
         # reset empty result so it doesn't contain '0'
         self.empty_result = dict.fromkeys(self.empty_result, '')
 

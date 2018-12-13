@@ -23,7 +23,6 @@ from formpack.schema.fields import CopyField
 
 class FormPack(object):
 
-
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
@@ -193,19 +192,24 @@ class FormPack(object):
 
     @staticmethod
     def _combine_field_choices(old_field, new_field):
-        """ Update `new_field.choice` so that it contains everything from
-            `old_field.choice`. In the event of a conflict, `new_field.choice`
-            wins. If either field does not have a `choice` attribute, do
-            nothing
+        """
+        Update `new_field.choice` so that it contains everything from
+        `old_field.choice`. In the event of a conflict, `new_field.choice`
+        wins. If either field does not have a `choice` attribute, do
+        nothing
+
+        :param old_field: FormField
+        :param new_field: FormField
+        :return: FormField. Updated new_field
         """
         try:
             old_choice = old_field.choice
             new_choice = new_field.choice
+            new_field.merge_choice(old_choice)
         except AttributeError:
-            return
-        combined_options = old_choice.options.copy()
-        combined_options.update(new_choice.options)
-        new_choice.options = combined_options
+            pass
+
+        return new_field
 
     def get_fields_for_versions(self, versions=-1, data_types=None):
 
@@ -273,7 +277,9 @@ class FormPack(object):
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
                             # in position as the latest one.
-                            self._combine_field_choices(field_object, latest_field_object)
+                            new_object = self._combine_field_choices(
+                                field_object, latest_field_object)
+                            tmp2d[position[0]][position[1]] = new_object
                         else:
                             try:
                                 current_index_list = tmp2d[index]
