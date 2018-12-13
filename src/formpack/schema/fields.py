@@ -55,6 +55,19 @@ class FormField(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
+    def create_unique_name(self, suffix):
+        self.unique_name = "{signature}_{suffix}".format(
+            signature=self.signature,
+            suffix=suffix
+        )
+
+    @property
+    def signature(self):
+        return "{name}_{type}".format(
+            name=self.name,
+            type=self.data_type,
+        )
+
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                    hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.

@@ -23,6 +23,7 @@ class FormDataDef(object):
 
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
+        self.unique_name = name
         self.labels = labels or {}
         self.value_names = self.get_value_names()
         self.has_stats = has_stats
@@ -47,6 +48,9 @@ class FormDataDef(object):
         else:
             labels = {}
         return labels
+
+    def create_unique_name(self, suffix):
+        pass
 
 
 class FormGroup(FormDataDef):  # useful to get __repr__
