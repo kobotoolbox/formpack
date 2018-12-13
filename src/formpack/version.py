@@ -317,6 +317,7 @@ class FormVersion(BaseForm):
                 field_choices,
                 translations=self.translations,
             )
+            field.create_unique_name(self.id)
             section.fields[field.name] = field
 
             _f = fields_by_name[field.name]
