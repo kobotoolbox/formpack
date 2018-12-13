@@ -49,7 +49,7 @@ class AutoReport(object):
 
     def _calculate_stats(self, submissions, fields, versions, lang):
 
-        metrics = {field.name: Counter() for field in fields}
+        metrics = {field.contextual_name: Counter() for field in fields}
 
         submissions_count = 0
         submission_counts_by_version = Counter()
@@ -67,7 +67,7 @@ class AutoReport(object):
             entry = FormSubmission(entry).data
             for field in fields:
                 if field.has_stats:
-                    counter = metrics[field.name]
+                    counter = metrics[field.contextual_name]
                     raw_value = entry.get(field.path)
                     if raw_value is not None:
                         values = list(field.parse_values(raw_value))
@@ -80,7 +80,7 @@ class AutoReport(object):
             for field in fields:
                 yield (field,
                        field.get_labels(lang)[0],
-                       field.get_stats(metrics[field.name], lang=lang))
+                       field.get_stats(metrics[field.contextual_name], lang=lang))
 
         return AutoReportStats(self, stats_generator(), submissions_count,
                                submission_counts_by_version)
@@ -110,7 +110,7 @@ class AutoReport(object):
         #              field_name2...},
         #         ...}
         #
-        metrics = {f.name: defaultdict(Counter) for f in fields}
+        metrics = {f.contextual_name: defaultdict(Counter) for f in fields}
 
         for sbmssn in submissions:
 
@@ -142,7 +142,7 @@ class AutoReport(object):
                     else:
                         values = (None,)
 
-                    value_metrics = metrics[field.name]
+                    value_metrics = metrics[field.contextual_name]
 
                     for value in values:
                         counters = value_metrics[value]
@@ -177,7 +177,7 @@ class AutoReport(object):
 
         def stats_generator():
             for field in fields:
-                stats = field.get_disaggregated_stats(metrics[field.name], lang=lang,
+                stats = field.get_disaggregated_stats(metrics[field.contextual_name], lang=lang,
                                                       top_splitters=top_splitters)
                 yield (field, field.get_labels(lang)[0], stats)
 
@@ -194,11 +194,11 @@ class AutoReport(object):
             fields = all_fields
         else:
             fields.add(split_by)
-            fields = [field for field in all_fields if field.name in fields]
+            fields = [field for field in all_fields if field.contextual_name in fields]
 
         if split_by:
             try:
-                split_by_field = next(f for f in fields if f.name == split_by)
+                split_by_field = next(f for f in fields if f.contextual_name == split_by)
             except StopIteration:
                 raise ValueError('No field matching name "%s" '
                                  'for split_by' % split_by)
