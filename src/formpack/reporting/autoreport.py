@@ -88,10 +88,8 @@ class AutoReport(object):
                     )
 
                     if raw_value is not None:
-                        # Matches with question with same name but different type
-                        # takes place here.
                         # Reminder `field.contextual_name` equals `<name>_<type>_<version_uid>`,
-                        # If `field.contextual_name` matchs this pattern, it's only valid for submissions of
+                        # If `field.contextual_name` matches this pattern, it's only valid for submissions of
                         # the same `<version_uid>`.
                         # Thanks to `reversed_fields`, we compared those fields before the ones of the latest version
                         if field.contextual_name.startswith("{}_{}_v".format(
