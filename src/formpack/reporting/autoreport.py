@@ -54,6 +54,16 @@ class AutoReport(object):
         submissions_count = 0
         submission_counts_by_version = Counter()
 
+        # When form contains questions with the same name with different types,
+        # Older found versions are pushed at the end of the list `fields`
+        # Because we want to match submission values with fields, we need to try
+        # to match with older version first.
+        # For example: Form contains two versions with one question.
+        # `reversed_fields` look this:
+        # [<FormField type="text" contextual_name="question_text_v123456">,
+        #  <FormField type="integer" contextual_name="question">]
+        reversed_fields = list(reversed(fields))
+
         for entry in submissions:
 
             version_id = self._get_version_id_from_submission(entry)
@@ -62,14 +72,39 @@ class AutoReport(object):
 
             submissions_count += 1
             submission_counts_by_version[version_id] += 1
+            fields_to_skip = []
 
             # TODO: do we really need FormSubmission ?
             entry = FormSubmission(entry).data
-            for field in fields:
-                if field.has_stats:
+
+            for field in reversed_fields:
+                if field.has_stats and field.name not in fields_to_skip:
                     counter = metrics[field.contextual_name]
                     raw_value = entry.get(field.path)
+                    field_contextual_name = "{}_{}_{}".format(
+                        field.name,
+                        field.data_type,
+                        version_id
+                    )
+
                     if raw_value is not None:
+                        # Matches with question with same name but different type
+                        # takes place here.
+                        # Reminder `field.contextual_name` equals `<name>_<type>_<version_uid>`,
+                        # If `field.contextual_name` matchs this pattern, it's only valid for submissions of
+                        # the same `<version_uid>`.
+                        # Thanks to `reversed_fields`, we compared those fields before the ones of the latest version
+                        if field.contextual_name.startswith("{}_{}_v".format(
+                            field.name,
+                            field.data_type
+                        )):
+                            # We have a match, we won't evaluate other fields with same name
+                            # for this submission.
+                            if field.contextual_name == field_contextual_name:
+                                fields_to_skip.append(field.name)
+                            else:
+                                continue
+
                         values = list(field.parse_values(raw_value))
                         counter.update(values)
                         counter['__submissions__'] += 1

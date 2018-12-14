@@ -142,7 +142,7 @@ class FormField(FormDataDef):
 
     def __repr__(self):
         args = (self.__class__.__name__, self.contextual_name, self.data_type)
-        return "<%s name='%s' type='%s'>" % args
+        return "<%s contextual_name='%s' type='%s'>" % args
 
     @classmethod
     def from_json_definition(cls, definition, hierarchy=None,
@@ -801,7 +801,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
     def __repr__(self):
         data = (self.contextual_name, self.data_type)
-        return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
+        return "<FormChoiceFieldWithMultipleSelect contextual_name='%s' type='%s'>" % data
 
     # maybe try to cache those
     def format(self, val, lang=UNSPECIFIED_TRANSLATION,

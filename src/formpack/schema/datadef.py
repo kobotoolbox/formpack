@@ -97,7 +97,7 @@ class FormSection(FormDataDef):
 
     def __repr__(self):
         parent_name = getattr(self.parent, 'name', None)
-        return "<FormSection name='%s' parent='%s'>" % (self.contextual_name, parent_name)
+        return "<FormSection name='%s' parent='%s'>" % (self.name, parent_name)
 
 
 class FormChoice(FormDataDef):
