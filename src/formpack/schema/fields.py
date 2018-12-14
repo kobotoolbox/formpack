@@ -525,14 +525,10 @@ class NumField(FormField):
         return stats
 
     def parse_values(self, raw_values):
-        try:
-            if self.data_type == "integer":
-                yield int(raw_values)
-            else:
-                yield float(raw_values)
-        except ValueError as e:
-            # TODO Remove try/except when https://github.com/kobotoolbox/formpack/issues/151 is fixed
-            logging.warning(str(e), exc_info=True)
+        if self.data_type == "integer":
+            yield int(raw_values)
+        else:
+            yield float(raw_values)
 
 
 class CopyField(FormField):
