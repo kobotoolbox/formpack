@@ -25,7 +25,7 @@ class TestAutoReport(unittest.TestCase):
 
         fields = fp.get_fields_for_versions()
 
-        field_names = [field.name for field in fields]
+        field_names = [field.contextual_name for field in fields]
         assert field_names == ['restaurant_name', 'location', 'eatery_type']
 
         field_types = [field.__class__.__name__ for field in fields]
@@ -39,7 +39,7 @@ class TestAutoReport(unittest.TestCase):
         self.assertEqual(len(fp.versions), 5)
 
         fields = {
-            field.name: field for field in fp.get_fields_for_versions(
+            field.contextual_name: field for field in fp.get_fields_for_versions(
             fp.versions.keys())
         }
         field_names = sorted(fields.keys())
