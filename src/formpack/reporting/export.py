@@ -113,7 +113,6 @@ class Export(object):
             except KeyError:
                 pass
 
-
     def reset(self):
         """ Reset sections and indexes to initial values """
 
@@ -221,7 +220,6 @@ class Export(object):
                     [flatten_tag_list(field.tags, tag_cols_and_seps)] *
                         len(field.value_names)
                 )
-
 
             names = [name for name_list in name_lists for name in name_list]
 

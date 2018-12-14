@@ -1,0 +1,65 @@
+{
+  "id_string": "favorite_coffee",
+  "version": "fcv1",
+  "content": {
+    "choices": [
+      {
+        "name": "french",
+        "label": [
+          "French"
+        ],
+        "list_name": "al1hv46",
+        "order": 0
+      },
+      {
+        "name": "italian",
+        "label": [
+          "Italian"
+        ],
+        "list_name": "al1hv46",
+        "order": 1
+      },
+      {
+        "name": "american",
+        "label": [
+          "American"
+        ],
+        "list_name": "al1hv46",
+        "order": 2
+      }
+    ],
+    "survey": [
+      {
+        "select_from_list_name": "al1hv46",
+        "required": false,
+        "label": [
+          "Favorite coffee type"
+        ],
+        "name": "favorite_coffee_type",
+        "type": "select_multiple"
+      },
+      {
+        "required": false,
+        "type": "text",
+        "label": [
+          "Brand of coffee machine"
+        ],
+        "name": "brand_of_coffee_machine"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "brand_of_coffee_machine": "Breville",
+      "favorite_coffee_type": "french italian"
+    },
+    {
+      "brand_of_coffee_machine": "DeLonghi",
+      "favorite_coffee_type": "italian"
+    },
+    {
+      "brand_of_coffee_machine": "Nespresso",
+      "favorite_coffee_type": "american"
+    }
+  ]
+}
