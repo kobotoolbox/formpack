@@ -85,7 +85,7 @@ class TestAutoReport(unittest.TestCase):
 
         expected = [
             (
-                "<TextField name='restaurant_name' type='text'>",
+                "<TextField contextual_name='restaurant_name' type='text'>",
                 'nom du restaurant',
                 {
                     'frequency': [
@@ -107,7 +107,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<FormGPSField name='location' type='geopoint'>",
+                "<FormGPSField contextual_name='location' type='geopoint'>",
                 'lieu',
                 {
                     'not_provided': 0,
@@ -117,7 +117,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<FormChoiceFieldWithMultipleSelect name='eatery_type' type='select_multiple'>",
+                "<FormChoiceFieldWithMultipleSelect contextual_name='eatery_type' type='select_multiple'>",
                 'type de restaurant',
                 {
                     'frequency': [
@@ -155,7 +155,7 @@ class TestAutoReport(unittest.TestCase):
             stats,
             [
                 (
-                    "<TextField name='inspector' type='text'>",
+                    "<TextField contextual_name='inspector' type='text'>",
                     'inspector',
                     {
                         'frequency': [('burger', 5), ('clouseau', 5)],
@@ -167,7 +167,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
+                    "<FormChoiceField contextual_name='did_you_find_the_site' type='select_one'>",
                     'did_you_find_the_site',
                     {
                         'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
@@ -184,7 +184,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
+                    "<FormChoiceField contextual_name='was_there_damage_to_the_site' type='select_one'>",
                     'was_there_damage_to_the_site',
                     {
                         'frequency': [(0, 2), (1, 2), ('yes', 1)],
@@ -196,7 +196,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
+                    "<FormChoiceField contextual_name='was_there_damage_to_the_site_dupe' type='select_one'>",
                     'was_there_damage_to_the_site_dupe',
                     {
                         'frequency': [(1, 1), ('yes', 1)],
@@ -208,7 +208,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<NumField name='ping' type='integer'>",
+                    "<NumField contextual_name='ping' type='integer'>",
                     'ping',
                     {
                         'mean': 238.4,
@@ -222,7 +222,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<NumField name='rssi' type='integer'>",
+                    "<NumField contextual_name='rssi' type='integer'>",
                     'rssi',
                     {
                         'mean': 63.8,
@@ -236,7 +236,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
+                    "<FormChoiceField contextual_name='is_the_gate_secure' type='select_one'>",
                     'is_the_gate_secure',
                     {
                         'frequency': [(0, 2), (1, 2), ('no', 1)],
@@ -248,7 +248,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
+                    "<FormChoiceField contextual_name='is_plant_life_encroaching' type='select_one'>",
                     'is_plant_life_encroaching',
                     {
                         'frequency': [(0, 1), (1, 3), ('yes', 1)],
@@ -260,7 +260,7 @@ class TestAutoReport(unittest.TestCase):
                     },
                 ),
                 (
-                    "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
+                    "<FormChoiceField contextual_name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
                     'please_rate_the_impact_of_any_defects_observed',
                     {
                         'frequency': [
@@ -296,7 +296,7 @@ class TestAutoReport(unittest.TestCase):
 
         expected = [
             (
-                "<TextField name='restaurant_name' type='text'>",
+                "<TextField contextual_name='restaurant_name' type='text'>",
                 'restaurant_name',
                 {
                     'frequency': [
@@ -316,7 +316,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<FormGPSField name='location' type='geopoint'>",
+                "<FormGPSField contextual_name='location' type='geopoint'>",
                 'location',
                 {
                     'not_provided': 1,
@@ -326,7 +326,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<DateField name='when' type='date'>",
+                "<DateField contextual_name='when' type='date'>",
                 'when',
                 {
                     'frequency': [
@@ -346,7 +346,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<NumField name='howmany' type='integer'>",
+                "<NumField contextual_name='howmany' type='integer'>",
                 'howmany',
                 {
                     'mean': 1.6,
@@ -377,7 +377,7 @@ class TestAutoReport(unittest.TestCase):
 
         expected = [
             (
-                "<FormChoiceField name='fav_emperor' type='select_one'>",
+                "<FormChoiceField contextual_name='fav_emperor' type='select_one'>",
                 'fav_emperor',
                 {
                     'total_count': 3,
@@ -389,7 +389,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<TextField name='fav_emperor_other' type='text'>",
+                "<TextField contextual_name='fav_emperor_other' type='text'>",
                 'fav_emperor_other',
                 {
                     'total_count': 3,
@@ -401,7 +401,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<FormChoiceFieldWithMultipleSelect name='fav_emperors' type='select_multiple'>",
+                "<FormChoiceFieldWithMultipleSelect contextual_name='fav_emperors' type='select_multiple'>",
                 'fav_emperors',
                 {
                     'total_count': 3,
@@ -425,7 +425,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<TextField name='fav_emperors_other' type='text'>",
+                "<TextField contextual_name='fav_emperors_other' type='text'>",
                 'fav_emperors_other',
                 {
                     'total_count': 3,
@@ -455,7 +455,7 @@ class TestAutoReport(unittest.TestCase):
 
         expected = [
             (
-                "<TextField name='restaurant_name' type='text'>",
+                "<TextField contextual_name='restaurant_name' type='text'>",
                 'restaurant_name',
                 {
                     'not_provided': 1,
@@ -512,7 +512,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<FormGPSField name='location' type='geopoint'>",
+                "<FormGPSField contextual_name='location' type='geopoint'>",
                 'location',
                 {
                     'not_provided': 1,
@@ -522,7 +522,7 @@ class TestAutoReport(unittest.TestCase):
                 },
             ),
             (
-                "<NumField name='howmany' type='integer'>",
+                "<NumField contextual_name='howmany' type='integer'>",
                 'howmany',
                 {
                     'not_provided': 1,
@@ -631,7 +631,7 @@ class TestAutoReport(unittest.TestCase):
         stats = [(str(repr(f)), n, d) for f, n, d in stats]
         expected = [
             (
-                "<NumField name='the_number' type='integer'>",
+                "<NumField contextual_name='the_number' type='integer'>",
                 'the_number',
                 {
                     'mean': 20.0,
@@ -685,7 +685,7 @@ class TestAutoReport(unittest.TestCase):
         stats = [(str(repr(f)), n, d) for f, n, d in stats]
         expected = [
             (
-                "<NumField name='the_number' type='decimal'>",
+                "<NumField contextual_name='the_number' type='decimal'>",
                 'the_number',
                 {
                     'mean': 2.0,
