@@ -60,10 +60,27 @@ class FormField(FormDataDef):
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     def create_unique_name(self, suffix):
-        self.unique_name = f'{self.signature}_{suffix}'
+        self.unique_name = self.get_unique_name(suffix)
+
+    def get_unique_name(self, suffix):
+        """
+        Returns a unique name based on `self.signature` and `suffix`.
+
+        :param suffix: str
+        :return: str
+        """
+        return f'{self.signature}_{suffix}'
 
     @property
     def signature(self):
+        """
+        Returns a string signature based `self.name` and `self.data_type`.
+
+        Useful to compare two fields to each other to determine whether they
+        are the same. (same name, same type)
+
+        :return: str
+        """
         return f'{self.name}_{self.data_type}'
 
     def get_labels(
