@@ -29,7 +29,7 @@ class FormDataDef(object):
         self.has_stats = has_stats
 
     def __repr__(self):
-        return "<%s name='%s'>" % (self.__class__.__name__, self.contextual_name)
+        return "<%s contextual_name='%s'>" % (self.__class__.__name__, self.contextual_name)
 
     @property
     def contextual_name(self):
@@ -133,7 +133,6 @@ class FormChoice(FormDataDef):
             option['labels'] = OrderedDict(zip(translation_list, _label))
             option['name'] = choice_name
         return all_choices
-
 
     @property
     def translations(self):
