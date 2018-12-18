@@ -81,26 +81,24 @@ class AutoReport(object):
                 if field.has_stats and field.name not in fields_to_skip:
                     counter = metrics[field.contextual_name]
                     raw_value = entry.get(field.path)
-                    field_contextual_name = "{}_{}_{}".format(
-                        field.name,
-                        field.data_type,
-                        version_id
-                    )
 
                     if raw_value is not None:
-                        # Reminder `field.contextual_name` equals `<name>_<type>_<version_uid>`,
-                        # If `field.contextual_name` matches this pattern, it's only valid for submissions of
-                        # the same `<version_uid>`.
-                        # Thanks to `reversed_fields`, we compared those fields before the ones of the latest version
-                        if field.contextual_name.startswith("{}_{}_v".format(
-                            field.name,
-                            field.data_type
-                        )):
-                            # We have a match, we won't evaluate other fields with same name
-                            # for this submission.
-                            if field.contextual_name == field_contextual_name:
+                        # Because `field.path` is the same for all fields which
+                        # have the same name, we want to be sure we don't append
+                        # data multiple times.
+
+                        # If `field.use_unique_name` is `True`, `data` could be
+                        # mapped to it depending on entry's version ID.
+                        if field.use_unique_name:
+                            if field.contextual_name == field.get_unique_name(version_id):
+                                # We have a match. Skip other fields with the same name
+                                # for this submission
                                 fields_to_skip.append(field.name)
                             else:
+                                # If we reach this line, it's because user has changed
+                                # the type of question more than once and
+                                # version is not the correct one yet.
+                                # We need to keep looking for the good one.
                                 continue
 
                         values = list(field.parse_values(raw_value))

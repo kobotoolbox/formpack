@@ -56,13 +56,31 @@ class FormField(FormDataDef):
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     def create_unique_name(self, suffix):
-        self.unique_name = "{signature}_{suffix}".format(
+        self.unique_name = self.get_unique_name(suffix)
+
+    def get_unique_name(self, suffix):
+        """
+        Returns a unique name based on `self.signature` and `suffix`.
+
+        :param suffix: str
+        :return: str
+        """
+        return "{signature}_{suffix}".format(
             signature=self.signature,
             suffix=suffix
         )
 
     @property
     def signature(self):
+        """
+        Returns a string signature based `self.name` and `self.data_type`.
+
+        Useful to compare two fields to each other to determine whether they
+        are the same. (same name, same type)
+
+        :param suffix: str
+        :return: str
+        """
         return "{name}_{type}".format(
             name=self.name,
             type=self.data_type,
@@ -730,9 +748,7 @@ class FormChoiceField(ExtendedFormField):
         combined_options = choice.options.copy()
         combined_options.update(self.choice.options)
         self.choice.options = combined_options
-
         self._empty_result()
-        self.value_names = self.get_value_names()
 
     def _empty_result(self):
         """

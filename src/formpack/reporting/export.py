@@ -215,10 +215,9 @@ class Export(object):
 
                 # Add the tags for this field. If the field has multiple
                 # labels, add the tags once for each label
-                tags.extend(
-                    [flatten_tag_list(field.tags, tag_cols_and_seps)] *
+                tags_list = [flatten_tag_list(field.tags, tag_cols_and_seps)] * \
                     len(field.value_names)
-                )
+                tags.extend(tags_list)
 
             names = [name for name_list in name_lists for name in name_list]
 

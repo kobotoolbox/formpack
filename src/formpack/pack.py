@@ -203,9 +203,8 @@ class FormPack(object):
         """
 
         try:
-            if hasattr(current_field, "merge_choice"):
-                older_version_choice = older_version_field.choice
-                current_field.merge_choice(older_version_choice)
+            older_version_choice = older_version_field.choice
+            current_field.merge_choice(older_version_choice)
         except AttributeError:
             pass
 
