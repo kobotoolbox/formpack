@@ -17,7 +17,7 @@ class FormDataDef:
         self.has_stats = has_stats
 
     def __repr__(self):
-        return "<%s name='%s'>" % (
+        return "<%s contextual_name='%s'>" % (
             self.__class__.__name__,
             self.contextual_name,
         )
