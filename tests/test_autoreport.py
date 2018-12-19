@@ -40,7 +40,7 @@ class TestAutoReport(unittest.TestCase):
 
         fields = {
             field.contextual_name: field for field in fp.get_fields_for_versions(
-            fp.versions.keys())
+                fp.versions.keys())
         }
         field_names = sorted(fields.keys())
         self.assertListEqual(field_names, [
