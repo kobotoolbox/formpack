@@ -6,7 +6,6 @@ import re
 
 from operator import itemgetter
 from functools import partial
-import logging
 
 try:
     xrange = xrange
