@@ -128,6 +128,7 @@ class AutoReport(object):
         submission_counts_by_version = Counter()
 
         fields = [f for f in fields if f != split_by_field]
+        reversed_fields = list(reversed(fields))
 
         # Then we map fields, values and splitters:
         #          {field_name1: {
@@ -143,10 +144,10 @@ class AutoReport(object):
         #
         metrics = {f.contextual_name: defaultdict(Counter) for f in fields}
 
-        for sbmssn in submissions:
+        for submission in submissions:
 
             # Skip unrequested versions
-            version_id = self._get_version_id_from_submission(sbmssn)
+            version_id = self._get_version_id_from_submission(submission)
             if version_id not in versions:
                 continue
 
@@ -159,16 +160,35 @@ class AutoReport(object):
 
             # since we are going to pop one entry, we make a copy
             # of it to avoid side effect
-            entry = dict(FormSubmission(sbmssn).data)
+            entry = dict(FormSubmission(submission).data)
             splitter = entry.pop(split_by_field.path, None)
+            fields_to_skip = []
 
-            for field in fields:
+            for field in reversed_fields:
 
                 if field.has_stats:
 
                     raw_value = entry.get(field.path)
 
                     if raw_value is not None:
+                        # Because `field.path` is the same for all fields which
+                        # have the same name, we want to be sure we don't append
+                        # data multiple times.
+
+                        # If `field.use_unique_name` is `True`, `data` could be
+                        # mapped to it depending on entry's version ID.
+                        if field.use_unique_name:
+                            if field.contextual_name == field.get_unique_name(version_id):
+                                # We have a match. Skip other fields with the same name
+                                # for this submission
+                                fields_to_skip.append(field.name)
+                            else:
+                                # If we reach this line, it's because user has changed
+                                # the type of question more than once and
+                                # version is not the correct one yet.
+                                # We need to keep looking for the good one.
+                                continue
+
                         values = field.parse_values(raw_value)
                     else:
                         values = (None,)
