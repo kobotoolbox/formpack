@@ -224,8 +224,11 @@ class FormField(FormDataDef):
         not_provided = 0
         provided = 0
         for val, counter in metrics.items():
-            not_provided += counter.pop(None, 0)
-            provided += counter.pop('__submissions__', 0)
+            # `counter['__submissions__'] contains the count of all submissions,
+            # including those where no response was provided.
+            none_submissions = counter.pop(None, 0)
+            not_provided += none_submissions
+            provided += counter.pop('__submissions__', 0) - none_submissions
 
         return {
             'total_count': not_provided + provided,
