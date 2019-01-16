@@ -5,4 +5,4 @@ flake8==3.6.0
 pytest==4.1.1
 funcsigs==1.0.2
 pytest-cov==2.6.1
-python-coveralls==2.9.1
+coveralls==1.5.1
