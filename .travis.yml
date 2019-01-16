@@ -3,8 +3,12 @@ language: python
 python:
   - "2.7"
 install:
+  # Get rid of Travis' pytest 3.3.0, which somehow persists even though our
+  # requirements pin a newer version!
+  - "pip uninstall --yes pytest"
   - "python setup.py develop"
 script:
+  - "pip freeze"
   - "pytest tests --cov=src -vv"
 after_success:
   - coveralls
