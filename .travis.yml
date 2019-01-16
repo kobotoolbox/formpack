@@ -3,8 +3,6 @@ language: python
 python:
   - "2.7"
 install:
-  - "pip install funcsigs"
-  - "pip install pytest pytest-cov python-coveralls"
   - "python setup.py develop"
 script:
   - "py.test tests --cov=src -vv"
