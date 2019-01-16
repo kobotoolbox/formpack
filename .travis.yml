@@ -5,6 +5,6 @@ python:
 install:
   - "python setup.py develop"
 script:
-  - "py.test tests --cov=src -vv"
+  - "pytest tests --cov=src -vv"
 after_success:
   - coveralls
