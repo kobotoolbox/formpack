@@ -8,7 +8,6 @@ install:
   - "pip uninstall --yes pytest"
   - "python setup.py develop"
 script:
-  - "pip freeze"
   - "pytest tests --cov=src -vv"
 after_success:
   - coveralls
