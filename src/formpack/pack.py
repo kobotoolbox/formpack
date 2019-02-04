@@ -283,14 +283,35 @@ class FormPack:
         for version in versions_desc[1:]:
             index = 0
             for section_name, section in version.sections.items():
+                any_field_name_mangled = False
                 for field_name, field_object in section.fields.items():
                     section_field_name = f'{section_name}_{field_name}'
                     if not isinstance(field_object, CopyField):
-                        if section_field_name in positions:
+                        try:
                             position = positions[section_field_name]
+                        except KeyError:
+                            new_field = True
+                        else:
                             latest_field_object = tmp2d[position[0]][
                                 position[1]
                             ]
+                            if (
+                                field_object.data_type
+                                == latest_field_object.data_type
+                            ):
+                                new_field = False
+                            else:
+                                # Avoid name collisions between fields that
+                                # have different types
+                                new_field = True
+                                field_name = field_object.mangle_name(
+                                    version.id
+                                )
+                                section_field_name = (
+                                    f'{section_name}_{field_name}'
+                                )
+                                any_field_name_mangled = True
+                        if not new_field:
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
                             # in position as the latest one.
@@ -315,6 +336,9 @@ class FormPack:
                             )
 
                         index += 1
+
+                if any_field_name_mangled:
+                    section.update_field_names()
 
         all_fields = []
 
