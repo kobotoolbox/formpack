@@ -81,6 +81,13 @@ class FormSection(FormDataDef):
     def get_label(self, lang=UNSPECIFIED_TRANSLATION):
         return [self.labels.get(lang) or self.name]
 
+    def update_field_names(self):
+        """
+        Update the `fields` dictionary so that the keys are consistent with the
+        names assigned to the field instances
+        """
+        self.fields = OrderedDict([(f.name, f) for f in self.fields.values()])
+
     def __repr__(self):
         parent_name = getattr(self.parent, 'name', None)
         return "<FormSection name='%s' parent='%s'>" % (self.name, parent_name)

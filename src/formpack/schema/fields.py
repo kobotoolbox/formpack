@@ -54,6 +54,22 @@ class FormField(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
+    def mangle_name(self, version_id):
+        """ Appends `_{data_type}_{version_id}` to the `name` of this field
+            instance and resets `value_names` accordingly. Does *not* touch
+            `path`.
+
+            Returns the new `name`.
+        """
+        if getattr(self, '_mangled_name', False):
+            raise RuntimeError(
+                'FormField.mangle_name() should not be called more than once '
+                'per field instance'
+            )
+        self._mangled_name = True
+        self.name = '_'.join([self.name, self.data_type, version_id])
+        self.value_names = self.get_value_names()
+
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                    hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.

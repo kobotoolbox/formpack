@@ -54,6 +54,8 @@ class AutoReport(object):
         submissions_count = 0
         submission_counts_by_version = Counter()
 
+        fields_for_version_cache = {}
+
         for entry in submissions:
 
             version_id = self._get_version_id_from_submission(entry)
@@ -63,10 +65,22 @@ class AutoReport(object):
             submissions_count += 1
             submission_counts_by_version[version_id] += 1
 
+            # Since we know which version of the form was in effect when this
+            # `entry` was collected, get a list of the field names belonging to
+            # that version
+            try:
+                version_fields = fields_for_version_cache[version_id]
+            except KeyError:
+                version_fields = set()
+                for section in versions[version_id].sections.values():
+                    version_fields.update(section.fields.keys())
+                fields_for_version_cache[version_id] = version_fields
+
             # TODO: do we really need FormSubmission ?
             entry = FormSubmission(entry).data
             for field in fields:
-                if field.has_stats:
+                # Consider only fields that exist in this version
+                if field.has_stats and field.name in version_fields:
                     counter = metrics[field.name]
                     raw_value = entry.get(field.path)
                     if raw_value is not None:
