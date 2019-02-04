@@ -381,3 +381,51 @@ class TestAutoReport(unittest.TestCase):
                 frequency_responses = [x[0] for x in value_list.get("frequency")]
                 assert percentage_responses == frequency_responses
                 assert percentage_responses[-1] == "..."
+
+    def test_stats_with_non_numeric_value_for_numeric_field(self):
+        '''
+        A string response to an integer question, for example, should not cause
+        a crash; it should be treated as if no response was provided
+        '''
+
+        title = 'Just one number'
+        schemas = [{
+            'content': {
+                'survey': [
+                    {
+                        'type': 'integer',
+                        'name': 'the_number',
+                        'label': 'Enter the number!'
+                    }
+                ]
+            }
+        }]
+        submissions = [
+            {'the_number': 10},
+            {'the_number': 20},
+            {'the_number': 30},
+            {'the_number': 'oops!'},
+        ]
+        fp = FormPack(schemas, title)
+
+        report = fp.autoreport()
+        stats = report.get_stats(submissions)
+
+        assert stats.submissions_count == len(submissions)
+
+        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        expected = [(
+            "<NumField name='the_number' type='integer'>", 'the_number',
+            {
+                'mean': 20.0,
+                'median': 20,
+                'mode': u'*',
+                'not_provided': 1,
+                'provided': 3,
+                'show_graph': False,
+                'stdev': 10.0,
+                'total_count': 4
+            }
+        )]
+        for (i, stat) in enumerate(stats):
+            assert stat == expected[i]
