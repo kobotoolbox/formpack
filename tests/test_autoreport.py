@@ -381,3 +381,41 @@ class TestAutoReport(unittest.TestCase):
                 frequency_responses = [x[0] for x in value_list.get("frequency")]
                 assert percentage_responses == frequency_responses
                 assert percentage_responses[-1] == "..."
+
+    def test_disaggregate_without_answers(self):
+
+        title, schemas, submissions = build_fixture('auto_report_without_answers')
+        fp = FormPack(schemas, title)
+
+        report = fp.autoreport()
+        stats = report.get_stats(submissions, split_by="favorite_coffee")
+
+        stats = [(unicode(repr(field)), field_name, stats_dict) for field, field_name, stats_dict in stats]
+
+        # Do not display None value.
+        # https://github.com/kobotoolbox/formpack/blob/master/src/formpack/schema/fields.py#L308
+
+        expected = {
+            "latte": {
+                "percentage": [("keurig", 0.0), ("nespresso", 0.0), ("tim_hortons", 25.0)],
+                "frequency": [("keurig", 0), ("nespresso", 0), ("tim_hortons", 1)]
+            },
+            "espresso": {
+                "percentage": [("keurig", 0.0), ("nespresso", 25.0), ("tim_hortons", 0.0)],
+                "frequency": [("keurig", 0), ("nespresso", 1), ("tim_hortons", 0)]
+            },
+            "": {
+                "percentage": [("keurig", 25.0), ("nespresso", 0.0), ("tim_hortons", 0.0)],
+                "frequency": [("keurig", 1), ("nespresso", 0), ("tim_hortons", 0)]
+            }
+        }
+
+        for stat in stats:
+            stats_dict = dict(stat[2])
+            for value in stats_dict.get("values"):
+                value_list = value[1]
+                value_group = value[0]
+                if value_group in expected:
+                    assert value_list == expected.get(value_group)
+
+
