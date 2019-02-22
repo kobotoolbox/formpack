@@ -2,6 +2,7 @@
 
 from __future__ import (division, print_function, unicode_literals)
 
+import logging
 from collections import Counter, defaultdict
 
 from ..constants import UNSPECIFIED_TRANSLATION
@@ -70,9 +71,18 @@ class AutoReport(object):
                     counter = metrics[field.name]
                     raw_value = entry.get(field.path)
                     if raw_value is not None:
-                        values = list(field.parse_values(raw_value))
-                        counter.update(values)
-                        counter['__submissions__'] += 1
+                        try:
+                            values = list(field.parse_values(raw_value))
+                        except ValueError as e:
+                            # TODO: Remove try/except when
+                            # https://github.com/kobotoolbox/formpack/issues/151
+                            # is fixed?
+                            logging.warning(str(e), exc_info=True)
+                            # Treat the bad value as a blank response
+                            counter[None] += 1
+                        else:
+                            counter.update(values)
+                            counter['__submissions__'] += 1
                     else:
                         counter[None] += 1
 
