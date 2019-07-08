@@ -102,9 +102,15 @@ class AutoReport(object):
                                 # We need to keep looking for the good one.
                                 continue
 
-                        values = list(field.parse_values(raw_value))
-                        counter.update(values)
-                        counter['__submissions__'] += 1
+                        try:
+                            values = list(field.parse_values(raw_value))
+                        except ValueError as e:
+                            logging.warning(str(e), exc_info=True)
+                            # Treat the bad value as a blank response
+                            counter[None] += 1
+                        else:
+                            counter.update(values)
+                            counter['__submissions__'] += 1
                     else:
                         counter[None] += 1
 

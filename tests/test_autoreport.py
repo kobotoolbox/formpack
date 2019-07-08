@@ -382,10 +382,10 @@ class TestAutoReport(unittest.TestCase):
                 assert percentage_responses[-1] == "..."
 
     def test_stats_with_non_numeric_value_for_numeric_field(self):
-        '''
+        """
         A string response to an integer question, for example, should not cause
         a crash; it should be treated as if no response was provided
-        '''
+        """
 
         title = 'Just one number'
         schemas = [{
@@ -414,7 +414,7 @@ class TestAutoReport(unittest.TestCase):
 
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
         expected = [(
-            "<NumField name='the_number' type='integer'>", 'the_number',
+            "<NumField contextual_name='the_number' type='integer'>", 'the_number',
             {
                 'mean': 20.0,
                 'median': 20,
