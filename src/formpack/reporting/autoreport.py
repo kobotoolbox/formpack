@@ -2,6 +2,7 @@
 
 from __future__ import (division, print_function, unicode_literals)
 
+import logging
 from collections import Counter, defaultdict
 
 from ..constants import UNSPECIFIED_TRANSLATION

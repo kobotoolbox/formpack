@@ -1107,6 +1107,43 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertTextEqual(csv_data, expected)
 
+    def test_csv_quote_escaping(self):
+        title, schemas, submissions = build_fixture(
+            'quotes_newlines_and_long_urls')
+        fp = FormPack(schemas, title)
+        lss = list(submissions)
+        csv_lines = list(fp.export().to_csv(submissions))
+        expected_lines = []
+        expected_lines.append(
+            '"Enter_some_long_text_and_linebreaks_here";'
+            '"Some_other_question"'
+        )
+        expected_lines.append(
+            '"Check out this URL I found:\nhttps://now.read.this/?Never%20forg'
+            'et%20that%20you%20are%20one%20of%20a%20kind.%20Never%20forget%20t'
+            'hat%20if%20there%20weren%27t%20any%20need%20for%20you%20in%20all%'
+            '20your%20uniqueness%20to%20be%20on%20this%20earth%2C%20you%20woul'
+            'dn%27t%20be%20here%20in%20the%20first%20place.%20And%20never%20fo'
+            'rget%2C%20no%20matter%20how%20overwhelming%20life%27s%20challenge'
+            's%20and%20problems%20seem%20to%20be%2C%20that%20one%20person%20ca'
+            'n%20make%20a%20difference%20in%20the%20world.%20In%20fact%2C%20it'
+            '%20is%20always%20because%20of%20one%20person%20that%20all%20the%2'
+            '0changes%20that%20matter%20in%20the%20world%20come%20about.%20So%'
+            '20be%20that%20one%20person.";"yes"'
+        )
+        expected_lines.append(
+            '"Hi, my name is Roger.""\n\nI like to enter quotes randomly and '
+            'follow them with new lines.";"yes"'
+        )
+        expected_lines.append('"This one has no linebreaks";"no"')
+        expected_lines.append('"This\nis\nnot\na Haiku";"yes"')
+        expected_lines.append(
+            '"""Hands up!"" He yelled.\nWhy?""\n'
+            '''She couldn't understand anything.";"yes"'''
+        )
+
+        self.assertListEqual(csv_lines, expected_lines)
+
     def test_csv_with_tag_headers(self):
         title, schemas, submissions = build_fixture('dietary_needs')
         fp = FormPack(schemas, title)

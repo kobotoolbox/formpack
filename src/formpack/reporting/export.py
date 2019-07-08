@@ -426,8 +426,22 @@ class Export(object):
         # if len(sections) > 1:
         #     raise RuntimeError("CSV export does not support repeatable groups")
 
+        def escape_quote(value, quote):
+            '''
+                According to https://www.ietf.org/rfc/rfc4180.txt,
+
+                    If double-quotes are used to enclose fields, then a
+                    double-quote appearing inside a field must be escaped by
+                    preceding it with another double quote.
+
+                We will follow this convention by doubling `quote` wherever it
+                appears in `value`, regardless of what `quote` is. Perhaps this
+                is not the best idea.
+            '''
+            return value.replace(quote, quote * 2)
+
         def format_line(line, sep, quote):
-            line = [unicode(x) for x in line]
+            line = [escape_quote(unicode(x), quote) for x in line]
             return quote + (quote + sep + quote).join(line) + quote
 
         section, labels = sections[0]
