@@ -1,0 +1,44 @@
+{
+  "id_string": "all_geo_types",
+  "version": "all_geo_types_v2",
+  "version_id_key": "__version__",
+  "content": {
+    "survey": [
+      {"name": "start", "type": "start"},
+      {"name": "end", "type": "end"},
+      {
+        "label": ["Just a regular text question"],
+        "name": "Just_a_regular_text_question",
+        "type": "text"
+      },
+      {"label": ["Geo Group"], "name": "geo_group", "type": "begin_group"},
+      {"label": ["Point"], "name": "Point", "type": "geopoint"},
+      {"label": ["Trace"], "name": "Trace", "type": "geotrace"},
+      {"label": ["Shape"], "name": "Shape", "type": "geoshape"},
+      {"type": "end_group"},
+      {"label": ["Outer Point"], "name": "Outer_Point", "type": "geopoint"}
+    ]
+  },
+  "submissions": [
+    {
+      "Just_a_regular_text_question": "Chacabuco",
+      "Outer_Point": "-34.619206 -58.355287 0 0",
+      "__version__": "vFWey6XYVSqKz3dxmxudKb",
+      "_geolocation": [
+        -34.631098,
+        -58.442238
+      ],
+      "_id": 14221037,
+      "_status": "submitted_via_web",
+      "_submission_time": "2019-07-19T23:03:12",
+      "_submitted_by": null,
+      "_uuid": "4a5ad9e6-87e3-4d03-bc0c-9e4b42b84eca",
+      "end": "2019-07-19T19:03:07.602-04:00",
+      "geo_group/Point": "-34.631098 -58.442238 0 0",
+      "geo_group/Shape": "-34.6347 -58.447229 0 0;-34.636607 -58.445613 0 0;-34.635194 -58.438946 0 0;-34.631063 -58.442056 0 0;-34.6347 -58.447229 0 0",
+      "geo_group/Trace": "-34.631089 -58.44218 0 0;-34.635079 -58.439112 0 0;-34.636562 -58.445635 0 0;-34.634929 -58.44713 0 0",
+      "meta/instanceID": "uuid:4a5ad9e6-87e3-4d03-bc0c-9e4b42b84eca",
+      "start": "2019-07-19T18:49:05.982-04:00"
+    }
+  ]
+}
