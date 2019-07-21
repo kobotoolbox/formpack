@@ -3,19 +3,13 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-'''
+"""
 all geo types:
 
-includes a `geopoint`, `geotrace`, and `geoshape`, outside and inside of a
-group. includes a second version where additional geo- questions are added.
-
- * v1: S
- * v2:  T
- * v3:   U
- * v4:    F
- * v5:     F
-
-'''
+ * v1: includes a `geopoint`, `geotrace`, and `geoshape`, as well as a `text`
+ * v2: moves the `geopoint`, `geotrace`, and `geoshape` into a group and adds a
+       new `geopoint` outside the group
+"""
 
 from ..load_fixture_json import load_fixture_json
 

@@ -494,8 +494,8 @@ class Export(object):
         """
         Returns a GeoJSON `FeatureCollection` as a string, where each
         submission is a `Feature` with `geometry` taken from the response to
-        the question identified by `geo_question_name`. Each question/response
-        pair is included in the `properties` of each `Feature`. As with
+        the question identified by `geo_question_name`. All question/response
+        pairs are included in the `properties` of each `Feature`. As with
         `to_csv()`, repeating groups are not included.
 
         Example:
@@ -505,7 +505,7 @@ class Export(object):
               "features": [
                 {
                   "geometry": {
-                    "coordinates": [latitude, longitude, accuracy],
+                    "coordinates": [longitude, latitude, accuracy],
                     "type": "Point"
                   },
                   "properties": {
