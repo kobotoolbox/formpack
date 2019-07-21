@@ -3,9 +3,8 @@ language: python
 python:
   - "2.7"
 install:
-  # Get rid of Travis' pytest 3.3.0, which somehow persists even though our
-  # requirements pin a newer version!
-  - "pip uninstall --yes pytest"
+  - "virtualenv e"
+  - "source e/bin/activate"
   - "pip install -r dev-requirements.txt"
 script:
   - "pytest tests --cov=src -vv"
