@@ -9,36 +9,23 @@ import sys
 from setuptools import setup, find_packages
 
 
-def get_requirements(path):
-
-    setuppy_format = \
-        'https://github.com/{user}/{repo}/tarball/master#egg={egg}'
-
-    setuppy_pattern = \
-        r'github.com/(?P<user>[^/.]+)/(?P<repo>[^.]+).git#egg=(?P<egg>.+)'
-
-    dep_links = []
-    install_requires = []
-    with open(path) as f:
-        for line in f:
-
-            if line.startswith('-e'):
-                url_infos = re.search(setuppy_pattern, line).groupdict()
-                dep_links.append(setuppy_format.format(**url_infos))
-                egg_name = '=='.join(url_infos['egg'].rsplit('-', 1))
-                install_requires.append(egg_name)
-            else:
-                install_requires.append(line.strip())
-
-    return install_requires, dep_links
-
-
-requirements, dep_links = get_requirements('requirements.txt')
-dev_requirements, dev_dep_links = get_requirements('dev-requirements.txt')
-
-if 'develop' in sys.argv:
-    requirements += dev_requirements
-    dep_links += dev_dep_links
+requirements = [
+    'begins',
+    'cyordereddict',
+    'jsonschema',
+    'lxml',
+    'path.py<12', # Pinned for Python 2 compatibility
+    'pyquery',
+    'pyxform',
+    'statistics',
+    'XlsxWriter',
+]
+dep_links = [
+    # "Be careful with the version" part of `#egg=project-version`, according to
+    # https://setuptools.readthedocs.io/en/latest/setuptools.html#dependencies-that-aren-t-in-pypi.
+    # "It should match the one inside the project files," i.e. the `version`
+    # argument to `setup()` in `setup.py`. It should also adhere to PEP 440.
+]
 
 setup(name='formpack',
       version='1.4',
@@ -49,6 +36,7 @@ setup(name='formpack',
       packages=[str(pkg) for pkg in find_packages('src')],
       package_dir={'': b'src'},
       install_requires=requirements,
+      dependency_links=dep_links,
       include_package_data=True,
       zip_safe=False,
       )
