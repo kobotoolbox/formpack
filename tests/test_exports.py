@@ -3,23 +3,20 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from collections import OrderedDict
 import json
-from io import BytesIO
-from path import tempdir
-from textwrap import dedent
 import unittest
-import xlrd
-
-from nose.tools import raises
+from collections import OrderedDict
+from io import BytesIO
+from textwrap import dedent
 from zipfile import ZipFile
 
-from .fixtures import build_fixture, open_fixture_file
-from formpack import FormPack
+import xlrd
+from path import tempdir
 
+from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.schema.fields import ValidationStatusCopyField
-
+from .fixtures import build_fixture, open_fixture_file
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')

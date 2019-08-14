@@ -1,10 +1,9 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import json
 import difflib
+import json
 from copy import deepcopy
 
 try:
@@ -13,7 +12,7 @@ except ImportError:
     from collections import OrderedDict
 
 from .version import FormVersion
-from .utils import get_version_identifiers, str_types
+from .utils import str_types
 from .reporting import Export, AutoReport
 from .utils.expand_content import expand_content
 from .utils.replace_aliases import replace_aliases
@@ -342,8 +341,9 @@ class FormPack(object):
                versions=-1, multiple_select="both",
                force_index=False, copy_fields=(), title=None,
                tag_cols_for_header=None):
-        '''Create an export for a given versions of the form'''
-
+        """
+        Create an export for a given versions of the form
+        """
         versions = self._get_versions(versions)
         title = title or self.title
         return Export(self, versions, lang=lang, group_sep=group_sep,
@@ -354,7 +354,9 @@ class FormPack(object):
                       tag_cols_for_header=tag_cols_for_header)
 
     def autoreport(self, versions=-1):
-        '''Create an automatic report for a given versions of the form'''
+        """
+        Create an automatic report for a given versions of the form
+        """
         return AutoReport(self, self._get_versions(versions))
 
     def _get_versions(self, versions):

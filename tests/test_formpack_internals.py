@@ -10,9 +10,9 @@ from .fixtures import build_fixture
 
 
 def test_fixture_has_translations():
-    '''
+    """
     restauraunt_profile@v2 has two translations
-    '''
+    """
 
     title, schemas, submissions = build_fixture('restaurant_profile')
     fp = FormPack(schemas, title)
@@ -29,9 +29,9 @@ def test_to_dict():
 
 
 def test_to_xml():
-    '''
+    """
     at the very least, version.to_xml() does not fail
-    '''
+    """
     title, schemas, submissions = build_fixture('restaurant_profile')
     fp = FormPack(schemas, title)
     for version in fp.versions.keys():
@@ -56,6 +56,7 @@ def test_to_xml_fails_when_null_labels():
                    'translated': ['label'],
                    }}, id_string='sdf')
     fp[0].to_xml()
+
 
 def test_null_untranslated_labels():
     content = json.loads('''
@@ -142,11 +143,12 @@ def test_null_untranslated_labels():
     question_names = field.get_labels(constants.UNSPECIFIED_TRANSLATION)
     assert untranslated_labels == question_names
 
+
 def test_get_fields_for_versions_returns_unique_fields():
-    '''
+    """
     As described in #127, `get_field_for_versions()` would return identical
     fields multiple times. This is was a failing test to reproduce that issue
-    '''
+    """
     fp = FormPack(
         [{'content': {u'survey': [{u'name': u'hey', u'type': u'image'},
                                   {u'name': u'two', u'type': u'image'}]},

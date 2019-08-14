@@ -1,14 +1,6 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-
-import re
-
-try:
-    xrange = xrange
-except NameError:  # python 3
-    xrange = range
 
 try:
     from cyordereddict import OrderedDict

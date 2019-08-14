@@ -1,13 +1,12 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-
-import re
-import unicodedata
-import string
 import random
+import re
+import string
+import unicodedata
+
 from ..constants import (
     EXCEL_SHEET_NAME_SIZE_LIMIT, EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
 )
@@ -27,7 +26,7 @@ def randstr(n):
 
 
 # TODO: use a lib for that such as minibelt or ww
-def normalize(string):
+def normalize(str_):
     r"""
         Returns a new string withou non ASCII characters, trying to replace
         them with their ASCII closest counter parts when possible.
@@ -37,11 +36,11 @@ def normalize(string):
         This version use unicodedata and provide limited yet
         useful results.
     """
-    string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
-    return string.decode('ascii')
+    str_ = unicodedata.normalize('NFKD', str_).encode('ascii', 'ignore')
+    return str_.decode('ascii')
 
 
-def slugify(string, separator=r'-'):
+def slugify(str_, separator=r'-'):
     r"""
     Slugify a unicode string using unicodedata to normalize the string.
     :Example:
@@ -53,10 +52,10 @@ def slugify(string, separator=r'-'):
         'stuff-with-dashes-and-spaces'
     """
 
-    string = normalize(string)
-    string = re.sub(r'[^\w\s' + separator + ']', '', string, flags=re.U)
-    string = string.strip().lower()
-    return re.sub(r'[' + separator + '\s]+', separator, string, flags=re.U)
+    str_ = normalize(str_)
+    str_ = re.sub(r'[^\w\s' + separator + ']', '', str_, flags=re.U)
+    str_ = str_.strip().lower()
+    return re.sub(r'[' + separator + '\s]+', separator, str_, flags=re.U)
 
 
 def ellipsize(s, max_len, ellipsis='...'):

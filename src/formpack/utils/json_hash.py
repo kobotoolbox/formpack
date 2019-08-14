@@ -1,5 +1,8 @@
-import json
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import hashlib
+import json
 
 
 def json_hash(obj, size=8):

@@ -1,18 +1,16 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-import re
 
-from operator import itemgetter
 from functools import partial
+from operator import itemgetter
 
 try:
     xrange = xrange
 except NameError:  # python 3
     xrange = range
 
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 try:
     from cyordereddict import OrderedDict
@@ -21,7 +19,6 @@ except ImportError:
 
 import statistics
 
-from ..utils.xform_tools import normalize_data_type
 from ..constants import UNSPECIFIED_TRANSLATION
 from .datadef import FormDataDef, FormChoice
 

@@ -5,7 +5,7 @@
 # any forked packages here first.
 
 # Install this package
--e .
+# -e .
 
 # Install testing / development requirements
 coverage==4.5.2

@@ -1,9 +1,8 @@
 # coding: utf-8
-
 from __future__ import (division, print_function, unicode_literals)
 
-import unittest
 import json
+import unittest
 
 from formpack import FormPack
 from .fixtures import build_fixture

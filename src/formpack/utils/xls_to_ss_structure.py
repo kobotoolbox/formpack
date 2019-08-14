@@ -1,14 +1,13 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 from collections import OrderedDict
 
-import pyxform
 import xlrd
 import re
 import datetime
+
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
@@ -29,16 +28,16 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
         if value_type == xlrd.XL_CELL_BOOLEAN:
             return u"TRUE" if value else u"FALSE"
         elif value_type == xlrd.XL_CELL_NUMBER:
-            #Try to display as an int if possible.
+            # Try to display as an int if possible.
             int_value = int(value)
             if int_value == value:
                 return unicode(int_value)
             else:
                 return unicode(value)
         elif value_type is xlrd.XL_CELL_DATE:
-            #Warn that it is better to single quote as a string.
-            #error_location = cellFormatString % (ss_row_idx, ss_col_idx)
-            #raise Exception(
+            # Warn that it is better to single quote as a string.
+            # error_location = cellFormatString % (ss_row_idx, ss_col_idx)
+            # raise Exception(
             #   "Cannot handle excel formatted date at " + error_location)
             datetime_or_time_only = xlrd.xldate_as_tuple(
                 value, workbook.datemode)
@@ -47,9 +46,9 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
                 return unicode(datetime.time(*datetime_or_time_only[3:]))
             return unicode(datetime.datetime(*datetime_or_time_only))
         else:
-            #ensure unicode and replace nbsp spaces with normal ones
-            #to avoid this issue:
-            #https://github.com/modilabs/pyxform/issues/83
+            # ensure unicode and replace nbsp spaces with normal ones
+            # to avoid this issue:
+            # https://github.com/modilabs/pyxform/issues/83
             return unicode(value).replace(unichr(160), ' ')
 
     def _escape_newline_chars(cell):
@@ -83,13 +82,14 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
         ss_structure[sheet_name] = sheet_contents
     return ss_structure
 
+
 def _parsed_sheet(sheet_lists):
-    '''
+    """
     take a sheet with 2+ rows and parse the first row as the column headers
     and the subsequent rows as the values.
 
     outputs a list of ordered dicts
-    '''
+    """
     # Treat sheets without at least two rows, i.e. without a header row
     # and at least one data row, as empty
     if len(sheet_lists) < 2:
@@ -105,12 +105,13 @@ def _parsed_sheet(sheet_lists):
         out_list.append(out_row)
     return out_list
 
+
 def xls_to_dicts(xls_file_object, strip_empty_rows=True):
-    '''
+    """
     outputs an ordered dict of (sheetname, sheet_contents)
 
     where sheet_contents is a list of ordered_dicts
-    '''
+    """
     lists = xls_to_lists(xls_file_object)
     out = OrderedDict()
     for key, sheet in lists.items():

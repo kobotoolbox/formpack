@@ -1,15 +1,14 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import re
 
-from pyxform.xls2json import workbook_to_json
-from .flatten_content import flatten_content
-from pyxform.builder import create_survey_element_from_dict
 from pyquery import PyQuery
+from pyxform.builder import create_survey_element_from_dict
+from pyxform.xls2json import workbook_to_json
 
+from .flatten_content import flatten_content
 
 DATA_TYPE_ALIASES = (
     ("add select one prompt using", 'select_one'),
@@ -42,7 +41,7 @@ def formversion_pyxform(data):
 
 def get_version_identifiers(node):
     pqi = PyQuery(node)
-    return (pqi.attr('id_string'), pqi.attr('version'))
+    return pqi.attr('id_string'), pqi.attr('version')
 
 
 def parse_xml_to_xmljson(node):

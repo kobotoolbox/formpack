@@ -1,30 +1,26 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-
-
 try:
     from cyordereddict import OrderedDict
 except ImportError:
     from collections import OrderedDict
 
-from .validators import validate_content
-
 from .constants import UNTRANSLATED
-from .submission import FormSubmission
-from .utils.xform_tools import formversion_pyxform
-from .utils import parse_xml_to_xmljson, normalize_data_type
 from .errors import SchemaError
-from .utils.flatten_content import flatten_content
-from .schema import (FormField, FormGroup, FormSection, FormChoice)
 from .errors import TranslationError
+from .schema import (FormField, FormGroup, FormSection, FormChoice)
+from .submission import FormSubmission
+from .utils import parse_xml_to_xmljson, normalize_data_type
+from .utils.flatten_content import flatten_content
+from .utils.xform_tools import formversion_pyxform
+from .validators import validate_content
 
 
 class LabelStruct(object):
-    '''
+    """
     LabelStruct stores labels + translations assigned to `field.labels`
-    '''
+    """
 
     def __init__(self, labels=[], translations=[]):
         if len(labels) != len(translations):

@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 
 import re
-from copy import deepcopy
 from collections import defaultdict, OrderedDict
+from copy import deepcopy
+
 from array_to_xpath import array_to_xpath
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)

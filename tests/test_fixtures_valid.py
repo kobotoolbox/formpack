@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
@@ -17,9 +16,9 @@ class TestFormPackFixtures(unittest.TestCase):
         return fd2
 
     def test_sanitation_report(self):
-        '''
+        """
         sanitation_report
-        '''
+        """
         title, schemas, submissions = build_fixture('sanitation_report')
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
@@ -30,9 +29,9 @@ class TestFormPackFixtures(unittest.TestCase):
                           'report_date'])
 
     def test_grouped_questions(self):
-        '''
+        """
         questions groups
-        '''
+        """
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
@@ -40,9 +39,9 @@ class TestFormPackFixtures(unittest.TestCase):
                          ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
 
     def test_customer_satisfaction(self):
-        '''
+        """
         customer_satisfaction
-        '''
+        """
         title, schemas, submissions = build_fixture('customer_satisfaction')
         fp = FormPack(schemas, title)
         v0 = fp[0]
@@ -101,9 +100,9 @@ class TestFormPackFixtures(unittest.TestCase):
 
     # TODO: update this test, it doesn't test anything anymore.
     def test_xml_instances_loaded(self):
-        '''
+        """
         favcolor has submissions_xml specified
-        '''
+        """
         fp = FormPack(**build_fixture('favcolor'))
         self.assertEqual(len(fp.versions), 2)
 

@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
@@ -7,9 +6,9 @@ import json
 
 from formpack.validators import validate_row
 
+
 def test_row_validator():
-    '''
-    '''
+
     rows = [
         {'type': 'text', 'name': 'x', 'label': 'z'},
         {'type': 'select_one', 'name': 'x', 'select_from_list_name': 'y', 'label': 'z'},

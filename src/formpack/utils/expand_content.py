@@ -3,13 +3,12 @@
 # This module might be more appropriately named "standardize_content"
 # and pass content through to formpack.utils.replace_aliases during
 # the standardization step: expand_content_in_place(...)
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from copy import deepcopy
-from collections import OrderedDict
 import re
+from collections import OrderedDict
+from copy import deepcopy
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .replace_aliases import META_TYPES
@@ -221,7 +220,7 @@ def _get_special_survey_cols(content):
             continue
     (translations,
      translated_cols) = _get_translations_from_special_cols(special,
-                        content.get('translations', []))
+                                                            content.get('translations', []))
     translated_cols.update(known_translated_cols)
     return (special, translations, sorted(translated_cols))
 
@@ -240,10 +239,10 @@ def _expand_type_to_dict(type_str):
         out['type'] = type_str
         return out
     for _re in [
-                '^(select_one)\s+(\S+)$',
-                '^(select_multiple)\s+(\S+)$',
-                '^(select_one_external)\s+(\S+)$',
-               ]:
+        '^(select_one)\s+(\S+)$',
+        '^(select_multiple)\s+(\S+)$',
+        '^(select_one_external)\s+(\S+)$',
+    ]:
         match = re.match(_re, type_str)
         if match:
             (type_, list_name) = match.groups()

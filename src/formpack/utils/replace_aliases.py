@@ -1,19 +1,18 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
+
+import json
+from collections import OrderedDict, defaultdict
+from copy import deepcopy
+
+from pyxform import aliases as pyxform_aliases
+from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
 # This file is a mishmash of things which culminate in the
 # "replace_aliases" method which iterates through a survey and
 # replaces xlsform aliases with a standardized set of colunns,
 # question types, and values.
-
-import json
-from copy import deepcopy
-from collections import OrderedDict, defaultdict
-
-from pyxform import aliases as pyxform_aliases
-from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
 
 TF_COLUMNS = [
@@ -22,9 +21,9 @@ TF_COLUMNS = [
 
 
 def aliases_to_ordered_dict(_d):
-    '''
+    """
     unpacks a dict-with-lists to an ordered dict with keys sorted by length
-    '''
+    """
     arr = []
     for (original, aliases) in _d.items():
         arr.append((original, original))
@@ -35,6 +34,7 @@ def aliases_to_ordered_dict(_d):
         for alias in aliases:
             arr.append((alias, original,))
     return OrderedDict(sorted(arr, key=lambda _kv: 0-len(_kv[0])))
+
 
 types = aliases_to_ordered_dict({
     u'begin_group': [

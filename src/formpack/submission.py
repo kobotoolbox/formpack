@@ -1,20 +1,17 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import re
 import json
-
+import re
 from collections import OrderedDict
-from lxml import etree
-
 try:
     # FIXME: Create failing test for this and remove.
     from cStringIO import StringIO
 except ImportError:  # we are on Python 3
     from io import StringIO
 
+from lxml import etree
 from pyquery import PyQuery
 
 from .b64_attachment import B64Attachment

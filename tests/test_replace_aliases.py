@@ -1,14 +1,10 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
-import json
+
 import pytest
 
-from formpack.utils.replace_aliases import (replace_aliases, dealias_type,
-                                            settings_header_columns,
-                                            survey_header_columns,
-                                            )
+from formpack.utils.replace_aliases import replace_aliases, dealias_type
 
 
 def test_replace_select_one():
