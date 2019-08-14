@@ -19,7 +19,7 @@ from .fixtures import build_fixture, open_fixture_file
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.schema.fields import ValidationStatusCopyField
-from formpack.utils.geojson import FormPackGeoJsonError
+from formpack.utils.exceptions import FormPackGeoJsonError
 
 
 customer_satisfaction = build_fixture('customer_satisfaction')

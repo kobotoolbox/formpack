@@ -5,9 +5,8 @@ from __future__ import (unicode_literals, print_function, absolute_import,
 
 from geojson_rewind import rewind
 
+from .exceptions import FormPackGeoJsonError
 
-class FormPackGeoJsonError(Exception):
-    pass
 
 def field_and_response_to_geometry(field, response):
     """
@@ -47,8 +46,7 @@ def field_and_response_to_geometry(field, response):
         """
 
         point_components = geopoint_str.split(' ')
-        if not (len(point_components) >=2
-                and len(point_components) <= 4):
+        if not 2 <= len(point_components) <= 4:
             raise FormPackGeoJsonError('Cannot parse coordinates')
         try:
             coordinates = map(float, point_components[:3])

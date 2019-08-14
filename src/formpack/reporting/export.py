@@ -17,11 +17,9 @@ from inspect import isclass
 from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
 from ..submission import FormSubmission
+from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
-from ..utils.geojson import (
-    FormPackGeoJsonError,
-    field_and_response_to_geometry,
-)
+from ..utils.geojson import field_and_response_to_geometry
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
 
@@ -117,9 +115,10 @@ class Export(object):
         Parse a single submission and return a formatted 'chunks' structure;
         see format_one_submission() for details
 
-        :param version: an optional `FormVersion` to use for this submission
-                        instead of inferring the version from the submission
-                        itself
+        Args:
+            version (FormVersion): optional, explicit version to use for this
+                submission instead of inferring the version from the submission
+                itself
         """
         if not version:
             version = self.get_version_for_submission(submission)
@@ -127,8 +126,9 @@ class Export(object):
             # TODO: somehow include this submission anyway; see
             # https://github.com/kobotoolbox/formpack/issues/164
             return None
-        # does this have the same effect as getting the first section?
-        section = version.sections[self.title]
+        # `format_one_submission()` will recurse through all the sections; get
+        # the first one to start
+        section = version.sections.values()[0]
         submission = FormSubmission(submission)
         return self.format_one_submission([submission.data], section)
 
