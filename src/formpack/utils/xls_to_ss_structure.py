@@ -8,6 +8,8 @@ import xlrd
 import re
 import datetime
 
+from .string import unicode, str_types
+
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
@@ -18,7 +20,7 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
     a part of `pyxform.xls2json_backends.xls_to_dict`.)
     """
     def _iswhitespace(string):
-        return isinstance(string, basestring) and len(string.strip()) == 0
+        return isinstance(string, str_types) and len(string.strip()) == 0
 
     def xls_value_to_unicode(value, value_type):
         """
@@ -26,7 +28,7 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
         representation.
         """
         if value_type == xlrd.XL_CELL_BOOLEAN:
-            return u"TRUE" if value else u"FALSE"
+            return 'TRUE' if value else 'FALSE'
         elif value_type == xlrd.XL_CELL_NUMBER:
             # Try to display as an int if possible.
             int_value = int(value)
@@ -61,7 +63,7 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
             row_empty = True
             for col in range(0, sheet.ncols):
                 value = sheet.cell_value(row, col)
-                if isinstance(value, basestring):
+                if isinstance(value, str_types):
                     value = _escape_newline_chars(value.strip())
                 if (value is not None) and (not _iswhitespace(value)):
                     value = xls_value_to_unicode(value, sheet.cell_type(row, col))

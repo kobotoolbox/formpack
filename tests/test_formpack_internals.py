@@ -150,19 +150,19 @@ def test_get_fields_for_versions_returns_unique_fields():
     fields multiple times. This is was a failing test to reproduce that issue
     """
     fp = FormPack(
-        [{'content': {u'survey': [{u'name': u'hey', u'type': u'image'},
-                                  {u'name': u'two', u'type': u'image'}]},
-          'version': u'vRR7hH6SxTupvtvCqu7n5d'},
-         {'content': {u'survey': [{u'name': u'one', u'type': u'image'},
-                                  {u'name': u'two', u'type': u'image'}]},
-          'version': u'vA8xs9JVi8aiSfypLgyYW2'},
-         {'content': {u'survey': [{u'name': u'one', u'type': u'image'},
-                                  {u'name': u'two', u'type': u'image'}]},
-          'version': u'vNqgh8fJqyjFk6jgiCk4rn'}]
+        [{'content': {'survey': [{'name': 'hey', 'type': 'image'},
+                                  {'name': 'two', 'type': 'image'}]},
+          'version': 'vRR7hH6SxTupvtvCqu7n5d'},
+         {'content': {'survey': [{'name': 'one', 'type': 'image'},
+                                  {'name': 'two', 'type': 'image'}]},
+          'version': 'vA8xs9JVi8aiSfypLgyYW2'},
+         {'content': {'survey': [{'name': 'one', 'type': 'image'},
+                                  {'name': 'two', 'type': 'image'}]},
+          'version': 'vNqgh8fJqyjFk6jgiCk4rn'}]
     )
     fields = fp.get_fields_for_versions(fp.versions)
     field_names = [field.name for field in fields]
-    assert sorted(field_names) == [u'hey', u'one', u'two']
+    assert sorted(field_names) == ['hey', 'one', 'two']
 
 
 def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
@@ -270,12 +270,12 @@ def test_field_position_with_multiple_versions():
 
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
-        u'City',
-        u'Firstname',
-        u'Lastname',
-        u'Gender',
-        u'Age',
-        u'Fullname',
+        'City',
+        'Firstname',
+        'Lastname',
+        'Gender',
+        'Age',
+        'Fullname',
     ]
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 6
@@ -288,9 +288,9 @@ def test_fields_for_versions_list_index_out_of_range():
     fp = FormPack(schemas, title)
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
-        u'one',
-        u'third',
-        u'first_but_not_one',
+        'one',
+        'third',
+        'first_but_not_one',
     ]
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 3

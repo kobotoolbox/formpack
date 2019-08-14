@@ -47,13 +47,13 @@ class TestFormPackFixtures(unittest.TestCase):
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(list(v0.sections['Customer Satisfaction'].fields.keys()),
-                         [u'restaurant_name', u'customer_enjoyment'])
+                         ['restaurant_name', 'customer_enjoyment'])
         self.assertEqual(sorted(fp.to_dict().keys()),
-                         [u'id_string', u'title', u'versions'])
+                         ['id_string', 'title', 'versions'])
         # TODO: find a way to restore this test (or change fixtures)
-        # self.assertEqual(fp.to_dict(), {u'title': u'Customer Satisfaction',
-        #                                 u'id_string': u'customer_satisfaction',
-        #                                 u'versions': schemas})
+        # self.assertEqual(fp.to_dict(), {'title': 'Customer Satisfaction',
+        #                                 'id_string': 'customer_satisfaction',
+        #                                 'versions': schemas})
 
     def test_restaurant_profile(self):
         title, schemas, submissions = build_fixture('restaurant_profile')
@@ -61,14 +61,14 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(len(fp.versions), 4)
         v0 = fp[0]
         self.assertEqual(list(v0.sections['Restaurant profile'].fields.keys()),
-                         [u'restaurant_name', u'location'])
+                         ['restaurant_name', 'location'])
 
         self.assertEqual(sorted(fp.to_dict().keys()),
-                         sorted([u'id_string', u'title', u'versions']))
+                         sorted(['id_string', 'title', 'versions']))
         # TODO: find a way to restore this test (or change fixtures)
-        # self.assertEqual(fp.to_dict(), {u'title': u'Restaurant profile',
-        #                                 u'id_string': u'restaurant_profile',
-        #                                 u'versions': schemas})
+        # self.assertEqual(fp.to_dict(), {'title': 'Restaurant profile',
+        #                                 'id_string': 'restaurant_profile',
+        #                                 'versions': schemas})
 
     def test_site_inspection(self):
         title, schemas, submissions = build_fixture('site_inspection')
@@ -77,25 +77,25 @@ class TestFormPackFixtures(unittest.TestCase):
         v0 = fp[0]
         self.assertEqual(
             list(v0.sections['Site inspection'].fields.keys()), [
-                u'inspector',
-                u'did_you_find_the_site',
-                u'was_there_damage_to_the_site',
-                u'was_there_damage_to_the_site_dupe',
-                u'ping',
-                u'rssi',
-                u'is_the_gate_secure',
-                u'is_plant_life_encroaching',
-                u'please_rate_the_impact_of_any_defects_observed',
+                'inspector',
+                'did_you_find_the_site',
+                'was_there_damage_to_the_site',
+                'was_there_damage_to_the_site_dupe',
+                'ping',
+                'rssi',
+                'is_the_gate_secure',
+                'is_plant_life_encroaching',
+                'please_rate_the_impact_of_any_defects_observed',
             ]
         )
 
         self.assertEqual(sorted(fp.to_dict().keys()),
-                         sorted([u'id_string', u'title', u'versions']))
+                         sorted(['id_string', 'title', 'versions']))
 
         self.assertEqual(fp.to_dict(), {
-            u'title': u'Site inspection',
-            u'id_string': u'site_inspection',
-            u'versions': [s['content'] for s in schemas]
+            'title': 'Site inspection',
+            'id_string': 'site_inspection',
+            'versions': [s['content'] for s in schemas]
         })
 
     # TODO: update this test, it doesn't test anything anymore.

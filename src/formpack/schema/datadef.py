@@ -8,6 +8,7 @@ except ImportError:
     from collections import OrderedDict
 
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
+from ..utils import str_types
 
 
 class FormDataDef(object):
@@ -104,7 +105,7 @@ class FormChoice(FormDataDef):
                 _label = choice_definition['label']
             else:
                 _label = choice_definition.get('image')
-            if isinstance(_label, basestring):
+            if isinstance(_label, str_types):
                 _label = [_label]
             elif _label is None:
                 _label = []

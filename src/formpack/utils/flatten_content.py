@@ -6,6 +6,7 @@ from collections import defaultdict, OrderedDict
 from copy import deepcopy
 
 from array_to_xpath import array_to_xpath
+from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
 
@@ -97,7 +98,7 @@ def _flatten_tags(row, tag_cols_and_seps=None):
         tag_cols_and_seps = {}
 
     for col in ['tags'] + tag_cols_and_seps.keys():
-        if col in row and isinstance(row[col], basestring):
+        if col in row and isinstance(row[col], str_types):
             return
 
     tag_list = row.pop('tags', [])

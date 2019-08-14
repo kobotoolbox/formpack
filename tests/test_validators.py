@@ -14,7 +14,7 @@ def test_row_validator():
         {'type': 'select_one', 'name': 'x', 'select_from_list_name': 'y', 'label': 'z'},
         {'type': 'select_multiple', 'name': 'x', 'select_from_list_name': 'y', 'label': 'z'},
         {'type': 'select_one_external', 'name': 'x', 'select_from_list_name': 'y', 'label': 'z'},
-        {u'appearance': u'label', u'type': u'select_one', u'name': u'ER_int_group2', u'select_from_list_name': u'emotion'},
+        {'appearance': 'label', 'type': 'select_one', 'name': 'ER_int_group2', 'select_from_list_name': 'emotion'},
         {'type': 'note', 'name': 'x', 'media::image': 'y'},
         # no names needed
         {'type': 'end_group'},

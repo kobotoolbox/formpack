@@ -134,102 +134,102 @@ class TestAutoReport(unittest.TestCase):
         self.assertListEqual(stats, [
             (
                "<TextField name='inspector' type='text'>",
-                u'inspector',
-                   {u'frequency': [(u'burger', 5), (u'clouseau', 5)],
-                    u'not_provided': 0,
-                    u'percentage': [(u'burger', 50.0), (u'clouseau', 50.0)],
-                    u'provided': 10,
-                    u'show_graph': False,
-                    u'total_count': 10}
+                'inspector',
+                   {'frequency': [('burger', 5), ('clouseau', 5)],
+                    'not_provided': 0,
+                    'percentage': [('burger', 50.0), ('clouseau', 50.0)],
+                    'provided': 10,
+                    'show_graph': False,
+                    'total_count': 10}
             ),
             (
                "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
-                u'did_you_find_the_site',
-                   {u'frequency': [(0, 4), (1, 4), (u'yes', 1), (u'no', 1)],
-                    u'not_provided': 0,
-                    u'percentage': [(0, 40.0),
+                'did_you_find_the_site',
+                   {'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
+                    'not_provided': 0,
+                    'percentage': [(0, 40.0),
                                     (1, 40.0),
-                                    (u'yes', 10.0),
-                                    (u'no', 10.0)],
-                    u'provided': 10,
-                    u'show_graph': True,
-                    u'total_count': 10}
+                                    ('yes', 10.0),
+                                    ('no', 10.0)],
+                    'provided': 10,
+                    'show_graph': True,
+                    'total_count': 10}
             ),
             (
                "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
-                u'was_there_damage_to_the_site',
-                   {u'frequency': [(0, 2), (1, 2), (u'yes', 1)],
-                    u'not_provided': 5,
-                    u'percentage': [(0, 40.0), (1, 40.0), (u'yes', 20.0)],
-                    u'provided': 5,
-                    u'show_graph': True,
-                    u'total_count': 10}
+                'was_there_damage_to_the_site',
+                   {'frequency': [(0, 2), (1, 2), ('yes', 1)],
+                    'not_provided': 5,
+                    'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 10}
             ),
             (
                "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
-                u'was_there_damage_to_the_site_dupe',
-                   {u'frequency': [(1, 1), (u'yes', 1)],
-                    u'not_provided': 8,
-                    u'percentage': [(1, 50.0), (u'yes', 50.0)],
-                    u'provided': 2,
-                    u'show_graph': True,
-                    u'total_count': 10}
+                'was_there_damage_to_the_site_dupe',
+                   {'frequency': [(1, 1), ('yes', 1)],
+                    'not_provided': 8,
+                    'percentage': [(1, 50.0), ('yes', 50.0)],
+                    'provided': 2,
+                    'show_graph': True,
+                    'total_count': 10}
             ),
             (
                "<NumField name='ping' type='integer'>",
-                u'ping',
-                   {u'mean': 238.4,
-                    u'median': 123,
-                    u'mode': u'*',
-                    u'not_provided': 5,
-                    u'provided': 5,
-                    u'show_graph': False,
-                    u'stdev': 255.77392361224003,
-                    u'total_count': 10}
+                'ping',
+                   {'mean': 238.4,
+                    'median': 123,
+                    'mode': '*',
+                    'not_provided': 5,
+                    'provided': 5,
+                    'show_graph': False,
+                    'stdev': 255.77392361224003,
+                    'total_count': 10}
             ),
             (
                "<NumField name='rssi' type='integer'>",
-                u'rssi',
-                   {u'mean': 63.8,
-                    u'median': u'65',
-                    u'mode': u'*',
-                    u'not_provided': 5,
-                    u'provided': 5,
-                    u'show_graph': False,
-                    u'stdev': 35.22357165308481,
-                    u'total_count': 10}
+                'rssi',
+                   {'mean': 63.8,
+                    'median': '65',
+                    'mode': '*',
+                    'not_provided': 5,
+                    'provided': 5,
+                    'show_graph': False,
+                    'stdev': 35.22357165308481,
+                    'total_count': 10}
             ),
             (
                "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
-                u'is_the_gate_secure',
-                   {u'frequency': [(0, 2), (1, 2), (u'no', 1)],
-                    u'not_provided': 5,
-                    u'percentage': [(0, 40.0), (1, 40.0), (u'no', 20.0)],
-                    u'provided': 5,
-                    u'show_graph': True,
-                    u'total_count': 10}
+                'is_the_gate_secure',
+                   {'frequency': [(0, 2), (1, 2), ('no', 1)],
+                    'not_provided': 5,
+                    'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 10}
             ),
             (
                "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
-                u'is_plant_life_encroaching',
-                   {u'frequency': [(0, 1), (1, 3), (u'yes', 1)],
-                    u'not_provided': 5,
-                    u'percentage': [(0, 20.0), (1, 60.0), (u'yes', 20.0)],
-                    u'provided': 5,
-                    u'show_graph': True,
-                    u'total_count': 10}
+                'is_plant_life_encroaching',
+                   {'frequency': [(0, 1), (1, 3), ('yes', 1)],
+                    'not_provided': 5,
+                    'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 10}
             ),
             (
                "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
-                u'please_rate_the_impact_of_any_defects_observed',
-                   {u'frequency': [(u'moderate', 4), (u'severe', 3), (u'low', 3)],
-                    u'not_provided': 0,
-                    u'percentage': [(u'moderate', 40.0),
-                                    (u'severe', 30.0),
-                                    (u'low', 30.0)],
-                    u'provided': 10,
-                    u'show_graph': True,
-                    u'total_count': 10}
+                'please_rate_the_impact_of_any_defects_observed',
+                   {'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
+                    'not_provided': 0,
+                    'percentage': [('moderate', 40.0),
+                                    ('severe', 30.0),
+                                    ('low', 30.0)],
+                    'provided': 10,
+                    'show_graph': True,
+                    'total_count': 10}
             )
         ])
 
@@ -356,7 +356,7 @@ class TestAutoReport(unittest.TestCase):
                           {'mean': 1.0,
                            'median': 1,
                            'mode': '*',
-                                   'stdev': u'*'}))})]
+                                   'stdev': '*'}))})]
         for (i, stat) in enumerate(stats):
             assert stat == expected[i]
 
@@ -418,7 +418,7 @@ class TestAutoReport(unittest.TestCase):
             {
                 'mean': 20.0,
                 'median': 20,
-                'mode': u'*',
+                'mode': '*',
                 'not_provided': 1,
                 'provided': 3,
                 'show_graph': False,

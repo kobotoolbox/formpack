@@ -32,7 +32,7 @@ class AutoReport(object):
         Get the version ID from the provided submission, or `None` if not found.
 
         :param dict submission: An individual data submission.
-        :rtype: basestring or NoneType
+        :rtype: `formpack.utils.string.str_types` or NoneType
         '''
         version_id_keys = set(self.formpack.version_id_keys()).\
             intersection(set(submission.keys()))

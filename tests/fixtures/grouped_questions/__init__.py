@@ -11,9 +11,9 @@ has some boring questions in a group
 '''
 
 DATA = {
-    u'title': 'Grouped questions',
-    u'id_string': 'grouped_questions',
-    u'versions': [
+    'title': 'Grouped questions',
+    'id_string': 'grouped_questions',
+    'versions': [
         {
             'version': 'gqs',
             'content': {

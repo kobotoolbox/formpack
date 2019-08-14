@@ -1146,9 +1146,9 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
         rows = list(fp.export(**options).to_csv(submissions))
-        assert rows[1] == (u'"#loc+name";"#indicator+diet";'
-                           u'"#indicator+diet";"#indicator+diet";'
-                           u'"#indicator+diet";"#indicator+diet"')
+        assert rows[1] == ('"#loc+name";"#indicator+diet";'
+                           '"#indicator+diet";"#indicator+diet";'
+                           '"#indicator+diet";"#indicator+diet"')
 
     # disabled for now
     # @raises(RuntimeError)
@@ -1314,9 +1314,9 @@ class TestFormPackExport(unittest.TestCase):
             assert xls.isfile()
             book = xlrd.open_workbook(xls)
             assert book.sheet_names() == [
-                u'long survey name_ the quick,...',
-                u'long_group_name__Victor_jagt...',
-                u'long_group_name__Victor_... (1)'
+                'long survey name_ the quick,...',
+                'long_group_name__Victor_jagt...',
+                'long_group_name__Victor_... (1)'
             ]
 
 
@@ -1333,11 +1333,11 @@ class TestFormPackExport(unittest.TestCase):
             sheet = book.sheet_by_name('Household survey with HXL an...')
             row_values = [cell.value for cell in sheet.row(1)]
             assert row_values == [
-                u'#date+start', u'#date+end', u'#loc+name', u'']
+                '#date+start', '#date+end', '#loc+name', '']
             # Verify repeating group
             sheet = book.sheet_by_name('houshold_member_repeat')
             row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == [u'#beneficiary', u'', u'']
+            assert row_values == ['#beneficiary', '', '']
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction

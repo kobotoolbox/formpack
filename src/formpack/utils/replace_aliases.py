@@ -9,6 +9,8 @@ from copy import deepcopy
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
+from .string import str_types
+
 # This file is a mishmash of things which culminate in the
 # "replace_aliases" method which iterates through a survey and
 # replaces xlsform aliases with a standardized set of colunns,
@@ -29,7 +31,7 @@ def aliases_to_ordered_dict(_d):
         arr.append((original, original))
         if isinstance(aliases, bool):
             aliases = [original]
-        elif isinstance(aliases, basestring):
+        elif isinstance(aliases, str_types):
             aliases = [aliases]
         for alias in aliases:
             arr.append((alias, original,))
@@ -37,23 +39,23 @@ def aliases_to_ordered_dict(_d):
 
 
 types = aliases_to_ordered_dict({
-    u'begin_group': [
-        u'begin group',
-        u'begin  group',
+    'begin_group': [
+        'begin group',
+        'begin  group',
     ],
-    u'end_group': [
-        u'end group',
-        u'end  group'
+    'end_group': [
+        'end group',
+        'end  group'
     ],
-    u'begin_repeat': [
-        u'begin lgroup',
-        u'begin repeat',
-        u'begin looped group',
+    'begin_repeat': [
+        'begin lgroup',
+        'begin repeat',
+        'begin looped group',
     ],
-    u'end_repeat': [
-        u'end lgroup',
-        u'end repeat',
-        u'end looped group',
+    'end_repeat': [
+        'end lgroup',
+        'end repeat',
+        'end looped group',
     ],
     'text': ['string'],
     'acknowledge': ['trigger'],
@@ -64,22 +66,22 @@ types = aliases_to_ordered_dict({
 })
 
 selects = aliases_to_ordered_dict({
-    u'select_multiple': [
-        u'select all that apply',
-        u'select multiple',
-        u'select many',
-        u'select_many',
-        u'select all that apply from',
-        u'add select multiple prompt using',
+    'select_multiple': [
+        'select all that apply',
+        'select multiple',
+        'select many',
+        'select_many',
+        'select all that apply from',
+        'add select multiple prompt using',
     ],
-    u'select_one_external': [
-        u'select one external',
+    'select_one_external': [
+        'select one external',
     ],
-    u'select_one': [
-        u'select one',
-        u'select one from',
-        u'add select one prompt using',
-        u'select1',
+    'select_one': [
+        'select one',
+        'select one from',
+        'add select one prompt using',
+        'select1',
     ],
 })
 

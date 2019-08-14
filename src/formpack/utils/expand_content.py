@@ -12,6 +12,7 @@ from copy import deepcopy
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .replace_aliases import META_TYPES
+from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
 
@@ -47,7 +48,7 @@ def _expand_tags(row, tag_cols_and_seps=None):
     tags = []
     main_tags = row.pop('tags', None)
     if main_tags:
-        if isinstance(main_tags, basestring):
+        if isinstance(main_tags, str_types):
             tags = tags + main_tags.split()
         elif isinstance(main_tags, list):
             # carry over any tags listed here
@@ -55,8 +56,8 @@ def _expand_tags(row, tag_cols_and_seps=None):
 
     for tag_col in tag_cols_and_seps.keys():
         tags_str = row.pop(tag_col, None)
-        if tags_str and isinstance(tags_str, basestring):
-            for tag in re.findall('([\#\+][a-zA-Z][a-zA-Z0-9_]*)', tags_str):
+        if tags_str and isinstance(tags_str, str_types):
+            for tag in re.findall(r'([\#\+][a-zA-Z][a-zA-Z0-9_]*)', tags_str):
                 tags.append('hxl:%s' % tag)
     if len(tags) > 0:
         row['tags'] = tags
@@ -84,26 +85,26 @@ def expand_content_in_place(content):
     _metas = []
 
     for row in survey_content:
-        if 'name' in row and row['name'] == None:
+        if 'name' in row and row['name'] is None:
             del row['name']
         if 'type' in row:
             _type = row['type']
             if _type in META_TYPES:
                 _metas.append(row)
-            if isinstance(_type, basestring):
+            if isinstance(_type, str_types):
                 row.update(_expand_type_to_dict(row['type']))
             elif isinstance(_type, dict):
                 # legacy {'select_one': 'xyz'} format might
                 # still be on kobo-prod
                 _type_str = _expand_type_to_dict(_type.keys()[0])['type']
                 _list_name = _type.values()[0]
-                row.update({u'type': _type_str,
-                            u'select_from_list_name': _list_name})
+                row.update({'type': _type_str,
+                            'select_from_list_name': _list_name})
 
         _expand_tags(row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
 
         for key in EXPANDABLE_FIELD_TYPES:
-            if key in row and isinstance(row[key], basestring):
+            if key in row and isinstance(row[key], str_types):
                 row[key] = _expand_xpath_to_list(row[key])
         for (key, vals) in specials.iteritems():
             if key in row:
@@ -250,7 +251,7 @@ def _expand_type_to_dict(type_str):
             out['select_from_list_name'] = list_name
             return out
     # if it does not expand, we return the original string
-    return {u'type': type_str}
+    return {'type': type_str}
 
 
 def _expand_xpath_to_list(xpath_string):

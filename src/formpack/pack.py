@@ -324,14 +324,14 @@ class FormPack(object):
 
     def to_dict(self, **kwargs):
         out = {
-            u'versions': [v.to_dict() for v in self.versions.values()],
+            'versions': [v.to_dict() for v in self.versions.values()],
         }
         if self.title is not None:
-            out[u'title'] = self.title
+            out['title'] = self.title
         if self.id_string is not None:
-            out[u'id_string'] = self.id_string
+            out['id_string'] = self.id_string
         if self.asset_type is not None:
-            out[u'asset_type'] = self.asset_type
+            out['asset_type'] = self.asset_type
         return out
 
     def to_json(self, **kwargs):

@@ -15,9 +15,11 @@ try:
     unicode = unicode
     basestring = basestring
 except NameError:  # Python 3
+    basestring = str
     unicode = str
 
-str_types = (unicode, bytes)
+# str_types = (basestring, bytes)
+str_types = (basestring,)
 
 
 def randstr(n):
@@ -64,7 +66,7 @@ def ellipsize(s, max_len, ellipsis='...'):
     `ellipsis` such that the final string length does not exceed `max_len`.
     :Example:
         >>> ellipsize('This string has more than 31 characters!', max_len=31)
-        u'This string has more than 31...'
+        'This string has more than 31...'
     """
 
     in_len = len(s)
@@ -89,7 +91,7 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
         ...     'This string has more than 31 characters!',
         ...     ('This string has more than 31...',)
         ... )
-        u'This string has more tha... (1)'
+        'This string has more tha... (1)'
     """
 
     sheet_name = sheet_name.translate({
@@ -101,7 +103,7 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
     i = 1
     while candidate in other_sheet_names:
         candidate = ellipsize(
-            sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, u'{} ({})'.format(
+            sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, '{} ({})'.format(
                 base_ellipsis, i)
         )
         i += 1
