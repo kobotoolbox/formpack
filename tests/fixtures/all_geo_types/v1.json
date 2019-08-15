@@ -1,0 +1,39 @@
+{
+  "id_string": "all_geo_types",
+  "version": "all_geo_types_v1",
+  "version_id_key": "__version__",
+  "content": {
+    "survey": [
+      {"name": "start", "type": "start"},
+      {"name": "end", "type": "end"},
+      {
+        "label": ["Just a regular text question"],
+        "name": "Just_a_regular_text_question",
+        "type": "text"
+      },
+      {"label": ["Point"], "name": "Point", "type": "geopoint"},
+      {"label": ["Trace"], "name": "Trace", "type": "geotrace"},
+      {"label": ["Shape"], "name": "Shape", "type": "geoshape"}
+    ]
+  },
+  "submissions": [
+    {
+      "Just_a_regular_text_question": "Greenmount",
+      "Point": "39.306938 -76.60869 11 22",
+      "Shape": "39.305938 -76.608294 0 0;39.309365 -76.609211 0 0;39.311288 -76.609332 0 0;39.31155 -76.604171 0 0;39.306138 -76.603656 0 0;39.305938 -76.608294 0 0",
+      "Trace": "39.306032 -76.608323 1 0;39.308701 -76.608953 2 0;39.311313 -76.60938 3 0;39.3116 -76.604223 4 0;39.306077 -76.603804 5 0",
+      "__version__": "vPFaUKns2GannaQj7hgi5x",
+      "_geolocation": [
+        39.306938,
+        -76.60869
+      ],
+      "_id": 14221036,
+      "_status": "submitted_via_web",
+      "_submission_time": "2019-07-19T22:47:15",
+      "_submitted_by": null,
+      "_uuid": "8cd7b882-c913-42cd-9c80-467d0711f4fb",
+      "end": "2019-07-19T18:47:10.516-04:00",
+      "start": "2019-07-19T18:42:37.313-04:00"
+    }
+  ]
+}

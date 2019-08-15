@@ -19,12 +19,15 @@ requirements = [
     'pyxform',
     'statistics',
     'XlsxWriter',
+    'backports.csv', # Remove after dropping Python 2 support (and rewrite `imports`)
+    'geojson-rewind==0.1.1+py2.jnm', # Stop using fork after dropping Python 2 support
 ]
 dep_links = [
     # "Be careful with the version" part of `#egg=project-version`, according to
     # https://setuptools.readthedocs.io/en/latest/setuptools.html#dependencies-that-aren-t-in-pypi.
     # "It should match the one inside the project files," i.e. the `version`
     # argument to `setup()` in `setup.py`. It should also adhere to PEP 440.
+    'https://github.com/jnm/geojson-rewind/tarball/master#egg=geojson-rewind-0.1.1+py2.jnm'
 ]
 
 setup(name='formpack',

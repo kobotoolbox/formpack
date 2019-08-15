@@ -3,24 +3,25 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
-from inspect import isclass
-
 try:
     from cyordereddict import OrderedDict
 except ImportError:
     from collections import OrderedDict
 
-from collections import defaultdict
-
-import zipfile
+import json
 import xlsxwriter
+import zipfile
+from collections import defaultdict
+from inspect import isclass
 
-from ..submission import FormSubmission
+from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
+from ..submission import FormSubmission
+from ..utils.exceptions import FormPackGeoJsonError
+from ..utils.flatten_content import flatten_tag_list
+from ..utils.geojson import field_and_response_to_geometry
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
-from ..utils.flatten_content import flatten_tag_list
-from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 
 
 class Export(object):
@@ -93,25 +94,55 @@ class Export(object):
             self._row_cache[section_name] = OrderedDict.fromkeys(fields, '')
             self._empty_row[section_name] = dict(self._row_cache[section_name])
 
+    def get_version_for_submission(self, submission):
+        """
+        Return the `FormVersion` for this submission, or `None` if none can be
+        found
+        """
+        version_id = None
+        # find the first version_id present in the submission
+        for _key in self.version_id_keys:
+            if _key in submission:
+                version_id = submission.get(_key)
+                break
+        try:
+            return self.versions[version_id]
+        except KeyError:
+            return None
+
+    def parse_one_submission(self, submission, version=None):
+        """
+        Parse a single submission and return a formatted 'chunks' structure;
+        see format_one_submission() for details
+
+        Args:
+            version (FormVersion): optional, explicit version to use for this
+                submission instead of inferring the version from the submission
+                itself
+        """
+        if not version:
+            version = self.get_version_for_submission(submission)
+        if not version:
+            # TODO: somehow include this submission anyway; see
+            # https://github.com/kobotoolbox/formpack/issues/164
+            return None
+        # `format_one_submission()` will recurse through all the sections; get
+        # the first one to start
+        section = version.sections.values()[0]
+        submission = FormSubmission(submission)
+        return self.format_one_submission([submission.data], section)
+
     def parse_submissions(self, submissions):
-        """Return the a generators yielding formatted chunks of the data set"""
+        """
+        Return a generator yielding formatted 'chunks' for each submission from
+        the data set
+        """
         self.reset()
-        versions = self.versions
-        for entry in submissions:
-            version_id = None
-
-            # find the first version_id present in the submission
-            for _key in self.version_id_keys:
-                if _key in entry:
-                    version_id = entry.get(_key)
-                    break
-
-            try:
-                section = versions[version_id].sections[self.title]
-                submission = FormSubmission(entry)
-                yield self.format_one_submission([submission.data], section)
-            except KeyError:
-                pass
+        for submission in submissions:
+            formatted_chunks = self.parse_one_submission(submission)
+            if not formatted_chunks:
+                continue
+            yield formatted_chunks
 
     def reset(self):
         """ Reset sections and indexes to initial values """
@@ -458,6 +489,106 @@ class Export(object):
                 if section == section_name:
                     for row in rows:
                         yield format_line(row, sep, quote)
+
+    def to_geojson(self, submissions, geo_question_name=None):
+        """
+        Returns a GeoJSON `FeatureCollection` as a string, where each
+        submission is a `Feature` with `geometry` taken from the response to
+        the question identified by `geo_question_name`. All question/response
+        pairs are included in the `properties` of each `Feature`. As with
+        `to_csv()`, repeating groups are not included.
+
+        Example:
+            {
+              "name": "[name of the first section]",
+              "type": "FeatureCollection"
+              "features": [
+                {
+                  "geometry": {
+                    "coordinates": [longitude, latitude, accuracy],
+                    "type": "Point"
+                  },
+                  "properties": {
+                    "question_name": "response value",
+                    …
+                  },
+                  "type": "Feature"
+                },
+                …
+              ],
+            }
+        """
+
+        # Consider the first section only (discard repeating groups)
+        first_section_name = self.sections.keys()[0]
+        labels = self.labels[first_section_name]
+
+        # Manually write the beginning and end of the GeoJSON file so that we
+        # can yield one GeoJSON `Feature` object at a time
+        feature_array_preamble = '\n'.join([
+            '{',
+            '"type": "FeatureCollection",',
+            '"name": "{name}",'.format(name=first_section_name),
+            '"features": [',
+        ])
+        feature_array_epilogue = '\n]\n}'
+        yield feature_array_preamble
+
+        self.reset() # since we're not using `parse_submissions()`
+
+        first = True
+        for submission in submissions:
+            # We need direct access to the field objects (available inside the
+            # version) and the unformatted submission data
+            version = self.get_version_for_submission(submission)
+            formatted_chunks = self.parse_one_submission(submission, version)
+            if not formatted_chunks:
+                continue
+
+            # Find the requested field
+            all_fields = version.sections[first_section_name].fields.values()
+            geo_fields = filter(lambda f: f.name == geo_question_name,
+                                all_fields)
+            try:
+                geo_field = geo_fields[0]
+            except IndexError:
+                # Requested field doesn't exist in the form version used by
+                # this submission; skip it
+                continue
+
+            rows = formatted_chunks[first_section_name]
+            for row in rows:
+                try:
+                    geo_response = submission[geo_field.path]
+                except KeyError:
+                    # Discard submissions with missing geo data
+                    continue
+                try:
+                    feature_geometry = field_and_response_to_geometry(
+                        geo_field, geo_response)
+                except FormPackGeoJsonError:
+                    # Discard submissions with invalid geo data
+                    continue
+                except RuntimeError:
+                    # If we're here, the field has an non-geo type. Continue in
+                    # the hope that other submissions belong to better versions
+                    # of the form
+                    continue
+                feature_properties = OrderedDict(zip(labels, row))
+                feature = {
+                    "type": "Feature",
+                    "geometry": feature_geometry,
+                    "properties": feature_properties,
+                }
+
+                if first:
+                    separator = '\n'
+                    first = False
+                else:
+                    separator = ',\n'
+                yield separator + json.dumps(feature, sort_keys=True)
+
+        yield feature_array_epilogue
 
     def to_table(self, submissions):
 
