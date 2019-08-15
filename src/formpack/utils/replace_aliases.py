@@ -9,6 +9,7 @@ from copy import deepcopy
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
+from .future import iteritems
 from .string import str_types
 
 # This file is a mishmash of things which culminate in the
@@ -84,8 +85,9 @@ selects = aliases_to_ordered_dict({
         'select1',
     ],
 })
-
-SELECT_TYPES = selects.keys()
+# Python3: Cast to a list because it's merged into other dicts
+# (i.e `SELECT_SCHEMA` in validators.py)
+SELECT_TYPES = list(selects.keys())
 
 META_TYPES = [
     'start',
@@ -138,7 +140,7 @@ MAIN_TYPES = [
     'acknowledge',
     'note',
 ] + GEO_TYPES
-formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + selects.keys())
+formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
 _pyxform_type_aliases = defaultdict(list)
 _formpack_type_reprs = {}
@@ -156,7 +158,9 @@ formpack_type_aliases = aliases_to_ordered_dict(dict([
     ]))
 
 
-KNOWN_TYPES = set(QUESTION_TYPE_DICT.keys() + selects.values() + types.values())
+KNOWN_TYPES = set(list(QUESTION_TYPE_DICT.keys()) +
+                  list(selects.values()) +
+                  list(types.values()))
 
 
 def _unpack_headers(p_aliases, fp_preferred):
@@ -164,12 +168,13 @@ def _unpack_headers(p_aliases, fp_preferred):
     combined = dict([
         (key, val if (val not in fp_preferred) else fp_preferred[val])
         for (key, val) in _aliases
-    ] + fp_preferred.items())
+    ] + list(fp_preferred.items()))
     # ensure that id_string points to id_string (for example)
     combined.update(dict([
         (val, val) for val in combined.values()
     ]))
     return combined
+
 
 formpack_preferred_settings_headers = {
     'title': 'form_title',
@@ -207,7 +212,7 @@ def dealias_type(type_str, strict=False, allowed_types=None):
         return allowed_types[type_str]
     if type_str in KNOWN_TYPES:
         return type_str
-    for key in selects.keys():
+    for key in SELECT_TYPES:
         if type_str.startswith(key):
             return type_str.replace(key, selects[key])
     if strict:
@@ -237,7 +242,7 @@ def replace_aliases_in_place(content, allowed_types=None):
                 if row[col] in pyxform_aliases.yes_no:
                     row[col] = pyxform_aliases.yes_no[row[col]]
 
-        for (key, val) in survey_header_columns.iteritems():
+        for (key, val) in iteritems(survey_header_columns):
             if key in row and key != val:
                 row[val] = row[key]
                 del row[key]

@@ -3,8 +3,8 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import re
-from copy import deepcopy, copy
-from collections import OrderedDict, defaultdict
+from copy import deepcopy
+from collections import OrderedDict
 
 from ..constants import TAG_COLUMNS_AND_SEPARATORS
 from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
@@ -56,8 +56,9 @@ def flatten_to_spreadsheet_content(content,
     translated_cols = content.pop('translated', [])
     if 'settings' in content and isinstance(content['settings'], dict):
         content['settings'] = [content['settings']]
-    sheet_names = _order_sheet_names(filter(lambda x: x not in remove_sheets,
-                                            content.keys()))
+    sheet_names = _order_sheet_names([x for x in content.keys()
+                                      if x not in remove_sheets])
+
     def _row_to_ordered_dict(row, dest):
         _flatten_translated_fields(row, translations, translated_cols,
                                    col_order=dest.keys(),
@@ -77,16 +78,17 @@ def flatten_to_spreadsheet_content(content,
 
         removed = remove_columns.get(sheet_name, [])
         firsts = prioritized_columns.get(sheet_name, [])
-        firsts = list(filter(lambda x: x in _all_cols, firsts))
+        firsts = [x for x in firsts if x in _all_cols]
         lasts = deprioritized_columns.get(sheet_name, [])
-        lasts = list(filter(lambda x: x in _all_cols, lasts))
+        lasts = [x for x in lasts if x in _all_cols]
         _not_mids = firsts + lasts + removed
-        mids = list(filter(lambda x: x not in _not_mids, _all_cols))
+        mids = [x for x in _all_cols if x not in _not_mids]
 
         ordered_cols = translated_col_list((firsts + mids + lasts), translations, translated_cols)
         return [
             _row_to_ordered_dict(row, OrderedDict.fromkeys(ordered_cols)) for row in rows
         ]
+
     if in_place:
         _od = content
         for sheet in remove_sheets:

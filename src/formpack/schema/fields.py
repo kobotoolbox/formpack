@@ -2,25 +2,19 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+from collections import defaultdict
 from functools import partial
 from operator import itemgetter
+
+import statistics
+
+from .datadef import FormDataDef, FormChoice
+from ..constants import UNSPECIFIED_TRANSLATION
 
 try:
     xrange = xrange
 except NameError:  # python 3
     xrange = range
-
-from collections import defaultdict
-
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    pass
-
-import statistics
-
-from ..constants import UNSPECIFIED_TRANSLATION
-from .datadef import FormDataDef, FormChoice
 
 
 class FormField(FormDataDef):

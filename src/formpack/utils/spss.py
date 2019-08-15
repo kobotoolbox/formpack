@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 import logging
 
-
 # Constants
 LINE_LIMIT_BYTES = 251
 VARIABLE_LABEL_LIMIT_BYTES = 255

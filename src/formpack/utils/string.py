@@ -18,7 +18,6 @@ except NameError:  # Python 3
     basestring = str
     unicode = str
 
-# str_types = (basestring, bytes)
 str_types = (basestring,)
 
 

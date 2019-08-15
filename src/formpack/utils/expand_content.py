@@ -11,6 +11,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
+from .future import iteritems
 from .replace_aliases import META_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
@@ -66,12 +67,12 @@ def _expand_tags(row, tag_cols_and_seps=None):
 
 def _get_translations_from_special_cols(special_cols, translations):
     translated_cols = []
-    for (colname, parsedvals) in special_cols.iteritems():
+    for colname, parsedvals in iteritems(special_cols):
         if 'translation' in parsedvals:
             translated_cols.append(parsedvals['column'])
             if parsedvals['translation'] not in translations:
                 translations.append(parsedvals['translation'])
-    return (translations, set(translated_cols))
+    return translations, set(translated_cols)
 
 
 def expand_content_in_place(content):
@@ -96,8 +97,8 @@ def expand_content_in_place(content):
             elif isinstance(_type, dict):
                 # legacy {'select_one': 'xyz'} format might
                 # still be on kobo-prod
-                _type_str = _expand_type_to_dict(_type.keys()[0])['type']
-                _list_name = _type.values()[0]
+                _type_str = _expand_type_to_dict(list(_type.keys())[0])['type']
+                _list_name = list(_type.values())[0]
                 row.update({'type': _type_str,
                             'select_from_list_name': _list_name})
 
@@ -106,7 +107,7 @@ def expand_content_in_place(content):
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], str_types):
                 row[key] = _expand_xpath_to_list(row[key])
-        for (key, vals) in specials.iteritems():
+        for (key, vals) in iteritems(specials):
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
 
@@ -122,7 +123,7 @@ def expand_content_in_place(content):
         survey_content.insert(0, row)
 
     for row in content.get('choices', []):
-        for (key, vals) in specials.iteritems():
+        for key, vals in iteritems(specials):
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
 
@@ -145,7 +146,9 @@ def expand_content(content, in_place=False):
 
 
 def _get_special_survey_cols(content):
-    '''This will extract information about columns in an xlsform with ':'s
+    """
+    This will extract information about columns in an xlsform with ':'s
+
     and give the "expand_content" information for parsing these columns.
     Examples--
         'media::image',
@@ -153,7 +156,7 @@ def _get_special_survey_cols(content):
         'label::Français',
         'hint::English',
     For more examples, see tests.
-    '''
+    """
     uniq_cols = OrderedDict()
     special = OrderedDict()
 
@@ -163,8 +166,8 @@ def _get_special_survey_cols(content):
         for row in content.get(sheet_name, []):
             # we don't want to expand columns which are already known
             # to be parsed and translated in a previous iteration
-            _cols = filter(lambda r: r not in known_translated_cols,
-                           row.keys())
+            _cols = [r for r in row.keys() if r not in known_translated_cols]
+
             uniq_cols.update(OrderedDict.fromkeys(_cols))
 
     def _mark_special(**kwargs):
@@ -185,7 +188,7 @@ def _get_special_survey_cols(content):
             continue
         if column_name.startswith('body:'):
             continue
-        mtch = re.match('^media\s*::?\s*([^:]+)\s*::?\s*([^:]+)$', column_name)
+        mtch = re.match(r'^media\s*::?\s*([^:]+)\s*::?\s*([^:]+)$', column_name)
         if mtch:
             matched = mtch.groups()
             media_type = matched[0]
@@ -195,7 +198,7 @@ def _get_special_survey_cols(content):
                           media=media_type,
                           translation=matched[1])
             continue
-        mtch = re.match('^media\s*::?\s*([^:]+)$', column_name)
+        mtch = re.match(r'^media\s*::?\s*([^:]+)$', column_name)
         if mtch:
             media_type = mtch.groups()[0]
             _mark_special(column_name=column_name,
@@ -204,7 +207,7 @@ def _get_special_survey_cols(content):
                           media=media_type,
                           translation=UNTRANSLATED)
             continue
-        mtch = re.match('^([^:]+)\s*::?\s*([^:]+)$', column_name)
+        mtch = re.match(r'^([^:]+)\s*::?\s*([^:]+)$', column_name)
         if mtch:
             # example: label::x, constraint_message::x, hint::x
             matched = mtch.groups()
@@ -223,7 +226,7 @@ def _get_special_survey_cols(content):
      translated_cols) = _get_translations_from_special_cols(special,
                                                             content.get('translations', []))
     translated_cols.update(known_translated_cols)
-    return (special, translations, sorted(translated_cols))
+    return special, translations, sorted(translated_cols)
 
 
 def _expand_type_to_dict(type_str):
@@ -240,9 +243,9 @@ def _expand_type_to_dict(type_str):
         out['type'] = type_str
         return out
     for _re in [
-        '^(select_one)\s+(\S+)$',
-        '^(select_multiple)\s+(\S+)$',
-        '^(select_one_external)\s+(\S+)$',
+        r'^(select_one)\s+(\S+)$',
+        r'^(select_multiple)\s+(\S+)$',
+        r'^(select_one_external)\s+(\S+)$',
     ]:
         match = re.match(_re, type_str)
         if match:

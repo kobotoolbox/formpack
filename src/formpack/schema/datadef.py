@@ -113,7 +113,6 @@ class FormChoice(FormDataDef):
             option['name'] = choice_name
         return all_choices
 
-
     @property
     def translations(self):
         for option in self.options.values():

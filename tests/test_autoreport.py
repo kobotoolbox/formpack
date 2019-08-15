@@ -6,6 +6,7 @@ import unittest
 
 from formpack import FormPack
 from .fixtures import build_fixture
+from formpack.utils.string import unicode
 
 
 class TestAutoReport(unittest.TestCase):
@@ -65,7 +66,6 @@ class TestAutoReport(unittest.TestCase):
             'FormChoiceField',
             'FormChoiceField',
         ])
-
 
     def test_simple_report(self):
 

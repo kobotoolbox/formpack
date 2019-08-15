@@ -182,7 +182,7 @@ class AutoReport(object):
         if len(top_splitters) > 5:
             top_splitters.pop()
         # TODO: Figure out a better way of reproducibly ordering values.
-        top_splitters.sort(key=lambda (val, _): val)
+        top_splitters.sort(key=lambda val_: val_[0])
 
         def stats_generator():
             for field in fields:

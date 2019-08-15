@@ -15,11 +15,11 @@ def flatten_content_in_place(survey_content,
                              remove_columns=None,
                              remove_sheets=None,
                              ):
-    '''
+    """
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
-    '''
+    """
     if isinstance(remove_columns, list):
         raise Exception('bad')
     if remove_columns is None:
@@ -62,13 +62,13 @@ def flatten_content(survey_content, in_place=False, **opts):
 
 
 def _stringify_type__depr(json_qtype):
-    '''
+    """
     NOTE: This particular representation of select_* types is being
           deprecated. [Oct 2016]
 
     {'select_one': 'xyz'} -> 'select_one xyz'
     {'select_multiple': 'xyz'} -> 'select_mutliple xyz'
-    '''
+    """
     _type_keys = ['select_one', 'select_multiple']
     if len(json_qtype.keys()) != 1:
         raise ValueError('Type object must have exactly one key: %s' %
@@ -89,15 +89,15 @@ def flatten_tag_list(tag_list, tag_cols_and_seps=None):
 
 
 def _flatten_tags(row, tag_cols_and_seps=None):
-    '''
+    """
     takes a "tags" column with an array of tags and
     reassigns them to the tag column in which they appear
     on import of xls
-    '''
+    """
     if tag_cols_and_seps is None:
         tag_cols_and_seps = {}
 
-    for col in ['tags'] + tag_cols_and_seps.keys():
+    for col in ['tags'] + list(tag_cols_and_seps.keys()):
         if col in row and isinstance(row[col], str_types):
             return
 

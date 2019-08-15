@@ -2,13 +2,14 @@
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+import json
 import zipfile
 from collections import defaultdict
-from inspect import isclass
 try:
     from cyordereddict import OrderedDict
 except ImportError:
     from collections import OrderedDict
+from inspect import isclass
 
 import xlsxwriter
 
@@ -16,6 +17,7 @@ from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.flatten_content import flatten_tag_list
+from ..utils.future import iteritems, itervalues
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
 
@@ -63,8 +65,8 @@ class Export(object):
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            for version in iter(form_versions.values()):
-                first_section = next(iter(version.sections.values()))
+            for version in itervalues(form_versions):
+                first_section = next(itervalues(version.sections))
                 for copy_field in copy_fields:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
@@ -365,7 +367,7 @@ class Export(object):
                 if nested_data:
                     chunk = self.format_one_submission(entry[child_section.path],
                                                        child_section)
-                    for key, value in chunk.iteritems():
+                    for key, value in iteritems(chunk):
                         if key in chunks:
                             chunks[key].extend(value)
                         else:
@@ -570,15 +572,17 @@ class Export(object):
         return None
 
     def to_spss_labels(self, output_file):
-        '''
+        """
         Write SPSS commands that set question and choice labels, creating a ZIP
         file containing one SPSS file per translation. This includes *no* data!
 
         :param output_file: a file-like object opened for writing
-        '''
+        """
         all_versions = self.formpack.versions.values()
         all_translations = set()
-        map(all_translations.update, [v.translations for v in all_versions])
+        for v in all_versions:
+            all_translations.update(v.translations)
+
         all_fields = self.formpack.get_fields_for_versions()
 
         with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as z_out:
@@ -640,8 +644,8 @@ class Export(object):
                 MAXIMUM_FILENAME_LENGTH = 240
                 overrun = (
                     len(title)
-                        + len(rest_of_filename)
-                        - MAXIMUM_FILENAME_LENGTH
+                    + len(rest_of_filename)
+                    - MAXIMUM_FILENAME_LENGTH
                 )
                 if overrun > 0:
                     # TODO: trim the title in a right-to-left-friendly way
