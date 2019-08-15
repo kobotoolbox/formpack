@@ -3,21 +3,18 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 import json
-import xlsxwriter
 import zipfile
 from collections import defaultdict
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
 from inspect import isclass
+
+import xlsxwriter
 
 from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
 from ..submission import FormSubmission
-from ..utils.future import iteritems, itervalues
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
+from ..utils.future import iteritems, itervalues, OrderedDict
 from ..utils.geojson import field_and_response_to_geometry
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls

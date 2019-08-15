@@ -5,6 +5,17 @@ from __future__ import (unicode_literals, print_function,
 # These helpers are duplicated from `six`.
 # When FormPack stops support for Python2, this file can be removed and code
 # can be replaced with Python3 code
+try:
+    from cyordereddict import OrderedDict
+except ImportError:
+    from collections import OrderedDict
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+
 import sys
 
 PY2 = sys.version_info[0] == 2
@@ -22,3 +33,4 @@ def itervalues(d, **kw):
         return d.itervalues(**kw)
     else:
         return iter(d.values(**kw))
+

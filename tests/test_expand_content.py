@@ -3,7 +3,6 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import copy
-from collections import OrderedDict
 
 from formpack import FormPack
 from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
@@ -13,6 +12,7 @@ from formpack.utils.expand_content import _expand_tags
 from formpack.utils.expand_content import _get_special_survey_cols
 from formpack.utils.expand_content import expand_content, _expand_type_to_dict
 from formpack.utils.flatten_content import flatten_content
+from formpack.utils.future import OrderedDict
 
 
 def test_expand_selects_with_or_other():

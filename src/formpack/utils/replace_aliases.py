@@ -2,14 +2,14 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import json
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from copy import deepcopy
+import json
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
-from .future import iteritems
+from .future import iteritems, OrderedDict
 from .string import str_types
 
 # This file is a mishmash of things which culminate in the

@@ -6,15 +6,11 @@ import difflib
 import json
 from copy import deepcopy
 
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
-
 from .version import FormVersion
 from .utils import str_types
 from .reporting import Export, AutoReport
 from .utils.expand_content import expand_content
+from .utils.future import OrderedDict
 from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
 from formpack.schema.fields import CopyField

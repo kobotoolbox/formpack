@@ -4,19 +4,13 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 import re
-from collections import OrderedDict
-try:
-    # FIXME: Create failing test for this and remove.
-    from cStringIO import StringIO
-except ImportError:  # we are on Python 3
-    from io import StringIO
 
 from lxml import etree
 from pyquery import PyQuery
 
 from .b64_attachment import B64Attachment
 from .utils import parse_xmljson_to_data
-from .utils.future import iteritems
+from .utils.future import iteritems, StringIO, OrderedDict
 
 
 class FormSubmission:

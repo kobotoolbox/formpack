@@ -2,14 +2,13 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from collections import OrderedDict
-
 import pytest
 
 from formpack.constants import OR_OTHER_COLUMN
 from formpack.utils.flatten_content import (flatten_content,
                                             flatten_tag_list,
                                             translated_col_list)
+from formpack.utils.future import OrderedDict
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import (flatten_to_spreadsheet_content,
                                                 _order_cols,

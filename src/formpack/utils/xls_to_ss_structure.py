@@ -2,12 +2,11 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from collections import OrderedDict
-
-import xlrd
-import re
 import datetime
+import re
+import xlrd
 
+from .future import OrderedDict
 from .string import unicode, str_types
 
 

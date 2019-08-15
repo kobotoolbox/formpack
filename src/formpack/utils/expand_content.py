@@ -5,13 +5,11 @@
 # the standardization step: expand_content_in_place(...)
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
-
-import re
-from collections import OrderedDict
 from copy import deepcopy
+import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
-from .future import iteritems
+from .future import iteritems, OrderedDict
 from .replace_aliases import META_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,

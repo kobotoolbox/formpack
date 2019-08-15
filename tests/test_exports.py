@@ -4,7 +4,6 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 import unittest
-from collections import OrderedDict
 from io import BytesIO
 from textwrap import dedent
 from zipfile import ZipFile
@@ -16,6 +15,7 @@ from path import tempdir
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.schema.fields import ValidationStatusCopyField
+from formpack.utils.future import OrderedDict
 from .fixtures import build_fixture, open_fixture_file
 
 customer_satisfaction = build_fixture('customer_satisfaction')
