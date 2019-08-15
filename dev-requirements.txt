@@ -2,7 +2,8 @@
 # https://caremad.io/posts/2013/07/setup-vs-requirement/
 
 # It doesn't seem like pip honors `dependency_links` in setup.py, so install
-# any forked packages here first.
+# any forked packages here, prior to `-e .`
+-e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
 
 # Install this package
 # -e .

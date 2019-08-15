@@ -10,6 +10,7 @@ from textwrap import dedent
 from zipfile import ZipFile
 
 import xlrd
+from backports import csv
 from path import tempdir
 
 from formpack import FormPack
@@ -1809,3 +1810,219 @@ class TestFormPackExport(unittest.TestCase):
             '1',
             'Keurig'
         ])
+
+    def assert_geojson_feature_properties_match_csv(self, geojson_str,
+                                                    export_obj, submissions):
+        geojson_obj = json.loads(geojson_str)
+        feature_props = [f['properties'] for f in geojson_obj['features']]
+        csv_reader = csv.DictReader(
+            export_obj.to_csv(submissions), delimiter=';')
+        for index, csv_dict in enumerate(csv_reader):
+            self.assertDictEqual(feature_props[index], csv_dict)
+
+
+    def test_geojson_point(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Point')
+        geojson_str = ''.join(geojson_gen)
+
+        # Check the `properties` of each `feature` against the CSV export
+        self.assert_geojson_feature_properties_match_csv(
+            geojson_str, export, submissions)
+
+        # Remove the `properties` we've already checked, and compare the rest
+        geojson_obj = json.loads(geojson_str)
+        for feature in geojson_obj['features']:
+            del feature['properties']
+        self.assertDictEqual(
+            geojson_obj,
+            {
+                'features': [
+                    {
+                        'geometry': {
+                            'coordinates': [
+                                -76.60869,
+                                39.306938,
+                                11.0,
+                            ],
+                            'type': 'Point',
+                        },
+                        'type': 'Feature',
+                    },
+                    {
+                        'geometry': {
+                            'coordinates': [
+                                -58.442238,
+                                -34.631098,
+                                0.0,
+                            ],
+                            'type': 'Point',
+                        },
+                        'type': 'Feature',
+                    },
+                ],
+                'name': 'I have points, traces, and shapes!',
+                'type': 'FeatureCollection',
+            }
+        )
+
+    def test_geojson_trace(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Trace')
+        geojson_str = ''.join(geojson_gen)
+
+        # Check the `properties` of each `feature` against the CSV export
+        self.assert_geojson_feature_properties_match_csv(
+            geojson_str, export, submissions)
+
+        # Remove the `properties` we've already checked, and compare the rest
+        geojson_obj = json.loads(geojson_str)
+        for feature in geojson_obj['features']:
+            del feature['properties']
+        self.assertDictEqual(
+            geojson_obj,
+            {
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
+                    {
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-76.608323, 39.306032, 1.0],
+                                [-76.608953, 39.308701, 2.0],
+                                [-76.60938, 39.311313, 3.0],
+                                [-76.604223, 39.3116, 4.0],
+                                [-76.603804, 39.306077, 5.0],
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                    {
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-58.44218, -34.631089, 0.0],
+                                [-58.439112, -34.635079, 0.0],
+                                [-58.445635, -34.636562, 0.0],
+                                [-58.44713, -34.634929, 0.0],
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                ],
+            }
+        )
+
+    def test_geojson_shape(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Shape')
+        geojson_str = ''.join(geojson_gen)
+
+        # Check the `properties` of each `feature` against the CSV export
+        self.assert_geojson_feature_properties_match_csv(
+            geojson_str, export, submissions)
+
+        # Remove the `properties` we've already checked, and compare the rest
+        geojson_obj = json.loads(geojson_str)
+        for feature in geojson_obj['features']:
+            del feature['properties']
+        self.assertDictEqual(
+            geojson_obj,
+            {
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
+                    {
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
+                                [
+                                    [-76.608294, 39.305938, 0.0],
+                                    [-76.603656, 39.306138, 0.0],
+                                    [-76.604171, 39.31155, 0.0],
+                                    [-76.609332, 39.311288, 0.0],
+                                    [-76.609211, 39.309365, 0.0],
+                                    [-76.608294, 39.305938, 0.0],
+                                ]
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                    {
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
+                                [
+                                    [-58.447229, -34.6347, 0.0],
+                                    [-58.445613, -34.636607, 0.0],
+                                    [-58.438946, -34.635194, 0.0],
+                                    [-58.442056, -34.631063, 0.0],
+                                    [-58.447229, -34.6347, 0.0],
+                                ]
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                ],
+            }
+        )
+
+    def test_geojson_invalid(self):
+        title, schemas, _ = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        # Can't test an invalid `geopoint` by itself; it'll blow up
+        # `FormGPSField.format()`
+        submissions = [
+            {'Trace': '1 2 3 4'}, # Not enough points
+            {'Trace': '1 2 3 4;1'}, # Second point is bogus
+            {'Trace': '1 2 3 4;1 2 banana'}, # Second point is still bogus
+            {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;13 14 15 16'}, # Not closed
+            # The following are okay and must appear in the export
+            {'Trace': '1 2 3 4;5 6 7 8'},
+            {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;1 2 3 4'},
+        ]
+        for s in submissions:
+            s[fp.default_version_id_key] = fp.versions.keys()[0]
+        export = fp.export(versions=fp.versions.keys())
+        geojson_obj = json.loads(''.join(
+            export.to_geojson(submissions, geo_question_name='Trace')
+        ))
+        self.assertEqual(len(geojson_obj['features']), 1)
+        self.assertDictEqual(
+            geojson_obj['features'][0]['geometry'],
+            {
+                "coordinates": [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
+                "type": "LineString"
+            }
+        )
+        geojson_obj = json.loads(''.join(
+            export.to_geojson(submissions, geo_question_name='Shape')
+        ))
+        self.assertEqual(len(geojson_obj['features']), 1)
+        self.assertDictEqual(
+            geojson_obj['features'][0]['geometry'],
+            {
+                "coordinates": [[
+                    [2.0, 1.0, 3.0],
+                    [10.0, 9.0, 11.0],
+                    [6.0, 5.0, 7.0],
+                    [2.0, 1.0, 3.0],
+                ]],
+                "type": "Polygon"
+            }
+        )
