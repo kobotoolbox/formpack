@@ -116,7 +116,7 @@ class TestAutoReport(unittest.TestCase):
                  'total_count': 4}
             )
         ]
-        for (i, stat) in enumerate(stats):
+        for i, stat in enumerate(stats):
             assert stat == expected[i]
 
     @unittest.skip('TODO: fix the autoreport so this test passes')
@@ -289,7 +289,7 @@ class TestAutoReport(unittest.TestCase):
                  'total_count': 6}
              )
         ]
-        for (i, stat) in enumerate(stats):
+        for i, stat in enumerate(stats):
             assert stat == expected[i]
 
     def test_disaggregate(self):
@@ -357,7 +357,7 @@ class TestAutoReport(unittest.TestCase):
                            'median': 1,
                            'mode': '*',
                                    'stdev': '*'}))})]
-        for (i, stat) in enumerate(stats):
+        for i, stat in enumerate(stats):
             assert stat == expected[i]
 
     def test_disaggregate_extended_fields(self):
@@ -426,5 +426,5 @@ class TestAutoReport(unittest.TestCase):
                 'total_count': 4
             }
         )]
-        for (i, stat) in enumerate(stats):
+        for i, stat in enumerate(stats):
             assert stat == expected[i]

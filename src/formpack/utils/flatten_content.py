@@ -110,7 +110,7 @@ def _flatten_tags(row, tag_cols_and_seps=None):
 
     for tag in tag_list:
         matched = False
-        for (col, re_str) in tag_res.items():
+        for col, re_str in tag_res.items():
             mtch = re.match(re_str, tag)
             if mtch:
                 additionals[col].append(mtch.groups()[0])
@@ -118,7 +118,7 @@ def _flatten_tags(row, tag_cols_and_seps=None):
         if not matched:
             additionals['tags'].append(tag)
 
-    for (col, items) in additionals.items():
+    for col, items in additionals.items():
         separator = tag_cols_and_seps.get(col, ' ')
         row[col] = separator.join(items)
 

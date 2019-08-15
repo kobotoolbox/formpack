@@ -118,5 +118,5 @@ def validate_row(row, row_number):
 
 
 def validate_content(content):
-    for (i, row) in enumerate(content['survey']):
+    for i, row in enumerate(content['survey']):
         validate_row(row, row_number=i)

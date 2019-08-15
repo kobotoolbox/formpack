@@ -21,7 +21,7 @@ def test_row_validator():
         {'type': 'end_repeat'},
         {'type': 'begin_group', 'name': 'x', 'appearance': 'field-list'},
     ]
-    for (i, row) in enumerate(rows):
+    for i, row in enumerate(rows):
         validate_row(row, i)
 
 
@@ -36,7 +36,7 @@ def test_row_validator_fails():
         # no label; no longer enforced because label can be either 'media::image', 'appearance', or 'label'
         # {'type': 'text', 'name': 'x'},
     ]
-    for (i, row) in enumerate(rows):
+    for i, row in enumerate(rows):
         failed = False
         try:
             validate_row(row, i)

@@ -105,12 +105,12 @@ def expand_content_in_place(content):
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], str_types):
                 row[key] = _expand_xpath_to_list(row[key])
-        for (key, vals) in iteritems(specials):
+        for key, vals in iteritems(specials):
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
 
         if REMOVE_EMPTY_STRINGS:
-            for (key, val) in row.items():
+            for key, val in row.items():
                 if val == "":
                     del row[key]
 

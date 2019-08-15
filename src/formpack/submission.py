@@ -82,7 +82,7 @@ class NestedStruct(OrderedDict):
             if 'text' in struct:
                 _node.text(struct['text'])
             elif 'children' in struct:
-                for (ugh, child) in iteritems(struct['children']):
+                for ugh, child in iteritems(struct['children']):
                     _append_contents(child, _node)
             par.append(_node)
 

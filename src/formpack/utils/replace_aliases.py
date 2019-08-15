@@ -28,7 +28,7 @@ def aliases_to_ordered_dict(_d):
     unpacks a dict-with-lists to an ordered dict with keys sorted by length
     """
     arr = []
-    for (original, aliases) in _d.items():
+    for original, aliases in _d.items():
         arr.append((original, original))
         if isinstance(aliases, bool):
             aliases = [original]
@@ -145,7 +145,7 @@ formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 _pyxform_type_aliases = defaultdict(list)
 _formpack_type_reprs = {}
 
-for (_type, val) in QUESTION_TYPE_DICT.items():
+for _type, val in QUESTION_TYPE_DICT.items():
     _xform_repr = json.dumps(val, sort_keys=True)
     if _type in formpack_preferred_types:
         _formpack_type_reprs[_type] = _xform_repr
@@ -154,7 +154,7 @@ for (_type, val) in QUESTION_TYPE_DICT.items():
 
 formpack_type_aliases = aliases_to_ordered_dict(dict([
         (_type, _pyxform_type_aliases[_repr])
-        for (_type, _repr) in _formpack_type_reprs.items()
+        for _type, _repr in _formpack_type_reprs.items()
     ]))
 
 
@@ -167,7 +167,7 @@ def _unpack_headers(p_aliases, fp_preferred):
     _aliases = p_aliases.copy().items()
     combined = dict([
         (key, val if (val not in fp_preferred) else fp_preferred[val])
-        for (key, val) in _aliases
+        for key, val in _aliases
     ] + list(fp_preferred.items()))
     # ensure that id_string points to id_string (for example)
     combined.update(dict([
@@ -242,7 +242,7 @@ def replace_aliases_in_place(content, allowed_types=None):
                 if row[col] in pyxform_aliases.yes_no:
                     row[col] = pyxform_aliases.yes_no[row[col]]
 
-        for (key, val) in iteritems(survey_header_columns):
+        for key, val in iteritems(survey_header_columns):
             if key in row and key != val:
                 row[val] = row[key]
                 del row[key]
@@ -264,5 +264,5 @@ def replace_aliases_in_place(content, allowed_types=None):
     if settings:
         content['settings'] = dict([
             (settings_header_columns.get(key, key), val)
-            for (key, val) in settings.items()
+            for key, val in settings.items()
         ])
