@@ -1997,7 +1997,7 @@ class TestFormPackExport(unittest.TestCase):
             {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;1 2 3 4'},
         ]
         for s in submissions:
-            s[fp.default_version_id_key] = fp.versions.keys()[0]
+            s[fp.default_version_id_key] = list(fp.versions)[0]
         export = fp.export(versions=fp.versions.keys())
         geojson_obj = json.loads(''.join(
             export.to_geojson(submissions, geo_question_name='Trace')

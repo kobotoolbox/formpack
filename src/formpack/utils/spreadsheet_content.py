@@ -74,7 +74,7 @@ def flatten_to_spreadsheet_content(content,
             return None
         for row in rows:
             all_cols.update(OrderedDict.fromkeys(row.keys()))
-        _all_cols = _order_cols(all_cols.keys(), sheet_name)
+        _all_cols = _order_cols(list(all_cols), sheet_name)
 
         removed = remove_columns.get(sheet_name, [])
         firsts = prioritized_columns.get(sheet_name, [])

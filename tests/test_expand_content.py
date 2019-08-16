@@ -357,7 +357,7 @@ def test_not_special_cols():
         'body:accuracyThreshold',
     ]
     (not_special, _t, tc) = _get_special_survey_cols(_s(not_special))
-    assert not_special.keys() == []
+    assert list(not_special) == []
 
 
 def test_expand_constraint_message():

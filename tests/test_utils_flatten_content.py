@@ -338,7 +338,7 @@ def test_flatten_to_spreadsheet_content():
     }
     _c = flatten_to_spreadsheet_content(_e)
     assert isinstance(_c, OrderedDict)
-    assert _c.keys() == ['survey', 'choices', 'settings']
+    assert list(_c) == ['survey', 'choices', 'settings']
 
 
 def test_flatten_tags_util_method():

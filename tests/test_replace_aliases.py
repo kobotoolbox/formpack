@@ -74,7 +74,7 @@ def _setting(settings_key, expected):
     _o = {'survey': [], 'settings': _s}
     replace_aliases(_o, in_place=True)
     assert len(_o['settings'].keys()) == 1
-    assert _o['settings'].keys()[0] == expected
+    assert list(_o['settings'])[0] == expected
 
 
 def test_settings_get_replaced():
@@ -107,7 +107,7 @@ def test_custom_allowed_types():
 
 def test_list_name_renamed():
     ex1 = replace_aliases({'choices': [{'list name': 'mylist'}]})
-    assert ex1['choices'][0].keys() == ['list_name']
+    assert list(ex1['choices'][0]) == ['list_name']
 
 # when formpack exports support choice['value'] as the identifier for the choice, then we
 # will use choice['value']; until then, we will do the opposite; since both are accepted
@@ -132,8 +132,9 @@ def _assert_column_converted_to(original, desired):
     row[original] = 'ABC'
     surv = {'survey': [row]}
     replace_aliases(surv, in_place=True)
-    assert len(surv['survey'][0].keys()) == 1
-    assert surv['survey'][0].keys()[0] == desired
+    surv_keys = list(surv['survey'][0])
+    assert len(surv_keys) == 1
+    assert surv_keys[0] == desired
 
 
 def test_survey_header_replaced():

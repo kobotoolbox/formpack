@@ -124,7 +124,7 @@ class Export(object):
             return None
         # `format_one_submission()` will recurse through all the sections; get
         # the first one to start
-        section = version.sections.values()[0]
+        section = list(version.sections.values())[0]
         submission = FormSubmission(submission)
         return self.format_one_submission([submission.data], section)
 
@@ -516,7 +516,7 @@ class Export(object):
         """
 
         # Consider the first section only (discard repeating groups)
-        first_section_name = self.sections.keys()[0]
+        first_section_name = list(self.sections)[0]
         labels = self.labels[first_section_name]
 
         # Manually write the beginning and end of the GeoJSON file so that we
@@ -543,8 +543,7 @@ class Export(object):
 
             # Find the requested field
             all_fields = version.sections[first_section_name].fields.values()
-            geo_fields = filter(lambda f: f.name == geo_question_name,
-                                all_fields)
+            geo_fields = [f for f in all_fields if f.name == geo_question_name]
             try:
                 geo_field = geo_fields[0]
             except IndexError:

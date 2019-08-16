@@ -212,7 +212,8 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     fields = fp.get_fields_for_versions(fp.versions)
     # The first and only field returned should be the first field of the first
     # section of the last version
-    assert fields[0] == fp[-1].sections.values()[0].fields.values()[0]
+    section_value = list(fp[-1].sections.values())[0]
+    assert fields[0] == list(section_value.fields.values())[0]
 
 
 def test_get_fields_for_versions_returns_all_choices():
