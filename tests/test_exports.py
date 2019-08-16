@@ -26,7 +26,7 @@ class TestFormPackExport(unittest.TestCase):
     maxDiff = None
 
     def assertTextEqual(self, text1, text2):
-        self.assertEquals(dedent(text1).strip(), dedent(text2).strip())
+        self.assertEqual(dedent(text1).strip(), dedent(text2).strip())
 
     def test_generator_export(self):
 
@@ -79,7 +79,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # by default, exports use the question 'name' attribute
         headers = fp.export(versions=0).to_dict(submissions)['Restaurant profile']['fields']
-        self.assertEquals(headers, ['restaurant_name',
+        self.assertEqual(headers, ['restaurant_name',
                                      'location',
                                      '_location_latitude',
                                      '_location_longitude',
@@ -92,7 +92,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=translations[0], versions=1)
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEquals(headers, ['restaurant name',
+        self.assertEqual(headers, ['restaurant name',
                                     'location',
                                     '_location_latitude',
                                     '_location_longitude',
@@ -102,7 +102,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=translations[1], versions=1)
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEquals(headers, ['nom du restaurant',
+        self.assertEqual(headers, ['nom du restaurant',
                                     'lieu',
                                     '_lieu_latitude',
                                     '_lieu_longitude',
@@ -113,7 +113,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=UNTRANSLATED, versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEquals(headers, ['restaurant name',
+        self.assertEqual(headers, ['restaurant name',
                                     'location',
                                     '_location_latitude',
                                     '_location_longitude',
@@ -130,14 +130,14 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'rpV3'}
 
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEquals(export['fields'], ['restaurant_name',
+        self.assertEqual(export['fields'], ['restaurant_name',
                                              'location',
                                              '_location_latitude',
                                              '_location_longitude',
                                              '_location_altitude',
                                              '_location_precision',
                                              'eatery_type'])
-        self.assertEquals(export['data'], [['Taco Truck',
+        self.assertEqual(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
                                              '-25.43',
@@ -156,7 +156,7 @@ class TestFormPackExport(unittest.TestCase):
         # are translated into that language
         options['lang'] = fp[1].translations[0]
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEquals(export['data'], [['Taco Truck',
+        self.assertEqual(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
                                              '-25.43',
@@ -173,7 +173,7 @@ class TestFormPackExport(unittest.TestCase):
 
         options['lang'] = fp[1].translations[1]
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEquals(export['data'], [['Taco Truck',
+        self.assertEqual(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
                                              '-25.43',
@@ -196,7 +196,7 @@ class TestFormPackExport(unittest.TestCase):
         # by default, groups are stripped.
         export = fp.export(**options).to_dict(submissions)
         headers = export['Grouped questions']['fields']
-        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
+        self.assertEqual(headers, ['q1', 'g1q1', 'g1sg1q1',
                                     'g1q2', 'g2q1', 'qz'])
 
     def test_headers_of_translated_group_exports(self):
@@ -206,7 +206,7 @@ class TestFormPackExport(unittest.TestCase):
             'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
         english_export = fp.export(lang='English', **options).to_dict(
             submissions)
-        self.assertEquals(
+        self.assertEqual(
             english_export[title]['fields'],
             [
                 'start',
@@ -222,7 +222,7 @@ class TestFormPackExport(unittest.TestCase):
         )
         spanish_export = fp.export(lang='Español', **options).to_dict(
             submissions)
-        self.assertEquals(
+        self.assertEqual(
             spanish_export[title]['fields'],
             [
                 'start',
