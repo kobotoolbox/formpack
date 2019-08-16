@@ -6,7 +6,7 @@
 -e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
 
 # Install this package
-# -e .
+-e .
 
 # Install testing / development requirements
 coverage==4.5.2
