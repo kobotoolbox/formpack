@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
 
 import re
 from collections import defaultdict, OrderedDict
 from copy import deepcopy
+from functools import reduce
 
-from array_to_xpath import array_to_xpath
+from .array_to_xpath import array_to_xpath
+from .future import range
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
@@ -81,10 +84,10 @@ def _stringify_type__depr(json_qtype):
 
 
 def flatten_tag_list(tag_list, tag_cols_and_seps=None):
-    '''
+    """
     takes a list of tags and reassigns them to the tag column in which they
     appear on import of xls
-    '''
+    """
     return _flatten_tags({'tags': tag_list}, tag_cols_and_seps)
 
 
@@ -170,6 +173,7 @@ def _flatten_translated_fields(row, translations, translated_cols,
                 _placed_cols.update([col])
 
     o_row = deepcopy(row)
+    translations_range = list(range(0, len(translations)))
     for key in (k for k in translated_cols if k in row):
         items = row[key]
         if not isinstance(items, list):
@@ -181,7 +185,7 @@ def _flatten_translated_fields(row, translations, translated_cols,
                     key,
                 ), o_row)
         del row[key]
-        for i in xrange(0, len(translations)):
+        for i in translations_range:
             _t = translations[i]
             try:
                 value = items[i]

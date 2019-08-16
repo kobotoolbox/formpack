@@ -10,11 +10,7 @@ import statistics
 
 from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
-
-try:
-    xrange = xrange
-except NameError:  # python 3
-    xrange = range
+from ..utils.future import range
 
 
 class FormField(FormDataDef):
@@ -359,9 +355,7 @@ class TextField(ExtendedFormField):
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
-        stats.update({
-            'values': values[:limit]
-        })
+        stats.update({'values': values[:limit]})
 
         return stats
 
@@ -369,9 +363,10 @@ class TextField(ExtendedFormField):
 class DateField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
-        """ Return total count for all, and freq and % for 'date' date types
+        """
+        Return total count for all, and freq and % for 'date' date types
 
-            Dates are sorted from old to new.
+        Dates are sorted from old to new.
         """
 
         stats = super(DateField, self).get_stats(metrics, lang, limit)
@@ -428,7 +423,7 @@ class NumField(FormField):
 
         """
         for value, freq in sorted(dataset.items()):
-            for x in xrange(freq):
+            for x in range(freq):
                 yield value
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):

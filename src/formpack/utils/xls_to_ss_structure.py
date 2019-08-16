@@ -57,10 +57,12 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
 
     def _sheet_to_lists(sheet):
         result = []
-        for row in range(0, sheet.nrows):
+        nrows_range = list(range(0, sheet.nrows))
+        ncols_range = list(range(0, sheet.ncols))
+        for row in nrows_range:
             row_results = []
             row_empty = True
-            for col in range(0, sheet.ncols):
+            for col in ncols_range:
                 value = sheet.cell_value(row, col)
                 if isinstance(value, str_types):
                     value = _escape_newline_chars(value.strip())
@@ -98,9 +100,10 @@ def _parsed_sheet(sheet_lists):
     columns = sheet_lists[0]
     rows = sheet_lists[1:]
     out_list = []
+    columns_range = list(range(0, len(columns)))
     for row in rows:
         out_row = OrderedDict()
-        for ii in range(0, len(columns)):
+        for ii in columns_range:
             if row[ii] is not None:
                 out_row[columns[ii]] = row[ii]
         out_list.append(out_row)

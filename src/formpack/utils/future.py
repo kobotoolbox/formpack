@@ -2,9 +2,6 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-# These helpers are duplicated from `six`.
-# When FormPack stops support for Python2, this file can be removed and code
-# can be replaced with Python3 code
 try:
     from cyordereddict import OrderedDict
 except ImportError:
@@ -15,9 +12,16 @@ try:
 except ImportError:
     from io import StringIO
 
+try:
+    range = xrange
+except NameError:
+    range = range
 
 import sys
 
+# These helpers are duplicated from `six`.
+# When FormPack stops support for Python2, this file can be removed and code
+# can be replaced with Python3 code
 PY2 = sys.version_info[0] == 2
 
 
