@@ -4,8 +4,6 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import re
-import sys
 from setuptools import setup, find_packages
 
 
@@ -14,13 +12,13 @@ requirements = [
     'cyordereddict',
     'jsonschema',
     'lxml',
-    'path.py<12', # Pinned for Python 2 compatibility
+    'path.py<12',  # Pinned for Python 2 compatibility
     'pyquery',
     'pyxform',
     'statistics',
     'XlsxWriter',
-    'backports.csv', # Remove after dropping Python 2 support (and rewrite `imports`)
-    'geojson-rewind==0.1.1+py2.jnm', # Stop using fork after dropping Python 2 support
+    'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
+    'geojson-rewind==0.1.1+py2.jnm',  # Stop using fork after dropping Python 2 support
 ]
 dep_links = [
     # "Be careful with the version" part of `#egg=project-version`, according to
@@ -37,7 +35,7 @@ setup(name='formpack',
       author_email='alex.dorey@kobotoolbox.org',
       url='https://github.com/kobotoolbox/formpack/',
       packages=[str(pkg) for pkg in find_packages('src')],
-      package_dir={'': b'src'},
+      package_dir={'': 'src'},
       install_requires=requirements,
       dependency_links=dep_links,
       include_package_data=True,
