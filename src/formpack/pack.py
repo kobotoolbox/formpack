@@ -77,7 +77,6 @@ class FormPack(object):
                 _id_keys.append(_id_key)
         return _id_keys
 
-
     @property
     def available_translations(self):
         translations = set()
@@ -191,25 +190,29 @@ class FormPack(object):
         return ''.join(out)
 
     @staticmethod
-    def _combine_field_choices(old_field, new_field):
+    def _combine_field_choices(older_version_field, current_field):
         """
-        Update `new_field.choice` so that it contains everything from
-        `old_field.choice`. In the event of a conflict, `new_field.choice`
+        Updates `current_field.choice` so that it contains everything from
+        `older_version_field.choice`. In the event of a conflict, `current_field.choice`
         wins. If either field does not have a `choice` attribute, do
         nothing
 
-        :param old_field: FormField
-        :param new_field: FormField
+        :param older_version_field: FormField
+        :param current_field: FormField
         :return: FormField. Updated new_field
         """
+
         try:
-            old_choice = old_field.choice
-            new_choice = new_field.choice
-            new_field.merge_choice(old_choice)
+            older_version_choice = older_version_field.choice
+            current_field.merge_choice(older_version_choice)
         except AttributeError:
             pass
 
-        return new_field
+        return current_field
+
+    @staticmethod
+    def _do_fields_match(older_versioned_field, current_field):
+        return older_versioned_field.signature == current_field.signature
 
     def get_fields_for_versions(self, versions=-1, data_types=None):
 
@@ -271,16 +274,23 @@ class FormPack(object):
             for section_name, section in version.sections.items():
                 for field_name, field_object in section.fields.items():
                     if not isinstance(field_object, CopyField):
+                        add_field = True
                         if field_name in positions:
                             position = positions[field_name]
                             latest_field_object = tmp2d[position[0]][position[1]]
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
                             # in position as the latest one.
-                            new_object = self._combine_field_choices(
-                                field_object, latest_field_object)
-                            tmp2d[position[0]][position[1]] = new_object
-                        else:
+
+                            if self._do_fields_match(field_object, latest_field_object):
+                                new_object = self._combine_field_choices(
+                                    field_object, latest_field_object)
+                                tmp2d[position[0]][position[1]] = new_object
+                                add_field = False
+                            else:
+                                field_object.use_unique_name = True
+
+                        if add_field:
                             try:
                                 current_index_list = tmp2d[index]
                                 current_index_list.append(field_object)
@@ -291,7 +301,7 @@ class FormPack(object):
                                 # it can happen when current version has more items than newest one.
                                 index = len(tmp2d) - 1
 
-                            positions[field_name] = (index, len(tmp2d[index]) - 1)
+                            positions[field_object.contextual_name] = (index, len(tmp2d[index]) - 1)
 
                         index += 1
 

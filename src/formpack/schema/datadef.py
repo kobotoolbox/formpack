@@ -23,15 +23,26 @@ class FormDataDef(object):
 
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
+        self.unique_name = name
+        self.use_unique_name = False
         self.labels = labels or {}
-        self.value_names = self.get_value_names()
         self.has_stats = has_stats
 
     def __repr__(self):
-        return "<%s name='%s'>" % (self.__class__.__name__, self.name)
+        return "<%s contextual_name='%s'>" % (self.__class__.__name__, self.contextual_name)
+
+    @property
+    def contextual_name(self):
+        if self.use_unique_name:
+            return self.unique_name
+        return self.name
+
+    @property
+    def value_names(self):
+        return self.get_value_names()
 
     def get_value_names(self):
-        return [self.name]
+        return [self.contextual_name]
 
     @classmethod
     def from_json_definition(cls, definition, translations=None):
@@ -47,6 +58,9 @@ class FormDataDef(object):
         else:
             labels = {}
         return labels
+
+    def create_unique_name(self, suffix):
+        pass
 
 
 class FormGroup(FormDataDef):  # useful to get __repr__
@@ -79,7 +93,7 @@ class FormSection(FormDataDef):
         return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
 
     def get_label(self, lang=UNSPECIFIED_TRANSLATION):
-        return [self.labels.get(lang) or self.name]
+        return [self.labels.get(lang) or self.contextual_name]
 
     def __repr__(self):
         parent_name = getattr(self.parent, 'name', None)
@@ -119,7 +133,6 @@ class FormChoice(FormDataDef):
             option['labels'] = OrderedDict(zip(translation_list, _label))
             option['name'] = choice_name
         return all_choices
-
 
     @property
     def translations(self):

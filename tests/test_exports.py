@@ -1465,13 +1465,15 @@ class TestFormPackExport(unittest.TestCase):
                 'fields': ['restaurant_name', 'location', '_location_latitude',
                            '_location_longitude', '_location_altitude',
                            '_location_precision', 'eatery_type',
-                           'eatery_type/sit_down', 'eatery_type/takeaway', '_uuid'],
+                           'eatery_type/sit_down', 'eatery_type/takeaway',
+                           'eatery_type_select_one_rpV3', '_uuid'],
                 'data': [
                     [
                         'Felipes',
                         '12.34 -23.45',
                         '12.34',
                         '-23.45',
+                        '',
                         '',
                         '',
                         '',
@@ -1490,6 +1492,7 @@ class TestFormPackExport(unittest.TestCase):
                         '',
                         '',
                         '',
+                        '',
                         'd6dee2e1-e0e6-4d08-9ad4-d78d77079f85',
                     ],
 
@@ -1500,9 +1503,10 @@ class TestFormPackExport(unittest.TestCase):
                         '-25.43',
                         '',
                         '',
+                        '',
+                        '',
+                        '',
                         'takeaway',
-                        '',
-                        '',
                         '3f2ac742-305a-4b0d-b7ef-f7f57fcd14dc',
                     ],
 
@@ -1513,9 +1517,10 @@ class TestFormPackExport(unittest.TestCase):
                         '-24.53',
                         '',
                         '',
+                        '',
+                        '',
+                        '',
                         'sit_down',
-                        '',
-                        '',
                         '3195b926-1578-4bac-80fc-735129a34090',
                     ],
 
@@ -1529,6 +1534,7 @@ class TestFormPackExport(unittest.TestCase):
                         'takeaway sit_down',
                         '1',
                         '1',
+                        '',
                         '04cbcf32-ecbd-4801-829b-299463dcd125',
                     ],
 
@@ -1542,6 +1548,7 @@ class TestFormPackExport(unittest.TestCase):
                         'sit_down',
                         '1',
                         '0',
+                        '',
                         '1f21b881-db1d-4629-9b82-f4111630187d',
                     ],
 
@@ -1555,6 +1562,7 @@ class TestFormPackExport(unittest.TestCase):
                         '',
                         '0',
                         '0',
+                        '',
                         'fda7e49b-6c84-4cfe-b1a8-3de997ac0880',
                     ],
 
@@ -1564,6 +1572,7 @@ class TestFormPackExport(unittest.TestCase):
                         '12.43',
                         '-24.54',
                         '1',
+                        '',
                         '',
                         '',
                         '',

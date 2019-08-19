@@ -54,6 +54,37 @@ class FormField(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
+    def create_unique_name(self, suffix):
+        self.unique_name = self.get_unique_name(suffix)
+
+    def get_unique_name(self, suffix):
+        """
+        Returns a unique name based on `self.signature` and `suffix`.
+
+        :param suffix: str
+        :return: str
+        """
+        return "{signature}_{suffix}".format(
+            signature=self.signature,
+            suffix=suffix
+        )
+
+    @property
+    def signature(self):
+        """
+        Returns a string signature based `self.name` and `self.data_type`.
+
+        Useful to compare two fields to each other to determine whether they
+        are the same. (same name, same type)
+
+        :param suffix: str
+        :return: str
+        """
+        return "{name}_{type}".format(
+            name=self.name,
+            type=self.data_type,
+        )
+
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                    hierarchy_in_labels=False, multiple_select="both"):
         """ Return a list of labels for this field.
@@ -122,13 +153,13 @@ class FormField(FormDataDef):
             return group_sep.join(path)
 
         # even if `lang` can be None, we don't want the `label` to be None.
-        label = self.labels.get(lang, self.name)
+        label = self.labels.get(lang, self.contextual_name)
         # If `label` is None, no matches are found, so return `field` name.
-        return self.name if label is None else label
+        return self.contextual_name if label is None else label
 
     def __repr__(self):
-        args = (self.__class__.__name__, self.name, self.data_type)
-        return "<%s name='%s' type='%s'>" % args
+        args = (self.__class__.__name__, self.contextual_name, self.data_type)
+        return "<%s contextual_name='%s' type='%s'>" % args
 
     @classmethod
     def from_json_definition(cls, definition, hierarchy=None,
@@ -204,7 +235,7 @@ class FormField(FormDataDef):
         return data_type_classes.get(data_type, cls)(**args)
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
-        return {self.name: val}
+        return {self.contextual_name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -530,7 +561,7 @@ class CopyField(FormField):
 
     def get_labels(self, *args, **kwargs):
         """ Labels are the just the value name. Groups are ignored """
-        return [self.name]
+        return [self.contextual_name]
 
 
 class ValidationStatusCopyField(CopyField):
@@ -549,9 +580,9 @@ class ValidationStatusCopyField(CopyField):
 
         if isinstance(val, dict):
             if lang == UNSPECIFIED_TRANSLATION:
-                value = {self.name: val.get("uid", "")}
+                value = {self.contextual_name: val.get("uid", "")}
             else:
-                value = {self.name: val.get("label", "")}
+                value = {self.contextual_name: val.get("label", "")}
         else:
             value = super(CopyField, self).format(val=val, lang=lang, context=context)
 
@@ -599,10 +630,10 @@ class FormGPSField(FormField):
     def get_value_names(self, multiple_select="both"):
         """ Return the list of field identifiers used by this field"""
         names = []
-        names.append(self.name)
+        names.append(self.contextual_name)
 
         for data_type in ('latitude', 'longitude', 'altitude', 'precision'):
-            names.append('_%s_%s' % (self.name, data_type))
+            names.append('_%s_%s' % (self.contextual_name, data_type))
 
         return names
 
@@ -660,7 +691,7 @@ class FormChoiceField(ExtendedFormField):
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
         val = self.get_translation(val, lang)
-        return {self.name: val}
+        return {self.contextual_name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -716,9 +747,7 @@ class FormChoiceField(ExtendedFormField):
         combined_options = choice.options.copy()
         combined_options.update(self.choice.options)
         self.choice.options = combined_options
-
         self._empty_result()
-        self.value_names = self.get_value_names()
 
     def _empty_result(self):
         """
@@ -774,16 +803,16 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         """ Return the list of field identifiers used by this field"""
         names = []
         if multiple_select in ("both", "summary"):
-            names.append(self.name)
+            names.append(self.contextual_name)
 
         if multiple_select in ("both", "details"):
             for option_name in self.choice.options.keys():
-                names.append(self.name + '/' + option_name)
+                names.append(self.contextual_name + '/' + option_name)
         return names
 
     def __repr__(self):
-        data = (self.name, self.data_type)
-        return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
+        data = (self.contextual_name, self.data_type)
+        return "<FormChoiceFieldWithMultipleSelect contextual_name='%s' type='%s'>" % data
 
     # maybe try to cache those
     def format(self, val, lang=UNSPECIFIED_TRANSLATION,
@@ -805,11 +834,11 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                     res.append(label)
                 else:
                     res.append(v)
-            cells[self.name] = " ".join(res)
+            cells[self.contextual_name] = " ".join(res)
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
-                cells[self.name + "/" + choice] = "1"
+                cells[self.contextual_name + "/" + choice] = "1"
         return cells
 
     def parse_values(self, raw_values):
@@ -857,8 +886,8 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
     def parameter_value_names(self):
         # Value names must be unique across the entire form!
         return [
-            self.name + '/' + name
-                for name, label in self.parameters_in_use
+            self.contextual_name + '/' + name
+            for name, label in self.parameters_in_use
         ]
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',

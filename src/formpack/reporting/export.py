@@ -201,7 +201,7 @@ class Export(object):
 
         for field in all_fields:
             section_fields.setdefault(field.section.name, []).append(
-                (field.name, field)
+                (field.contextual_name, field)
             )
             section_labels.setdefault(field.section.name, []).append(
                 field.get_labels(lang, group_sep,
@@ -228,7 +228,6 @@ class Export(object):
                         auto_field_names.append(
                             "_submission_{}".format(copy_field))
 
-
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
         # have several values. We needed them grouped to insert them at the
@@ -248,8 +247,8 @@ class Export(object):
                 # Add the tags for this field. If the field has multiple
                 # labels, add the tags once for each label
                 tags.extend(
-                    [flatten_tag_list(field.tags, tag_cols_and_seps)] *
-                        len(field.value_names)
+                    [flatten_tag_list(field.tags, tag_cols_and_seps)]
+                    * len(field.value_names)
                 )
 
             names = [name for name_list in name_lists for name in name_list]

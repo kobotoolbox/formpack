@@ -127,7 +127,7 @@ class FormVersion(object):
 
         for data_definition in survey:
             data_type = data_definition.get('type')
-            if not data_type: # handle broken data type definition
+            if not data_type:  # handle broken data type definition
                 continue
 
             data_type = normalize_data_type(data_type)
@@ -191,6 +191,7 @@ class FormVersion(object):
                                                    hierarchy, section,
                                                    field_choices,
                                                    translations=self.translations)
+            field.create_unique_name(self.id)
             section.fields[field.name] = field
 
             _f = fields_by_name[field.name]

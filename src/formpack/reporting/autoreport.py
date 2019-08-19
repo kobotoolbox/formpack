@@ -50,10 +50,20 @@ class AutoReport(object):
 
     def _calculate_stats(self, submissions, fields, versions, lang):
 
-        metrics = {field.name: Counter() for field in fields}
+        metrics = {field.contextual_name: Counter() for field in fields}
 
         submissions_count = 0
         submission_counts_by_version = Counter()
+
+        # When form contains questions with the same name with different types,
+        # Older found versions are pushed at the end of the list `fields`
+        # Because we want to match submission values with fields, we need to try
+        # to match with older version first.
+        # For example: Form contains two versions with one question.
+        # `reversed_fields` look this:
+        # [<FormField type="text" contextual_name="question_text_v123456">,
+        #  <FormField type="integer" contextual_name="question">]
+        reversed_fields = list(reversed(fields))
 
         for entry in submissions:
 
@@ -63,20 +73,38 @@ class AutoReport(object):
 
             submissions_count += 1
             submission_counts_by_version[version_id] += 1
+            fields_to_skip = []
 
             # TODO: do we really need FormSubmission ?
             entry = FormSubmission(entry).data
-            for field in fields:
-                if field.has_stats:
-                    counter = metrics[field.name]
+
+            for field in reversed_fields:
+                if field.has_stats and field.name not in fields_to_skip:
+                    counter = metrics[field.contextual_name]
                     raw_value = entry.get(field.path)
+
                     if raw_value is not None:
+                        # Because `field.path` is the same for all fields which
+                        # have the same name, we want to be sure we don't append
+                        # data multiple times.
+
+                        # If `field.use_unique_name` is `True`, `data` could be
+                        # mapped to it depending on entry's version ID.
+                        if field.use_unique_name:
+                            if field.contextual_name == field.get_unique_name(version_id):
+                                # We have a match. Skip other fields with the same name
+                                # for this submission
+                                fields_to_skip.append(field.name)
+                            else:
+                                # If we reach this line, it's because user has changed
+                                # the type of question more than once and
+                                # version is not the correct one yet.
+                                # We need to keep looking for the good one.
+                                continue
+
                         try:
                             values = list(field.parse_values(raw_value))
                         except ValueError as e:
-                            # TODO: Remove try/except when
-                            # https://github.com/kobotoolbox/formpack/issues/151
-                            # is fixed?
                             logging.warning(str(e), exc_info=True)
                             # Treat the bad value as a blank response
                             counter[None] += 1
@@ -90,7 +118,7 @@ class AutoReport(object):
             for field in fields:
                 yield (field,
                        field.get_labels(lang)[0],
-                       field.get_stats(metrics[field.name], lang=lang))
+                       field.get_stats(metrics[field.contextual_name], lang=lang))
 
         return AutoReportStats(self, stats_generator(), submissions_count,
                                submission_counts_by_version)
@@ -107,6 +135,7 @@ class AutoReport(object):
         submission_counts_by_version = Counter()
 
         fields = [f for f in fields if f != split_by_field]
+        reversed_fields = list(reversed(fields))
 
         # Then we map fields, values and splitters:
         #          {field_name1: {
@@ -120,12 +149,12 @@ class AutoReport(object):
         #              field_name2...},
         #         ...}
         #
-        metrics = {f.name: defaultdict(Counter) for f in fields}
+        metrics = {f.contextual_name: defaultdict(Counter) for f in fields}
 
-        for sbmssn in submissions:
+        for submission in submissions:
 
             # Skip unrequested versions
-            version_id = self._get_version_id_from_submission(sbmssn)
+            version_id = self._get_version_id_from_submission(submission)
             if version_id not in versions:
                 continue
 
@@ -138,21 +167,40 @@ class AutoReport(object):
 
             # since we are going to pop one entry, we make a copy
             # of it to avoid side effect
-            entry = dict(FormSubmission(sbmssn).data)
+            entry = dict(FormSubmission(submission).data)
             splitter = entry.pop(split_by_field.path, None)
+            fields_to_skip = []
 
-            for field in fields:
+            for field in reversed_fields:
 
                 if field.has_stats:
 
                     raw_value = entry.get(field.path)
 
                     if raw_value is not None:
+                        # Because `field.path` is the same for all fields which
+                        # have the same name, we want to be sure we don't append
+                        # data multiple times.
+
+                        # If `field.use_unique_name` is `True`, `data` could be
+                        # mapped to it depending on entry's version ID.
+                        if field.use_unique_name:
+                            if field.contextual_name == field.get_unique_name(version_id):
+                                # We have a match. Skip other fields with the same name
+                                # for this submission
+                                fields_to_skip.append(field.name)
+                            else:
+                                # If we reach this line, it's because user has changed
+                                # the type of question more than once and
+                                # version is not the correct one yet.
+                                # We need to keep looking for the good one.
+                                continue
+
                         values = field.parse_values(raw_value)
                     else:
                         values = (None,)
 
-                    value_metrics = metrics[field.name]
+                    value_metrics = metrics[field.contextual_name]
 
                     for value in values:
                         counters = value_metrics[value]
@@ -187,7 +235,7 @@ class AutoReport(object):
 
         def stats_generator():
             for field in fields:
-                stats = field.get_disaggregated_stats(metrics[field.name], lang=lang,
+                stats = field.get_disaggregated_stats(metrics[field.contextual_name], lang=lang,
                                                       top_splitters=top_splitters)
                 yield (field, field.get_labels(lang)[0], stats)
 
@@ -204,11 +252,11 @@ class AutoReport(object):
             fields = all_fields
         else:
             fields.add(split_by)
-            fields = [field for field in all_fields if field.name in fields]
+            fields = [field for field in all_fields if field.contextual_name in fields]
 
         if split_by:
             try:
-                split_by_field = next(f for f in fields if f.name == split_by)
+                split_by_field = next(f for f in fields if f.contextual_name == split_by)
             except StopIteration:
                 raise ValueError('No field matching name "%s" '
                                  'for split_by' % split_by)
