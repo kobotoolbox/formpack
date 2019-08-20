@@ -6,6 +6,8 @@ import random
 import re
 import string
 import unicodedata
+from functools import total_ordering
+
 
 from ..constants import (
     EXCEL_SHEET_NAME_SIZE_LIMIT, EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
@@ -107,3 +109,34 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
         )
         i += 1
     return candidate
+
+
+def orderable_with_none(k):
+    """
+    Tiny helper to sort a list in Python3 which contains `None` values
+
+    Usage example:
+    e.g. sorted(['En', '', None], key=orderable_with_none)
+    """
+    class OrderableNone(object):
+        @total_ordering
+        class __OrderableNone:
+            def __init__(self):
+                pass
+
+            def __le__(self, other):
+                return True
+
+            def __eq__(self, other):
+                return self is other
+
+        instance = None
+
+        def __new__(cls):
+            if not cls.instance:
+                cls.instance = cls.__OrderableNone()
+            return cls.instance
+
+    if k is None:
+        return OrderableNone()
+    return k

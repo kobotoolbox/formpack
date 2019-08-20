@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 import unittest
-from io import BytesIO
+from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
 
@@ -755,7 +755,6 @@ class TestFormPackExport(unittest.TestCase):
             })
         ])
         self.assertEqual(export_dict, expected_dict)
-
 
     def test_repeats_alias(self):
         title, schemas, submissions = build_fixture('grouped_repeatable_alias')
@@ -1734,8 +1733,16 @@ class TestFormPackExport(unittest.TestCase):
         zipped = ZipFile(raw_zip, 'r')
         for name in expected_label_file_names:
             with open_fixture_file(fixture_name, name, 'r') as expected:
-                actual = zipped.open(name, 'r')
-                assert actual.read() == expected.read()
+                actual = TextIOWrapper(zipped.open(name, 'r'), newline=None,
+                                       encoding='utf-8')
+                actual_content = actual.read()
+                expected_content = expected.read()
+
+                # ToDo remove condition when Python2 support is dropped
+                if isinstance(actual_content, bytes):
+                    actual_content = actual_content.decode('utf-8')
+
+                assert actual_content == expected_content
         zipped.close()
         raw_zip.close()
 
@@ -1775,8 +1782,16 @@ class TestFormPackExport(unittest.TestCase):
         zipped = ZipFile(raw_zip, 'r')
         with open_fixture_file(
                 fixture_name, fixture_label_file_name, 'r') as expected:
-            actual = zipped.open(expected_label_file_name, 'r')
-            assert actual.read() == expected.read()
+            actual = TextIOWrapper(zipped.open(expected_label_file_name, 'r'),
+                                   newline=None,
+                                   encoding='utf-8')
+            actual_content = actual.read()
+            expected_content = expected.read()
+            # ToDo remove condition when Python2 support is dropped
+            if isinstance(actual_content, bytes):
+                actual_content = actual_content.decode('utf-8')
+
+            assert actual_content == expected_content
         zipped.close()
         raw_zip.close()
 

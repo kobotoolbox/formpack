@@ -10,7 +10,8 @@ import statistics
 
 from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
-from ..utils.future import range
+from ..utils.future import range, OrderedDict
+from ..utils.ordered_collection import OrderedDefaultdict
 
 
 class FormField(FormDataDef):
@@ -278,8 +279,8 @@ class ExtendedFormField(FormField):
 
 
         :param stats: dict {'total_count': <int>, 'provided': <int>, 'show_graph': <bool>, 'not_provided': <int>}
-        :param metrics: defaultdict {'field value': Counter('value1', 'value2', ..., 'value3')}
-        :param top_splitters: list 5 most commons values among Counter collections
+        :param metrics: defaultdict {'field value': OrderedCounter('value1', 'value2', ..., 'value3')}
+        :param top_splitters: list 5 most commons values among OrderedCounter collections
         :param lang: string
         :return: defaultdict
 
@@ -458,11 +459,12 @@ class NumField(FormField):
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
 
-        substats = {}
+        substats = OrderedDict()
 
         # transpose the metrics data structure to look like
         # {splitter1: [x, y, z], splitter2...}}
-        inversed_metrics = defaultdict(list)
+        inversed_metrics = OrderedDefaultdict(list)
+
         for val, counter in metrics.items():
             if val is None:
                 continue

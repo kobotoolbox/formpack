@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
-
+import io
 import os
 import importlib
 from copy import deepcopy
@@ -30,6 +30,7 @@ def build_fixture(modulename, data_variable_name="DATA"):
             submissions.append(submission)
     return title, schemas, submissions
 
+
 def open_fixture_file(modulename, filename, *args, **kwargs):
     """
     Open a file included with a text fixture, e.g. the expected output of an
@@ -38,5 +39,6 @@ def open_fixture_file(modulename, filename, *args, **kwargs):
     fixture_dir = os.path.dirname(
         os.path.abspath(
             importlib.import_module('..%s' % modulename, __name__).__file__
-    ))
-    return open(os.path.join(fixture_dir, filename), *args, **kwargs)
+        )
+    )
+    return io.open(os.path.join(fixture_dir, filename), encoding='utf-8', *args, **kwargs)

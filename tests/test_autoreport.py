@@ -10,12 +10,12 @@ from formpack.utils.string import unicode
 
 
 class TestAutoReport(unittest.TestCase):
-
     maxDiff = None
 
     def assertDictEquals(self, arg1, arg2):
         def _j(arg):
             return json.dumps(arg, indent=4, sort_keys=True)
+
         assert _j(arg1) == _j(arg2)
 
     def test_list_fields_on_packs(self):
@@ -85,13 +85,13 @@ class TestAutoReport(unittest.TestCase):
                 'nom du restaurant',
                 {'frequency': [('Taco Truck', 1),
                                ('Harvest', 1),
-                               ('Los pollos hermanos', 1),
-                               ('Wololo', 1)],
+                               ('Wololo', 1),
+                               ('Los pollos hermanos', 1)],
                  'not_provided': 0,
                  'percentage': [('Taco Truck', 25.00),
                                 ('Harvest', 25.00),
-                                ('Los pollos hermanos', 25.00),
-                                ('Wololo', 25.00)],
+                                ('Wololo', 25.00),
+                                ('Los pollos hermanos', 25.00)],
                  'provided': 4,
                  'show_graph': False,
                  'total_count': 4}
@@ -116,6 +116,7 @@ class TestAutoReport(unittest.TestCase):
                  'total_count': 4}
             )
         ]
+
         for i, stat in enumerate(stats):
             assert stat == expected[i]
 
@@ -133,103 +134,103 @@ class TestAutoReport(unittest.TestCase):
 
         self.assertListEqual(stats, [
             (
-               "<TextField name='inspector' type='text'>",
+                "<TextField name='inspector' type='text'>",
                 'inspector',
-                   {'frequency': [('burger', 5), ('clouseau', 5)],
-                    'not_provided': 0,
-                    'percentage': [('burger', 50.0), ('clouseau', 50.0)],
-                    'provided': 10,
-                    'show_graph': False,
-                    'total_count': 10}
+                {'frequency': [('burger', 5), ('clouseau', 5)],
+                 'not_provided': 0,
+                 'percentage': [('burger', 50.0), ('clouseau', 50.0)],
+                 'provided': 10,
+                 'show_graph': False,
+                 'total_count': 10}
             ),
             (
-               "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
+                "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
                 'did_you_find_the_site',
-                   {'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
-                    'not_provided': 0,
-                    'percentage': [(0, 40.0),
-                                    (1, 40.0),
-                                    ('yes', 10.0),
-                                    ('no', 10.0)],
-                    'provided': 10,
-                    'show_graph': True,
-                    'total_count': 10}
+                {'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
+                 'not_provided': 0,
+                 'percentage': [(0, 40.0),
+                                (1, 40.0),
+                                ('yes', 10.0),
+                                ('no', 10.0)],
+                 'provided': 10,
+                 'show_graph': True,
+                 'total_count': 10}
             ),
             (
-               "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
+                "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
                 'was_there_damage_to_the_site',
-                   {'frequency': [(0, 2), (1, 2), ('yes', 1)],
-                    'not_provided': 5,
-                    'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
-                    'provided': 5,
-                    'show_graph': True,
-                    'total_count': 10}
+                {'frequency': [(0, 2), (1, 2), ('yes', 1)],
+                 'not_provided': 5,
+                 'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
+                 'provided': 5,
+                 'show_graph': True,
+                 'total_count': 10}
             ),
             (
-               "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
+                "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
                 'was_there_damage_to_the_site_dupe',
-                   {'frequency': [(1, 1), ('yes', 1)],
-                    'not_provided': 8,
-                    'percentage': [(1, 50.0), ('yes', 50.0)],
-                    'provided': 2,
-                    'show_graph': True,
-                    'total_count': 10}
+                {'frequency': [(1, 1), ('yes', 1)],
+                 'not_provided': 8,
+                 'percentage': [(1, 50.0), ('yes', 50.0)],
+                 'provided': 2,
+                 'show_graph': True,
+                 'total_count': 10}
             ),
             (
-               "<NumField name='ping' type='integer'>",
+                "<NumField name='ping' type='integer'>",
                 'ping',
-                   {'mean': 238.4,
-                    'median': 123,
-                    'mode': '*',
-                    'not_provided': 5,
-                    'provided': 5,
-                    'show_graph': False,
-                    'stdev': 255.77392361224003,
-                    'total_count': 10}
+                {'mean': 238.4,
+                 'median': 123,
+                 'mode': '*',
+                 'not_provided': 5,
+                 'provided': 5,
+                 'show_graph': False,
+                 'stdev': 255.77392361224003,
+                 'total_count': 10}
             ),
             (
-               "<NumField name='rssi' type='integer'>",
+                "<NumField name='rssi' type='integer'>",
                 'rssi',
-                   {'mean': 63.8,
-                    'median': '65',
-                    'mode': '*',
-                    'not_provided': 5,
-                    'provided': 5,
-                    'show_graph': False,
-                    'stdev': 35.22357165308481,
-                    'total_count': 10}
+                {'mean': 63.8,
+                 'median': '65',
+                 'mode': '*',
+                 'not_provided': 5,
+                 'provided': 5,
+                 'show_graph': False,
+                 'stdev': 35.22357165308481,
+                 'total_count': 10}
             ),
             (
-               "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
+                "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
                 'is_the_gate_secure',
-                   {'frequency': [(0, 2), (1, 2), ('no', 1)],
-                    'not_provided': 5,
-                    'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
-                    'provided': 5,
-                    'show_graph': True,
-                    'total_count': 10}
+                {'frequency': [(0, 2), (1, 2), ('no', 1)],
+                 'not_provided': 5,
+                 'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
+                 'provided': 5,
+                 'show_graph': True,
+                 'total_count': 10}
             ),
             (
-               "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
+                "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
                 'is_plant_life_encroaching',
-                   {'frequency': [(0, 1), (1, 3), ('yes', 1)],
-                    'not_provided': 5,
-                    'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
-                    'provided': 5,
-                    'show_graph': True,
-                    'total_count': 10}
+                {'frequency': [(0, 1), (1, 3), ('yes', 1)],
+                 'not_provided': 5,
+                 'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
+                 'provided': 5,
+                 'show_graph': True,
+                 'total_count': 10}
             ),
             (
-               "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
+                "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
                 'please_rate_the_impact_of_any_defects_observed',
-                   {'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
-                    'not_provided': 0,
-                    'percentage': [('moderate', 40.0),
-                                    ('severe', 30.0),
-                                    ('low', 30.0)],
-                    'provided': 10,
-                    'show_graph': True,
-                    'total_count': 10}
+                {'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
+                 'not_provided': 0,
+                 'percentage': [('moderate', 40.0),
+                                ('severe', 30.0),
+                                ('low', 30.0)],
+                 'provided': 10,
+                 'show_graph': True,
+                 'total_count': 10}
             )
         ])
 
@@ -247,46 +248,46 @@ class TestAutoReport(unittest.TestCase):
 
         expected = [
             ("<TextField name='restaurant_name' type='text'>",
-                'restaurant_name',
-                {'frequency': [('Felipes', 2),
-                               ('The other one', 2),
-                               ('That one', 1)],
-                 'not_provided': 1,
-                 'percentage': [('Felipes', 33.33),
-                                ('The other one', 33.33),
-                                ('That one', 16.67)],
-                 'provided': 5,
-                 'show_graph': False,
-                 'total_count': 6}),
+             'restaurant_name',
+             {'frequency': [('Felipes', 2),
+                            ('The other one', 2),
+                            ('That one', 1)],
+              'not_provided': 1,
+              'percentage': [('Felipes', 33.33),
+                             ('The other one', 33.33),
+                             ('That one', 16.67)],
+              'provided': 5,
+              'show_graph': False,
+              'total_count': 6}),
             ("<FormGPSField name='location' type='geopoint'>",
-                'location',
-                {'not_provided': 1,
-                 'provided': 5,
-                 'show_graph': False,
-                 'total_count': 6}),
+             'location',
+             {'not_provided': 1,
+              'provided': 5,
+              'show_graph': False,
+              'total_count': 6}),
             ("<DateField name='when' type='date'>",
-                'when',
-                {'frequency': [('2001-01-01', 2),
-                               ('2002-01-01', 2),
-                               ('2003-01-01', 1)],
-                 'not_provided': 1,
-                 'percentage': [('2001-01-01', 33.33),
-                                ('2002-01-01', 33.33),
-                                ('2003-01-01', 16.67)],
+             'when',
+             {'frequency': [('2001-01-01', 2),
+                            ('2002-01-01', 2),
+                            ('2003-01-01', 1)],
+              'not_provided': 1,
+              'percentage': [('2001-01-01', 33.33),
+                             ('2002-01-01', 33.33),
+                             ('2003-01-01', 16.67)],
 
-                 'provided': 5,
-                 'show_graph': True,
-                 'total_count': 6}),
+              'provided': 5,
+              'show_graph': True,
+              'total_count': 6}),
             ("<NumField name='howmany' type='integer'>",
-                'howmany',
-                {'mean': 1.6,
-                 'median': 2,
-                 'mode': 2,
-                 'not_provided': 1,
-                 'provided': 5,
-                 'show_graph': False,
-                 'stdev': 0.5477225575051661,
-                 'total_count': 6}
+             'howmany',
+             {'mean': 1.6,
+              'median': 2,
+              'mode': 2,
+              'not_provided': 1,
+              'provided': 5,
+              'show_graph': False,
+              'stdev': 0.5477225575051661,
+              'total_count': 6}
              )
         ]
         for i, stat in enumerate(stats):
@@ -306,57 +307,114 @@ class TestAutoReport(unittest.TestCase):
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
-            ("<TextField name='restaurant_name' type='text'>",
-             'restaurant_name',
-             {'not_provided': 1,
-              'provided': 5,
-              'show_graph': False,
-              'total_count': 6,
-              'values': [('Felipes',
-                          {'frequency': [('2001-01-01', 2),
-                                         ('2002-01-01', 0),
-                                         ('2003-01-01', 0)],
-                           'percentage': [('2001-01-01', 33.33),
-                                          ('2002-01-01', 0.00),
-                                          ('2003-01-01', 0.00)]}),
-                         ('The other one',
-                          {'frequency': [('2001-01-01', 0),
-                                         ('2002-01-01', 2),
-                                         ('2003-01-01', 0)],
-                           'percentage': [('2001-01-01', 0.00),
-                                          ('2002-01-01', 33.33),
-                                          ('2003-01-01', 0.00)]}),
-                         ('That one',
-                          {'frequency': [('2001-01-01', 0),
-                                         ('2002-01-01', 0),
-                                         ('2003-01-01', 1)],
-                           'percentage': [('2001-01-01', 0.00),
-                                          ('2002-01-01', 0.00),
-                                          ('2003-01-01', 16.67)]})]}),
-            ("<FormGPSField name='location' type='geopoint'>",
-             'location',
-             {'not_provided': 1,
-              'provided': 5,
-              'show_graph': False,
-              'total_count': 6}),
-            ("<NumField name='howmany' type='integer'>",
-             'howmany',
-             {'not_provided': 1,
-              'provided': 5,
-              'show_graph': False,
-              'total_count': 6,
-              'values': (('2001-01-01',
-                          {'mean': 1.5,
-                           'median': 1.5,
-                           'mode': '*',
-                                   'stdev': 0.7071067811865476}),
-                         ('2002-01-01',
-                          {'mean': 2.0, 'median': 2.0, 'mode': 2, 'stdev': 0.0}),
-                         ('2003-01-01',
-                          {'mean': 1.0,
-                           'median': 1,
-                           'mode': '*',
-                                   'stdev': '*'}))})]
+            (
+                "<TextField name='restaurant_name' type='text'>",
+                'restaurant_name',
+                {
+                    'not_provided': 1,
+                    'provided': 5,
+                    'show_graph': False,
+                    'total_count': 6,
+                    'values': [
+                        (
+                            'Felipes',
+                            {
+                                'frequency': [
+                                    ('2001-01-01', 2),
+                                    ('2002-01-01', 0),
+                                    ('2003-01-01', 0)
+                                ],
+                                'percentage': [
+                                    ('2001-01-01', 33.33),
+                                    ('2002-01-01', 0.00),
+                                    ('2003-01-01', 0.00)
+                                ]
+                            }
+                        ),
+                        (
+                            'The other one',
+                            {
+                                'frequency': [
+                                    ('2001-01-01', 0),
+                                    ('2002-01-01', 2),
+                                    ('2003-01-01', 0)
+                                ],
+                                'percentage': [
+                                    ('2001-01-01', 0.00),
+                                    ('2002-01-01', 33.33),
+                                    ('2003-01-01', 0.00)
+                                ]
+                            }
+                        ),
+                        (
+                            'That one',
+                            {
+                                'frequency': [
+                                    ('2001-01-01', 0),
+                                    ('2002-01-01', 0),
+                                    ('2003-01-01', 1)
+                                ],
+                                'percentage': [
+                                    ('2001-01-01', 0.00),
+                                    ('2002-01-01', 0.00),
+                                    ('2003-01-01', 16.67)
+                                ]
+                            }
+                        )
+                    ]
+                }
+            ),
+            (
+                "<FormGPSField name='location' type='geopoint'>",
+                'location',
+                {
+                    'not_provided': 1,
+                    'provided': 5,
+                    'show_graph': False,
+                    'total_count': 6
+                }
+            ),
+            (
+                "<NumField name='howmany' type='integer'>",
+                'howmany',
+                {
+                    'not_provided': 1,
+                    'provided': 5,
+                    'show_graph': False,
+                    'total_count': 6,
+                    'values': (
+                        (
+                            '2001-01-01',
+                            {
+                                'mean': 1.5,
+                                'median': 1.5,
+                                'mode': '*',
+                                'stdev': 0.7071067811865476
+                            }
+                        ),
+                        (
+                            '2003-01-01',
+                            {
+                                'mean': 1.0,
+                                'median': 1,
+                                'mode': '*',
+                                'stdev': '*'
+                            }
+                        ),
+                        (
+                            '2002-01-01',
+                            {
+                                'mean': 2.0,
+                                'median': 2.0,
+                                'mode': 2,
+                                'stdev': 0.0
+                            }
+                        )
+                    )
+                }
+            )
+        ]
+
         for i, stat in enumerate(stats):
             assert stat == expected[i]
 
@@ -382,10 +440,10 @@ class TestAutoReport(unittest.TestCase):
                 assert percentage_responses[-1] == "..."
 
     def test_stats_with_non_numeric_value_for_numeric_field(self):
-        '''
+        """
         A string response to an integer question, for example, should not cause
         a crash; it should be treated as if no response was provided
-        '''
+        """
 
         title = 'Just one number'
         schemas = [{
