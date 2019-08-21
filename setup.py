@@ -29,7 +29,7 @@ dep_links = [
 ]
 
 setup(name='formpack',
-      version='1.4',
+      version='2.0',
       description='Manipulation tools for kobocat forms',
       author='Alex Dorey',
       author_email='alex.dorey@kobotoolbox.org',
