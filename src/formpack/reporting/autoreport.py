@@ -1,5 +1,6 @@
 # coding: utf-8
-from __future__ import (division, print_function, unicode_literals)
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
 
 import logging
 from collections import defaultdict
