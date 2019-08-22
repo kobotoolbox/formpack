@@ -244,9 +244,9 @@ class FormVersion(object):
         return self.lookup('id_string')
 
     def _get_title(self):
-        '''
+        """
         if formversion has no name, uses form's name
-        '''
+        """
         if self.title is None:
             return self.form_pack.title
         return self.title
@@ -290,4 +290,5 @@ class FormVersion(object):
             'title': self.lookup('title'),
             'version': self.lookup('id'),
         })
-        return survey._to_pretty_xml().encode('utf-8')
+
+        return survey._to_pretty_xml() #.encode('utf-8')
