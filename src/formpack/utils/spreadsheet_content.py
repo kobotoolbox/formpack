@@ -60,11 +60,12 @@ def flatten_to_spreadsheet_content(content,
                                       if x not in remove_sheets])
 
     def _row_to_ordered_dict(row, dest):
+        dest_keys = list(dest.keys())
         _flatten_translated_fields(row, translations, translated_cols,
-                                   col_order=dest.keys(),
+                                   col_order=dest_keys,
                                    )
         _flatten_survey_row(row)
-        for key in dest.keys():
+        for key in dest_keys:
             dest[key] = row.get(key, None)
         return dest
 

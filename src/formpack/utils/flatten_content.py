@@ -156,21 +156,21 @@ def _flatten_translated_fields(row, translations, translated_cols,
 
     _placed_cols = set()
 
-    def _place_col_in_order(col, base_col=None):
+    def _place_col_in_order(col_, base_col=None):
         if col_order is False:
             return
-        if col in col_order:
-            if col not in _placed_cols:
-                _placed_cols.update([col])
+        if col_ in col_order:
+            if col_ not in _placed_cols:
+                _placed_cols.update([col_])
             return
         else:
             if base_col in col_order:
                 _i = col_order.index(base_col)
-                col_order.insert(_i, col)
-                _placed_cols.update([col])
+                col_order.insert(_i, col_)
+                _placed_cols.update([col_])
             else:
-                col_order.append(col)
-                _placed_cols.update([col])
+                col_order.append(col_)
+                _placed_cols.update([col_])
 
     o_row = deepcopy(row)
     translations_range = list(range(0, len(translations)))
