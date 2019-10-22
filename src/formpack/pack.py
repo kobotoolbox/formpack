@@ -72,12 +72,13 @@ class FormPack(object):
                 _id_keys.append(_id_key)
         return _id_keys
 
-
     @property
     def available_translations(self):
-        translations = set()
+        translations = []
         for version in self.versions.values():
-            translations.update(version.translations)
+            for translation in version.translations:
+                if translation not in translations:
+                    translations.append(translation)
         return translations
 
     def lookup(self, prop, default=None):
