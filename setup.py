@@ -52,7 +52,7 @@ else:
 
 
 setup(name='FormPack',
-      version='2.0',
+      version='2.0.0',
       description='Manipulation tools for KoBoCat forms',
       author='Alex Dorey',
       author_email='alex.dorey@kobotoolbox.org',
