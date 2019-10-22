@@ -191,7 +191,7 @@ class Export(object):
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_sections = {}
 
-        # List of fields we generate ourself to add at the very ends
+        # List of fields we generate ourselves to add at the very end
         # of the field list
         auto_fields = OrderedDict()
 
@@ -224,7 +224,6 @@ class Export(object):
                         auto_field_names.append(
                             "_submission_{}".format(copy_field))
 
-
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
         # have several values. We needed them grouped to insert them at the
@@ -245,7 +244,7 @@ class Export(object):
                 # labels, add the tags once for each label
                 tags.extend(
                     [flatten_tag_list(field.tags, tag_cols_and_seps)] *
-                        len(field.value_names)
+                    len(field.value_names)
                 )
 
             names = [name for name_list in name_lists for name in name_list]
@@ -275,7 +274,7 @@ class Export(object):
         # containing all the formatted data.
         # If you have repeat groups, you will have one section per repeat
         # group. Section are hierarchical, and can have a parent and one
-        # or more children. format_one_submission() is called recursivelly
+        # or more children. format_one_submission() is called recursively
         # with each section to process them all.
 
         # 'chunks' is a mapping of section names with associated formatted data
@@ -426,9 +425,9 @@ class Export(object):
         return rows
 
     def to_dict(self, submissions):
-        '''
-            This defeats the purpose of using generators, but it's useful for tests
-        '''
+        """
+        This defeats the purpose of using generators, but it's useful for tests
+        """
 
         d = OrderedDict()
 
@@ -442,12 +441,12 @@ class Export(object):
         return d
 
     def to_csv(self, submissions, sep=";", quote='"'):
-        '''
-            Return a generator yielding csv lines.
+        """
+        Return a generator yielding csv lines.
 
-            We don't use the csv module to avoid buffering the lines
-            in memory.
-        '''
+        We don't use the csv module to avoid buffering the lines
+        in memory.
+        """
 
         sections = list(self.labels.items())
 
@@ -455,17 +454,17 @@ class Export(object):
         #     raise RuntimeError("CSV export does not support repeatable groups")
 
         def escape_quote(value, quote):
-            '''
-                According to https://www.ietf.org/rfc/rfc4180.txt,
+            """
+            According to https://www.ietf.org/rfc/rfc4180.txt,
 
-                    If double-quotes are used to enclose fields, then a
-                    double-quote appearing inside a field must be escaped by
-                    preceding it with another double quote.
+                If double-quotes are used to enclose fields, then a
+                double-quote appearing inside a field must be escaped by
+                preceding it with another double quote.
 
-                We will follow this convention by doubling `quote` wherever it
-                appears in `value`, regardless of what `quote` is. Perhaps this
-                is not the best idea.
-            '''
+            We will follow this convention by doubling `quote` wherever it
+            appears in `value`, regardless of what `quote` is. Perhaps this
+            is not the best idea.
+            """
             return value.replace(quote, quote * 2)
 
         def format_line(line, sep, quote):

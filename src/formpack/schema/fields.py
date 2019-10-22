@@ -78,7 +78,8 @@ class FormField(FormDataDef):
     def _get_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both",
                    _hierarchy_end=None):
-        """Return the label for this field
+        """
+        Return the label for this field
 
         Args:
             lang (str, optional): Lang to translate the label to if possible.
