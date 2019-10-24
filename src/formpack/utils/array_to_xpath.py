@@ -27,7 +27,7 @@ def _case_fn(args):
         raise ValueError('empty @case expression')
 
     def _pop_arg():
-        return False if len(args) is 0 else args.pop()
+        return False if len(args) == 0 else args.pop()
 
     # last item in args specifies the default value
     expr = _pop_arg()

@@ -101,7 +101,7 @@ class FormField(FormDataDef):
             path = []
             for level in self.hierarchy[1:_hierarchy_end]:
                 _t = level.labels.get(lang)
-                if isinstance(_t, list) and len(_t) is 1:
+                if isinstance(_t, list) and len(_t) == 1:
                     _t = _t[0]
                 # sometimes, level.labels returns a list
                 if _t:
