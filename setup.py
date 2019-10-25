@@ -57,7 +57,8 @@ setup(name='formpack',
       author='the formpack contributors (https://github.com/kobotoolbox/formpack/graphs/contributors)',
       url='https://github.com/kobotoolbox/formpack/',
       packages=[str(pkg) for pkg in find_packages('src')],
-      package_dir={'': 'src'},
+      package_dir={'': str('src')},  # coercing to `str` only necessary for Python 2, see
+                                     # https://github.com/sdss/python_template/issues/9
       install_requires=requirements,
       dependency_links=dep_links,
       include_package_data=True,
