@@ -1,21 +1,10 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
-import re
-
-try:
-    xrange = xrange
-except NameError:  # python 3
-    xrange = range
-
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
-
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
+from ..utils import str_types
+from ..utils.future import OrderedDict
 
 
 class FormDataDef(object):
@@ -112,14 +101,13 @@ class FormChoice(FormDataDef):
                 _label = choice_definition['label']
             else:
                 _label = choice_definition.get('image')
-            if isinstance(_label, basestring):
+            if isinstance(_label, str_types):
                 _label = [_label]
             elif _label is None:
                 _label = []
             option['labels'] = OrderedDict(zip(translation_list, _label))
             option['name'] = choice_name
         return all_choices
-
 
     @property
     def translations(self):

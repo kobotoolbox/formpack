@@ -6,13 +6,14 @@ import json
 from copy import deepcopy
 
 from formpack import FormPack, constants
+from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture
 
 
 def test_fixture_has_translations():
-    '''
+    """
     restauraunt_profile@v2 has two translations
-    '''
+    """
 
     title, schemas, submissions = build_fixture('restaurant_profile')
     fp = FormPack(schemas, title)
@@ -29,9 +30,9 @@ def test_to_dict():
 
 
 def test_to_xml():
-    '''
+    """
     at the very least, version.to_xml() does not fail
-    '''
+    """
     title, schemas, submissions = build_fixture('restaurant_profile')
     fp = FormPack(schemas, title)
     for version in fp.versions.keys():
@@ -56,6 +57,7 @@ def test_to_xml_fails_when_null_labels():
                    'translated': ['label'],
                    }}, id_string='sdf')
     fp[0].to_xml()
+
 
 def test_null_untranslated_labels():
     content = json.loads('''
@@ -142,25 +144,26 @@ def test_null_untranslated_labels():
     question_names = field.get_labels(constants.UNSPECIFIED_TRANSLATION)
     assert untranslated_labels == question_names
 
+
 def test_get_fields_for_versions_returns_unique_fields():
-    '''
+    """
     As described in #127, `get_field_for_versions()` would return identical
     fields multiple times. This is was a failing test to reproduce that issue
-    '''
+    """
     fp = FormPack(
-        [{'content': {u'survey': [{u'name': u'hey', u'type': u'image'},
-                                  {u'name': u'two', u'type': u'image'}]},
-          'version': u'vRR7hH6SxTupvtvCqu7n5d'},
-         {'content': {u'survey': [{u'name': u'one', u'type': u'image'},
-                                  {u'name': u'two', u'type': u'image'}]},
-          'version': u'vA8xs9JVi8aiSfypLgyYW2'},
-         {'content': {u'survey': [{u'name': u'one', u'type': u'image'},
-                                  {u'name': u'two', u'type': u'image'}]},
-          'version': u'vNqgh8fJqyjFk6jgiCk4rn'}]
+        [{'content': {'survey': [{'name': 'hey', 'type': 'image'},
+                                  {'name': 'two', 'type': 'image'}]},
+          'version': 'vRR7hH6SxTupvtvCqu7n5d'},
+         {'content': {'survey': [{'name': 'one', 'type': 'image'},
+                                  {'name': 'two', 'type': 'image'}]},
+          'version': 'vA8xs9JVi8aiSfypLgyYW2'},
+         {'content': {'survey': [{'name': 'one', 'type': 'image'},
+                                  {'name': 'two', 'type': 'image'}]},
+          'version': 'vNqgh8fJqyjFk6jgiCk4rn'}]
     )
     fields = fp.get_fields_for_versions(fp.versions)
     field_names = [field.name for field in fields]
-    assert sorted(field_names) == [u'hey', u'one', u'two']
+    assert sorted(field_names) == ['hey', 'one', 'two']
 
 
 def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
@@ -210,7 +213,8 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     fields = fp.get_fields_for_versions(fp.versions)
     # The first and only field returned should be the first field of the first
     # section of the last version
-    assert fields[0] == fp[-1].sections.values()[0].fields.values()[0]
+    section_value = get_first_occurrence(fp[-1].sections.values())
+    assert fields[0] == get_first_occurrence(section_value.fields.values())
 
 
 def test_get_fields_for_versions_returns_all_choices():
@@ -268,12 +272,12 @@ def test_field_position_with_multiple_versions():
 
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
-        u'City',
-        u'Firstname',
-        u'Lastname',
-        u'Gender',
-        u'Age',
-        u'Fullname',
+        'City',
+        'Firstname',
+        'Lastname',
+        'Gender',
+        'Age',
+        'Fullname',
     ]
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 6
@@ -286,9 +290,9 @@ def test_fields_for_versions_list_index_out_of_range():
     fp = FormPack(schemas, title)
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
-        u'one',
-        u'third',
-        u'first_but_not_one',
+        'one',
+        'third',
+        'first_but_not_one',
     ]
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 3

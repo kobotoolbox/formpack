@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
@@ -49,7 +48,7 @@ def field_and_response_to_geometry(field, response):
         if not 2 <= len(point_components) <= 4:
             raise FormPackGeoJsonError('Cannot parse coordinates')
         try:
-            coordinates = map(float, point_components[:3])
+            coordinates = list(map(float, point_components[:3]))
         except ValueError:
             raise FormPackGeoJsonError('Non-numeric data for a coordinate')
 
@@ -68,7 +67,7 @@ def field_and_response_to_geometry(field, response):
         geometry['type'] = 'LineString'
         geometry['coordinates'] = [
             split_geopoint_str(point)
-                for point in response.split(';')
+            for point in response.split(';')
         ]
         if len(geometry['coordinates']) < 2:
             raise FormPackGeoJsonError('Too few points for a line')

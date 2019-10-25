@@ -1,25 +1,22 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
-
 import json
-import xlsxwriter
 import zipfile
 from collections import defaultdict
 from inspect import isclass
+
+import xlsxwriter
 
 from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
+from ..utils.future import iteritems, itervalues, OrderedDict
 from ..utils.geojson import field_and_response_to_geometry
+from ..utils.iterator import get_first_occurrence
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
 
@@ -67,8 +64,8 @@ class Export(object):
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            for version in iter(form_versions.values()):
-                first_section = next(iter(version.sections.values()))
+            for version in itervalues(form_versions):
+                first_section = next(itervalues(version.sections))
                 for copy_field in copy_fields:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
@@ -128,7 +125,7 @@ class Export(object):
             return None
         # `format_one_submission()` will recurse through all the sections; get
         # the first one to start
-        section = version.sections.values()[0]
+        section = get_first_occurrence(version.sections.values())
         submission = FormSubmission(submission)
         return self.format_one_submission([submission.data], section)
 
@@ -195,7 +192,7 @@ class Export(object):
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_sections = {}
 
-        # List of fields we generate ourself to add at the very ends
+        # List of fields we generate ourselves to add at the very end
         # of the field list
         auto_fields = OrderedDict()
 
@@ -228,7 +225,6 @@ class Export(object):
                         auto_field_names.append(
                             "_submission_{}".format(copy_field))
 
-
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
         # have several values. We needed them grouped to insert them at the
@@ -240,7 +236,7 @@ class Export(object):
             tags = []
             for _field_data in fields:
                 if len(_field_data) != 2:
-                    # e.g. [u'location', u'_location_latitude',...]
+                    # e.g. ['location', '_location_latitude',...]
                     continue
                 (field_name, field) = _field_data
                 name_lists.append(field.value_names)
@@ -249,7 +245,7 @@ class Export(object):
                 # labels, add the tags once for each label
                 tags.extend(
                     [flatten_tag_list(field.tags, tag_cols_and_seps)] *
-                        len(field.value_names)
+                    len(field.value_names)
                 )
 
             names = [name for name_list in name_lists for name in name_list]
@@ -279,7 +275,7 @@ class Export(object):
         # containing all the formatted data.
         # If you have repeat groups, you will have one section per repeat
         # group. Section are hierarchical, and can have a parent and one
-        # or more children. format_one_submission() is called recursivelly
+        # or more children. format_one_submission() is called recursively
         # with each section to process them all.
 
         # 'chunks' is a mapping of section names with associated formatted data
@@ -381,11 +377,11 @@ class Export(object):
                     for extra_mapping_field in self.copy_fields:
                         if isclass(extra_mapping_field):
                             row[
-                                u"_submission_{}".format(extra_mapping_field.FIELD_NAME)
+                                '_submission_{}'.format(extra_mapping_field.FIELD_NAME)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
                         else:
                             row[
-                                u"_submission_{}".format(extra_mapping_field)
+                                '_submission_{}'.format(extra_mapping_field)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
 
             rows.append(list(row.values()))
@@ -399,7 +395,7 @@ class Export(object):
                 if nested_data:
                     chunk = self.format_one_submission(entry[child_section.path],
                                                        child_section)
-                    for key, value in chunk.iteritems():
+                    for key, value in iteritems(chunk):
                         if key in chunks:
                             chunks[key].extend(value)
                         else:
@@ -430,9 +426,9 @@ class Export(object):
         return rows
 
     def to_dict(self, submissions):
-        '''
-            This defeats the purpose of using generators, but it's useful for tests
-        '''
+        """
+        This defeats the purpose of using generators, but it's useful for tests
+        """
 
         d = OrderedDict()
 
@@ -446,12 +442,12 @@ class Export(object):
         return d
 
     def to_csv(self, submissions, sep=";", quote='"'):
-        '''
-            Return a generator yielding csv lines.
+        """
+        Return a generator yielding csv lines.
 
-            We don't use the csv module to avoid buffering the lines
-            in memory.
-        '''
+        We don't use the csv module to avoid buffering the lines
+        in memory.
+        """
 
         sections = list(self.labels.items())
 
@@ -459,17 +455,17 @@ class Export(object):
         #     raise RuntimeError("CSV export does not support repeatable groups")
 
         def escape_quote(value, quote):
-            '''
-                According to https://www.ietf.org/rfc/rfc4180.txt,
+            """
+            According to https://www.ietf.org/rfc/rfc4180.txt,
 
-                    If double-quotes are used to enclose fields, then a
-                    double-quote appearing inside a field must be escaped by
-                    preceding it with another double quote.
+                If double-quotes are used to enclose fields, then a
+                double-quote appearing inside a field must be escaped by
+                preceding it with another double quote.
 
-                We will follow this convention by doubling `quote` wherever it
-                appears in `value`, regardless of what `quote` is. Perhaps this
-                is not the best idea.
-            '''
+            We will follow this convention by doubling `quote` wherever it
+            appears in `value`, regardless of what `quote` is. Perhaps this
+            is not the best idea.
+            """
             return value.replace(quote, quote * 2)
 
         def format_line(line, sep, quote):
@@ -520,7 +516,7 @@ class Export(object):
         """
 
         # Consider the first section only (discard repeating groups)
-        first_section_name = self.sections.keys()[0]
+        first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
 
         # Manually write the beginning and end of the GeoJSON file so that we
@@ -547,8 +543,7 @@ class Export(object):
 
             # Find the requested field
             all_fields = version.sections[first_section_name].fields.values()
-            geo_fields = filter(lambda f: f.name == geo_question_name,
-                                all_fields)
+            geo_fields = [f for f in all_fields if f.name == geo_question_name]
             try:
                 geo_field = geo_fields[0]
             except IndexError:
@@ -612,6 +607,7 @@ class Export(object):
         sheet_name_mapping = {}
 
         sheet_row_positions = defaultdict(lambda: 0)
+
         def _append_row_to_sheet(sheet_, data):
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
@@ -654,9 +650,9 @@ class Export(object):
         workbook.close()
 
     def to_html(self, submissions):
-        '''
-            Yield lines of and HTML table strings.
-        '''
+        """
+        Yield lines of and HTML table strings.
+        """
 
         yield "<table>"
 
@@ -703,15 +699,17 @@ class Export(object):
         return None
 
     def to_spss_labels(self, output_file):
-        '''
+        """
         Write SPSS commands that set question and choice labels, creating a ZIP
         file containing one SPSS file per translation. This includes *no* data!
 
         :param output_file: a file-like object opened for writing
-        '''
+        """
         all_versions = self.formpack.versions.values()
         all_translations = set()
-        map(all_translations.update, [v.translations for v in all_versions])
+        for v in all_versions:
+            all_translations.update(v.translations)
+
         all_fields = self.formpack.get_fields_for_versions()
 
         with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as z_out:
@@ -773,8 +771,8 @@ class Export(object):
                 MAXIMUM_FILENAME_LENGTH = 240
                 overrun = (
                     len(title)
-                        + len(rest_of_filename)
-                        - MAXIMUM_FILENAME_LENGTH
+                    + len(rest_of_filename)
+                    - MAXIMUM_FILENAME_LENGTH
                 )
                 if overrun > 0:
                     # TODO: trim the title in a right-to-left-friendly way

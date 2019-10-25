@@ -1,9 +1,7 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import unittest
 from formpack import FormPack
 from .fixtures import build_fixture
 
@@ -16,8 +14,8 @@ def test_submission_counts_match():
     stats = report.get_stats(submissions)
     assert stats.submissions_count == len(submissions)
     assert stats.submission_counts_by_version == {
-        u'rpv1': 1,
-        u'rpV2': 1,
-        u'rpV3': 2,
-        u'rpV4': 4,
+        'rpv1': 1,
+        'rpV2': 1,
+        'rpV3': 2,
+        'rpV4': 4,
     }

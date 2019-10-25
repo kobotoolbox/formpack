@@ -16,8 +16,8 @@ v1 = load_fixture_json('restaurant_photo/v1')
 v1['submissions'] = [{'photo': pdata} for pdata in photos]
 
 DATA = {
-    u'title': 'Restaurant profile',
-    u'versions': [
+    'title': 'Restaurant profile',
+    'versions': [
         v1
     ],
 }

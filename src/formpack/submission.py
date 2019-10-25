@@ -1,24 +1,16 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import re
 import json
+import re
 
-from collections import OrderedDict
 from lxml import etree
-
-try:
-    # FIXME: Create failing test for this and remove.
-    from cStringIO import StringIO
-except ImportError:  # we are on Python 3
-    from io import StringIO
-
 from pyquery import PyQuery
 
 from .b64_attachment import B64Attachment
 from .utils import parse_xmljson_to_data
+from .utils.future import iteritems, StringIO, OrderedDict
 
 
 class FormSubmission:
@@ -38,7 +30,7 @@ class FormSubmission:
         def _item_to_struct(item):
             (key, val,) = item
             if isinstance(val, list):
-                val = map(_item_to_struct, val)
+                val = list(map(_item_to_struct, val))
             elif isinstance(val, B64Attachment) and files is not False:
                 (fname, fpath) = B64Attachment.write_to_tempfile(
                                                         val)
@@ -52,7 +44,7 @@ class FormSubmission:
                 'version': self._version._version_id,
             },
             'children': [_item_to_struct(item)
-                         for item in self.data.iteritems()],
+                         for item in iteritems(self.data)],
         }
 
     def to_xml(self, files=False):
@@ -60,12 +52,12 @@ class FormSubmission:
 
     def to_xml_export(self):
         files = []
-        return (self.to_xml(), files)
+        return self.to_xml(), files
 
     @classmethod
-    def from_xml(kls, xml, version=None):
+    def from_xml(cls, xml, version=None):
         xmljson = OrderedDict(parse_xmljson_to_data(xml, [], []))
-        return kls(xmljson, version)
+        return cls(xmljson, version)
 
 
 class NestedStruct(OrderedDict):
@@ -78,7 +70,7 @@ class NestedStruct(OrderedDict):
         return json.dumps(self, indent=4)
 
     def to_xml(self):
-        (_tag, contents) = list(self.iteritems())[0]
+        _tag, contents = get_first_occurrence(iteritems(self))
         pqi = PyQuery('<wrap />')
 
         def _append_contents(struct, par):
@@ -90,7 +82,7 @@ class NestedStruct(OrderedDict):
             if 'text' in struct:
                 _node.text(struct['text'])
             elif 'children' in struct:
-                for (ugh, child) in struct['children'].iteritems():
+                for ugh, child in iteritems(struct['children']):
                     _append_contents(child, _node)
             par.append(_node)
 

@@ -1,19 +1,21 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
+
+from collections import defaultdict
+from copy import deepcopy
+import json
+
+from pyxform import aliases as pyxform_aliases
+from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
+
+from .future import iteritems, OrderedDict
+from .string import str_types
 
 # This file is a mishmash of things which culminate in the
 # "replace_aliases" method which iterates through a survey and
 # replaces xlsform aliases with a standardized set of colunns,
 # question types, and values.
-
-import json
-from copy import deepcopy
-from collections import OrderedDict, defaultdict
-
-from pyxform import aliases as pyxform_aliases
-from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
 
 TF_COLUMNS = [
@@ -22,38 +24,39 @@ TF_COLUMNS = [
 
 
 def aliases_to_ordered_dict(_d):
-    '''
+    """
     unpacks a dict-with-lists to an ordered dict with keys sorted by length
-    '''
+    """
     arr = []
-    for (original, aliases) in _d.items():
+    for original, aliases in _d.items():
         arr.append((original, original))
         if isinstance(aliases, bool):
             aliases = [original]
-        elif isinstance(aliases, basestring):
+        elif isinstance(aliases, str_types):
             aliases = [aliases]
         for alias in aliases:
             arr.append((alias, original,))
     return OrderedDict(sorted(arr, key=lambda _kv: 0-len(_kv[0])))
 
+
 types = aliases_to_ordered_dict({
-    u'begin_group': [
-        u'begin group',
-        u'begin  group',
+    'begin_group': [
+        'begin group',
+        'begin  group',
     ],
-    u'end_group': [
-        u'end group',
-        u'end  group'
+    'end_group': [
+        'end group',
+        'end  group'
     ],
-    u'begin_repeat': [
-        u'begin lgroup',
-        u'begin repeat',
-        u'begin looped group',
+    'begin_repeat': [
+        'begin lgroup',
+        'begin repeat',
+        'begin looped group',
     ],
-    u'end_repeat': [
-        u'end lgroup',
-        u'end repeat',
-        u'end looped group',
+    'end_repeat': [
+        'end lgroup',
+        'end repeat',
+        'end looped group',
     ],
     'text': ['string'],
     'acknowledge': ['trigger'],
@@ -64,26 +67,27 @@ types = aliases_to_ordered_dict({
 })
 
 selects = aliases_to_ordered_dict({
-    u'select_multiple': [
-        u'select all that apply',
-        u'select multiple',
-        u'select many',
-        u'select_many',
-        u'select all that apply from',
-        u'add select multiple prompt using',
+    'select_multiple': [
+        'select all that apply',
+        'select multiple',
+        'select many',
+        'select_many',
+        'select all that apply from',
+        'add select multiple prompt using',
     ],
-    u'select_one_external': [
-        u'select one external',
+    'select_one_external': [
+        'select one external',
     ],
-    u'select_one': [
-        u'select one',
-        u'select one from',
-        u'add select one prompt using',
-        u'select1',
+    'select_one': [
+        'select one',
+        'select one from',
+        'add select one prompt using',
+        'select1',
     ],
 })
-
-SELECT_TYPES = selects.keys()
+# Python3: Cast to a list because it's merged into other dicts
+# (i.e `SELECT_SCHEMA` in validators.py)
+SELECT_TYPES = list(selects.keys())
 
 META_TYPES = [
     'start',
@@ -136,12 +140,12 @@ MAIN_TYPES = [
     'acknowledge',
     'note',
 ] + GEO_TYPES
-formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + selects.keys())
+formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
 _pyxform_type_aliases = defaultdict(list)
 _formpack_type_reprs = {}
 
-for (_type, val) in QUESTION_TYPE_DICT.items():
+for _type, val in QUESTION_TYPE_DICT.items():
     _xform_repr = json.dumps(val, sort_keys=True)
     if _type in formpack_preferred_types:
         _formpack_type_reprs[_type] = _xform_repr
@@ -150,24 +154,27 @@ for (_type, val) in QUESTION_TYPE_DICT.items():
 
 formpack_type_aliases = aliases_to_ordered_dict(dict([
         (_type, _pyxform_type_aliases[_repr])
-        for (_type, _repr) in _formpack_type_reprs.items()
+        for _type, _repr in _formpack_type_reprs.items()
     ]))
 
 
-KNOWN_TYPES = set(QUESTION_TYPE_DICT.keys() + selects.values() + types.values())
+KNOWN_TYPES = set(list(QUESTION_TYPE_DICT.keys())
+                  + list(selects.values())
+                  + list(types.values()))
 
 
 def _unpack_headers(p_aliases, fp_preferred):
     _aliases = p_aliases.copy().items()
     combined = dict([
         (key, val if (val not in fp_preferred) else fp_preferred[val])
-        for (key, val) in _aliases
-    ] + fp_preferred.items())
+        for key, val in _aliases
+    ] + list(fp_preferred.items()))
     # ensure that id_string points to id_string (for example)
     combined.update(dict([
         (val, val) for val in combined.values()
     ]))
     return combined
+
 
 formpack_preferred_settings_headers = {
     'title': 'form_title',
@@ -205,7 +212,7 @@ def dealias_type(type_str, strict=False, allowed_types=None):
         return allowed_types[type_str]
     if type_str in KNOWN_TYPES:
         return type_str
-    for key in selects.keys():
+    for key in SELECT_TYPES:
         if type_str.startswith(key):
             return type_str.replace(key, selects[key])
     if strict:
@@ -235,7 +242,7 @@ def replace_aliases_in_place(content, allowed_types=None):
                 if row[col] in pyxform_aliases.yes_no:
                     row[col] = pyxform_aliases.yes_no[row[col]]
 
-        for (key, val) in survey_header_columns.iteritems():
+        for key, val in iteritems(survey_header_columns):
             if key in row and key != val:
                 row[val] = row[key]
                 del row[key]
@@ -257,5 +264,5 @@ def replace_aliases_in_place(content, allowed_types=None):
     if settings:
         content['settings'] = dict([
             (settings_header_columns.get(key, key), val)
-            for (key, val) in settings.items()
+            for key, val in settings.items()
         ])
