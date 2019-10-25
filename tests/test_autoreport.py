@@ -136,101 +136,123 @@ class TestAutoReport(unittest.TestCase):
             (
                 "<TextField name='inspector' type='text'>",
                 'inspector',
-                {'frequency': [('burger', 5), ('clouseau', 5)],
-                 'not_provided': 0,
-                 'percentage': [('burger', 50.0), ('clouseau', 50.0)],
-                 'provided': 10,
-                 'show_graph': False,
-                 'total_count': 10}
+                {
+                    'frequency': [('burger', 5), ('clouseau', 5)],
+                    'not_provided': 0,
+                    'percentage': [('burger', 50.0), ('clouseau', 50.0)],
+                    'provided': 10,
+                    'show_graph': False,
+                    'total_count': 10
+                }
             ),
             (
                 "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
                 'did_you_find_the_site',
-                {'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
-                 'not_provided': 0,
-                 'percentage': [(0, 40.0),
-                                (1, 40.0),
-                                ('yes', 10.0),
-                                ('no', 10.0)],
-                 'provided': 10,
-                 'show_graph': True,
-                 'total_count': 10}
+                {
+                    'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
+                    'not_provided': 0,
+                    'percentage': [
+                        (0, 40.0),
+                        (1, 40.0),
+                        ('yes', 10.0),
+                        ('no', 10.0)
+                    ],
+                    'provided': 10,
+                    'show_graph': True,
+                    'total_count': 10
+                }
             ),
             (
                 "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
                 'was_there_damage_to_the_site',
-                {'frequency': [(0, 2), (1, 2), ('yes', 1)],
-                 'not_provided': 5,
-                 'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
-                 'provided': 5,
-                 'show_graph': True,
-                 'total_count': 10}
+                {
+                    'frequency': [(0, 2), (1, 2), ('yes', 1)],
+                    'not_provided': 5,
+                    'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 10
+                }
             ),
             (
                 "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
                 'was_there_damage_to_the_site_dupe',
-                {'frequency': [(1, 1), ('yes', 1)],
-                 'not_provided': 8,
-                 'percentage': [(1, 50.0), ('yes', 50.0)],
-                 'provided': 2,
-                 'show_graph': True,
-                 'total_count': 10}
+                {
+                    'frequency': [(1, 1), ('yes', 1)],
+                    'not_provided': 8,
+                    'percentage': [(1, 50.0), ('yes', 50.0)],
+                    'provided': 2,
+                    'show_graph': True,
+                    'total_count': 10
+                }
             ),
             (
                 "<NumField name='ping' type='integer'>",
                 'ping',
-                {'mean': 238.4,
-                 'median': 123,
-                 'mode': '*',
-                 'not_provided': 5,
-                 'provided': 5,
-                 'show_graph': False,
-                 'stdev': 255.77392361224003,
-                 'total_count': 10}
+                {
+                    'mean': 238.4,
+                    'median': 123,
+                    'mode': '*',
+                    'not_provided': 5,
+                    'provided': 5,
+                    'show_graph': False,
+                    'stdev': 255.77392361224003,
+                    'total_count': 10
+                }
             ),
             (
                 "<NumField name='rssi' type='integer'>",
                 'rssi',
-                {'mean': 63.8,
-                 'median': '65',
-                 'mode': '*',
-                 'not_provided': 5,
-                 'provided': 5,
-                 'show_graph': False,
-                 'stdev': 35.22357165308481,
-                 'total_count': 10}
+                {
+                    'mean': 63.8,
+                    'median': '65',
+                    'mode': '*',
+                    'not_provided': 5,
+                    'provided': 5,
+                    'show_graph': False,
+                    'stdev': 35.22357165308481,
+                    'total_count': 10
+                }
             ),
             (
                 "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
                 'is_the_gate_secure',
-                {'frequency': [(0, 2), (1, 2), ('no', 1)],
-                 'not_provided': 5,
-                 'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
-                 'provided': 5,
-                 'show_graph': True,
-                 'total_count': 10}
+                {
+                    'frequency': [(0, 2), (1, 2), ('no', 1)],
+                    'not_provided': 5,
+                    'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 10
+                }
             ),
             (
                 "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
                 'is_plant_life_encroaching',
-                {'frequency': [(0, 1), (1, 3), ('yes', 1)],
-                 'not_provided': 5,
-                 'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
-                 'provided': 5,
-                 'show_graph': True,
-                 'total_count': 10}
+                {
+                    'frequency': [(0, 1), (1, 3), ('yes', 1)],
+                    'not_provided': 5,
+                    'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 10
+                }
             ),
             (
                 "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
                 'please_rate_the_impact_of_any_defects_observed',
-                {'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
-                 'not_provided': 0,
-                 'percentage': [('moderate', 40.0),
-                                ('severe', 30.0),
-                                ('low', 30.0)],
-                 'provided': 10,
-                 'show_graph': True,
-                 'total_count': 10}
+                {
+                    'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
+                    'not_provided': 0,
+                    'percentage': [
+                        ('moderate', 40.0),
+                        ('severe', 30.0),
+                        ('low', 30.0)
+                    ],
+                    'provided': 10,
+                    'show_graph': True,
+                    'total_count': 10
+                }
             )
         ])
 
@@ -247,48 +269,70 @@ class TestAutoReport(unittest.TestCase):
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
-            ("<TextField name='restaurant_name' type='text'>",
-             'restaurant_name',
-             {'frequency': [('Felipes', 2),
-                            ('The other one', 2),
-                            ('That one', 1)],
-              'not_provided': 1,
-              'percentage': [('Felipes', 33.33),
-                             ('The other one', 33.33),
-                             ('That one', 16.67)],
-              'provided': 5,
-              'show_graph': False,
-              'total_count': 6}),
-            ("<FormGPSField name='location' type='geopoint'>",
-             'location',
-             {'not_provided': 1,
-              'provided': 5,
-              'show_graph': False,
-              'total_count': 6}),
-            ("<DateField name='when' type='date'>",
-             'when',
-             {'frequency': [('2001-01-01', 2),
-                            ('2002-01-01', 2),
-                            ('2003-01-01', 1)],
-              'not_provided': 1,
-              'percentage': [('2001-01-01', 33.33),
-                             ('2002-01-01', 33.33),
-                             ('2003-01-01', 16.67)],
-
-              'provided': 5,
-              'show_graph': True,
-              'total_count': 6}),
-            ("<NumField name='howmany' type='integer'>",
-             'howmany',
-             {'mean': 1.6,
-              'median': 2,
-              'mode': 2,
-              'not_provided': 1,
-              'provided': 5,
-              'show_graph': False,
-              'stdev': 0.5477225575051661,
-              'total_count': 6}
-             )
+            (
+                "<TextField name='restaurant_name' type='text'>",
+                'restaurant_name',
+                {
+                    'frequency': [
+                        ('Felipes', 2),
+                        ('The other one', 2),
+                        ('That one', 1)
+                    ],
+                    'not_provided': 1,
+                    'percentage': [
+                        ('Felipes', 33.33),
+                        ('The other one', 33.33),
+                        ('That one', 16.67)
+                    ],
+                    'provided': 5,
+                    'show_graph': False,
+                    'total_count': 6
+                }
+            ),
+            (
+                "<FormGPSField name='location' type='geopoint'>",
+                'location',
+                {
+                    'not_provided': 1,
+                    'provided': 5,
+                    'show_graph': False,
+                    'total_count': 6
+                }
+            ),
+            (
+                "<DateField name='when' type='date'>",
+                'when',
+                {
+                    'frequency': [
+                        ('2001-01-01', 2),
+                        ('2002-01-01', 2),
+                        ('2003-01-01', 1)
+                    ],
+                    'not_provided': 1,
+                    'percentage': [
+                        ('2001-01-01', 33.33),
+                        ('2002-01-01', 33.33),
+                        ('2003-01-01', 16.67)
+                    ],
+                    'provided': 5,
+                    'show_graph': True,
+                    'total_count': 6
+                }
+            ),
+            (
+                "<NumField name='howmany' type='integer'>",
+                'howmany',
+                {
+                    'mean': 1.6,
+                    'median': 2,
+                    'mode': 2,
+                    'not_provided': 1,
+                    'provided': 5,
+                    'show_graph': False,
+                    'stdev': 0.5477225575051661,
+                    'total_count': 6
+                }
+            )
         ]
         for i, stat in enumerate(stats):
             assert stat == expected[i]

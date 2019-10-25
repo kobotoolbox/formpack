@@ -51,11 +51,10 @@ else:
     ]
 
 
-setup(name='FormPack',
+setup(name='formpack',
       version='2.0.0',
-      description='Manipulation tools for KoBoCat forms',
-      author='Alex Dorey',
-      author_email='alex.dorey@kobotoolbox.org',
+      description='Manipulation tools for KoBo forms',
+      author='the formpack contributors (https://github.com/kobotoolbox/formpack/graphs/contributors)',
       url='https://github.com/kobotoolbox/formpack/',
       packages=[str(pkg) for pkg in find_packages('src')],
       package_dir={'': 'src'},

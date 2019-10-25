@@ -16,6 +16,7 @@ from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
 from ..utils.future import iteritems, itervalues, OrderedDict
 from ..utils.geojson import field_and_response_to_geometry
+from ..utils.iterator import get_first_occurrence
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
 
@@ -124,7 +125,7 @@ class Export(object):
             return None
         # `format_one_submission()` will recurse through all the sections; get
         # the first one to start
-        section = list(version.sections.values())[0]
+        section = get_first_occurrence(version.sections.values())
         submission = FormSubmission(submission)
         return self.format_one_submission([submission.data], section)
 
@@ -515,7 +516,7 @@ class Export(object):
         """
 
         # Consider the first section only (discard repeating groups)
-        first_section_name = list(self.sections)[0]
+        first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
 
         # Manually write the beginning and end of the GeoJSON file so that we

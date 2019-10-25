@@ -341,7 +341,7 @@ def test_get_special_survey_cols():
             'hint:English',
         ])
     values = [special[key] for key in sorted(special.keys())]
-    translations = sorted(map(lambda x: x.get('translation'), values),
+    translations = sorted([x.get('translation') for x in values],
                           key=orderable_with_none)
     expected = sorted(['English', 'English', 'English', 'English',
                        'chinese', 'Arabic', 'German', 'Français',

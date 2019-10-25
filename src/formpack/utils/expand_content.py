@@ -10,6 +10,7 @@ import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .future import iteritems, OrderedDict
+from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
@@ -95,8 +96,9 @@ def expand_content_in_place(content):
             elif isinstance(_type, dict):
                 # legacy {'select_one': 'xyz'} format might
                 # still be on kobo-prod
-                _type_str = _expand_type_to_dict(list(_type.keys())[0])['type']
-                _list_name = list(_type.values())[0]
+                _type_str = _expand_type_to_dict(
+                    get_first_occurrence(_type.keys()))['type']
+                _list_name = get_first_occurrence(_type.values())
                 row.update({'type': _type_str,
                             'select_from_list_name': _list_name})
 

@@ -70,7 +70,7 @@ class NestedStruct(OrderedDict):
         return json.dumps(self, indent=4)
 
     def to_xml(self):
-        (_tag, contents) = list(iteritems(self))[0]
+        _tag, contents = get_first_occurrence(iteritems(self))
         pqi = PyQuery('<wrap />')
 
         def _append_contents(struct, par):

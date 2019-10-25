@@ -80,7 +80,8 @@ def spss_labels_from_variables_dict(variables):
                         variable['label'],
                         VARIABLE_LABEL_LIMIT_BYTES,
                     )
-                ))
+                )
+            )
         )
         variable_count += 1
 

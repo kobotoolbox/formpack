@@ -4,6 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import pytest
 
+from formpack.utils.iterator import get_first_occurrence
 from formpack.utils.replace_aliases import replace_aliases, dealias_type
 
 
@@ -74,7 +75,7 @@ def _setting(settings_key, expected):
     _o = {'survey': [], 'settings': _s}
     replace_aliases(_o, in_place=True)
     assert len(_o['settings'].keys()) == 1
-    assert list(_o['settings'])[0] == expected
+    assert get_first_occurrence(_o['settings']) == expected
 
 
 def test_settings_get_replaced():

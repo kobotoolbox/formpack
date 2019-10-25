@@ -6,6 +6,7 @@ import json
 from copy import deepcopy
 
 from formpack import FormPack, constants
+from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture
 
 
@@ -212,8 +213,8 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     fields = fp.get_fields_for_versions(fp.versions)
     # The first and only field returned should be the first field of the first
     # section of the last version
-    section_value = list(fp[-1].sections.values())[0]
-    assert fields[0] == list(section_value.fields.values())[0]
+    section_value = get_first_occurrence(fp[-1].sections.values())
+    assert fields[0] == get_first_occurrence(section_value.fields.values())
 
 
 def test_get_fields_for_versions_returns_all_choices():

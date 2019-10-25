@@ -339,7 +339,7 @@ class FormPack(object):
                force_index=False, copy_fields=(), title=None,
                tag_cols_for_header=None):
         """
-        Create an export for a given versions of the form
+        Create an export for given versions of the form
         """
         versions = self._get_versions(versions)
         title = title or self.title
@@ -352,7 +352,7 @@ class FormPack(object):
 
     def autoreport(self, versions=-1):
         """
-        Create an automatic report for a given versions of the form
+        Create an automatic report for given versions of the form
         """
         return AutoReport(self, self._get_versions(versions))
 

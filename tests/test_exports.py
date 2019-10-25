@@ -16,6 +16,7 @@ from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.schema.fields import ValidationStatusCopyField
 from formpack.utils.future import OrderedDict
+from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture, open_fixture_file
 
 customer_satisfaction = build_fixture('customer_satisfaction')
@@ -2012,7 +2013,7 @@ class TestFormPackExport(unittest.TestCase):
             {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;1 2 3 4'},
         ]
         for s in submissions:
-            s[fp.default_version_id_key] = list(fp.versions)[0]
+            s[fp.default_version_id_key] = get_first_occurrence(fp.versions)
         export = fp.export(versions=fp.versions.keys())
         geojson_obj = json.loads(''.join(
             export.to_geojson(submissions, geo_question_name='Trace')

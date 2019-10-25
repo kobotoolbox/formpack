@@ -116,7 +116,10 @@ def orderable_with_none(k):
     Tiny helper to sort a list in Python3 which contains `None` values
 
     Usage example:
-    e.g. sorted(['En', '', None], key=orderable_with_none)
+    $>python
+    >>> print(sorted(['En', '', None], key=orderable_with_none))
+    >>> [None, '', 'En']
+
     """
     class OrderableNone(object):
         @total_ordering

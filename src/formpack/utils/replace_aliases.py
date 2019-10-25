@@ -158,9 +158,9 @@ formpack_type_aliases = aliases_to_ordered_dict(dict([
     ]))
 
 
-KNOWN_TYPES = set(list(QUESTION_TYPE_DICT.keys()) +
-                  list(selects.values()) +
-                  list(types.values()))
+KNOWN_TYPES = set(list(QUESTION_TYPE_DICT.keys())
+                  + list(selects.values())
+                  + list(types.values()))
 
 
 def _unpack_headers(p_aliases, fp_preferred):
