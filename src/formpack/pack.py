@@ -254,21 +254,25 @@ class FormPack(object):
         copy_fields = []
         index = 0
         for section in versions_desc[0].sections.values():
-            for field_name, field_object in section.fields.items():
+            for field_object in section.fields.values():
                 if isinstance(field_object, CopyField):
                     copy_fields.append(field_object)
                 else:
-                    positions[field_name] = (index, 0)
+                    positions[field_object.path] = (index, 0)
                     tmp2d.append([field_object])
                     index += 1
+
+        print('PROCESSED', versions_desc[0].id)
+        for x in tmp2d:
+            print('\t', [y.path for y in x])
 
         for version in versions_desc[1:]:
             index = 0
             for section_name, section in version.sections.items():
-                for field_name, field_object in section.fields.items():
+                for field_object in section.fields.values():
                     if not isinstance(field_object, CopyField):
-                        if field_name in positions:
-                            position = positions[field_name]
+                        if field_object.path in positions:
+                            position = positions[field_object.path]
                             latest_field_object = tmp2d[position[0]][position[1]]
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
@@ -287,9 +291,12 @@ class FormPack(object):
                                 # it can happen when current version has more items than newest one.
                                 index = len(tmp2d) - 1
 
-                            positions[field_name] = (index, len(tmp2d[index]) - 1)
+                            positions[field_object.path] = (index, len(tmp2d[index]) - 1)
 
                         index += 1
+            print('PROCESSED', version.id)
+            for x in tmp2d:
+                print('\t', [y.path for y in x])
 
         all_fields = []
 
@@ -305,14 +312,39 @@ class FormPack(object):
                 all_fields.append(field)
                 first_dimension.pop(0)
 
-        # Then flatten tmp2d
-        for first_dimension in tmp2d:
-            for field in first_dimension:
-                if data_types:
-                    if field.data_type in data_types:
-                        all_fields.append(field)
+        # Imaginging tmp2d as a table:
+        #
+        #   [['1', '2', '3', '4', '5'],
+        #    ['a', 'b', 'c', 'd', 'e'],
+        #    ['f', 'o', 'o'],
+        #    ['w', 'x', 'y', 'z']]
+        #
+        # …we want to serialize the elements by column from left to right, so
+        # that the example above becomes:
+        #
+        #   ['1', 'a', 'f', 'w', '2', 'b', 'o', 'x', '3', 'c', 'o', 'y', '4',
+        #    'd', 'z', '5', 'e']
+
+        while tmp2d:
+            for first_dimension in tmp2d:
+                try:
+                    # Pop the first item off of the sublist. It will be
+                    # appended to our flat list of fields
+                    field = first_dimension.pop(0)
+                except IndexError:
+                    # The sublist is empty; it will be removed after this loop
+                    # completes
+                    continue
                 else:
-                    all_fields.append(field)
+                    if data_types:
+                        if field.data_type in data_types:
+                            all_fields.append(field)
+                    else:
+                        all_fields.append(field)
+
+            # Remove sublists once they have been emptied
+            tmp2d = [i for i in tmp2d if i]
+
 
         # Finally, add copy fields at the end
         all_fields += copy_fields
