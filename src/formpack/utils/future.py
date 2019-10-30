@@ -17,6 +17,12 @@ try:
 except NameError:
     range = range
 
+
+try:
+    unichr = unichr
+except NameError:
+    unichr = chr
+
 import sys
 
 # These helpers are duplicated from `six`.
@@ -37,4 +43,3 @@ def itervalues(d, **kw):
         return d.itervalues(**kw)
     else:
         return iter(d.values(**kw))
-
