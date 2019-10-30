@@ -6,7 +6,7 @@ import datetime
 import re
 import xlrd
 
-from .future import OrderedDict
+from .future import OrderedDict, unichr
 from .string import unicode, str_types
 
 
