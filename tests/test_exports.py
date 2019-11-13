@@ -1146,9 +1146,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
         rows = list(fp.export(**options).to_csv(submissions))
-        assert rows[1] == ('"#loc+name";"#indicator+diet";'
-                           '"#indicator+diet";"#indicator+diet";'
-                           '"#indicator+diet";"#indicator+diet"')
+        assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";"";""')
 
     # disabled for now
     # @raises(RuntimeError)
