@@ -185,9 +185,9 @@ class Export(object):
             raise RuntimeError(
                 '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
 
-        section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
-        section_labels = OrderedDict()  # {section: [field_label, field_label]}
-        section_tags = OrderedDict()  # {section: [{column_name: tag_string, ...}, ...]}
+        section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
+        section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
+        section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_sections = {}
@@ -197,9 +197,7 @@ class Export(object):
         auto_fields = OrderedDict()
 
         for field in all_fields:
-            section_fields.setdefault(field.section.name, []).append(
-                (field.name, field)
-            )
+            section_fields.setdefault(field.section.name, []).append(field)
             section_labels.setdefault(field.section.name, []).append(
                 field.get_labels(lang, group_sep,
                                  hierarchy_in_labels,
@@ -231,22 +229,18 @@ class Export(object):
         # proper index, but now we want just list of all of them.
 
         # Flatten all the names for all the value of all the fields
-        for section, fields in list(section_fields.items()):
+        for section, fields in section_fields.items():
             name_lists = []
             tags = []
-            for _field_data in fields:
-                if len(_field_data) != 2:
-                    # e.g. ['location', '_location_latitude',...]
-                    continue
-                (field_name, field) = _field_data
+            for field in fields:
                 name_lists.append(field.value_names)
 
                 # Add the tags for this field. If the field has multiple
-                # labels, add the tags once for each label
-                tags.extend(
-                    [flatten_tag_list(field.tags, tag_cols_and_seps)] *
-                    len(field.value_names)
-                )
+                # labels, add the tag for the first label *only*. Insert blanks
+                # for the subsequent fields. See
+                # https://github.com/kobotoolbox/formpack/issues/208
+                tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
+                tags.extend([{}] * (len(field.value_names) - 1))
 
             names = [name for name_list in name_lists for name in name_list]
 
