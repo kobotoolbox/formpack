@@ -839,8 +839,7 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
     def __init__(self, *args, **kwargs):
         self.parameters_in_use = [
             param for param in self.PREPENDED_PARAMETERS if param is not None]
-        return super(FormChoiceFieldWithMultipleSelect, self).__init__(
-            *args, **kwargs)
+        super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
 
     @property
     def parameter_value_names(self):
