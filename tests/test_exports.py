@@ -1300,6 +1300,9 @@ class TestFormPackExport(unittest.TestCase):
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
 
+    def test_jdu(self):
+        assert 1 == 1
+
     def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
         fp = FormPack(schemas, title)
@@ -1336,6 +1339,8 @@ class TestFormPackExport(unittest.TestCase):
             sheet = book.sheet_by_name('houshold_member_repeat')
             row_values = [cell.value for cell in sheet.row(1)]
             assert row_values == ['#beneficiary', '', '']
+
+
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
@@ -2040,3 +2045,112 @@ class TestFormPackExport(unittest.TestCase):
                 "type": "Polygon"
             }
         )
+
+    #https://github.com/kobotoolbox/formpack/pull/215
+    def test_header_label_list_label(self):
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+        options = {'header_lang': None, 'lang' : None}
+        exported = fp.export(**options).to_dict(submissions)
+        expected = OrderedDict({
+            "Customer Satisfaction": {
+                'fields': ["Restaurant name",
+                           "Did you enjoy your dining experience?"],
+                'data': [
+                    ["Felipes", "Yes"],
+                    ["Dunkin Donuts", "No"],
+                    ["McDonalds", "No"]
+                ]
+            }
+        })
+        self.assertEqual(exported, expected)
+
+    def test_header_key_list_key(self):
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+        options = {'header_lang': False, 'lang' : False}
+        exported = fp.export(**options).to_dict(submissions)
+        expected = OrderedDict({
+            "Customer Satisfaction": {
+                'fields': ["restaurant_name",
+                           "customer_enjoyment"],
+                'data': [
+                    ["Felipes", "yes"],
+                    ["Dunkin Donuts", "no"],
+                    ["McDonalds", "no"]
+                ]
+            }
+        })
+        self.assertEqual(exported, expected)
+
+    def test_header_key_list_label(self):
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+        options = {'header_lang': False, 'lang' : None}
+        exported = fp.export(**options).to_dict(submissions)
+        expected = OrderedDict({
+            "Customer Satisfaction": {
+                'fields': ["restaurant_name",
+                           "customer_enjoyment"],
+                'data': [
+                    ["Felipes", "Yes"],
+                    ["Dunkin Donuts", "No"],
+                    ["McDonalds", "No"]
+                ]
+            }
+        })
+        self.assertEqual(exported, expected)
+
+    def test_header_Label_list_key(self):
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+        options = {'header_lang': None, 'lang' : False}
+        exported = fp.export(**options).to_dict(submissions)
+        expected = OrderedDict({
+            "Customer Satisfaction": {
+                'fields': ["Restaurant name",
+                           "Did you enjoy your dining experience?"],
+                'data': [
+                    ["Felipes", "yes"],
+                    ["Dunkin Donuts", "no"],
+                    ["McDonalds", "no"]
+                ]
+            }
+        })
+        self.assertEqual(exported, expected)
+
+    def test_header_label_no_lang(self):
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+        options = {'header_lang': None}
+        exported = fp.export(**options).to_dict(submissions)
+        expected = OrderedDict({
+            "Customer Satisfaction": {
+                'fields': ["Restaurant name",
+                           "Did you enjoy your dining experience?"],
+                'data': [
+                    ["Felipes", "yes"],
+                    ["Dunkin Donuts", "no"],
+                    ["McDonalds", "no"]
+                ]
+            }
+        })
+        self.assertEqual(exported, expected)
+
+    def test_header_key_no_lang(self):
+        title, schemas, submissions = customer_satisfaction
+        fp = FormPack(schemas, title)
+        options = {'header_lang': False}
+        exported = fp.export(**options).to_dict(submissions)
+        expected = OrderedDict({
+            "Customer Satisfaction": {
+                'fields': ["restaurant_name",
+                           "customer_enjoyment"],
+                'data': [
+                    ["Felipes", "yes"],
+                    ["Dunkin Donuts", "no"],
+                    ["McDonalds", "no"]
+                ]
+            }
+        })
+        self.assertEqual(exported, expected)
