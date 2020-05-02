@@ -178,7 +178,7 @@ def _get_special_survey_cols(content):
     _pluck_uniq_cols('survey')
     _pluck_uniq_cols('choices')
 
-    for column_name in uniq_cols:
+    for column_name in sorted(uniq_cols):
         if column_name in ['label', 'hint']:
             _mark_special(column_name=column_name,
                           column=column_name,
