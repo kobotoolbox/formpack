@@ -20,7 +20,8 @@ class OrderedSet(collections.MutableSet):
             self.list.append(key)
 
     def update(self, keys):
-        map(self.add, keys)
+        for key in keys:
+            self.add(key)
 
     def discard(self, key):
         if key in self.set:
