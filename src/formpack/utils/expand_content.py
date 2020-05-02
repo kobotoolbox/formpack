@@ -158,7 +158,8 @@ def _get_special_survey_cols(content):
         'hint::English',
     For more examples, see tests.
     """
-    uniq_cols = set()
+    uniq_cols_unordered = set()
+    uniq_cols = []
     special = OrderedDict()
 
     known_translated_cols = content.get('translated', [])
@@ -169,7 +170,11 @@ def _get_special_survey_cols(content):
             # to be parsed and translated in a previous iteration
             _cols = [r for r in row.keys() if r not in known_translated_cols]
 
-            uniq_cols.update(_cols)
+            for _col in _cols:
+                if _col in uniq_cols_unordered:
+                    continue
+                uniq_cols_unordered.add(_col)
+                uniq_cols.append(_col)
 
     def _mark_special(**kwargs):
         column_name = kwargs.pop('column_name')
@@ -178,7 +183,7 @@ def _get_special_survey_cols(content):
     _pluck_uniq_cols('survey')
     _pluck_uniq_cols('choices')
 
-    for column_name in sorted(uniq_cols):
+    for column_name in uniq_cols:
         if column_name in ['label', 'hint']:
             _mark_special(column_name=column_name,
                           column=column_name,
@@ -218,7 +223,7 @@ def _get_special_survey_cols(content):
                           translation=matched[1])
 
             # also add the empty column if it exists
-            if column_shortname in uniq_cols:
+            if column_shortname in uniq_cols_unordered:
                 _mark_special(column_name=column_shortname,
                               column=column_shortname,
                               translation=UNTRANSLATED)
