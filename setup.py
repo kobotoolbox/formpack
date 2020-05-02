@@ -39,7 +39,7 @@ else:
         'begins',
         'jsonschema',
         'lxml',
-        'msgpack'
+        'msgpack',
         'path.py',
         'pyquery',
         'pyxform',
