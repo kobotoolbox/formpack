@@ -18,7 +18,6 @@ if sys.version_info[0] == 2:
         'path.py<12',  # Pinned for Python 2 compatibility
         'pyquery',
         'pyxform',
-        'orderedset',
         'statistics',
         'XlsxWriter',
         'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
@@ -42,7 +41,6 @@ else:
         'path.py',
         'pyquery',
         'pyxform',
-        'orderedset',
         'statistics',
         'XlsxWriter',
         'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
