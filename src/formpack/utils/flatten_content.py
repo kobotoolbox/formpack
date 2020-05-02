@@ -173,7 +173,7 @@ def _flatten_translated_fields(row, translations, translated_cols,
                 col_order.append(col_)
                 _placed_cols.update([col_])
 
-    o_row = msgpack.unpackb(msgpack.packb(row))
+    o_row = fast_deepcopy(row)
     translations_range = list(range(0, len(translations)))
     for key in (k for k in translated_cols if k in row):
         items = row[key]
