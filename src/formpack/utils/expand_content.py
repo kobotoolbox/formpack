@@ -11,6 +11,7 @@ import re
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .future import iteritems, OrderedDict
 from .iterator import get_first_occurrence
+from .ordered_set import OrderedSet
 from .replace_aliases import META_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
@@ -158,18 +159,7 @@ def _get_special_survey_cols(content):
         'hint::English',
     For more examples, see tests.
     """
-    uniq_cols_set = set()
-    uniq_cols = []
-    """
-    The reason for two separate data structures is performance. The goal is to have a unique
-    set that preserves insertion order.
-
-    We implement that by using set() for uniqueness and list() for order.
-
-    Python has OrderedDict that provides that functionality, but the performance is slightly
-    worse compared to this solution.
-    """
-
+    uniq_cols = OrderedSet()
     special = OrderedDict()
 
     known_translated_cols = content.get('translated', [])
@@ -180,11 +170,7 @@ def _get_special_survey_cols(content):
             # to be parsed and translated in a previous iteration
             _cols = [r for r in row.keys() if r not in known_translated_cols]
 
-            for _col in _cols:
-                if _col in uniq_cols_set:
-                    continue
-                uniq_cols_set.add(_col)
-                uniq_cols.append(_col)
+            uniq_cols.update(_cols)
 
     def _mark_special(**kwargs):
         column_name = kwargs.pop('column_name')
@@ -233,7 +219,7 @@ def _get_special_survey_cols(content):
                           translation=matched[1])
 
             # also add the empty column if it exists
-            if column_shortname in uniq_cols_set:
+            if column_shortname in uniq_cols:
                 _mark_special(column_name=column_shortname,
                               column=column_shortname,
                               translation=UNTRANSLATED)
