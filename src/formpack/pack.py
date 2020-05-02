@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import difflib
 import json
-from copy import deepcopy
+import msgpack
 
 from .version import FormVersion
 from .utils import str_types
@@ -112,7 +112,9 @@ class FormPack(object):
 
     def load_all_versions(self, versions):
         for schema in versions:
-            self.load_version(deepcopy(schema))
+            # This is safe, because `schema` is JSON-compatible
+            copied_schema = msgpack.unpackb(msgpack.packb(schema))
+            self.load_version(copied_schema)
 
     def load_version(self, schema):
         """ Load one version and attach it to this Formpack

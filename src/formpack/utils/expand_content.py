@@ -5,7 +5,7 @@
 # the standardization step: expand_content_in_place(...)
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
-from copy import deepcopy
+import msgpack
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
@@ -141,7 +141,8 @@ def expand_content(content, in_place=False):
         expand_content_in_place(content)
         return None
     else:
-        content_copy = deepcopy(content)
+        # This is safe, because `content` is JSON-compatible
+        content_copy = msgpack.unpackb(msgpack.packb(content))
         expand_content_in_place(content_copy)
         return content_copy
 

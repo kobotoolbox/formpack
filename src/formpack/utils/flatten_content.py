@@ -4,8 +4,8 @@ from __future__ import (unicode_literals, print_function,
 
 import re
 from collections import defaultdict, OrderedDict
-from copy import deepcopy
 from functools import reduce
+import msgpack
 
 from .array_to_xpath import array_to_xpath
 from .future import range
@@ -59,7 +59,8 @@ def flatten_content(survey_content, in_place=False, **opts):
         flatten_content_in_place(survey_content, **opts)
         return None
     else:
-        survey_content_copy = deepcopy(survey_content)
+        # This is safe, because `survey_content` is JSON-compatible
+        survey_content_copy = msgpack.unpackb(msgpack.packb(survey_content))
         flatten_content_in_place(survey_content_copy, **opts)
         return survey_content_copy
 
@@ -172,7 +173,7 @@ def _flatten_translated_fields(row, translations, translated_cols,
                 col_order.append(col_)
                 _placed_cols.update([col_])
 
-    o_row = deepcopy(row)
+    o_row = msgpack.unpackb(msgpack.packb(row))
     translations_range = list(range(0, len(translations)))
     for key in (k for k in translated_cols if k in row):
         items = row[key]

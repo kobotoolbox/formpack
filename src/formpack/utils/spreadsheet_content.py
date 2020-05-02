@@ -2,8 +2,8 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+import msgpack
 import re
-from copy import deepcopy
 
 from ..constants import TAG_COLUMNS_AND_SEPARATORS
 from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
@@ -50,7 +50,8 @@ def flatten_to_spreadsheet_content(content,
     if remove_sheets is None:
         remove_sheets = []
     if not in_place:
-        content = deepcopy(content)
+        # This is safe, because `content` is JSON-compatible
+        content = msgpack.unpackb(msgpack.packb(content))
 
     translations = content.pop('translations', [])
     translated_cols = content.pop('translated', [])
