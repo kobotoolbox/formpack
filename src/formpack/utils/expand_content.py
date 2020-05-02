@@ -5,10 +5,10 @@
 # the standardization step: expand_content_in_place(...)
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
-import msgpack
 import re
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
+from .fast_deepcopy import fast_deepcopy
 from .future import iteritems, OrderedDict
 from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES
@@ -142,7 +142,7 @@ def expand_content(content, in_place=False):
         return None
     else:
         # This is safe, because `content` is JSON-compatible
-        content_copy = msgpack.unpackb(msgpack.packb(content))
+        content_copy = fast_deepcopy(content)
         expand_content_in_place(content_copy)
         return content_copy
 

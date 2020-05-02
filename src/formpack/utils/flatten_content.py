@@ -5,9 +5,9 @@ from __future__ import (unicode_literals, print_function,
 import re
 from collections import defaultdict, OrderedDict
 from functools import reduce
-import msgpack
 
 from .array_to_xpath import array_to_xpath
+from .fast_deepcopy import fast_deepcopy
 from .future import range
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
@@ -60,7 +60,7 @@ def flatten_content(survey_content, in_place=False, **opts):
         return None
     else:
         # This is safe, because `survey_content` is JSON-compatible
-        survey_content_copy = msgpack.unpackb(msgpack.packb(survey_content))
+        survey_content_copy = fast_deepcopy(survey_content)
         flatten_content_in_place(survey_content_copy, **opts)
         return survey_content_copy
 

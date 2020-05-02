@@ -4,11 +4,11 @@ from __future__ import (unicode_literals, print_function,
 
 from collections import defaultdict
 import json
-import msgpack
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
+from .fast_deepcopy import fast_deepcopy
 from .future import iteritems, OrderedDict
 from .string import str_types
 
@@ -225,7 +225,7 @@ def replace_aliases(content, in_place=False, allowed_types=None):
         return None
     else:
         # This is safe, because `content` is JSON-compatible
-        _content = msgpack.unpackb(msgpack.packb(content))
+        _content = fast_deepcopy(content)
         replace_aliases_in_place(_content, allowed_types=allowed_types)
         return _content
 
