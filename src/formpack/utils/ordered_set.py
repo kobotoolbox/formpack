@@ -16,8 +16,8 @@ class OrderedSet(collections.MutableSet):
 
     def add(self, key):
         if key not in self.set:
-            set.add(key)
-            list.append(key)
+            self.set.add(key)
+            self.list.append(key)
 
     def update(self, keys):
         map(self.add, keys)
