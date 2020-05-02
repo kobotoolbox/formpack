@@ -158,8 +158,18 @@ def _get_special_survey_cols(content):
         'hint::English',
     For more examples, see tests.
     """
-    uniq_cols_unordered = set()
+    uniq_cols_set = set()
     uniq_cols = []
+    """
+    The reason for two separate data structures is performance. The goal is to have a unique
+    set that preserves insertion order.
+
+    We implement that by using set() for uniqueness and list() for order.
+
+    Python has OrderedDict that provides that functionality, but the performance is slightly
+    worse compared to this solution.
+    """
+
     special = OrderedDict()
 
     known_translated_cols = content.get('translated', [])
@@ -171,9 +181,9 @@ def _get_special_survey_cols(content):
             _cols = [r for r in row.keys() if r not in known_translated_cols]
 
             for _col in _cols:
-                if _col in uniq_cols_unordered:
+                if _col in uniq_cols_set:
                     continue
-                uniq_cols_unordered.add(_col)
+                uniq_cols_set.add(_col)
                 uniq_cols.append(_col)
 
     def _mark_special(**kwargs):
@@ -223,7 +233,7 @@ def _get_special_survey_cols(content):
                           translation=matched[1])
 
             # also add the empty column if it exists
-            if column_shortname in uniq_cols_unordered:
+            if column_shortname in uniq_cols_set:
                 _mark_special(column_name=column_shortname,
                               column=column_shortname,
                               translation=UNTRANSLATED)
