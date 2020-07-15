@@ -19,6 +19,9 @@ from .utils.flatten_content import flatten_content
 from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 
+from a1d05eba1.utils.kfrozendict import kfrozendict
+from a1d05eba1.utils.kfrozendict import freeze as kfrozendict_freeze
+
 from copy import deepcopy
 
 class LabelStruct:
@@ -49,14 +52,45 @@ class NoLabelStruct:
     def get(self, key, _default):
         return _default
 
+
+def iter_rows(row, parent=''):
+    # yields: (rowdata, parentname)
+    if isinstance(row, (list, tuple)):
+        for subrow in row:
+            for pps in iter_rows(subrow, parent):
+                yield pps
+    else:
+        subrows = []
+        if 'rows' in row:
+            (row, subrows) = row.popout('rows')
+        yield (row, parent)
+        if len(subrows) > 0:
+            for pps in iter_rows(subrows, row['name']):
+                yield pps
+
+def extract_label_ordered_dict(_row, _txs):
+    _rowlabels = _row.get('label', {})
+    labels = OrderedDict()
+    for tx in _txs:
+        anchor = tx['$anchor']
+        name = tx['name']
+        labels[name] = _rowlabels.get(anchor)
+        if name == '':
+            labels[None] = _rowlabels.get(anchor)
+    return labels
+
+
 class FormVersion(object):
     def __init__(self, form_pack, schema, content):
-        if 'name' in schema:
-            raise ValueError('FormVersion should not have a name parameter. '
-                             'consider using "title" or "id_string"')
+        # everything pulled from "schema" in these lines:
+        id_string = schema.get('id_string')
+        title = schema.get('title', form_pack.title)
+        _id = schema.get('version')
+        version_id_key = schema.get('version_id_key',
+                                    form_pack.default_version_id_key)
 
-        self.schema = schema
-        self.title = schema.get('title', form_pack.title)
+        content = kfrozendict_freeze(content)
+        self.title = title
         self.form_pack = form_pack
         self.content = content
         self.full_txs = content.get('translations')
@@ -66,16 +100,15 @@ class FormVersion(object):
         self.root_node_name = self._get_root_node_name()
 
         # form version id, unique to this version of the form
-        self.id = schema.get('version')
-        self.version_id_key = schema.get('version_id_key',
-                                         form_pack.default_version_id_key)
+        self.id = _id
+        self.version_id_key = version_id_key
 
         # form string id, unique to this form, shared accross versions
-        self.id_string = schema.get('id_string')
+        self.id_string = id_string
         if self.id_string:
-            settings['identifier'] = self.id_string
+            settings = settings.copy(identifier=self.id_string)
         elif self.form_pack.id_string:
-            settings['identifier'] = self.form_pack.id_string
+            settings = settings.copy(identifier=self.form_pack.id_string)
 
         # TODO: set the title of the last version as the name of the first
         # section ?
@@ -98,124 +131,76 @@ class FormVersion(object):
         get_name = lambda tt: tt['name'] if tt['name'] != '' else None
         self.translations = [get_name(t) for t in self.full_txs]
 
-        survey = content['survey']
-        fields_by_name = {}
-        def _iter_rows(row):
-            if isinstance(row, (list, tuple)):
-                for subrow in row:
-                    for isubrow in _iter_rows(subrow):
-                        yield isubrow
-            else:
-                subrows = row.get('rows', [])
-                yield row
-                if len(subrows) > 0:
-                    for isubrow in _iter_rows(subrows):
-                        yield isubrow
-
-        metas = settings.get('metas', {}).copy()
-        meta_rows = []
-        for metakey in ['start', 'end']:
-            if metakey in metas:
-                val = metas.pop(metakey)
-                _metarow = {}
-                if isinstance(val, dict):
-                    _metarow = val
-                else:
-                    if val is True:
-                        _metarow['name'] = metakey
-                        _metarow['type'] = metakey
-                        _metarow['$anchor'] = '${}'.format(metakey)
-                if 'name' not in _metarow:
-                    _metarow['name'] = metakey
-                if 'type' not in _metarow:
-                    _metarow['type'] = metakey
-                meta_rows.append(_metarow)
-
-        for row in _iter_rows(meta_rows):
-            fields_by_name[row['name']] = row
-
-        for row in _iter_rows(survey):
-            fields_by_name[row['name']] = row
-
-        choices_copy = deepcopy(content['choices'])
         flat_choice_lists = []
-        for (list_name, choices) in choices_copy.items():
+        for (list_name, choices) in content['choices'].items():
             for choice in choices:
                 flat_choice_lists.append(
-                    {**choice, 'list_name': list_name}
+                    {**choice.unfreeze(), 'list_name': list_name}
                 )
 
         choice_lists = form_choice_list_from_json_definition(flat_choice_lists,
                                                              self.full_txs,
                                                              self.translations)
+        survey_rows = (self._load_metas(settings['metas']) +
+                       content['survey'],
+                       )
 
-        # Extract fields data
-        root_section_ = FormRootSection(name=form_pack.title)
+        fields_by_name = {}
+        self.sections = sections = OrderedDict()
+        _title = form_pack.title
+        sections[_title] = root_section = FormRootSection(name=_title)
 
-        self.sections = OrderedDict()
-        self.sections[form_pack.title] = root_section_
-
-        def extract_label_ordered_dict(_row, _txs):
-            _rowlabels = _row.get('label', {})
-            labels = OrderedDict()
-            for tx in _txs:
-                anchor = tx['$anchor']
-                name = tx['name']
-                labels[name] = _rowlabels.get(anchor)
-                if name == '':
-                    labels[None] = _rowlabels.get(anchor)
-            return labels
-
-        def _parse_row(row, parent_group):
+        for (row, parent_name) in iter_rows(survey_rows, root_section.name):
             name = row['name']
-            if 'label' in row:
-                row['labels'] = LabelStruct(row['label'], self.full_txs)
+            _type = row['type']
+            parent_section = fields_by_name.get(parent_name, root_section)
+            if _type in ['group', 'repeat']:
+                extracted_labels = extract_label_ordered_dict(row,
+                                                              self.full_txs)
+                opts = {'name': row['name'],
+                        'labels': extracted_labels}
+                if _type == 'repeat':
+                    obj = FormRepeatSection(**opts)
+                    sections[obj.name]= obj
+                else:
+                    obj = FormGroup(**opts)
             else:
-                row['labels'] = NoLabelStruct(row, self.full_txs)
+                if 'label' in row:
+                    labels = LabelStruct(row['label'], self.full_txs)
+                else:
+                    labels = NoLabelStruct(row, self.full_txs)
+                obj = form_field_from_json_definition(row,
+                                                      labels,
+                                                      choice_lists)
+            obj.set_parent(parent_section)
+            fields_by_name[name] = obj
 
-            obj = form_field_from_json_definition(row, choice_lists)
-            obj.set_parent(parent_group)
 
-        def _parse_group(_group, parent):
-            extracted_labels = extract_label_ordered_dict(_group,
-                                                          self.full_txs)
-            group = FormGroup(name=_group['name'],
-                              labels=extracted_labels,
-                              )
-            group.set_parent(parent)
-            for row in _group['rows']:
-                _parse_row_or_group(row, group)
-
-        def _parse_repeat(_repeat, parent):
-            _name = _repeat['name']
-            params = {
-                'name': _repeat['name'],
-                'labels': extract_label_ordered_dict(_repeat, self.full_txs)
-            }
-            repeat = FormRepeatSection(**params)
-            self.sections[_name] = repeat
-            repeat.set_parent(parent)
-            for row in _repeat['rows']:
-                _parse_row_or_group(row, repeat)
-
-        def _parse_row_or_group(row_or_group, parent_group):
-            if 'rows' in row_or_group and row_or_group['type'] == 'repeat':
-                _parse_repeat(row_or_group, parent_group)
-            elif 'rows' in row_or_group:
-                _parse_group(row_or_group, parent_group)
-            else:
-                _parse_row(row_or_group, parent_group)
-
-        for rows in [meta_rows,
-                     content['survey']]:
-            for row in rows:
-                _parse_row_or_group(row, root_section_)
-
-    # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
-    # to fix https://github.com/kobotoolbox/formpack/issues/150
-    #
-    # def __repr__(self):
-    #    return '<FormVersion %s>' % self._stats()
+    def _load_metas(self, frozen_metas):
+        metas = frozen_metas.unfreeze()
+        meta_rows = []
+        def _load_meta(key, val):
+            _row = {}
+            if val is True:
+                _row.update({
+                    'name': key,
+                    'type': key,
+                    '$anchor': '$' + key,
+                })
+            elif isinstance(val, dict):
+                _row.update(val)
+            if 'name' not in _row:
+                _row['name'] = metakey
+            if 'type' not in _row:
+                _row['type'] = metakey
+            meta_rows.append(_row)
+        for metakey in ['start']:
+            if metakey in metas:
+                metaval = metas.pop(metakey)
+                _load_meta(metakey, metaval)
+        for (metakey, metaval) in metas.items():
+            _load_meta(metakey, metaval)
+        return kfrozendict_freeze(meta_rows)
 
     def to_dict(self, **opts):
         # return self.content

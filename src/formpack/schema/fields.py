@@ -815,7 +815,7 @@ CLASSES_BY_TYPE = {
     "image": FormField,
 }
 
-def form_field_from_json_definition(row, field_choices_):
+def form_field_from_json_definition(row, labels, field_choices):
     type_ = row['type']
     tags = row.get('tags', ())
     kls = CLASSES_BY_TYPE.get(type_, TextField)
@@ -823,11 +823,11 @@ def form_field_from_json_definition(row, field_choices_):
         kls = FormLiteracyTestField
     args = {
         'name': row['name'],
-        'labels': row['labels'],
+        'labels': labels,
         'data_type': type_,
     }
     if 'select_from' in row:
-        args['choice'] = field_choices_[row['select_from']]
+        args['choice'] = field_choices[row['select_from']]
     if len(tags) > 0:
         args['tags'] = tags
     out = kls(**args)
