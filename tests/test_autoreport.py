@@ -71,10 +71,18 @@ class TestAutoReport(unittest.TestCase):
 
         title, schemas, submissions = build_fixture('restaurant_profile')
         fp = FormPack(schemas, title)
+        vv = fp.versions['rpV3']
+        sec = vv.sections['Restaurant profile']
+        fields = sec.fields
+        eattype = fields['eatery_type']
+        opts0 = eattype.choice.options['sit_down']['labels']
+        opts1 = eattype.choice.options['takeaway']['labels']
+        assert opts0['english'] == 'sit down'
+        assert opts0['french'] == 'traditionnel'
+        assert 'english' in opts1
 
         report = fp.autoreport()
         stats = report.get_stats(submissions, lang='french')
-
         assert stats.submissions_count == 4
 
         stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
@@ -120,141 +128,141 @@ class TestAutoReport(unittest.TestCase):
         for i, stat in enumerate(stats):
             assert stat == expected[i]
 
-    @unittest.skip('TODO: fix the autoreport so this test passes')
-    def test_simple_multi_version_report(self):
-        title, schemas, submissions = build_fixture('site_inspection')
-        fp = FormPack(schemas, title)
-
-        report = fp.autoreport(versions=fp.versions.keys())
-        stats = report.get_stats(submissions)
-
-        self.assertEqual(stats.submissions_count, 10)
-
-        stats = [(repr(f), n, d) for f, n, d in stats]
-
-        self.assertListEqual(stats, [
-            (
-                "<TextField name='inspector' type='text'>",
-                'inspector',
-                {
-                    'frequency': [('burger', 5), ('clouseau', 5)],
-                    'not_provided': 0,
-                    'percentage': [('burger', 50.0), ('clouseau', 50.0)],
-                    'provided': 10,
-                    'show_graph': False,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
-                'did_you_find_the_site',
-                {
-                    'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
-                    'not_provided': 0,
-                    'percentage': [
-                        (0, 40.0),
-                        (1, 40.0),
-                        ('yes', 10.0),
-                        ('no', 10.0)
-                    ],
-                    'provided': 10,
-                    'show_graph': True,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
-                'was_there_damage_to_the_site',
-                {
-                    'frequency': [(0, 2), (1, 2), ('yes', 1)],
-                    'not_provided': 5,
-                    'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
-                    'provided': 5,
-                    'show_graph': True,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
-                'was_there_damage_to_the_site_dupe',
-                {
-                    'frequency': [(1, 1), ('yes', 1)],
-                    'not_provided': 8,
-                    'percentage': [(1, 50.0), ('yes', 50.0)],
-                    'provided': 2,
-                    'show_graph': True,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<NumField name='ping' type='integer'>",
-                'ping',
-                {
-                    'mean': 238.4,
-                    'median': 123,
-                    'mode': '*',
-                    'not_provided': 5,
-                    'provided': 5,
-                    'show_graph': False,
-                    'stdev': 255.77392361224003,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<NumField name='rssi' type='integer'>",
-                'rssi',
-                {
-                    'mean': 63.8,
-                    'median': '65',
-                    'mode': '*',
-                    'not_provided': 5,
-                    'provided': 5,
-                    'show_graph': False,
-                    'stdev': 35.22357165308481,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
-                'is_the_gate_secure',
-                {
-                    'frequency': [(0, 2), (1, 2), ('no', 1)],
-                    'not_provided': 5,
-                    'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
-                    'provided': 5,
-                    'show_graph': True,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
-                'is_plant_life_encroaching',
-                {
-                    'frequency': [(0, 1), (1, 3), ('yes', 1)],
-                    'not_provided': 5,
-                    'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
-                    'provided': 5,
-                    'show_graph': True,
-                    'total_count': 10
-                }
-            ),
-            (
-                "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
-                'please_rate_the_impact_of_any_defects_observed',
-                {
-                    'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
-                    'not_provided': 0,
-                    'percentage': [
-                        ('moderate', 40.0),
-                        ('severe', 30.0),
-                        ('low', 30.0)
-                    ],
-                    'provided': 10,
-                    'show_graph': True,
-                    'total_count': 10
-                }
-            )
-        ])
+    # @unittest.skip('TODO: fix the autoreport so this test passes')
+    # def test_simple_multi_version_report(self):
+    #     title, schemas, submissions = build_fixture('site_inspection')
+    #     fp = FormPack(schemas, title)
+    #
+    #     report = fp.autoreport(versions=fp.versions.keys())
+    #     stats = report.get_stats(submissions)
+    #
+    #     self.assertEqual(stats.submissions_count, 10)
+    #
+    #     stats = [(repr(f), n, d) for f, n, d in stats]
+    #
+    #     self.assertListEqual(stats, [
+    #         (
+    #             "<TextField name='inspector' type='text'>",
+    #             'inspector',
+    #             {
+    #                 'frequency': [('burger', 5), ('clouseau', 5)],
+    #                 'not_provided': 0,
+    #                 'percentage': [('burger', 50.0), ('clouseau', 50.0)],
+    #                 'provided': 10,
+    #                 'show_graph': False,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<FormChoiceField name='did_you_find_the_site' type='select_one'>",
+    #             'did_you_find_the_site',
+    #             {
+    #                 'frequency': [(0, 4), (1, 4), ('yes', 1), ('no', 1)],
+    #                 'not_provided': 0,
+    #                 'percentage': [
+    #                     (0, 40.0),
+    #                     (1, 40.0),
+    #                     ('yes', 10.0),
+    #                     ('no', 10.0)
+    #                 ],
+    #                 'provided': 10,
+    #                 'show_graph': True,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<FormChoiceField name='was_there_damage_to_the_site' type='select_one'>",
+    #             'was_there_damage_to_the_site',
+    #             {
+    #                 'frequency': [(0, 2), (1, 2), ('yes', 1)],
+    #                 'not_provided': 5,
+    #                 'percentage': [(0, 40.0), (1, 40.0), ('yes', 20.0)],
+    #                 'provided': 5,
+    #                 'show_graph': True,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<FormChoiceField name='was_there_damage_to_the_site_dupe' type='select_one'>",
+    #             'was_there_damage_to_the_site_dupe',
+    #             {
+    #                 'frequency': [(1, 1), ('yes', 1)],
+    #                 'not_provided': 8,
+    #                 'percentage': [(1, 50.0), ('yes', 50.0)],
+    #                 'provided': 2,
+    #                 'show_graph': True,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<NumField name='ping' type='integer'>",
+    #             'ping',
+    #             {
+    #                 'mean': 238.4,
+    #                 'median': 123,
+    #                 'mode': '*',
+    #                 'not_provided': 5,
+    #                 'provided': 5,
+    #                 'show_graph': False,
+    #                 'stdev': 255.77392361224003,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<NumField name='rssi' type='integer'>",
+    #             'rssi',
+    #             {
+    #                 'mean': 63.8,
+    #                 'median': '65',
+    #                 'mode': '*',
+    #                 'not_provided': 5,
+    #                 'provided': 5,
+    #                 'show_graph': False,
+    #                 'stdev': 35.22357165308481,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<FormChoiceField name='is_the_gate_secure' type='select_one'>",
+    #             'is_the_gate_secure',
+    #             {
+    #                 'frequency': [(0, 2), (1, 2), ('no', 1)],
+    #                 'not_provided': 5,
+    #                 'percentage': [(0, 40.0), (1, 40.0), ('no', 20.0)],
+    #                 'provided': 5,
+    #                 'show_graph': True,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<FormChoiceField name='is_plant_life_encroaching' type='select_one'>",
+    #             'is_plant_life_encroaching',
+    #             {
+    #                 'frequency': [(0, 1), (1, 3), ('yes', 1)],
+    #                 'not_provided': 5,
+    #                 'percentage': [(0, 20.0), (1, 60.0), ('yes', 20.0)],
+    #                 'provided': 5,
+    #                 'show_graph': True,
+    #                 'total_count': 10
+    #             }
+    #         ),
+    #         (
+    #             "<FormChoiceField name='please_rate_the_impact_of_any_defects_observed' type='select_one'>",
+    #             'please_rate_the_impact_of_any_defects_observed',
+    #             {
+    #                 'frequency': [('moderate', 4), ('severe', 3), ('low', 3)],
+    #                 'not_provided': 0,
+    #                 'percentage': [
+    #                     ('moderate', 40.0),
+    #                     ('severe', 30.0),
+    #                     ('low', 30.0)
+    #                 ],
+    #                 'provided': 10,
+    #                 'show_graph': True,
+    #                 'total_count': 10
+    #             }
+    #         )
+    #     ])
 
     def test_rich_report(self):
 

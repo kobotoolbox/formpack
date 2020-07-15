@@ -120,27 +120,37 @@ def test_translated_label_hierarchy():
                 'name': 'group',
                 'label::English': 'Group',
                 'label::Español': 'Grupo',
+                '$anchor': 'x1',
             },
             {
                 'type': 'text',
                 'name': 'question',
                 'label::English': 'Question',
                 'label::Español': 'Pregunta',
+                '$anchor': 'x2',
             },
             {
                 'type': 'begin_repeat',
                 'name': 'repeat',
                 'label::English': 'Repeat',
                 'label::Español': 'Repetición',
+                '$anchor': 'x3',
             },
             {
                 'type': 'text',
                 'name': 'repeated_question',
                 'label::English': 'Repeated Question',
                 'label::Español': 'Pregunta con repetición',
+                '$anchor': 'x4',
             },
-            {'type': 'end_repeat'},
-            {'type': 'end_group'},
+            {'type': 'end_repeat',
+                '$anchor': 'x5',
+
+            },
+            {'type': 'end_group',
+                '$anchor': 'x6',
+
+            },
         ]
     }
     schema = {'content': expand_content(survey), 'version': 1}

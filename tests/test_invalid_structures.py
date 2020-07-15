@@ -47,13 +47,3 @@ class TestInvalidCases(unittest.TestCase):
                  versions=[
                      vdata,
                  ])
-
-    # TODO: remove this test of fix it
-    # @raises(PyXFormError)
-    # def test_xform(self):
-    #     fp = FormPack(title='test_fixture_title',
-    #                   root_node_name='daata',
-    #                   versions=[
-    #                       SINGLE_NOTE_SURVEY,
-    #                   ])
-    #     fp.versions[0].to_xml()

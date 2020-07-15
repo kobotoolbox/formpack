@@ -14,20 +14,19 @@ from ..utils.future import range, OrderedDict
 from ..utils.ordered_collection import OrderedDefaultdict
 
 
+
 class FormField(FormDataDef):
     """ A form field definition knowing how to find and format data """
 
-    def __init__(self, name, labels, data_type, hierarchy=None,
+    def __init__(self, name, labels, data_type,
                  section=None, can_format=True, has_stats=None,
                  *args, **kwargs):
 
         self.data_type = data_type
-        self.section = section
+        self._section = section
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
-
-        hierarchy = list(hierarchy) if hierarchy is not None else [None]
-        self.hierarchy = hierarchy + [self]
+        self._parent = None
 
         # warning: the order of the super() call matters
         super(FormField, self).__init__(name, labels, *args, **kwargs)
@@ -38,9 +37,6 @@ class FormField(FormDataDef):
             self.has_stats = data_type != "note"
 
         self.empty_result = self.format('', lang=UNSPECIFIED_TRANSLATION)
-
-        # do not include the root section in the path
-        self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
                    hierarchy_in_labels=False, multiple_select="both"):
@@ -100,7 +96,7 @@ class FormField(FormDataDef):
         if hierarchy_in_labels:
             path = []
             for level in self.hierarchy[1:_hierarchy_end]:
-                _t = level.labels.get(lang)
+                _t = level.labels.get(lang, None)
                 if isinstance(_t, list) and len(_t) == 1:
                     _t = _t[0]
                 # sometimes, level.labels returns a list
@@ -118,79 +114,6 @@ class FormField(FormDataDef):
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
         return "<%s name='%s' type='%s'>" % args
-
-    @classmethod
-    def from_json_definition(cls, definition, hierarchy=None,
-                             section=None, field_choices={},
-                             translations=None):
-        """Return an instance of a Field class matching this JSON field def
-
-        Depending of the data datype extracted from the field definition,
-        this method will return an instance of a different class.
-
-        Args:
-            definition (dict): Description
-            group (FormGroup, optional): The group this field is into
-            section (FormSection, optional): The section this field is into
-            field_choices (dict, optional):
-                A mapping of all the FormChoice instances available for
-                this form.
-
-        Returns:
-            Union[FormChoiceField, FormChoiceField,
-                  FormChoiceFieldWithMultipleSelect, FormField]:
-                  The FormField instance matching this definiton.
-        """
-        name = definition['name']
-        tags = definition.get('tags', [])
-        labels = cls._extract_json_labels(definition, translations)
-        appearance = definition.get('appearance')
-
-        # normalize spaces
-        data_type = definition['type']
-        choice = None
-
-        if ' ' in data_type:
-            raise ValueError('invalid data_type: %s' % data_type)
-
-        if data_type in ('select_one', 'select_multiple'):
-            choice_id = definition['select_from_list_name']
-            choice = field_choices[choice_id]
-
-        data_type_classes = {
-            "select_one": FormChoiceField,
-            "select_multiple": FormChoiceFieldWithMultipleSelect,
-            "geopoint": FormGPSField,
-            "date": DateField,
-            "text": TextField,
-            "barcode": TextField,
-
-            # calculate is usually not text but for our purpose it's good
-            # enough
-            "calculate": TextField,
-            "acknowledge": TextField,
-            "integer": NumField,
-            'decimal': NumField,
-
-            # legacy type, treat them as text
-            "select_one_external": partial(TextField, data_type=data_type),
-            "cascading_select": partial(TextField, data_type=data_type),
-        }
-
-        args = {
-            'name': name,
-            'labels': labels,
-            'tags': tags,
-            'data_type': data_type,
-            'hierarchy': hierarchy,
-            'section': section,
-            'choice': choice
-        }
-
-        if data_type == 'select_multiple' and appearance == 'literacy':
-            return FormLiteracyTestField(**args)
-
-        return data_type_classes.get(data_type, cls)(**args)
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
         return {self.name: val}
@@ -508,10 +431,9 @@ class NumField(FormField):
 
 class CopyField(FormField):
     """ Just copy the data over. No translation. No manipulation """
-    def __init__(self, name, hierarchy=(None,), section=None, *args, **kwargs):
+    def __init__(self, name, section=None, *args, **kwargs):
         super(CopyField, self).__init__(name, labels=None,
                                         data_type=name,
-                                        hierarchy=(None,),
                                         section=section,
                                         can_format=True,
                                         has_stats=False,
@@ -549,10 +471,10 @@ class ValidationStatusCopyField(CopyField):
 
 class FormGPSField(FormField):
 
-    def __init__(self, name, labels, data_type, hierarchy=None,
+    def __init__(self, name, labels, data_type,
                  section=None, choice=None, *args, **kwargs):
         super(FormGPSField, self).__init__(name, labels, data_type,
-                                           hierarchy, section, *args, **kwargs)
+                                           section, *args, **kwargs)
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both"):
@@ -629,11 +551,11 @@ class FormGPSField(FormField):
 class FormChoiceField(ExtendedFormField):
     """  Same as FormField, but link the data to a FormChoice """
 
-    def __init__(self, name, labels, data_type, hierarchy=None,
+    def __init__(self, name, labels, data_type,
                  section=None, choice=None, *args, **kwargs):
         self.choice = choice or FormChoice(name)
         super(FormChoiceField, self).__init__(name, labels, data_type,
-                                              hierarchy, section,
+                                              section,
                                               *args, **kwargs)
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
@@ -873,3 +795,40 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
             ' '.join(word_values), *args, **kwargs)
         cells.update(prepended_cells)
         return cells
+
+
+CLASSES_BY_TYPE = {
+    "select_one": FormChoiceField,
+    "select_multiple": FormChoiceFieldWithMultipleSelect,
+    "geopoint": FormGPSField,
+    "note": FormField,
+
+    "datetime": FormField,
+    "start": FormField,
+    "end": FormField,
+    "geotrace": FormField,
+    "geoshape": FormField,
+
+    "date": DateField,
+    "integer": NumField,
+    "decimal": NumField,
+    "image": FormField,
+}
+
+def form_field_from_json_definition(row, field_choices_):
+    type_ = row['type']
+    tags = row.get('tags', ())
+    kls = CLASSES_BY_TYPE.get(type_, TextField)
+    if 'appearance' in row and row['appearance'] == 'literacy':
+        kls = FormLiteracyTestField
+    args = {
+        'name': row['name'],
+        'labels': row['labels'],
+        'data_type': type_,
+    }
+    if 'select_from' in row:
+        args['choice'] = field_choices_[row['select_from']]
+    if len(tags) > 0:
+        args['tags'] = tags
+    out = kls(**args)
+    return out

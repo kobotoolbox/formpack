@@ -55,7 +55,12 @@ class AutoReport(object):
 
         submissions_count = 0
         submission_counts_by_version = OrderedCounter()
+        field_names = [f.name for f in fields]
+        eat_field = False
 
+        if 'eatery_type' in field_names:
+            eat_field = fields[field_names.index('eatery_type')]
+            # import pdb; pdb.set_trace()
         for entry in submissions:
 
             version_id = self._get_version_id_from_submission(entry)
@@ -207,6 +212,9 @@ class AutoReport(object):
         else:
             fields.add(split_by)
             fields = [field for field in all_fields if field.name in fields]
+
+        field_names = [f.name for f in fields]
+        eat_field = False
 
         if split_by:
             try:

@@ -15,6 +15,8 @@ from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
 from formpack.schema.fields import CopyField
 
+from a1d05eba1 import Content
+
 
 class FormPack(object):
 
@@ -31,11 +33,6 @@ class FormPack(object):
         :param id_string: The human readable id of the form.
         :param default_version_id_key: string. The name of the field in submissions which stores the version ID
         """
-        # @TODO: Complete the signature for __init__
-
-        if not versions:
-            versions = []
-
         # accept a single version, but normalize it to an iterable
         if isinstance(versions, dict):
             versions = [versions]
@@ -72,15 +69,6 @@ class FormPack(object):
                 _id_keys.append(_id_key)
         return _id_keys
 
-    @property
-    def available_translations(self):
-        translations = []
-        for version in self.versions.values():
-            for translation in version.translations:
-                if translation not in translations:
-                    translations.append(translation)
-        return translations
-
     def lookup(self, prop, default=None):
         # can't use a one liner because sometimes self.prop is None
         result = getattr(self, prop, default)
@@ -98,17 +86,6 @@ class FormPack(object):
             raise KeyError('formpack with version [%s] not found' % str(index))
         except IndexError:
             raise IndexError('version at index %d is not available' % index)
-
-    def _stats(self):
-        _stats = OrderedDict()
-        _stats['id_string'] = self.id_string
-        _stats['versions'] = len(self.versions)
-        # _stats['submissions'] = self.submissions_count()
-        if self.versions:
-            _stats['row_count'] = len(self[-1].schema.get('content', {})
-                                                     .get('survey', []))
-        # returns stats in the format [ key="value" ]
-        return '\n\t'.join('%s="%s"' % item for item in _stats.items())
 
     def load_all_versions(self, versions):
         for schema in versions:
@@ -130,13 +107,22 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
+        cschema = deepcopy(schema)
+
         replace_aliases(schema['content'], in_place=True)
         expand_content(schema['content'], in_place=True)
 
-        if self.strict_schema:
-            FormVersion.verify_schema_structure(schema)
+        _content = cschema.pop('content')
+        content = {**_content, 'schema': '1+formpack'}
 
-        form_version = FormVersion(self, schema)
+        validated_content = Content(content).export(schema='2',
+                                                    flat=False,
+                                                    remove_nulls=False)
+        if self.id_string:
+            validated_content['settings']['identifier'] = self.id_string
+        if self.title:
+            validated_content['settings']['title'] = self.title
+        form_version = FormVersion(self, schema, validated_content)
 
         # NB: id_string are readable string unique to the form
         # while version id are id unique to one of the versions of the form
@@ -167,24 +153,6 @@ class FormPack(object):
             self.title = form_version.version_title
 
         self.versions[form_version.id] = form_version
-
-    def version_diff(self, vn1, vn2):
-        v1 = self.versions[vn1]
-        v2 = self.versions[vn2]
-
-        def summr(v):
-            return json.dumps(v.schema.get('content'),
-                              indent=4,
-                              sort_keys=True,
-                              ).splitlines(1)
-        out = []
-        for line in difflib.unified_diff(summr(v1),
-                                         summr(v2),
-                                         fromfile=vn1,
-                                         tofile=vn2,
-                                         n=1):
-            out.append(line)
-        return ''.join(out)
 
     @staticmethod
     def _combine_field_choices(old_field, new_field):
@@ -225,9 +193,10 @@ class FormPack(object):
         :return: list
         """
         # Cast data_types if it's not already a list
-        if data_types is not None:
-            if isinstance(data_types, str_types):
-                data_types = [data_types]
+
+        # if data_types is not None:
+        #     if isinstance(data_types, str_types):
+        #         data_types = [data_types]
 
         # tmp2 is a 2 dimensions list of `field`.
         # First dimension is the position of fields where they should be in the latest version
@@ -330,9 +299,6 @@ class FormPack(object):
         if self.asset_type is not None:
             out['asset_type'] = self.asset_type
         return out
-
-    def to_json(self, **kwargs):
-        return json.dumps(self.to_dict(), **kwargs)
 
     def export(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",

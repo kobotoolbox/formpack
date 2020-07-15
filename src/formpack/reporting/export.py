@@ -71,7 +71,7 @@ class Export(object):
                         dumb_field = copy_field(section=first_section)
                     else:
                         dumb_field = CopyField(copy_field, section=first_section)
-                    first_section.fields[dumb_field.name] = dumb_field
+                    dumb_field.set_parent(first_section)
 
         # this deals with merging all form versions headers and labels
         params = (
@@ -211,7 +211,7 @@ class Export(object):
             if section.children or self.force_index:
                 auto_field_names.append('_index')
 
-            if section.parent:
+            if section._parent:
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
@@ -364,9 +364,9 @@ class Export(object):
                 row['_index'] = _indexes[_section_name]
 
             if '_parent_table_name' in row:
-                row['_parent_table_name'] = current_section.parent.name
+                row['_parent_table_name'] = current_section.parent_section.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
-                extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
+                extra_mapping_values = self.__get_extra_mapping_values(current_section._parent)
                 if extra_mapping_values:
                     for extra_mapping_field in self.copy_fields:
                         if isclass(extra_mapping_field):
@@ -579,18 +579,18 @@ class Export(object):
 
         yield feature_array_epilogue
 
-    def to_table(self, submissions):
-
-        table = OrderedDict(((s, [list(l)]) for s, l in self.labels.items()))
-
-        # build the table
-        for chunk in self.parse_submissions(submissions):
-            for section_name, rows in chunk.items():
-                section = table[section_name]
-                for row in rows:
-                    section.append(row)
-
-        return table
+    # def to_table(self, submissions):
+    #
+    #     table = OrderedDict(((s, [list(l)]) for s, l in self.labels.items()))
+    #
+    #     # build the table
+    #     for chunk in self.parse_submissions(submissions):
+    #         for section_name, rows in chunk.items():
+    #             section = table[section_name]
+    #             for row in rows:
+    #                 section.append(row)
+    #
+    #     return table
 
     def to_xlsx(self, filename, submissions):
         workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
@@ -643,34 +643,34 @@ class Export(object):
 
         workbook.close()
 
-    def to_html(self, submissions):
-        """
-        Yield lines of and HTML table strings.
-        """
-
-        yield "<table>"
-
-        sections = list(self.labels.items())
-
-        yield "<thead>"
-
-        section, labels = sections[0]
-        yield "<tr><th>" + "</th><th>".join(labels) + "</th></tr>"
-
-        yield "</thead>"
-
-        yield "<tbody>"
-
-        for chunk in self.parse_submissions(submissions):
-            for section_name, rows in chunk.items():
-                if section == section_name:
-                    for row in rows:
-                        row = [unicode(x) for x in row]
-                        yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
-
-        yield "</tbody>"
-
-        yield "</table>"
+    # def to_html(self, submissions):
+    #     """
+    #     Yield lines of and HTML table strings.
+    #     """
+    #
+    #     yield "<table>"
+    #
+    #     sections = list(self.labels.items())
+    #
+    #     yield "<thead>"
+    #
+    #     section, labels = sections[0]
+    #     yield "<tr><th>" + "</th><th>".join(labels) + "</th></tr>"
+    #
+    #     yield "</thead>"
+    #
+    #     yield "<tbody>"
+    #
+    #     for chunk in self.parse_submissions(submissions):
+    #         for section_name, rows in chunk.items():
+    #             if section == section_name:
+    #                 for row in rows:
+    #                     row = [unicode(x) for x in row]
+    #                     yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
+    #
+    #     yield "</tbody>"
+    #
+    #     yield "</table>"
 
     def __get_extra_mapping_values(self, section):
         """
@@ -686,7 +686,7 @@ class Export(object):
         if section:
             values = self.__r_groups_submission_mapping_values.get(section.name)
             if values is None:
-                return self.__get_extra_mapping_values(getattr(section, "parent"))
+                return self.__get_extra_mapping_values(section._parent)
             else:
                 return values
 

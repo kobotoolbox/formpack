@@ -130,15 +130,16 @@ def test_null_untranslated_labels():
     fields = fp.get_fields_for_versions()
     field = fields[0]
     assert len(fields) == 1
-    expected_arabic_labels = [
+    expected_arabic_labels = sorted([
         'إذا كان نعم ماهي المساعدات التي تتلقاها؟',
         'إذا كان نعم ماهي المساعدات التي تتلقاها؟/سلل غذائية',
         'إذا كان نعم ماهي المساعدات التي تتلقاها؟/سلل شتوية',
         'إذا كان نعم ماهي المساعدات التي تتلقاها؟/سلل زراعية',
         'إذا كان نعم ماهي المساعدات التي تتلقاها؟/قسائم',
         'إذا كان نعم ماهي المساعدات التي تتلقاها؟/أخرى',
-    ]
-    arabic_labels = field.get_labels('arabic')
+    ], key=len)
+    arabic_labels = sorted(field.get_labels('arabic'), key=len)
+
     assert arabic_labels == expected_arabic_labels
     untranslated_labels = field.get_labels(constants.UNTRANSLATED)
     question_names = field.get_labels(constants.UNSPECIFIED_TRANSLATION)

@@ -54,6 +54,11 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
 
         self.assertEqual(len(fp[0].translations), 1)
+        v1 = fp.versions[None]
+        sect = v1.sections['Customer Satisfaction']
+        ff = sect.fields['customer_enjoyment']
+
+        # import pdb; pdb.set_trace()
 
         export = fp.export(lang=UNTRANSLATED).to_dict(submissions)
         expected = OrderedDict({
