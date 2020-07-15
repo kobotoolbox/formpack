@@ -5,6 +5,8 @@ from __future__ import (unicode_literals, print_function,
 import json
 from copy import deepcopy
 
+from nose.tools import raises
+
 from formpack import FormPack, constants
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture
@@ -91,6 +93,36 @@ def test_disabled_questions_ignored():
     fp = FormPack(scontent, id_string='xx')
     s1_fields = [ss for ss in fp[0].sections.values()][0].fields
     assert 'q2' in s1_fields
+
+
+@raises(KeyError)
+def test_missing_choice_list_breaks():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'select_one dogs', 'name': 'q1',
+                               'label': ['aa']},
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    q1 = scontent['content']['survey'][0]
+    fp = FormPack(scontent, id_string='xx')
+
+
+def test_commented_out_missing_choice_list_does_not_break():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'select_one dogs', 'name': 'q1',
+                               'disabled': 'TRUE',
+                               'label': ['aa']},
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    q1 = scontent['content']['survey'][0]
+    fp = FormPack(scontent, id_string='xx')
 
 
 def test_null_untranslated_labels():
