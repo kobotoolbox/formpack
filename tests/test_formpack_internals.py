@@ -59,6 +59,40 @@ def test_to_xml_fails_when_null_labels():
     fp[0].to_xml()
 
 
+def test_disabled_questions_ignored():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'note', 'name': 'n1', 'label': ['aa']},
+                              {'type': 'text','name': 'q2', 'label': ['bb'],
+                               }
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    q1 = scontent['content']['survey'][1]
+
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' in s1_fields
+
+    q1['disabled'] = True
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' not in s1_fields
+
+
+    q1['disabled'] = 'true'
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' not in s1_fields
+
+    q1['disabled'] = 'FALSE'
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' in s1_fields
+
+
 def test_null_untranslated_labels():
     content = json.loads('''
         {
