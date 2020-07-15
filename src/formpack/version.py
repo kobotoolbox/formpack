@@ -120,6 +120,10 @@ class FormVersion(object):
         section_stack = []
 
         for data_definition in survey:
+            if 'disabled' in data_definition:
+                if YES_NO.get(str(data_definition['disabled']), False):
+                    continue
+
             data_type = data_definition.get('type')
             if not data_type:  # handle broken data type definition
                 continue
@@ -178,10 +182,6 @@ class FormVersion(object):
                 section_stack.append(parent_section)
                 parent_section.children.append(section)
                 continue
-
-            if 'disabled' in data_definition:
-                if YES_NO.get(str(data_definition['disabled']), False):
-                    continue
 
             # If we are here, it's a regular field
             # Get the the data name and type

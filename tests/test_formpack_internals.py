@@ -60,6 +60,23 @@ def test_to_xml_fails_when_null_labels():
                    }}, id_string='sdf')
     fp[0].to_xml()
 
+def test_groups_disabled():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'text','name': 'n1', 'label': ['aa']},
+                              {'type': 'begin_group', 'name': 'nada', 'disabled': 'TRUE'},
+                              {'type': 'note', 'name': 'n2', 'label': ['ab']},
+                              {'type': 'end_group', 'disabled': 'TRUE'},
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    fp = FormPack(scontent, id_string='xx')
+    ss = [ss for ss in fp[0].sections.values()][0]
+    gg = ss.fields['n2'].hierarchy[1]
+    xml = fp[0].to_xml()
+    assert 'nada' not in xml
 
 def test_disabled_questions_ignored():
     scontent = {'content': {
@@ -72,24 +89,23 @@ def test_disabled_questions_ignored():
                    'translated': ['label'],
                   }
                 }
-    q1 = scontent['content']['survey'][1]
+    qq = scontent['content']['survey'][1]
 
     fp = FormPack(scontent, id_string='xx')
     s1_fields = [ss for ss in fp[0].sections.values()][0].fields
     assert 'q2' in s1_fields
 
-    q1['disabled'] = True
+    qq['disabled'] = True
     fp = FormPack(scontent, id_string='xx')
     s1_fields = [ss for ss in fp[0].sections.values()][0].fields
     assert 'q2' not in s1_fields
 
-
-    q1['disabled'] = 'true'
+    qq['disabled'] = 'true'
     fp = FormPack(scontent, id_string='xx')
     s1_fields = [ss for ss in fp[0].sections.values()][0].fields
     assert 'q2' not in s1_fields
 
-    q1['disabled'] = 'FALSE'
+    qq['disabled'] = 'FALSE'
     fp = FormPack(scontent, id_string='xx')
     s1_fields = [ss for ss in fp[0].sections.values()][0].fields
     assert 'q2' in s1_fields
@@ -106,7 +122,6 @@ def test_missing_choice_list_breaks():
                    'translated': ['label'],
                   }
                 }
-    q1 = scontent['content']['survey'][0]
     fp = FormPack(scontent, id_string='xx')
 
 
@@ -121,7 +136,6 @@ def test_commented_out_missing_choice_list_does_not_break():
                    'translated': ['label'],
                   }
                 }
-    q1 = scontent['content']['survey'][0]
     fp = FormPack(scontent, id_string='xx')
 
 
