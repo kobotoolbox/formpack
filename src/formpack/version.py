@@ -203,8 +203,7 @@ class FormVersion(object):
         return kfrozendict_freeze(meta_rows)
 
     def to_dict(self, **opts):
-        # return self.content
-        return flatten_content(self.schema['content'], **opts)
+        return self.content
 
     def lookup(self, prop, default=None):
         result = getattr(self, prop, None)

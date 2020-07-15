@@ -38,12 +38,3 @@ class TestInvalidCases(unittest.TestCase):
                  versions=[
                      vdata,
                  ])
-
-    @raises(ValueError)
-    def test_formpack_version_cannot_have_name(self):
-        vdata = copy(SINGLE_NOTE_SURVEY)
-        vdata['name'] = "somename"
-        FormPack(id_string="idstring",
-                 versions=[
-                     vdata,
-                 ])

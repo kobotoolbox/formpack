@@ -23,6 +23,7 @@ def flatten_content_in_place(survey_content,
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
     """
+    raise NotImplementedError('this will be removed')
     if isinstance(remove_columns, list):
         raise Exception('bad')
     if remove_columns is None:
