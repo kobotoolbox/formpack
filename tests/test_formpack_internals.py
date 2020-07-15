@@ -60,23 +60,46 @@ def test_to_xml_fails_when_null_labels():
                    }}, id_string='sdf')
     fp[0].to_xml()
 
+
 def test_groups_disabled():
     scontent = {'content': {
                    'survey': [
                               {'type': 'text','name': 'n1', 'label': ['aa']},
-                              {'type': 'begin_group', 'name': 'nada', 'disabled': 'TRUE'},
+                              {'type': 'begin_group', 'name': 'nada'},
                               {'type': 'note', 'name': 'n2', 'label': ['ab']},
-                              {'type': 'end_group', 'disabled': 'TRUE'},
+                              {'type': 'end_group'},
                               ],
                    'translations': ['en'],
                    'translated': ['label'],
                   }
                 }
+
+    (ga, gz) = [scontent['content']['survey'][nn] for nn in [1, 3]]
+    # verify that "ga" and "gz" variables point to group begin/end
+    assert ga['type'] == 'begin_group'
+    assert gz['type'] == 'end_group'
+    assert ga.get('disabled') == gz.get('disabled') == None
+
+    # verify values before setting "disabled=TRUE"
     fp = FormPack(scontent, id_string='xx')
     ss = [ss for ss in fp[0].sections.values()][0]
-    gg = ss.fields['n2'].hierarchy[1]
-    xml = fp[0].to_xml()
-    assert 'nada' not in xml
+    # only(?) way to access groups is in the hierarchy of a child question
+    n2_parent = ss.fields['n2'].hierarchy[-2]
+    group_class_repr = "<class 'formpack.schema.datadef.FormGroup'>"
+    assert repr(n2_parent.__class__) == group_class_repr
+    assert n2_parent.name == 'nada'
+    assert 'nada' in fp[0].to_xml()
+
+    ga['disabled'] = gz['disabled'] = 'TRUE'
+    fp = FormPack(scontent, id_string='xx')
+    ss = [ss for ss in fp[0].sections.values()][0]
+    n2_parent = ss.fields['n2'].hierarchy[-2]
+    # n2_parent is a "<FormSection name='submissions'>"
+    # test opposite of what's tested above--
+    assert repr(n2_parent.__class__) != group_class_repr
+    assert n2_parent.name != 'nada'
+    assert 'nada' not in fp[0].to_xml()
+
 
 def test_disabled_questions_ignored():
     scontent = {'content': {
