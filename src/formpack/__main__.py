@@ -8,12 +8,11 @@ import sys
 import begin
 
 from formpack import FormPack
-from .utils.expand_content import expand_content
 from .utils.flatten_content import flatten_content
 from .utils.xls_to_ss_structure import xls_to_dicts
 
 
-def print_xls(filename, expand=False, flatten=False, xml=False):
+def print_xls(filename, flatten=False, xml=False):
     """
     converts and XLS file with many sheets to a JSON object with lists
     of key-value pairs for each row in the sheet.
@@ -21,12 +20,6 @@ def print_xls(filename, expand=False, flatten=False, xml=False):
     try:
         with open(filename, 'r') as ff:
             content = xls_to_dicts(ff)
-            if expand:
-                expand_content(content)
-                settings = content.get('settings', {})
-                settings['title'] = settings.get('title', 'title')
-                settings['id_string'] = settings.get('id_string', 'id_string')
-                content['settings'] = [settings]
             if flatten:
                 flatten_content(content)
             settings = content.pop('settings', [{}])[0]

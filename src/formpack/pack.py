@@ -9,9 +9,7 @@ from copy import deepcopy
 from .version import FormVersion
 from .utils import str_types
 from .reporting import Export, AutoReport
-from .utils.expand_content import expand_content
 from .utils.future import OrderedDict
-from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
 from formpack.schema.fields import CopyField
 
@@ -108,9 +106,6 @@ class FormPack(object):
             one version in the FormPack.
         """
         cschema = deepcopy(schema)
-
-        replace_aliases(schema['content'], in_place=True)
-        expand_content(schema['content'], in_place=True)
 
         _content = cschema.pop('content')
         content = {**_content, 'schema': '1+formpack'}

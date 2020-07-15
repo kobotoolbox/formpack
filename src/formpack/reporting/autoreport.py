@@ -6,7 +6,6 @@ import logging
 from collections import defaultdict
 
 from ..constants import UNSPECIFIED_TRANSLATION
-from ..submission import FormSubmission
 from ..utils.ordered_collection import OrderedCounter
 
 
@@ -70,8 +69,6 @@ class AutoReport(object):
             submissions_count += 1
             submission_counts_by_version[version_id] += 1
 
-            # TODO: do we really need FormSubmission ?
-            entry = FormSubmission(entry).data
             for field in fields:
                 if field.has_stats:
                     counter = metrics[field.name]
@@ -140,11 +137,9 @@ class AutoReport(object):
             submissions_count += 1
             submission_counts_by_version.update([version_id])
 
-            # TODO: do we really need FormSubmission ?
-
             # since we are going to pop one entry, we make a copy
             # of it to avoid side effect
-            entry = dict(FormSubmission(sbmssn).data)
+            entry = dict(sbmssn)
             splitter = entry.pop(split_by_field.path, None)
 
             for field in fields:

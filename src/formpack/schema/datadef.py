@@ -9,7 +9,6 @@ from ..utils import str_types
 from ..utils.future import OrderedDict
 
 
-
 class FormDataDef(object):
     """ Any object composing a form. It's only used with a subclass. """
 
@@ -25,17 +24,6 @@ class FormDataDef(object):
 
     def get_value_names(self):
         return [self.name]
-
-    @classmethod
-    def _extract_json_labels(cls, definition, translations):
-        """ Extract translation labels from the JSON data definition """
-        label = definition.get('label')
-        if label:
-            labels = OrderedDict(zip(translations, label))
-        else:
-            labels = {}
-        return labels
-
 
     @property
     def path(self):
@@ -69,11 +57,7 @@ class FormDataDef(object):
 
     @property
     def section(self):
-        if self._section:
-            assert self._section is self.parent_section
-            return self._section
-        else:
-            return self.parent_section
+        return self.parent_section
 
     def _add_to_parent_section_fields(self):
         _parent_section = self.parent_section

@@ -11,7 +11,6 @@ import xlsxwriter
 
 from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
-from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
 from ..utils.future import iteritems, itervalues, OrderedDict
@@ -126,8 +125,7 @@ class Export(object):
         # `format_one_submission()` will recurse through all the sections; get
         # the first one to start
         section = get_first_occurrence(version.sections.values())
-        submission = FormSubmission(submission)
-        return self.format_one_submission([submission.data], section)
+        return self.format_one_submission([submission], section)
 
     def parse_submissions(self, submissions):
         """
