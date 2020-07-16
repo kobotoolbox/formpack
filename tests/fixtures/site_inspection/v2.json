@@ -86,12 +86,12 @@
     "choices": [
       {
         "list_name": "zero_one",
-        "name": 0,
+        "name": "0",
         "label": "no"
       },
       {
         "list_name": "zero_one",
-        "name": 1,
+        "name": "1",
         "label": "yes"
       },
       {

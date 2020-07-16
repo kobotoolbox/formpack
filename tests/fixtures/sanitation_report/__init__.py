@@ -7,6 +7,7 @@ from ..load_fixture_json import load_fixture_json
 
 DATA = {
     'title': 'Sanitation report',
+    'id_string': 'sanitation_report',
     'versions': [
         load_fixture_json('sanitation_report/v1'),
     ],
