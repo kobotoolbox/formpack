@@ -60,6 +60,7 @@ def test_to_xml_fails_when_null_labels():
                    }}, id_string='sdf')
     fp[0].to_xml()
 
+from formpack.schema.datadef import FormGroup
 
 def test_groups_disabled():
     scontent = {'content': {
@@ -82,21 +83,20 @@ def test_groups_disabled():
 
     # verify values before setting "disabled=TRUE"
     fp = FormPack(scontent, id_string='xx')
-    ss = [ss for ss in fp[0].sections.values()][0]
+    section = next(iter(fp[0].sections.values()))
     # only(?) way to access groups is in the hierarchy of a child question
-    n2_parent = ss.fields['n2'].hierarchy[-2]
-    group_class_repr = "<class 'formpack.schema.datadef.FormGroup'>"
-    assert repr(n2_parent.__class__) == group_class_repr
+    n2_parent = section.fields['n2'].hierarchy[-2]
+    assert isinstance(n2_parent, FormGroup)
     assert n2_parent.name == 'nada'
     assert 'nada' in fp[0].to_xml()
 
     ga['disabled'] = gz['disabled'] = 'TRUE'
     fp = FormPack(scontent, id_string='xx')
-    ss = [ss for ss in fp[0].sections.values()][0]
-    n2_parent = ss.fields['n2'].hierarchy[-2]
+    section = next(iter(fp[0].sections.values()))
+    n2_parent = section.fields['n2'].hierarchy[-2]
     # n2_parent is a "<FormSection name='submissions'>"
     # test opposite of what's tested above--
-    assert repr(n2_parent.__class__) != group_class_repr
+    assert not isinstance(n2_parent, FormGroup)
     assert n2_parent.name != 'nada'
     assert 'nada' not in fp[0].to_xml()
 
