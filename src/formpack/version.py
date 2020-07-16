@@ -11,7 +11,9 @@ from .utils.flatten_content import flatten_content
 from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 from .validators import validate_content
+from pyxform import aliases as pyxform_aliases
 
+YES_NO = pyxform_aliases.yes_no
 
 class LabelStruct(object):
     """
@@ -118,6 +120,10 @@ class FormVersion(object):
         section_stack = []
 
         for data_definition in survey:
+            if 'disabled' in data_definition:
+                if YES_NO.get(str(data_definition['disabled']), False):
+                    continue
+
             data_type = data_definition.get('type')
             if not data_type:  # handle broken data type definition
                 continue
