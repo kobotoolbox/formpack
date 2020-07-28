@@ -2,11 +2,20 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+import os
+import json
 import unittest
+
+from glob import glob
+from jsonschema import ValidationError
 
 from a1d05eba1 import Content
 from formpack import FormPack
 from .fixtures import build_fixture
+
+CURDIR = os.path.dirname(os.path.abspath(__file__))
+JSONS_DIR = os.path.abspath(os.path.join(CURDIR, 'fixtures', 'json'))
+GLOB_PATH = os.path.join(JSONS_DIR, '*.json')
 
 
 class TestFormPackFixtures(unittest.TestCase):
@@ -21,7 +30,7 @@ class TestFormPackFixtures(unittest.TestCase):
         sanitation_report
         """
         title, schemas, submissions = build_fixture('sanitation_report')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 1)
         v0 = fp[0]
         self.assertEqual(list(v0.sections['Sanitation report'].fields.keys()),
@@ -34,7 +43,7 @@ class TestFormPackFixtures(unittest.TestCase):
         questions groups
         """
         title, schemas, submissions = build_fixture('grouped_questions')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(list(fp[0].sections['Grouped questions'].fields.keys()),
                          ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
@@ -44,7 +53,7 @@ class TestFormPackFixtures(unittest.TestCase):
         customer_satisfaction
         """
         title, schemas, submissions = build_fixture('customer_satisfaction')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
         self.assertEqual(list(v0.sections['Customer Satisfaction'].fields.keys()),
@@ -58,7 +67,7 @@ class TestFormPackFixtures(unittest.TestCase):
 
     def test_restaurant_profile(self):
         title, schemas, submissions = build_fixture('restaurant_profile')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 4)
         v0 = fp[0]
         self.assertEqual(list(v0.sections['Restaurant profile'].fields.keys()),
@@ -73,7 +82,7 @@ class TestFormPackFixtures(unittest.TestCase):
 
     def test_site_inspection(self):
         title, schemas, submissions = build_fixture('site_inspection')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 5)
         v0 = fp[0]
         self.assertEqual(
@@ -93,3 +102,30 @@ class TestFormPackFixtures(unittest.TestCase):
         v_out = fp.to_version_list()
         assert v_out == [Content(s).export(flat=False)
                          for s in schemas]
+
+
+def _each_fixture():
+    outs = []
+    for jfpath in glob(GLOB_PATH):
+        if jfpath.endswith('_old.json'):
+            continue
+        filename = os.path.split(jfpath)[-1]
+        with open(jfpath, 'r') as ff:
+            versions = json.loads(ff.read()).get('versions')
+            outs.append(
+                (jfpath, filename, versions,)
+            )
+    for out in outs:
+        yield out
+
+
+def test_new_jsons():
+    assert os.path.exists(JSONS_DIR)
+    for (filepath, filename, versions) in _each_fixture():
+        needs_update = False
+        for version_content in versions:
+            try:
+                Content(version_content, validate=True)
+            except ValidationError as err:
+                vmessage = 'fixtures/json/{} : {}'.format(filename, err.message)
+                raise ValidationError(vmessage)

@@ -28,22 +28,13 @@ SINGLE_NOTE_SURVEY = {
 class TestInvalidCases(unittest.TestCase):
 
     def test_single_version_doesnt_require_version(self):
-        FormPack(id_string="idstring", versions=[
+        FormPack(versions=[
                 copy(SINGLE_NOTE_SURVEY),
-            ], title='Single Note Survey')
+            ])
 
     @raises(ValueError)
     def test_conflicting_version_ids(self):
-        FormPack(id_string="idstring", versions=[
+        FormPack(versions=[
                 copy(SINGLE_NOTE_SURVEY),
                 copy(SINGLE_NOTE_SURVEY),
-            ], title='Single Note Survey')
-
-    @raises(TypeError)
-    def test_formpack_cannot_have_name(self):
-        vdata = copy(SINGLE_NOTE_SURVEY)
-        FormPack(id_string="idstring",
-                 name="somename",
-                 versions=[
-                     vdata,
-                ], title='Single Note Survey')
+            ])

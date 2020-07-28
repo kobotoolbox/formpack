@@ -54,7 +54,7 @@ def test_xml_equivs():
 
     for (zinx, mn) in enumerate(MODULES):
         (title, versions, submissions) = build_fixture(mn)
-        fp = FormPack(versions, title)
+        fp = FormPack(versions)
         # print('\t-', mn)
         for (index, vkey) in enumerate(fp.versions.keys()):
             fversion = fp.versions[vkey]

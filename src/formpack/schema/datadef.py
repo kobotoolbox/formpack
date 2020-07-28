@@ -116,23 +116,28 @@ class FormRepeatSection(FormSection):
     pass
 
 
-class FormChoice(FormDataDef):
+class ChoiceList(FormDataDef):
     def __init__(self, name, *args, **kwargs):
-        super(FormChoice, self).__init__(name, *args, **kwargs)
+        super(ChoiceList, self).__init__(name, *args, **kwargs)
         self.name = name
         self.options = OrderedDict()
 
-def form_choice_list_from_json_definition(definition,
+
+def _iter_choices(choices_in):
+    for list_name, choices in choices_in.items():
+        for choice in choices:
+            yield (list_name, choice)
+
+def form_choice_list_from_json_definition(choices_in,
                                           translation_list,
                                           translation_names):
-    all_choices = {}
-    for choice_definition in definition:
+    choice_lists = {}
+    for (list_name, choice_definition) in _iter_choices(choices_in):
         choice_value = choice_definition['value']
-        choice_key = choice_definition['list_name']
 
-        if choice_key not in all_choices:
-            all_choices[choice_key] = FormChoice(choice_key)
-        choices = all_choices[choice_key]
+        if list_name not in choice_lists:
+            choice_lists[list_name] = ChoiceList(list_name)
+        choices = choice_lists[list_name]
 
         option = choices.options[choice_value] = {}
 
@@ -149,4 +154,4 @@ def form_choice_list_from_json_definition(definition,
 
         option['labels'] = OrderedDict(zip(translation_names, _labels))
         option['name'] = choice_value
-    return all_choices
+    return choice_lists

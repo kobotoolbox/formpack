@@ -21,7 +21,7 @@ class TestAutoReport(unittest.TestCase):
     def test_list_fields_on_packs(self):
 
         title, schemas, _ = build_fixture('restaurant_profile')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         fields = fp.get_fields_for_versions()
 
@@ -35,7 +35,7 @@ class TestAutoReport(unittest.TestCase):
     def test_list_fields_from_many_versions_on_packs(self):
 
         title, schemas, submissions = build_fixture('site_inspection')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         assert len(schemas) == 5
 
         self.assertEqual(len(fp.versions), 5)
@@ -76,7 +76,7 @@ class TestAutoReport(unittest.TestCase):
     def test_simple_report(self):
 
         title, schemas, submissions = build_fixture('restaurant_profile')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         vv = fp.versions['rpV3']
         sec = vv.sections['Restaurant profile']
         fields = sec.fields
@@ -137,7 +137,7 @@ class TestAutoReport(unittest.TestCase):
     @unittest.skip('TODO: fix the autoreport so this test passes')
     def test_simple_multi_version_report(self):
         title, schemas, submissions = build_fixture('site_inspection')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         report = fp.autoreport(versions=fp.versions.keys())
         stats = report.get_stats(submissions)
@@ -273,7 +273,7 @@ class TestAutoReport(unittest.TestCase):
     def test_rich_report(self):
 
         title, schemas, submissions = build_fixture('auto_report')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         report = fp.autoreport()
         stats = report.get_stats(submissions)
@@ -355,7 +355,7 @@ class TestAutoReport(unittest.TestCase):
 
         title, schemas, submissions = build_fixture('auto_report')
 
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         report = fp.autoreport()
         stats = report.get_stats(submissions, split_by="when")
@@ -479,7 +479,7 @@ class TestAutoReport(unittest.TestCase):
     def test_disaggregate_extended_fields(self):
 
         title, schemas, submissions = build_fixture('auto_report_extended_fields')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         report = fp.autoreport()
         stats = report.get_stats(submissions, split_by="when")
@@ -526,7 +526,7 @@ class TestAutoReport(unittest.TestCase):
             {'the_number': 30},
             {'the_number': 'oops!'},
         ]
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         report = fp.autoreport()
         stats = report.get_stats(submissions)

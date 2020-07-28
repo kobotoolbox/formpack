@@ -96,6 +96,15 @@ class Export(object):
         found
         """
         version_id = None
+        # a small hack to ensure single-version forms still export
+        #
+        # if there's just one version available, then assume submissions
+        # are intended for that one version. this helps pass tests and match
+        # functionality that was coded early on
+        if len(self.formpack.versions) == 1:
+            return self.formpack[0]
+
+
         # find the first version_id present in the submission
         for _key in self.version_id_keys:
             if _key in submission:
@@ -577,18 +586,18 @@ class Export(object):
 
         yield feature_array_epilogue
 
-    # def to_table(self, submissions):
-    #
-    #     table = OrderedDict(((s, [list(l)]) for s, l in self.labels.items()))
-    #
-    #     # build the table
-    #     for chunk in self.parse_submissions(submissions):
-    #         for section_name, rows in chunk.items():
-    #             section = table[section_name]
-    #             for row in rows:
-    #                 section.append(row)
-    #
-    #     return table
+    def to_table(self, submissions):
+
+        table = OrderedDict(((s, [list(l)]) for s, l in self.labels.items()))
+
+        # build the table
+        for chunk in self.parse_submissions(submissions):
+            for section_name, rows in chunk.items():
+                section = table[section_name]
+                for row in rows:
+                    section.append(row)
+
+        return table
 
     def to_xlsx(self, filename, submissions):
         workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})

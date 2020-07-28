@@ -8,7 +8,7 @@ from operator import itemgetter
 
 import statistics
 
-from .datadef import FormDataDef, FormChoice
+from .datadef import FormDataDef, ChoiceList
 from ..constants import UNSPECIFIED_TRANSLATION
 from ..utils.future import range, OrderedDict
 from ..utils.ordered_collection import OrderedDefaultdict
@@ -553,7 +553,7 @@ class FormChoiceField(ExtendedFormField):
 
     def __init__(self, name, labels, data_type,
                  section=None, choice=None, *args, **kwargs):
-        self.choice = choice or FormChoice(name)
+        self.choice = choice or ChoiceList(name)
         super(FormChoiceField, self).__init__(name, labels, data_type,
                                               section,
                                               *args, **kwargs)

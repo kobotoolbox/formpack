@@ -13,15 +13,19 @@ from .constants import UNSPECIFIED_TRANSLATION
 from formpack.schema.fields import CopyField
 
 from a1d05eba1 import Content
+from a1d05eba1.utils.kfrozendict import kfrozendict
 
 
 class FormPack(object):
 
-    def __init__(self, versions=None, title='Submissions', id_string=None,
+    def __init__(self,
+                 versions=None,
+                 title=None,
                  default_version_id_key='__version__',
                  strict_schema=False,
-                 root_node_name='data',
-                 asset_type=None, submissions_xml=None):
+                 asset_type=None,
+                 validate=True,
+                 submissions_xml=None):
         """
 
 
@@ -30,8 +34,10 @@ class FormPack(object):
         :param id_string: The human readable id of the form.
         :param default_version_id_key: string. The name of the field in submissions which stores the version ID
         """
+        if title is not None:
+            raise ValueError("title must be set in form's settings.title")
         # accept a single version, but normalize it to an iterable
-        if isinstance(versions, dict):
+        if isinstance(versions, (dict, kfrozendict)):
             versions = [versions]
 
         self.versions = OrderedDict()
@@ -39,21 +45,16 @@ class FormPack(object):
         # the name of the field in submissions which stores the version ID
         self.default_version_id_key = default_version_id_key
 
-        self.id_string = id_string
-        self.root_node_name = root_node_name
+        self.validate = validate
 
-        self.title = title
+        self.id_string = None
+        self.title = None
+        self.identifier = None
         self.strict_schema = strict_schema
 
         self.asset_type = asset_type
 
         self.load_all_versions(versions)
-
-    # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
-    # to fix https://github.com/kobotoolbox/formpack/issues/150
-    #
-    #def __repr__(self):
-    #    return '<FormPack %s>' % self._stats()
 
     def version_id_keys(self, _versions=None):
         # if no parameter is passed, default to 'all'
@@ -85,67 +86,52 @@ class FormPack(object):
             raise IndexError('version at index %d is not available' % index)
 
     def load_all_versions(self, versions):
+        # a hack to ensure single-version forms still validate
+        if len(versions) == 1 and 'version' not in versions[0]['settings']:
+            versions[0]['settings']['version'] = ''
+
         for schema in versions:
             self.load_version(deepcopy(schema))
+        self.set_properties()
 
-    def load_version(self, schema):
+    def set_properties(self):
+        settings_ids = []
+        titles = []
+        version_ids = []
+        for version in self.versions.values():
+            if version.id in version_ids:
+                raise ValueError('cannot have duplicate version id: %s'
+                                 % version.id)
+            version_ids.append(version.id)
+            if version.settings_identifier not in settings_ids:
+                settings_ids.append(version.settings_identifier)
+            if version.title and version.title not in titles:
+                titles.append(version.title)
+
+        if len(version_ids) > 1 and None in version_ids:
+            raise ValueError('cannot have two versions without '
+                             'a "version" id specified')
+        self.title = titles[-1]
+        self.id_string = settings_ids[-1]
+
+    def load_version(self, content):
         """ Load one version and attach it to this Formpack
 
-            All the metadata parsing is delegated to the FormVersion class,
-            hence several attributes for FormPack are populated on the fly
-            while getting versions loaded:
-
-                - title : the human readable name of the form. Match the one
-                          from the most recent version.
-                - id_string : the human readable id of the form. The same for
-                              all versions of the same FormPack.
+            All the metadata parsing is delegated to the FormVersion class
 
             Each version can be distinguish by its version_id, which is
             unique accross an entire FormPack. It can be None, but only for
-            one version in the FormPack.
+            a FormPack with just one version.
         """
-        if 'content' in schema:
-            content = schema['content']
-        else:
-            content = schema
-        validated_content = Content(content).export(schema='2',
-                                                              flat=False,
-                                                              remove_nulls=False)
-
-        if self.id_string:
-            validated_content['settings']['identifier'] = self.id_string
-        if self.title:
-            validated_content['settings']['title'] = self.title
+        if 'content' in content:
+            # the "versions" parameter no longer wraps the survey object in
+            # an extra object with a property "content"
+            raise ArgumentError('Discontinued parameter structure: "content"')
+        _content_structure = Content(content, validate=self.validate)
+        validated_content = _content_structure.export(schema='2',
+                                                      flat=False,
+                                                      remove_nulls=False)
         form_version = FormVersion(self, validated_content)
-
-        # NB: id_string are readable string unique to the form
-        # while version id are id unique to one of the versions of the form
-
-        # Avoid duplicate versions id
-        if form_version.id in self.versions:
-            if form_version.id is None:
-                raise ValueError('cannot have two versions without '
-                                 'a "version" id specified')
-
-            raise ValueError('cannot have duplicate version id: %s'
-                             % form_version.id)
-
-        # If the form pack doesn't have an id_string, we get it from the
-        # first form version. We also avoid heterogenenous id_string in versions
-        if form_version.id_string:
-            if self.id_string and self.id_string != form_version.id_string:
-                raise ValueError('Versions must of the same form must '
-                                 'share an id_string: %s != %s' % (
-                                    self.id_string, form_version.id_string,
-                                 ))
-
-            self.id_string = form_version.id_string
-
-        # If the form pack doesn't have an title, we get it from the
-        # first form version.
-        if form_version.title and not self.title:
-            self.title = form_version.version_title
-
         self.versions[form_version.id] = form_version
 
     @staticmethod

@@ -54,15 +54,19 @@ class AutoReport(object):
 
         submissions_count = 0
         submission_counts_by_version = OrderedCounter()
+
+        # a small hack to ensure single-version packs still work
+        single_version = len(self.formpack.versions) == 1
+        if single_version:
+            single_version_id = self.formpack[0].id
         field_names = [f.name for f in fields]
         eat_field = False
 
-        if 'eatery_type' in field_names:
-            eat_field = fields[field_names.index('eatery_type')]
-            # import pdb; pdb.set_trace()
         for entry in submissions:
-
-            version_id = self._get_version_id_from_submission(entry)
+            if single_version:
+                version_id = single_version_id
+            else:
+                version_id = self._get_version_id_from_submission(entry)
             if version_id not in versions:
                 continue
 

@@ -8,7 +8,7 @@ from .fixtures import build_fixture
 
 def test_submission_counts_match():
     title, schemas, submissions = build_fixture('restaurant_profile')
-    fp = FormPack(schemas, title)
+    fp = FormPack(schemas)
 
     report = fp.autoreport(versions=fp.versions.keys())
     stats = report.get_stats(submissions)

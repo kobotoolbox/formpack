@@ -9,10 +9,10 @@ from .schema import (
                      FormGroup,
                      FormRootSection,
                      FormRepeatSection,
-                     FormChoice,
                     )
 from .schema.fields import form_field_from_json_definition
 from .schema.datadef import form_choice_list_from_json_definition
+from .schema.label_struct import LabelStruct, NoLabelStruct
 
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .utils.flatten_content import flatten_content
@@ -20,54 +20,10 @@ from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 from .utils.content_to_xform import content_to_xform
 
-from a1d05eba1.utils.kfrozendict import kfrozendict
 from a1d05eba1.utils.kfrozendict import deepfreeze
 
 from copy import deepcopy
 
-class LabelStruct:
-    def __init__(self, label, txs):
-        self._label = label
-        _labels = []
-        self._txs = txs
-        self._txnames = [tx['name'] for tx in txs]
-        for tx in txs:
-            _labels.append(self._label.get(tx['$anchor']))
-        self._labels = _labels
-
-    def get(self, key, _default):
-        if key is None:
-            key = ''
-        if key is False:
-            return _default
-        else:
-            _i = self._txnames.index(key)
-            return self._labels[_i]
-
-
-class NoLabelStruct:
-    def __init__(self, *_args):
-        self._args = _args
-        self._labels = []
-
-    def get(self, key, _default):
-        return _default
-
-
-def iter_rows(row, parent=''):
-    # yields: (rowdata, parentname)
-    if isinstance(row, (list, tuple)):
-        for subrow in row:
-            for pps in iter_rows(subrow, parent):
-                yield pps
-    else:
-        subrows = []
-        if 'rows' in row:
-            (row, subrows) = row.popout('rows')
-        yield (row, parent)
-        if len(subrows) > 0:
-            for pps in iter_rows(subrows, row['name']):
-                yield pps
 
 def extract_label_ordered_dict(_row, _txs):
     _rowlabels = _row.get('label', {})
@@ -88,26 +44,24 @@ class FormVersion(object):
         self.form_pack = form_pack
         self.content = content
         self.full_txs = content.get('translations')
-        settings = content.get('settings')
-        self.title = settings.get('title', form_pack.title)
 
-        # slug of title
-        self.root_node_name = self._get_root_node_name()
+        settings = content.get('settings')
+        self.title = settings.get('title')
+
+        # used in xform output
+        self.root_node_name = settings.get('root', 'data')
+
+        if 'version' not in settings:
+            raise ValueError('settings.version must be set')
 
         # form version id, unique to this version of the form
-        self.id = settings.get('version')
+        self.id = self.version_id = settings['version']
         self.version_id_key = settings.get('version_key', '__version__')
 
         # form string id, unique to this form, shared accross versions
-        self.id_string = settings.get('identifier', form_pack.id_string)
-        if self.id_string:
-            settings = settings.copy(identifier=self.id_string)
-        elif self.form_pack.id_string:
+        if 'identifier' not in settings:
             settings = settings.copy(identifier=self.form_pack.id_string)
-
-        # TODO: set the title of the last version as the name of the first
-        # section ?
-        # Human readable title for this version
+        self.settings_identifier = settings['identifier']
 
         # List of available language for translation. One translation does
         # not mean all labels are translated, but at least one.
@@ -132,8 +86,7 @@ class FormVersion(object):
                 flat_choice_lists.append(
                     {**choice.unfreeze(), 'list_name': list_name}
                 )
-
-        choice_lists = form_choice_list_from_json_definition(flat_choice_lists,
+        choice_lists = form_choice_list_from_json_definition(content['choices'],
                                                              self.full_txs,
                                                              self.translations)
         survey_rows = (self._load_metas(content['metas']) +
@@ -142,13 +95,13 @@ class FormVersion(object):
 
         fields_by_name = {}
         self.sections = sections = OrderedDict()
-        _title = form_pack.title
-        sections[_title] = root_section = FormRootSection(name=_title)
+        sections[self.title] = self.root_section = FormRootSection(name=self.title)
 
-        for (row, parent_name) in iter_rows(survey_rows, root_section.name):
+        for (row, parent_name) in self._iter_rows(survey_rows,
+                                                  self.root_section.name):
             name = row['name']
             _type = row['type']
-            parent_section = fields_by_name.get(parent_name, root_section)
+            parent_section = fields_by_name.get(parent_name, self.root_section)
             if _type in ['group', 'repeat']:
                 extracted_labels = extract_label_ordered_dict(row,
                                                               self.full_txs)
@@ -170,6 +123,20 @@ class FormVersion(object):
             obj.set_parent(parent_section)
             fields_by_name[name] = obj
 
+    def _iter_rows(self, row, parent=''):
+        # yields: (rowdata, parentname)
+        if isinstance(row, (list, tuple)):
+            for subrow in row:
+                for pps in self._iter_rows(subrow, parent):
+                    yield pps
+        else:
+            subrows = []
+            if 'rows' in row:
+                (row, subrows) = row.popout('rows')
+            yield (row, parent)
+            if len(subrows) > 0:
+                for pps in self._iter_rows(subrows, row['name']):
+                    yield pps
 
     def _load_metas(self, frozen_metas):
         metas = frozen_metas.unfreeze()
@@ -206,24 +173,19 @@ class FormVersion(object):
             result = self.form_pack.lookup(prop, default=default)
         return result
 
-    def _get_root_node_name(self):
-        return self.lookup('root_node_name', default='data')
-
     def _get_title(self):
         """
         if formversion has no name, uses form's name
         """
-        if self.title is None:
-            return self.form_pack.title
         return self.title
 
     def to_xml(self, warnings=None):
         content = self.content
         settings = content['settings']
         default_settings = {
-            'version': self.lookup('id'),
+            'version': self.id,
             'root': self.lookup('root') or 'data',
-            'identifier': self.lookup('id_string'),
+            'identifier': self.settings_identifier,
         }
         updates = {}
         for key in default_settings.keys():

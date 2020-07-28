@@ -34,7 +34,7 @@ class TestFormPackExport(unittest.TestCase):
 
         title, schemas, submissions = customer_satisfaction
 
-        forms = FormPack(schemas, title)
+        forms = FormPack(schemas)
         export = forms.export().to_dict(submissions)
         expected = OrderedDict({
                     "Customer Satisfaction": {
@@ -52,10 +52,10 @@ class TestFormPackExport(unittest.TestCase):
     def test_generator_export_labels_without_translations(self):
 
         title, schemas, submissions = customer_satisfaction
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         self.assertEqual(len(fp[0].translations), 1)
-        v1 = fp.versions[None]
+        v1 = fp[0]
         sect = v1.sections['Customer Satisfaction']
         ff = sect.fields['customer_enjoyment']
 
@@ -79,7 +79,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_generator_export_translation_headers(self):
 
         title, schemas, submissions = restaurant_profile
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
 
         self.assertEqual(len(fp.versions), 4)
         self.assertEqual(len(fp[1].translations), 2)
@@ -131,7 +131,7 @@ class TestFormPackExport(unittest.TestCase):
 
         title, schemas, submissions = restaurant_profile
 
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp[1].translations), 2)
         # by default, exports use the question 'name' attribute
         options = {'versions': 'rpV3'}
@@ -197,7 +197,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_headers_of_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_questions')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'gqs'}
 
         # by default, groups are stripped.
@@ -208,7 +208,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_headers_of_translated_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_translated')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         fpc0 = fp[0].content
         assert [tx['name'] for tx in fpc0['translations']] == ['English', 'Español']
         assert len(fpc0['translations']) == 2
@@ -253,7 +253,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_submissions_of_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_questions')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'gqs'}
 
         export = fp.export(**options).to_dict(submissions)['Grouped questions']
@@ -295,7 +295,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_repeats(self):
         title, schemas, submissions = build_fixture('grouped_repeatable')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'rgv1'}
         export = fp.export(**options).to_dict(submissions)
         self.assertEqual(export, OrderedDict([
@@ -427,7 +427,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_nested_repeats_with_copy_fields(self):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         export_dict = fp.export(
             versions='bird_nests_v1',
             copy_fields=('_id', '_uuid', ValidationStatusCopyField)
@@ -630,7 +630,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_nested_repeats(self):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         export_dict = fp.export(versions='bird_nests_v1').to_dict(submissions)
         expected_dict = OrderedDict([
             ('Bird nest survey with nested repeatable groups', {
@@ -768,7 +768,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_repeats_alias(self):
         title, schemas, submissions = build_fixture('grouped_repeatable_alias')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'rgv1'}
         export = fp.export(**options).to_dict(submissions)
 
@@ -932,7 +932,7 @@ class TestFormPackExport(unittest.TestCase):
         )
         del survey[4]['label']
 
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {
             'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
 
@@ -1011,7 +1011,7 @@ class TestFormPackExport(unittest.TestCase):
         assert survey[4]['label']['tx1'] == '¿Tienes fluidos corporales que ocupan espacio intracelular?'
         survey[4]['label']['tx1'] = ''
 
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {
             'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
 
@@ -1061,7 +1061,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_csv(self):
         title, schemas, submissions = build_fixture('grouped_questions')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'gqs'}
         csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
@@ -1096,7 +1096,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertTextEqual(csv_data, expected)
 
         title, schemas, submissions = restaurant_profile
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'rpV3', 'lang': fp[1].translations[1]}
         csv_data = "\n".join(fp.export(**options).to_csv(submissions))
 
@@ -1111,7 +1111,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_csv_quote_escaping(self):
         title, schemas, submissions = build_fixture(
             'quotes_newlines_and_long_urls')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         lss = list(submissions)
         csv_lines = list(fp.export().to_csv(submissions))
         expected_lines = []
@@ -1147,7 +1147,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_csv_with_tag_headers(self):
         title, schemas, submissions = build_fixture('dietary_needs')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
         rows = list(fp.export(**options).to_csv(submissions))
         assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";"";""')
@@ -1156,13 +1156,13 @@ class TestFormPackExport(unittest.TestCase):
     # @raises(RuntimeError)
     # def test_csv_on_repeatable_groups(self):
     #     title, schemas, submissions = build_fixture('grouped_repeatable')
-    #     fp = FormPack(schemas, title)
+    #     fp = FormPack(schemas)
     #     options = {'versions': 'rgv1'}
     #     list(fp.export(**options).to_csv(submissions))
 
     def test_export_with_split_fields(self):
         title, schemas, submissions = restaurant_profile
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'rpV4'}
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         expected = {
@@ -1296,7 +1296,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_xlsx(self):
         title, schemas, submissions = build_fixture('grouped_repeatable')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'rgv1'}
 
         with tempdir() as d:
@@ -1306,7 +1306,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
                                '_over_the_lazy_dog_v1'}
 
@@ -1324,7 +1324,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_xlsx_with_tag_headers(self):
         title, schemas, submissions = build_fixture('hxl_grouped_repeatable')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {'versions': 'hxl_rgv1', 'tag_cols_for_header': ['hxl']}
         with tempdir() as d:
             xls = d / 'foo.xlsx'
@@ -1344,7 +1344,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
 
-        forms = FormPack(schemas, title)
+        forms = FormPack(schemas)
         export = forms.export(force_index=True).to_dict(submissions)
         expected = OrderedDict({
                     "Customer Satisfaction": {
@@ -1363,7 +1363,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_copy_fields(self):
         title, schemas, submissions = customer_satisfaction
 
-        forms = FormPack(schemas, title)
+        forms = FormPack(schemas)
         export = forms.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField))
         exported = export.to_dict(submissions)
         expected = OrderedDict({
@@ -1407,7 +1407,7 @@ class TestFormPackExport(unittest.TestCase):
         _title = 'رضا العملاء'
         for schema in schemas:
             schema['settings']['title'] = _title
-        fp = FormPack(schemas, _title)
+        fp = FormPack(schemas)
         export = fp.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField),
                               force_index=True)
         exported = export.to_dict(submissions)
@@ -1456,7 +1456,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_copy_fields_multiple_versions(self):
         title, schemas, submissions = restaurant_profile
 
-        forms = FormPack(schemas, title)
+        forms = FormPack(schemas)
         export = forms.export(
             versions=forms.versions,
             copy_fields=('_uuid',)
@@ -1581,7 +1581,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_choices_external_as_text_field(self):
         title, schemas, submissions = build_fixture('sanitation_report_external')
 
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         export = fp.export(lang=UNTRANSLATED)
         exported = export.to_dict(submissions)
         expected = OrderedDict([
@@ -1622,7 +1622,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_headers_of_multi_version_exports(self):
         title, schemas, submissions = build_fixture('site_inspection')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
         headers = export['Site inspection']['fields']
         self.assertListEqual(headers, [
@@ -1639,7 +1639,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_literacy_test_export(self):
         title, schemas, submissions = build_fixture('literacy_test')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
         headers = export['Literacy test']['fields']
         expected_headers = (
@@ -1710,7 +1710,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_headers_of_multi_version_exports_with_copy_fields(self):
         title, schemas, submissions = build_fixture('site_inspection', "DATA_WITH_COPY_FIELDS")
 
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         export = fp.export(versions=fp.versions.keys(),
                            copy_fields=('_id', '_uuid', '_submission_time', ValidationStatusCopyField)).to_dict(submissions)
         headers = export['Site inspection']['fields'][-4:]
@@ -1724,7 +1724,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_spss_labels(self):
         fixture_name = 'long_unicode_labels'
         title, schemas, submissions = build_fixture(fixture_name)
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {
             'versions': 'long_unicode_labels_v1',
         }
@@ -1765,7 +1765,7 @@ class TestFormPackExport(unittest.TestCase):
         tx0['name'] = ''
         content['translations'] = [tx0]
         # Proceed with the export
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         options = {
             'versions': 'long_unicode_labels_v1',
         }
@@ -1798,7 +1798,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_select_multiple_with_different_options_in_multiple_versions(self):
         title, schemas, submissions = build_fixture('favorite_coffee')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 2)
 
         export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
@@ -1839,7 +1839,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_geojson_point(self):
         title, schemas, submissions = build_fixture('all_geo_types')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 2)
 
         export = fp.export(versions=fp.versions.keys())
@@ -1888,7 +1888,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_geojson_trace(self):
         title, schemas, submissions = build_fixture('all_geo_types')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 2)
 
         export = fp.export(versions=fp.versions.keys())
@@ -1940,7 +1940,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_geojson_shape(self):
         title, schemas, submissions = build_fixture('all_geo_types')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 2)
 
         export = fp.export(versions=fp.versions.keys())
@@ -1998,7 +1998,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_geojson_invalid(self):
         title, schemas, _ = build_fixture('all_geo_types')
-        fp = FormPack(schemas, title)
+        fp = FormPack(schemas)
         self.assertEqual(len(fp.versions), 2)
 
         # Can't test an invalid `geopoint` by itself; it'll blow up
