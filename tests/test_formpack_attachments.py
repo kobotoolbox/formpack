@@ -5,7 +5,7 @@ from __future__ import (unicode_literals, print_function,
 import unittest
 from formpack.b64_attachment import B64Attachment
 
-from .fixtures.load_fixture_json import load_fixture_json
+from .fixtures import open_b64_images_file
 
 
 class TestB64Attachment(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestB64Attachment(unittest.TestCase):
             self.assertEqual(exp_mtype, mtype)
 
     def test_write_to_file(self):
-        img_example = load_fixture_json('restaurant_photo/images')[0]
+        img_example = open_b64_images_file('restaurant_photos')[0]
         attachment = B64Attachment(img_example)
         (filename, filepath,) = B64Attachment.write_to_tempfile(attachment)
         self.assertTrue(len(filename) > 1)

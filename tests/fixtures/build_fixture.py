@@ -41,3 +41,9 @@ def open_sps_fixture_file(filename):
     """
     sps_filename = os.path.join(_DIR, 'sps', filename)
     return io.open(sps_filename, 'r', encoding='utf-8')
+
+def open_b64_images_file(filename):
+    images_filename = os.path.join(_DIR, 'b64_images', filename + '.json')
+    with open(images_filename, 'r') as ff:
+        content_ = ff.read()
+        return json.loads(content_)
