@@ -104,7 +104,11 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
-        validated_content = Content(schema['content']).export(schema='2',
+        if 'content' in schema:
+            content = schema['content']
+        else:
+            content = schema
+        validated_content = Content(content).export(schema='2',
                                                               flat=False,
                                                               remove_nulls=False)
 
@@ -112,7 +116,7 @@ class FormPack(object):
             validated_content['settings']['identifier'] = self.id_string
         if self.title:
             validated_content['settings']['title'] = self.title
-        form_version = FormVersion(self, schema, validated_content)
+        form_version = FormVersion(self, validated_content)
 
         # NB: id_string are readable string unique to the form
         # while version id are id unique to one of the versions of the form

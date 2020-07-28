@@ -9,13 +9,12 @@ from nose.tools import raises
 
 from formpack import FormPack
 
-SINGLE_NOTE_SURVEY = {'content': {
-        'schema': '2',
-        'survey': [
-            {'type': 'note', 'label': {'tx0': 'Note'}, 'name': 'note'}
-        ],
-        'translations': [{'$anchor': 'tx0', 'name': ''}]
-    }
+SINGLE_NOTE_SURVEY = {
+    'schema': '2',
+    'survey': [
+        {'type': 'note', 'label': {'tx0': 'Note'}, 'name': 'note'}
+    ],
+    'translations': [{'$anchor': 'tx0', 'name': ''}]
 }
 
 

@@ -91,5 +91,5 @@ class TestFormPackFixtures(unittest.TestCase):
         )
 
         v_out = fp.to_version_list()
-        assert v_out == [Content(s['content']).export(flat=False)
+        assert v_out == [Content(s).export(flat=False)
                          for s in schemas]

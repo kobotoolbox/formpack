@@ -901,7 +901,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_translated')
 
         # Remove a choice's labels
-        c0list = schemas[0]['content']['choices']['symmetry']
+        c0list = schemas[0]['choices']['symmetry']
         self.assertEqual(
             c0list[0]['label'],
             {'tx0': 'Spherical', 'tx1': 'Esférico'},
@@ -909,7 +909,7 @@ class TestFormPackExport(unittest.TestCase):
         del c0list[0]['label']
 
         # Remove a group's labels
-        survey = schemas[0]['content']['survey']
+        survey = schemas[0]['survey']
         s_0 = survey[0]
         s_2 = survey[2]
 
@@ -981,7 +981,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_translated')
 
         # Remove a choice's translation
-        choices0 = schemas[0]['content']['choices']['symmetry']
+        choices0 = schemas[0]['choices']['symmetry']
         self.assertEqual(
             choices0[0]['label'],
             {'tx0': 'Spherical', 'tx1': 'Esférico'},
@@ -989,7 +989,7 @@ class TestFormPackExport(unittest.TestCase):
         choices0[0]['label']['tx1'] = ''
 
         # Remove a group's translation
-        survey = schemas[0]['content']['survey']
+        survey = schemas[0]['survey']
         self.assertEqual(
             survey[0]['label'],
             {'tx0': 'External Characteristics',
@@ -1754,7 +1754,7 @@ class TestFormPackExport(unittest.TestCase):
         # Remove every language except the first
         # Easiest way to do this (with schema v2) is to set translations list
         # to a length of 1 and change the name to ''
-        content = schemas[0]['content']
+        content = schemas[0]
         first_translation = content['translations'][0]['name']
         tx0 = content['translations'][0]
         tx0['name'] = ''

@@ -505,17 +505,15 @@ class TestAutoReport(unittest.TestCase):
 
         title = 'Just one number'
         schemas = [{
-            'content': {
-                'schema': '2',
-                'survey': [
-                    {
-                        'type': 'integer',
-                        'name': 'the_number',
-                        'label': {'tx0': 'Enter the number!'}
-                    }
-                ],
-                'translations': [{'name': '', '$anchor': 'tx0'}]
-            }
+            'schema': '2',
+            'survey': [
+                {
+                    'type': 'integer',
+                    'name': 'the_number',
+                    'label': {'tx0': 'Enter the number!'}
+                }
+            ],
+            'translations': [{'name': '', '$anchor': 'tx0'}]
         }]
         submissions = [
             {'the_number': 10},

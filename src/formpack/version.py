@@ -82,9 +82,8 @@ def extract_label_ordered_dict(_row, _txs):
 
 
 class FormVersion(object):
-    def __init__(self, form_pack, schema, content):
+    def __init__(self, form_pack, content):
         # everything pulled from "schema" in these lines:
-        id_string = schema.get('id_string')
         content = deepfreeze(content)
         self.form_pack = form_pack
         self.content = content

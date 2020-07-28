@@ -27,9 +27,7 @@ def build_fixture(modulename, data_variable_name="DATA"):
         for vv in _versions:
             _titles.append(vv['settings']['title'])
             _ids.append(vv['settings']['identifier'])
-            schemas.append({
-                'content': vv,
-            })
+            schemas.append(vv)
         assert len(set(_titles)) == 1
         assert len(set(_ids)) == 1
         _submissions = infile['submissions']
