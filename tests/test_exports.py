@@ -17,7 +17,7 @@ from formpack.constants import UNTRANSLATED
 from formpack.schema.fields import ValidationStatusCopyField
 from formpack.utils.future import OrderedDict
 from formpack.utils.iterator import get_first_occurrence
-from .fixtures import build_fixture, open_fixture_file
+from .fixtures import build_fixture, open_sps_fixture_file
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')
@@ -1734,7 +1734,7 @@ class TestFormPackExport(unittest.TestCase):
         raw_zip.seek(0)
         zipped = ZipFile(raw_zip, 'r')
         for name in expected_label_file_names:
-            with open_fixture_file(fixture_name, name, 'r') as expected:
+            with open_sps_fixture_file(name) as expected:
                 actual = TextIOWrapper(zipped.open(name, 'r'), newline=None,
                                        encoding='utf-8')
                 actual_content = actual.read()
@@ -1777,8 +1777,7 @@ class TestFormPackExport(unittest.TestCase):
         fp.export(**options).to_spss_labels(raw_zip)
         raw_zip.seek(0)
         zipped = ZipFile(raw_zip, 'r')
-        with open_fixture_file(
-                fixture_name, fixture_label_file_name, 'r') as expected:
+        with open_sps_fixture_file(fixture_label_file_name) as expected:
             actual = TextIOWrapper(zipped.open(expected_label_file_name, 'r'),
                                    newline=None,
                                    encoding='utf-8')

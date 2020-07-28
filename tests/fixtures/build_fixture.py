@@ -34,14 +34,10 @@ def build_fixture(modulename, data_variable_name="DATA"):
     return _titles[0], schemas, _submissions
 
 
-def open_fixture_file(modulename, filename, *args, **kwargs):
+def open_sps_fixture_file(filename):
     """
     Open a file included with a text fixture, e.g. the expected output of an
     export. Not used to load test fixture schema/submission JSON data
     """
-    fixture_dir = os.path.dirname(
-        os.path.abspath(
-            importlib.import_module('..%s' % modulename, __name__).__file__
-        )
-    )
-    return io.open(os.path.join(fixture_dir, filename), encoding='utf-8', *args, **kwargs)
+    sps_filename = os.path.join(_DIR, 'sps', filename)
+    return io.open(sps_filename, 'r', encoding='utf-8')
