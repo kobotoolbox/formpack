@@ -11,6 +11,7 @@ from zipfile import ZipFile
 import xlrd
 from backports import csv
 from path import tempdir
+from copy import deepcopy
 
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
@@ -1402,7 +1403,11 @@ class TestFormPackExport(unittest.TestCase):
     def test_copy_fields_and_force_index_and_unicode(self):
         title, schemas, submissions = customer_satisfaction
 
-        fp = FormPack(schemas, 'رضا العملاء')
+        schemas = deepcopy(schemas)
+        _title = 'رضا العملاء'
+        for schema in schemas:
+            schema['settings']['title'] = _title
+        fp = FormPack(schemas, _title)
         export = fp.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField),
                               force_index=True)
         exported = export.to_dict(submissions)

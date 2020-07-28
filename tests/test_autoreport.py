@@ -514,6 +514,10 @@ class TestAutoReport(unittest.TestCase):
                     'label': {'tx0': 'Enter the number!'}
                 }
             ],
+            'settings': {
+                'title': title,
+                'identifier': 'autoreport_number_test',
+            },
             'translations': [{'name': '', '$anchor': 'tx0'}]
         }]
         submissions = [

@@ -49,7 +49,7 @@ def test_to_xml_fails_when_null_labels():
 
     # it occurs when a named translation has a <NoneType> value
     # (empty strings are OK)
-    with pytest.raises(Exception):
+    with pytest.raises(Exception) as exc:
         fp = FormPack({'survey': [
                                   {'type': 'note',
                                    'name': 'n1',
@@ -58,9 +58,14 @@ def test_to_xml_fails_when_null_labels():
                                    },
                                   ],
                        'schema': '2',
+                       'settings': {'identifier': 'valid',
+                                    'title': 'Null labels'},
                        'translations': [{'$anchor': 'tx0', 'name': ''}],
-                       }, id_string='sdf')
+                       },
+                       title='Null labels',
+                       id_string='valid')
         fp[0].to_xml()
+    assert 'PyXFormError' in repr(exc)
 
 def test_null_untranslated_labels():
     AR_LABELS = ['إذا كان نعم ماهي المساعدات التي تتلقاها؟']
@@ -83,6 +88,7 @@ def test_null_untranslated_labels():
                  'schema': '2+fill_missing_labels',
                  'settings': {
                     'identifier': 'arabic_and_null',
+                    'title': 'Arabic and Null'
                  },
                  'survey': [{'$anchor': 'vp8um3sk7',
                              'label': {'tx0': AR_LABELS[0],
@@ -95,7 +101,7 @@ def test_null_untranslated_labels():
                                   {'$anchor': 'tx1', 'name': ''}]}
 
 
-    fp = FormPack(content, id_string='arabic_and_null')
+    fp = FormPack(content, id_string='arabic_and_null', title='Arabic and Null')
     fields = fp.get_fields_for_versions()
     field = fields[0]
     assert len(fields) == 1
@@ -128,6 +134,8 @@ def test_get_fields_for_versions_returns_unique_fields():
                     {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
                 'settings': {
+                    'identifier': 'xx',
+                    'title': 'Xx Title',
                     'version': 'vRR7hH6SxTupvtvCqu7n5d',
                 }
             },
@@ -137,6 +145,8 @@ def test_get_fields_for_versions_returns_unique_fields():
                     {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
                 'settings': {
+                    'identifier': 'xx',
+                    'title': 'Xx Title',
                     'version': 'vA8xs9JVi8aiSfypLgyYW2',
                 }
             },
@@ -146,10 +156,13 @@ def test_get_fields_for_versions_returns_unique_fields():
                     {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
                 'settings': {
+                    'identifier': 'xx',
+                    'title': 'Xx Title',
                     'version': 'vNqgh8fJqyjFk6jgiCk4rn',
                 }
             },
-        ]
+        ],
+        title='Xx Title',
     )
     fields = fp.get_fields_for_versions(fp.versions)
     field_names = [field.name for field in fields]
@@ -159,7 +172,11 @@ def test_get_fields_for_versions_returns_unique_fields():
 def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     schemas = [
         {
-            'settings': {'version': 'v1'},
+            'settings': {
+                'version': 'v1',
+                'title': 'Newest of fields with same name',
+                'identifier': 'newest_of_fields_with_same_name',
+            },
             'schema': '2',
             'survey': [
                 {
@@ -182,7 +199,11 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
             'translations': [{'$anchor': 'tx0', 'name': ''}],
         },
         {
-            'settings': {'version': 'v2'},
+            'settings': {
+                'version': 'v2',
+                'title': 'Newest of fields with same name',
+                'identifier': 'newest_of_fields_with_same_name',
+            },
             'schema': '2',
             'survey': [
                 {
@@ -205,7 +226,7 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
             'translations': [{'$anchor': 'tx0', 'name': ''}],
         }
     ]
-    fp = FormPack(schemas)
+    fp = FormPack(schemas, title='Newest of fields with same name')
     fields = fp.get_fields_for_versions(fp.versions)
     # The first and only field returned should be the first field of the first
     # section of the last version
@@ -216,7 +237,11 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
 def test_get_fields_for_versions_returns_all_choices():
     schemas = [
         {
-            'settings': {'version': 'v1'},
+            'settings': {
+                'version': 'v1',
+                'title': 'Returns All Choices',
+                'identifier': 'returns_all_choices',
+            },
             'schema': '2',
             'survey': [
                 {
@@ -239,7 +264,11 @@ def test_get_fields_for_versions_returns_all_choices():
             'translations': [{'$anchor': 'tx0', 'name': ''}],
         },
         {
-            'settings': {'version': 'v2'},
+            'settings': {
+                'version': 'v2',
+                'title': 'Returns All Choices',
+                'identifier': 'returns_all_choices',
+            },
             'schema': '2',
             'survey': [
                 {
@@ -262,7 +291,7 @@ def test_get_fields_for_versions_returns_all_choices():
             'translations': [{'$anchor': 'tx0', 'name': ''}],
         }
     ]
-    fp = FormPack(schemas)
+    fp = FormPack(schemas, title='Returns All Choices')
     fields = fp.get_fields_for_versions(fp.versions)
     choice_names = fields[0].choice.options.keys()
     assert 'first_version_choice_value' in choice_names
