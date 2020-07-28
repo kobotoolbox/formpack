@@ -12,7 +12,10 @@ from formpack import FormPack
 SINGLE_NOTE_SURVEY = {
     'schema': '2',
     'survey': [
-        {'type': 'note', 'label': {'tx0': 'Note'}, 'name': 'note'}
+        {'type': 'note',
+         'label': {'tx0': 'Note'},
+         '$anchor': 'note',
+         'name': 'note'},
     ],
     'translations': [{'$anchor': 'tx0', 'name': ''}]
 }

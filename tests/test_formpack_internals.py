@@ -53,6 +53,7 @@ def test_to_xml_fails_when_null_labels():
         fp = FormPack({'survey': [
                                   {'type': 'note',
                                    'name': 'n1',
+                                   '$anchor': 'n1',
                                    'label': {'tx0': ''},
                                    },
                                   ],
@@ -123,8 +124,8 @@ def test_get_fields_for_versions_returns_unique_fields():
         [
             {'schema': '2',
                 'survey': [
-                    {'name': 'hey', 'type': 'image', 'anchor': 'hey'},
-                    {'name': 'two', 'type': 'image', 'anchor': 'two'},
+                    {'name': 'hey', 'type': 'image', '$anchor': 'hey'},
+                    {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
                 'settings': {
                     'version': 'vRR7hH6SxTupvtvCqu7n5d',
@@ -132,8 +133,8 @@ def test_get_fields_for_versions_returns_unique_fields():
             },
             {'schema': '2',
                 'survey': [
-                    {'name': 'one', 'type': 'image', 'anchor': 'one'},
-                    {'name': 'two', 'type': 'image', 'anchor': 'two'},
+                    {'name': 'one', 'type': 'image', '$anchor': 'one'},
+                    {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
                 'settings': {
                     'version': 'vA8xs9JVi8aiSfypLgyYW2',
@@ -141,8 +142,8 @@ def test_get_fields_for_versions_returns_unique_fields():
             },
             {'schema': '2',
                 'survey': [
-                    {'name': 'one', 'type': 'image', 'anchor': 'one'},
-                    {'name': 'two', 'type': 'image', 'anchor': 'two'},
+                    {'name': 'one', 'type': 'image', '$anchor': 'one'},
+                    {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
                 'settings': {
                     'version': 'vNqgh8fJqyjFk6jgiCk4rn',
@@ -163,20 +164,22 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
             'survey': [
                 {
                     'name': 'constant_question_name',
+                    '$anchor': 'constant_question_name',
                     'type': 'select_one',
                     'select_from': 'choice',
                     'label': {'tx0': 'first version question label'},
-                    'hxl': '#first_version_hxl'
+                    'tags': ['hxl:#first_version_hxl']
                 },
             ],
             'choices': {
                 'choice': [
                     {'value': 'constant_choice_name',
+                     '$anchor': 'constant_choice_name',
                     'label': {'tx0': 'first version choice label'},
                     },
                 ]
             },
-            'translations': [{'anchor': 'tx0', 'name': ''}],
+            'translations': [{'$anchor': 'tx0', 'name': ''}],
         },
         {
             'settings': {'version': 'v2'},
@@ -184,20 +187,22 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
             'survey': [
                 {
                     'name': 'constant_question_name',
+                    '$anchor': 'constant_question_name',
                     'type': 'select_one',
                     'select_from': 'choice',
                     'label': {'tx0': 'second version question label'},
-                    'hxl': '#second_version_hxl'
+                    'tags': ['hxl:#second_version_hxl']
                 },
             ],
             'choices': {
                 'choice': [
                     {'value': 'constant_choice_name',
+                     '$anchor': 'constant_choice_name',
                     'label': {'tx0': 'second version choice label'},
-                    }
+                    },
                 ]
             },
-            'translations': [{'anchor': 'tx0', 'name': ''}],
+            'translations': [{'$anchor': 'tx0', 'name': ''}],
         }
     ]
     fp = FormPack(schemas)
@@ -216,20 +221,22 @@ def test_get_fields_for_versions_returns_all_choices():
             'survey': [
                 {
                     'name': 'constant_question_name',
+                    '$anchor': 'constant_question_name',
                     'type': 'select_one',
                     'select_from': 'choice',
                     'label': {'tx0': 'first version question label'},
-                    'hxl': '#first_version_hxl'
+                    'tags': ['hxl:#first_version_hxl']
                 },
             ],
             'choices': {
                 'choice': [
                     {'value': 'first_version_choice_value',
+                     '$anchor': 'first_version_choice_value',
                     'label': {'tx0': 'first version choice label'},
                     },
                 ]
             },
-            'translations': [{'anchor': 'tx0', 'name': ''}],
+            'translations': [{'$anchor': 'tx0', 'name': ''}],
         },
         {
             'settings': {'version': 'v2'},
@@ -237,20 +244,22 @@ def test_get_fields_for_versions_returns_all_choices():
             'survey': [
                 {
                     'name': 'constant_question_name',
+                    '$anchor': 'constant_question_name',
                     'type': 'select_one',
                     'select_from': 'choice',
                     'label': {'tx0': 'second version question label'},
-                    'hxl': '#second_version_hxl'
+                    'tags': ['hxl:#second_version_hxl']
                 },
             ],
             'choices': {
                 'choice': [
                     {'value': 'second_version_choice_value',
+                     '$anchor': 'second_version_choice_value',
                     'label': {'tx0': 'second version choice label'},
-                    }
+                    },
                 ]
             },
-            'translations': [{'anchor': 'tx0', 'name': ''}],
+            'translations': [{'$anchor': 'tx0', 'name': ''}],
         }
     ]
     fp = FormPack(schemas)

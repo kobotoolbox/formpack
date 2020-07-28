@@ -510,6 +510,7 @@ class TestAutoReport(unittest.TestCase):
                 {
                     'type': 'integer',
                     'name': 'the_number',
+                    '$anchor': 'the_number',
                     'label': {'tx0': 'Enter the number!'}
                 }
             ],
