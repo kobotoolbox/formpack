@@ -1,0 +1,216 @@
+{
+  "submissions": [],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "field_position_with_multiple_versions",
+        "title": "Field Position with Multiple Versions",
+        "version": "fpmv_1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "ftsexji7u",
+          "label": {
+            "tx0": "Person"
+          },
+          "name": "group_wy15q80",
+          "type": "begin_repeat"
+        },
+        {
+          "$anchor": "rh2jg316m",
+          "label": {
+            "tx0": "Fullname"
+          },
+          "name": "Fullname",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "$anchor": "tik95czu8",
+          "label": {
+            "tx0": "Age"
+          },
+          "name": "Age",
+          "required": false,
+          "type": "date"
+        },
+        {
+          "$anchor": "/ftsexji7u",
+          "type": "end_repeat"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "field_position_with_multiple_versions",
+        "title": "Field Position with Multiple Versions",
+        "version": "fpmv_2",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "mhiunvxk8",
+          "label": {
+            "tx0": "Person"
+          },
+          "name": "group_wy15q80",
+          "type": "begin_repeat"
+        },
+        {
+          "$anchor": "rv0s4wtio",
+          "label": {
+            "tx0": "Fullname"
+          },
+          "name": "Fullname",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "$anchor": "vjull650e",
+          "label": {
+            "tx0": "Age"
+          },
+          "name": "Age",
+          "required": false,
+          "type": "date"
+        },
+        {
+          "$anchor": "/mhiunvxk8",
+          "type": "end_repeat"
+        },
+        {
+          "$anchor": "ylhr2nuxk",
+          "label": {
+            "tx0": "City"
+          },
+          "name": "City",
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {
+        "kd0ep51": [
+          {
+            "$anchor": "uxo4kn9hw",
+            "label": {
+              "tx0": "Male"
+            },
+            "value": "male"
+          },
+          {
+            "$anchor": "m5hr6teia",
+            "label": {
+              "tx0": "Female"
+            },
+            "value": "female"
+          },
+          {
+            "$anchor": "efe73r4ra",
+            "label": {
+              "tx0": "Other"
+            },
+            "value": "other"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "field_position_with_multiple_versions",
+        "title": "Field Position with Multiple Versions",
+        "version": "fpmv_3",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "vbnadr0rk",
+          "label": {
+            "tx0": "Person"
+          },
+          "name": "group_wy15q80",
+          "type": "begin_repeat"
+        },
+        {
+          "$anchor": "mmtq32wo1",
+          "label": {
+            "tx0": "Firstname"
+          },
+          "name": "Firstname",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "$anchor": "ttaqeg75j",
+          "label": {
+            "tx0": "Lastname"
+          },
+          "name": "Lastname",
+          "required": false,
+          "type": "text"
+        },
+        {
+          "$anchor": "p0xgwonkn",
+          "label": {
+            "tx0": "Gender"
+          },
+          "name": "Gender",
+          "required": false,
+          "select_from": "kd0ep51",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "obh9o9k08",
+          "label": {
+            "tx0": "Age"
+          },
+          "name": "Age",
+          "required": false,
+          "type": "date"
+        },
+        {
+          "$anchor": "/vbnadr0rk",
+          "type": "end_repeat"
+        },
+        {
+          "$anchor": "ezj8zceyb",
+          "label": {
+            "tx0": "City"
+          },
+          "name": "City",
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

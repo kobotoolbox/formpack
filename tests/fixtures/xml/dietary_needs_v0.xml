@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Dietary needs</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="dietary_needs" version="dietv1">
+          <restaurant_name/>
+          <dietary_accommodations/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/restaurant_name" required="true()" type="string"/>
+      <bind nodeset="/data/dietary_accommodations" required="true()" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/restaurant_name">
+      <label>Restaurant name</label>
+    </input>
+    <select ref="/data/dietary_accommodations">
+      <label>Accommodating of dietary needs</label>
+      <item>
+        <label>Gluten-free</label>
+        <value>gluten_free</value>
+      </item>
+      <item>
+        <label>Vegan</label>
+        <value>vegan</value>
+      </item>
+      <item>
+        <label>Vegetarian</label>
+        <value>vegetarian</value>
+      </item>
+      <item>
+        <label>Lactose-free</label>
+        <value>lactose_free</value>
+      </item>
+    </select>
+  </h:body>
+</h:html>

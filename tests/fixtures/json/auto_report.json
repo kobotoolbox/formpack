@@ -1,0 +1,109 @@
+{
+  "submissions": [
+    {
+      "__version__": "rpfrv1",
+      "howmany": 1,
+      "location": "12.34 -23.45",
+      "note": "Bla",
+      "restaurant_name": "Felipes",
+      "when": "2001-01-01"
+    },
+    {
+      "__version__": "rpfrv1",
+      "howmany": 2,
+      "location": "12.34 -23.45",
+      "note": "Bla",
+      "restaurant_name": "Felipes",
+      "when": "2001-01-01"
+    },
+    {
+      "__version__": "rpfrv1"
+    },
+    {
+      "__version__": "rpfrv1",
+      "howmany": 2,
+      "location": "12.34 -23.45",
+      "note": "Bla",
+      "restaurant_name": "The other one",
+      "when": "2002-01-01"
+    },
+    {
+      "__version__": "rpfrv1",
+      "howmany": 2,
+      "location": "12.34 -23.45",
+      "note": "Bla",
+      "restaurant_name": "The other one",
+      "when": "2002-01-01"
+    },
+    {
+      "__version__": "rpfrv1",
+      "howmany": 1,
+      "location": "12.34 -23.45",
+      "note": "Bla",
+      "restaurant_name": "That one",
+      "when": "2003-01-01"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "auto_report",
+        "title": "Auto report",
+        "version": "rpfrv1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "ihmcnp63e",
+          "label": {
+            "tx0": "Restaurant name"
+          },
+          "name": "restaurant_name",
+          "type": "text"
+        },
+        {
+          "$anchor": "vva7g40kh",
+          "label": {
+            "tx0": "Location"
+          },
+          "name": "location",
+          "type": "geopoint"
+        },
+        {
+          "$anchor": "b8u95gvbi",
+          "label": {
+            "tx0": "Note"
+          },
+          "name": "note",
+          "type": "note"
+        },
+        {
+          "$anchor": "p91rul7tq",
+          "label": {
+            "tx0": "When"
+          },
+          "name": "when",
+          "type": "date"
+        },
+        {
+          "$anchor": "s4lio833k",
+          "label": {
+            "tx0": "How many"
+          },
+          "name": "howmany",
+          "type": "integer"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

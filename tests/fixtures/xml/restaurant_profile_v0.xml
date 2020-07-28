@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Restaurant profile</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="restaurant_profile" version="rpv1">
+          <restaurant_name/>
+          <location/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/restaurant_name" required="true()" type="string"/>
+      <bind nodeset="/data/location" required="true()" type="geopoint"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/restaurant_name">
+      <label>restaurant name</label>
+    </input>
+    <input ref="/data/location">
+      <label>location</label>
+    </input>
+  </h:body>
+</h:html>

@@ -1,0 +1,110 @@
+{
+  "submissions": [
+    {
+      "report_date": "012345",
+      "restaurant_name": "Felipes",
+      "restaurant_rating": "A"
+    },
+    {
+      "report_date": "012346",
+      "restaurant_name": "Chipotle",
+      "restaurant_rating": "C"
+    },
+    {
+      "report_date": "012347",
+      "restaurant_name": "Dunkin Donuts",
+      "restaurant_rating": "D"
+    },
+    {
+      "report_date": "012348",
+      "restaurant_name": "Boloco",
+      "restaurant_rating": "B"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "xy3qc67": [
+          {
+            "$anchor": "up84ki2o9",
+            "label": {
+              "tx0": "A"
+            },
+            "value": "a"
+          },
+          {
+            "$anchor": "ogr0lvxpt",
+            "label": {
+              "tx0": "B"
+            },
+            "value": "b"
+          },
+          {
+            "$anchor": "e6v6o9a46",
+            "label": {
+              "tx0": "C"
+            },
+            "value": "c"
+          },
+          {
+            "$anchor": "xkaxn3kbi",
+            "label": {
+              "tx0": "D"
+            },
+            "value": "d"
+          },
+          {
+            "$anchor": "oph67p7ui",
+            "label": {
+              "tx0": "F"
+            },
+            "value": "f"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "sanitation_report",
+        "title": "Sanitation report"
+      },
+      "survey": [
+        {
+          "$anchor": "zfjipapuc",
+          "label": {
+            "tx0": "Restaurant name"
+          },
+          "name": "restaurant_name",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "i274xefyy",
+          "label": {
+            "tx0": "How did this restaurant do on its sanitation report?"
+          },
+          "name": "restaurant_rating",
+          "required": true,
+          "select_from": "xy3qc67",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "rrytvxc02",
+          "label": {
+            "tx0": "Report date"
+          },
+          "name": "report_date",
+          "required": true,
+          "type": "datetime"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

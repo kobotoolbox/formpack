@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Quotes, newlines, and long URLs</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="quotes_newlines_and_long_urls" version="first">
+          <Enter_some_long_text_and_linebreaks_here/>
+          <Some_other_question/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/Enter_some_long_text_and_linebreaks_here" required="false()" type="string"/>
+      <bind nodeset="/data/Some_other_question" required="false()" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input appearance="multiline" ref="/data/Enter_some_long_text_and_linebreaks_here">
+      <label>Enter some long text with " and linebreaks here</label>
+    </input>
+    <select1 ref="/data/Some_other_question">
+      <label>Some other question</label>
+      <item>
+        <label>yes</label>
+        <value>yes</value>
+      </item>
+      <item>
+        <label>no</label>
+        <value>no</value>
+      </item>
+    </select1>
+  </h:body>
+</h:html>

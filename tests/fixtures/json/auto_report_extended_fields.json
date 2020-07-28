@@ -1,0 +1,228 @@
+{
+  "submissions": [
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-01"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-01"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-01"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-02"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-02"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-02"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-03"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-03"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-05"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-05"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Chez C\u00e9line",
+      "restaurant_type": "french",
+      "when": "2001-01-06"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Po Tha\u00ef",
+      "restaurant_type": "thai",
+      "when": "2001-01-01"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Po Tha\u00ef",
+      "restaurant_type": "thai",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Po Tha\u00ef",
+      "restaurant_type": "thai",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "La Bodega",
+      "restaurant_type": "italian",
+      "when": "2001-01-05"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "La Bodega",
+      "restaurant_type": "italian",
+      "when": "2001-01-02"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Mc Donalds",
+      "restaurant_type": "american",
+      "when": "2001-01-04"
+    },
+    {
+      "__version__": "rpfrv2",
+      "restaurant_name": "Beijing Express",
+      "restaurant_type": "chinese",
+      "when": "2001-01-01"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "restaurant_type": [
+          {
+            "$anchor": "ttphsbvjm",
+            "label": {
+              "tx0": "Italian"
+            },
+            "value": "italian"
+          },
+          {
+            "$anchor": "s2ae2ce0r",
+            "label": {
+              "tx0": "French"
+            },
+            "value": "french"
+          },
+          {
+            "$anchor": "qzlkyk8i0",
+            "label": {
+              "tx0": "Vietnamese"
+            },
+            "value": "vietnamese"
+          },
+          {
+            "$anchor": "f8eox0q96",
+            "label": {
+              "tx0": "Chinese"
+            },
+            "value": "chinese"
+          },
+          {
+            "$anchor": "zaw9oen51",
+            "label": {
+              "tx0": "Thai"
+            },
+            "value": "thai"
+          },
+          {
+            "$anchor": "x2bmn0ikm",
+            "label": {
+              "tx0": "American"
+            },
+            "value": "american"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "auto_report_extended_fields",
+        "title": "Auto report with extended fields",
+        "version": "rpfrv2",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "ctuq476st",
+          "label": {
+            "tx0": "Restaurant name"
+          },
+          "name": "restaurant_name",
+          "type": "text"
+        },
+        {
+          "$anchor": "e7m3ssuyd",
+          "label": {
+            "tx0": "Type of restaurant"
+          },
+          "name": "restaurant_type",
+          "select_from": "restaurant_type",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "u3a2snf5w",
+          "label": {
+            "tx0": "When"
+          },
+          "name": "when",
+          "type": "date"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

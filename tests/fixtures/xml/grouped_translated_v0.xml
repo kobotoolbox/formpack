@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Animal identification survey with translations and groups</h:title>
+    <model odk:xforms-version="1.0.0">
+      <itext>
+        <translation lang="English">
+          <text id="/data/external_characteristics:label">
+            <value>External Characteristics</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have:label">
+            <value>What kind of symmetry do you have?</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have/spherical:label">
+            <value>Spherical</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have/radial:label">
+            <value>Radial</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have/bilateral:label">
+            <value>Bilateral</value>
+          </text>
+          <text id="/data/external_characteristics/How_many_segments_does_your_body_have:label">
+            <value>How many segments does your body have?</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space:label">
+            <value>Do you have body fluids that occupy intracellular space?</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space/yes:label">
+            <value>Yes</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space/yes__and_some_:label">
+            <value>Yes, and some extracellular space</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space/no___unsure:label">
+            <value>No / Unsure</value>
+          </text>
+          <text id="/data/Do_you_descend_from_unicellular_organism:label">
+            <value>Do you descend from an ancestral unicellular organism?</value>
+          </text>
+          <text id="/data/Do_you_descend_from_unicellular_organism/yes:label">
+            <value>Yes</value>
+          </text>
+          <text id="/data/Do_you_descend_from_unicellular_organism/no:label">
+            <value>No</value>
+          </text>
+        </translation>
+        <translation lang="Español">
+          <text id="/data/external_characteristics:label">
+            <value>Características externas</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have:label">
+            <value>¿Qué tipo de simetría tiene?</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have/spherical:label">
+            <value>Esférico</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have/radial:label">
+            <value>Radial</value>
+          </text>
+          <text id="/data/external_characteristics/What_kind_of_symmetry_do_you_have/bilateral:label">
+            <value>Bilateral</value>
+          </text>
+          <text id="/data/external_characteristics/How_many_segments_does_your_body_have:label">
+            <value>¿Cuántos segmentos tiene tu cuerpo?</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space:label">
+            <value>¿Tienes fluidos corporales que ocupan espacio intracelular?</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space/yes:label">
+            <value>Sí</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space/yes__and_some_:label">
+            <value>Sí, y algún espacio extracelular</value>
+          </text>
+          <text id="/data/Do_you_have_body_flu_intracellular_space/no___unsure:label">
+            <value>No / Inseguro</value>
+          </text>
+          <text id="/data/Do_you_descend_from_unicellular_organism:label">
+            <value>¿Desciende de un organismo unicelular ancestral?</value>
+          </text>
+          <text id="/data/Do_you_descend_from_unicellular_organism/yes:label">
+            <value>Sí</value>
+          </text>
+          <text id="/data/Do_you_descend_from_unicellular_organism/no:label">
+            <value>No</value>
+          </text>
+        </translation>
+      </itext>
+      <instance>
+        <data id="grouped_translated" version="grouped_translated_v1">
+          <start/>
+          <end/>
+          <external_characteristics>
+            <What_kind_of_symmetry_do_you_have/>
+            <How_many_segments_does_your_body_have/>
+          </external_characteristics>
+          <Do_you_have_body_flu_intracellular_space/>
+          <Do_you_descend_from_unicellular_organism/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+      <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+      <bind nodeset="/data/external_characteristics/What_kind_of_symmetry_do_you_have" required="false()" type="string"/>
+      <bind nodeset="/data/external_characteristics/How_many_segments_does_your_body_have" required="false()" type="int"/>
+      <bind nodeset="/data/Do_you_have_body_flu_intracellular_space" required="false()" type="string"/>
+      <bind nodeset="/data/Do_you_descend_from_unicellular_organism" required="false()" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/data/external_characteristics">
+      <label ref="jr:itext('/data/external_characteristics:label')"/>
+      <select ref="/data/external_characteristics/What_kind_of_symmetry_do_you_have">
+        <label ref="jr:itext('/data/external_characteristics/What_kind_of_symmetry_do_you_have:label')"/>
+        <item>
+          <label ref="jr:itext('/data/external_characteristics/What_kind_of_symmetry_do_you_have/spherical:label')"/>
+          <value>spherical</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/external_characteristics/What_kind_of_symmetry_do_you_have/radial:label')"/>
+          <value>radial</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/external_characteristics/What_kind_of_symmetry_do_you_have/bilateral:label')"/>
+          <value>bilateral</value>
+        </item>
+      </select>
+      <input ref="/data/external_characteristics/How_many_segments_does_your_body_have">
+        <label ref="jr:itext('/data/external_characteristics/How_many_segments_does_your_body_have:label')"/>
+      </input>
+    </group>
+    <select1 ref="/data/Do_you_have_body_flu_intracellular_space">
+      <label ref="jr:itext('/data/Do_you_have_body_flu_intracellular_space:label')"/>
+      <item>
+        <label ref="jr:itext('/data/Do_you_have_body_flu_intracellular_space/yes:label')"/>
+        <value>yes</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/Do_you_have_body_flu_intracellular_space/yes__and_some_:label')"/>
+        <value>yes__and_some_</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/Do_you_have_body_flu_intracellular_space/no___unsure:label')"/>
+        <value>no___unsure</value>
+      </item>
+    </select1>
+    <select1 ref="/data/Do_you_descend_from_unicellular_organism">
+      <label ref="jr:itext('/data/Do_you_descend_from_unicellular_organism:label')"/>
+      <item>
+        <label ref="jr:itext('/data/Do_you_descend_from_unicellular_organism/yes:label')"/>
+        <value>yes</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/Do_you_descend_from_unicellular_organism/no:label')"/>
+        <value>no</value>
+      </item>
+    </select1>
+  </h:body>
+</h:html>

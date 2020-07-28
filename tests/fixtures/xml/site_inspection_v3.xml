@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Site inspection</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="site_inspection" version="siv4">
+          <inspector/>
+          <did_you_find_the_site/>
+          <group_site_condition>
+            <was_there_damage_to_the_site/>
+            <group_network_quality>
+              <ping/>
+              <rssi/>
+            </group_network_quality>
+            <group_gate>
+              <is_the_gate_secure/>
+            </group_gate>
+            <is_plant_life_encroaching/>
+          </group_site_condition>
+          <please_rate_the_impact_of_any_defects_observed/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/inspector" required="true()" type="string"/>
+      <bind nodeset="/data/did_you_find_the_site" required="true()" type="string"/>
+      <bind nodeset="/data/group_site_condition" relevant=" /data/did_you_find_the_site  = 'yes'"/>
+      <bind nodeset="/data/group_site_condition/was_there_damage_to_the_site" required="true()" type="string"/>
+      <bind nodeset="/data/group_site_condition/group_network_quality/ping" required="true()" type="int"/>
+      <bind nodeset="/data/group_site_condition/group_network_quality/rssi" required="true()" type="int"/>
+      <bind nodeset="/data/group_site_condition/group_gate/is_the_gate_secure" required="true()" type="string"/>
+      <bind nodeset="/data/group_site_condition/is_plant_life_encroaching" required="true()" type="string"/>
+      <bind nodeset="/data/please_rate_the_impact_of_any_defects_observed" required="true()" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/inspector">
+      <label>inspector</label>
+    </input>
+    <select1 ref="/data/did_you_find_the_site">
+      <label>did you find the site</label>
+      <item>
+        <label>no</label>
+        <value>0</value>
+      </item>
+      <item>
+        <label>yes</label>
+        <value>1</value>
+      </item>
+    </select1>
+    <group ref="/data/group_site_condition">
+      <label>site condition</label>
+      <select1 ref="/data/group_site_condition/was_there_damage_to_the_site">
+        <label>was there damage to the site?</label>
+        <item>
+          <label>no</label>
+          <value>0</value>
+        </item>
+        <item>
+          <label>yes</label>
+          <value>1</value>
+        </item>
+      </select1>
+      <group ref="/data/group_site_condition/group_network_quality">
+        <label>network quality</label>
+        <input ref="/data/group_site_condition/group_network_quality/ping">
+          <label>ping</label>
+        </input>
+        <input ref="/data/group_site_condition/group_network_quality/rssi">
+          <label>rssi</label>
+        </input>
+      </group>
+      <group ref="/data/group_site_condition/group_gate">
+        <label>gate</label>
+        <select1 ref="/data/group_site_condition/group_gate/is_the_gate_secure">
+          <label>is the gate secure?</label>
+          <item>
+            <label>no</label>
+            <value>0</value>
+          </item>
+          <item>
+            <label>yes</label>
+            <value>1</value>
+          </item>
+        </select1>
+      </group>
+      <select1 ref="/data/group_site_condition/is_plant_life_encroaching">
+        <label>is plant life encroaching?</label>
+        <item>
+          <label>no</label>
+          <value>0</value>
+        </item>
+        <item>
+          <label>yes</label>
+          <value>1</value>
+        </item>
+      </select1>
+    </group>
+    <select1 ref="/data/please_rate_the_impact_of_any_defects_observed">
+      <label>please rate the impact of any defects observed</label>
+      <item>
+        <label>low</label>
+        <value>low</value>
+      </item>
+      <item>
+        <label>moderate</label>
+        <value>moderate</value>
+      </item>
+      <item>
+        <label>severe</label>
+        <value>severe</value>
+      </item>
+    </select1>
+  </h:body>
+</h:html>

@@ -1,0 +1,1312 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>long unicode labels to test SPSS export</h:title>
+    <model odk:xforms-version="1.0.0">
+      <itext>
+        <translation lang="Swahili">
+          <text id="/data/What_is_your_age:label">
+            <value>Je! Umri wako ni wapi?</value>
+          </text>
+          <text id="/data/What_is_your_name:label">
+            <value>Jina lako nani?</value>
+          </text>
+          <text id="/data/What_is_your_name/Franck_M:label">
+            <value>Franck Mbuyu Ziaka</value>
+          </text>
+          <text id="/data/What_is_your_name/Janvier_P:label">
+            <value>Janvier Paluku Bwakyanakazi</value>
+          </text>
+          <text id="/data/What_is_your_name/Jeanette_L:label">
+            <value>Jeanette Longhi Faida</value>
+          </text>
+          <text id="/data/What_is_your_name/mariam_K:label">
+            <value>Mariam Kalimasi Jamil</value>
+          </text>
+          <text id="/data/What_is_your_name/Micheline_K:label">
+            <value>Micheline Kitamuliko Masika</value>
+          </text>
+          <text id="/data/What_is_your_name/thierry_K:label">
+            <value>Thierry Katsongo Malikidogo</value>
+          </text>
+          <text id="/data/What_is_your_name/Tite_N:label">
+            <value>Tite Nyangwibe Maneno</value>
+          </text>
+          <text id="/data/What_is_your_name/Winnie_Y:label">
+            <value>Winnie Yaya</value>
+          </text>
+          <text id="/data/What_is_your_name/Francine_W:label">
+            <value>Francine WINGI</value>
+          </text>
+          <text id="/data/What_is_your_name/Gervais_B:label">
+            <value>Gervais BAHOGWERHE BASHIZI</value>
+          </text>
+          <text id="/data/What_is_your_name/Gilardin_B:label">
+            <value>Gilardin BAGUMA</value>
+          </text>
+          <text id="/data/What_is_your_name/Hortense_B:label">
+            <value>Hortense BARHOLERE</value>
+          </text>
+          <text id="/data/What_is_your_name/joseph_S:label">
+            <value>Joseph Salumu Mwamba</value>
+          </text>
+          <text id="/data/What_is_your_name/Lucien_M:label">
+            <value>Lucien MUNYAKA</value>
+          </text>
+          <text id="/data/What_is_your_name/Minerve_B:label">
+            <value>Minerve BASHIGE BYADUNIA</value>
+          </text>
+          <text id="/data/What_is_your_name/Prisca_C:label">
+            <value>Prisca CHINOGERWA</value>
+          </text>
+          <text id="/data/What_is_your_name/Yusuf_M:label">
+            <value>Yusuf MOHAMMED</value>
+          </text>
+          <text id="/data/What_is_your_name/Prince_M:label">
+            <value>Prince MUCINDI</value>
+          </text>
+          <text id="/data/What_is_your_name/benjamin_K:label">
+            <value>Benjamin Kasereba</value>
+          </text>
+          <text id="/data/What_is_your_name/benjamin_M:label">
+            <value>Benjamin Muyeme Tabani</value>
+          </text>
+          <text id="/data/What_is_your_name/Clarice_A:label">
+            <value>Clarice Akubese Masemande</value>
+          </text>
+          <text id="/data/What_is_your_name/Furaha_B:label">
+            <value>Furaha Bahimbire</value>
+          </text>
+          <text id="/data/What_is_your_name/Gerard_C:label">
+            <value>Gerard Cibinda</value>
+          </text>
+          <text id="/data/What_is_your_name/Jean-Christian_M:label">
+            <value>Jean-Christian Mukena</value>
+          </text>
+          <text id="/data/What_is_your_name/London_M:label">
+            <value>London M. Kalume</value>
+          </text>
+          <text id="/data/What_is_your_name/Sylvain_M:label">
+            <value>Sylvain Medho Kalumbo</value>
+          </text>
+          <text id="/data/What_is_your_name/Djulfa_D:label">
+            <value>Djulfa Djuma</value>
+          </text>
+          <text id="/data/What_is_your_name/Christine_F:label">
+            <value>Christine Faida</value>
+          </text>
+          <text id="/data/What_is_your_name/Clement_M:label">
+            <value>Clement Matembera</value>
+          </text>
+          <text id="/data/What_is_your_name/Delphin_M:label">
+            <value>Delphin Muhindo</value>
+          </text>
+          <text id="/data/What_is_your_name/diego_L:label">
+            <value>Diego LunenoBwira</value>
+          </text>
+          <text id="/data/What_is_your_name/Esperance_M:label">
+            <value>Esperance Masika</value>
+          </text>
+          <text id="/data/What_is_your_name/Francine_N:label">
+            <value>Francine Ntambwe</value>
+          </text>
+          <text id="/data/What_is_your_name/Francis_L:label">
+            <value>Francis Lenzo</value>
+          </text>
+          <text id="/data/What_is_your_name/Gauthier_B:label">
+            <value>Gauthier Bisimwa</value>
+          </text>
+          <text id="/data/What_is_your_name/Jacques_M:label">
+            <value>Jacques Mubalama</value>
+          </text>
+          <text id="/data/What_is_your_name/Julie_M:label">
+            <value>Julie Mujinga</value>
+          </text>
+          <text id="/data/What_is_your_name/Patient_M:label">
+            <value>Patient Muhozi</value>
+          </text>
+          <text id="/data/What_is_your_name/Sassou_M:label">
+            <value>Sassou Mahatane</value>
+          </text>
+          <text id="/data/What_is_your_name/aline_ucb:label">
+            <value>BAHATI Aline</value>
+          </text>
+          <text id="/data/What_is_your_name/chance_ucb:label">
+            <value>BAHATI MITIMA Chance</value>
+          </text>
+          <text id="/data/What_is_your_name/evelyne_ucb:label">
+            <value>BALYARMWABO MULAGANO Evelyne</value>
+          </text>
+          <text id="/data/What_is_your_name/grace_bm_ucb:label">
+            <value>BAZIRIA MIHIGO Grace</value>
+          </text>
+          <text id="/data/What_is_your_name/etienne_ucb:label">
+            <value>BIRINDWA FLESI Etienne</value>
+          </text>
+          <text id="/data/What_is_your_name/barthelemy_ucb:label">
+            <value>BUNANI BIRERE Barthelemy</value>
+          </text>
+          <text id="/data/What_is_your_name/theo_ucb:label">
+            <value>BWAMUCHUMA BILINGI Théo</value>
+          </text>
+          <text id="/data/What_is_your_name/charles_ucb:label">
+            <value>Charles Muderhwa</value>
+          </text>
+          <text id="/data/What_is_your_name/aimee_ucb:label">
+            <value>Cirhibuka Aimee</value>
+          </text>
+          <text id="/data/What_is_your_name/yvette_ucb:label">
+            <value>EKA MUKANIRE Yvette</value>
+          </text>
+          <text id="/data/What_is_your_name/vianney_ucb:label">
+            <value>Mubagwa Vianney</value>
+          </text>
+          <text id="/data/What_is_your_name/jules_ucb:label">
+            <value>NYUNDA NKURU Jules</value>
+          </text>
+          <text id="/data/What_is_your_name/grace_rc_ucb:label">
+            <value>RANGA CINYEMA Grace</value>
+          </text>
+          <text id="/data/What_is_your_name/solange_mak_ucb:label">
+            <value>RIZIKI MAKELELE Solange</value>
+          </text>
+          <text id="/data/What_is_your_name/solange_mon_ucb:label">
+            <value>RIZIKI MONGANE Solange</value>
+          </text>
+          <text id="/data/What_is_your_name/arlette_ulpgl:label">
+            <value>Arlette Syambite</value>
+          </text>
+          <text id="/data/What_is_your_name/plaisir_ulpgl:label">
+            <value>Amida SIFA Plaisir</value>
+          </text>
+          <text id="/data/What_is_your_name/christian_Mp_ulpgl:label">
+            <value>Christian Mpabwa</value>
+          </text>
+          <text id="/data/What_is_your_name/christian_ulpgl:label">
+            <value>Christian Mwenyemali Milenge</value>
+          </text>
+          <text id="/data/What_is_your_name/daniel_ulpgl:label">
+            <value>Daniel BUTOKI KIRINDERA</value>
+          </text>
+          <text id="/data/What_is_your_name/eloise_ulpgl:label">
+            <value>Eloise Nkuo Clarisse</value>
+          </text>
+          <text id="/data/What_is_your_name/joelle_ulpgl:label">
+            <value>Joelle MUGHUMALEWA</value>
+          </text>
+          <text id="/data/What_is_your_name/mamy_ulpgl:label">
+            <value>Kavira Mwendevya Mamy</value>
+          </text>
+          <text id="/data/What_is_your_name/levi_ulpgl:label">
+            <value>Levi Bouesi</value>
+          </text>
+          <text id="/data/What_is_your_name/lucie_ulpgl:label">
+            <value>Mapenzi Kissa Lucie</value>
+          </text>
+          <text id="/data/What_is_your_name/muyisa_ulpgl:label">
+            <value>Muyisa Tasakana</value>
+          </text>
+          <text id="/data/What_is_your_name/nadine_ulpgl:label">
+            <value>Mwadjuma Lubuto Nadine</value>
+          </text>
+          <text id="/data/What_is_your_name/georges_ulpgl:label">
+            <value>Namegabe Kubaburhanzi Georges</value>
+          </text>
+          <text id="/data/What_is_your_name/nathalie_ulpgl:label">
+            <value>Nathalie Bishikwabo</value>
+          </text>
+          <text id="/data/What_is_your_name/renilde_ulpgl:label">
+            <value>Nzigire Kalegamire Renilde</value>
+          </text>
+          <text id="/data/What_is_your_name/obed_ulpgl:label">
+            <value>Obed MBUSA MULEMBERI</value>
+          </text>
+          <text id="/data/What_is_your_name/olivier_ulpgl:label">
+            <value>Olivier Kisamba</value>
+          </text>
+          <text id="/data/What_is_your_name/pyame_ulpgl:label">
+            <value>Pyame Mushagalusa Balemirwe</value>
+          </text>
+          <text id="/data/What_is_your_name/thomas_ulpgl:label">
+            <value>Thomas Tcheshe</value>
+          </text>
+          <text id="/data/What_is_your_name/chrysostome_ulpgl:label">
+            <value>Kasereka Muyisa Jean Chrysostome</value>
+          </text>
+          <text id="/data/What_is_your_name/david_ulpgl:label">
+            <value>David Kubuya Baroki</value>
+          </text>
+          <text id="/data/What_is_your_name/safi_ulpgl:label">
+            <value>Kasoki Wasunduku Safi</value>
+          </text>
+          <text id="/data/What_is_your_name/donatiane_ulpgl:label">
+            <value>KAVUGHO SIBANZIRE Donatiane</value>
+          </text>
+          <text id="/data/What_is_your_name/buroko_ulpgl:label">
+            <value>Kanuni Buroko</value>
+          </text>
+          <text id="/data/What_is_your_name/annie_ulpgl:label">
+            <value>Mutongerwa Venge Annie</value>
+          </text>
+          <text id="/data/What_is_your_name/raphael_ulpgl:label">
+            <value>Wema Lukoo Raphael</value>
+          </text>
+          <text id="/data/group_separationquestions:label">
+            <value>kujitenga</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241:label">
+            <value>Je! Familia yako inakosa mtoto aliyeachwa na wewe wakati wa kuondoka kwako?</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241/1:label">
+            <value>Ndiyo</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241/2:label">
+            <value>Hapana</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242:label">
+            <value>Je! Familia yako inahudumia mtoto kutengwa na familia yake wakati wa kuondoka?</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242/1:label">
+            <value>Ndiyo</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242/2:label">
+            <value>Hapana</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2243:label">
+            <value>Je! Kujitenga kwao kulikuwaje?</value>
+          </text>
+          <text id="/data/approval:label">
+            <value>Jambo, jina langu ni ____niko hapa kuuliza habari kuhusu amani, sheria na ujenzi mupya mashariki ya jamuhuri ya kidemokratia ya kongo. Natumika pamoja na -------. Atuna ushirika na serkali yoyote. Tunaendesha maongezi kamili juu ya kusikia na kujuwa hali na yale yanaofaa kuhusu kongo la kidemokrasiya. Maongezi ambayo tunaendesha ni kwa siri na bila kuchukuwa majina yoyote. Tuko huru na hakuna mutu yeyote ambaye atatambulishwa mahali pa kutolea habari kuhusu maongezi haya. Akuna jibu nzuri na hakuna lililo mbaya. Tuna kusihi kushiriki kwa utashi wako maongezi haya. Unaweza kataa kushiriki na kwakuto jibiya kwako kwa ulizo lolote. Hakuna malipo yoyote kwa ajili yako alakini tunafikiri ya kwamba kushiriki kwako ita rahisisha babadiliko mzuri ya hali ya mashariki mwa kongo la kidemokrasiya. Matokeo ya tajulishwa nayatatolewa kwa watumishi mbalimbali katika mashariki mwa kongo. Maongezi kwa kuuliza yatakamata muda wa dakika makumi mbili. Je unakubali kushiriki utafiti huu ao una maulizo?</value>
+          </text>
+          <text id="/data/approval/1:label">
+            <value>Ndiyo</value>
+          </text>
+          <text id="/data/approval/2:label">
+            <value>Hapana</value>
+          </text>
+          <text id="/data/electronics_owned:label">
+            <value>Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo?</value>
+          </text>
+          <text id="/data/electronics_owned/tv:label">
+            <value>Televisheni</value>
+          </text>
+          <text id="/data/electronics_owned/radio:label">
+            <value>Radi</value>
+          </text>
+          <text id="/data/electronics_owned/laptop:label">
+            <value>Kompyuta ya kompyuta</value>
+          </text>
+          <text id="/data/electronics_owned/tamagotchi:label">
+            <value>Toy ya elektroniki inayoonyesha picha ya kiumbe ya kiumbe wa digital, ambayo inapaswa kuzingatiwa na kuitibiwa na "mmiliki " kama ni pet</value>
+          </text>
+        </translation>
+        <translation lang="English">
+          <text id="/data/What_is_your_age:label">
+            <value>What is your age?</value>
+          </text>
+          <text id="/data/What_is_your_name:label">
+            <value>What is your name?</value>
+          </text>
+          <text id="/data/What_is_your_name/Franck_M:label">
+            <value>Franck Mbuyu Ziaka</value>
+          </text>
+          <text id="/data/What_is_your_name/Janvier_P:label">
+            <value>Janvier Paluku Bwakyanakazi</value>
+          </text>
+          <text id="/data/What_is_your_name/Jeanette_L:label">
+            <value>Jeanette Longhi Faida</value>
+          </text>
+          <text id="/data/What_is_your_name/mariam_K:label">
+            <value>Mariam Kalimasi Jamil</value>
+          </text>
+          <text id="/data/What_is_your_name/Micheline_K:label">
+            <value>Micheline Kitamuliko Masika</value>
+          </text>
+          <text id="/data/What_is_your_name/thierry_K:label">
+            <value>Thierry Katsongo Malikidogo</value>
+          </text>
+          <text id="/data/What_is_your_name/Tite_N:label">
+            <value>Tite Nyangwibe Maneno</value>
+          </text>
+          <text id="/data/What_is_your_name/Winnie_Y:label">
+            <value>Winnie Yaya</value>
+          </text>
+          <text id="/data/What_is_your_name/Francine_W:label">
+            <value>Francine WINGI</value>
+          </text>
+          <text id="/data/What_is_your_name/Gervais_B:label">
+            <value>Gervais BAHOGWERHE BASHIZI</value>
+          </text>
+          <text id="/data/What_is_your_name/Gilardin_B:label">
+            <value>Gilardin BAGUMA</value>
+          </text>
+          <text id="/data/What_is_your_name/Hortense_B:label">
+            <value>Hortense BARHOLERE</value>
+          </text>
+          <text id="/data/What_is_your_name/joseph_S:label">
+            <value>Joseph Salumu Mwamba</value>
+          </text>
+          <text id="/data/What_is_your_name/Lucien_M:label">
+            <value>Lucien MUNYAKA</value>
+          </text>
+          <text id="/data/What_is_your_name/Minerve_B:label">
+            <value>Minerve BASHIGE BYADUNIA</value>
+          </text>
+          <text id="/data/What_is_your_name/Prisca_C:label">
+            <value>Prisca CHINOGERWA</value>
+          </text>
+          <text id="/data/What_is_your_name/Yusuf_M:label">
+            <value>Yusuf MOHAMMED</value>
+          </text>
+          <text id="/data/What_is_your_name/Prince_M:label">
+            <value>Prince MUCINDI</value>
+          </text>
+          <text id="/data/What_is_your_name/benjamin_K:label">
+            <value>Benjamin Kasereba</value>
+          </text>
+          <text id="/data/What_is_your_name/benjamin_M:label">
+            <value>Benjamin Muyeme Tabani</value>
+          </text>
+          <text id="/data/What_is_your_name/Clarice_A:label">
+            <value>Clarice Akubese Nasemande Avuta Mbafele</value>
+          </text>
+          <text id="/data/What_is_your_name/Furaha_B:label">
+            <value>Furaha Bahimbire</value>
+          </text>
+          <text id="/data/What_is_your_name/Gerard_C:label">
+            <value>Gerard Cibinda</value>
+          </text>
+          <text id="/data/What_is_your_name/Jean-Christian_M:label">
+            <value>Jean Christian Mukena Muntu</value>
+          </text>
+          <text id="/data/What_is_your_name/London_M:label">
+            <value>London M. Kalume</value>
+          </text>
+          <text id="/data/What_is_your_name/Sylvain_M:label">
+            <value>Sylvain Medho Kalumbo</value>
+          </text>
+          <text id="/data/What_is_your_name/Djulfa_D:label">
+            <value>Djulfa Djuma</value>
+          </text>
+          <text id="/data/What_is_your_name/Christine_F:label">
+            <value>Christine Faida Kabino</value>
+          </text>
+          <text id="/data/What_is_your_name/Clement_M:label">
+            <value>Clement Matembera</value>
+          </text>
+          <text id="/data/What_is_your_name/Delphin_M:label">
+            <value>Delphin Muhindo</value>
+          </text>
+          <text id="/data/What_is_your_name/diego_L:label">
+            <value>Diego Luneno Bwira</value>
+          </text>
+          <text id="/data/What_is_your_name/Esperance_M:label">
+            <value>Esperance Masika</value>
+          </text>
+          <text id="/data/What_is_your_name/Francine_N:label">
+            <value>Francine Zalia Ntambwe</value>
+          </text>
+          <text id="/data/What_is_your_name/Francis_L:label">
+            <value>Francis Lenzo</value>
+          </text>
+          <text id="/data/What_is_your_name/Gauthier_B:label">
+            <value>Gauthier Bisimwa</value>
+          </text>
+          <text id="/data/What_is_your_name/Jacques_M:label">
+            <value>Jacques Mubalama Bishikwabo</value>
+          </text>
+          <text id="/data/What_is_your_name/Julie_M:label">
+            <value>Julie Mujinga</value>
+          </text>
+          <text id="/data/What_is_your_name/Patient_M:label">
+            <value>Patient Muhozi</value>
+          </text>
+          <text id="/data/What_is_your_name/Sassou_M:label">
+            <value>Sassou Mahatane</value>
+          </text>
+          <text id="/data/What_is_your_name/aline_ucb:label">
+            <value>BAHATI Aline</value>
+          </text>
+          <text id="/data/What_is_your_name/chance_ucb:label">
+            <value>BAHATI MITIMA Chanceline</value>
+          </text>
+          <text id="/data/What_is_your_name/evelyne_ucb:label">
+            <value>BALYARMWABO MULAGANO Evelyne</value>
+          </text>
+          <text id="/data/What_is_your_name/grace_bm_ucb:label">
+            <value>BAZIRIA MIHIGO Grace</value>
+          </text>
+          <text id="/data/What_is_your_name/etienne_ucb:label">
+            <value>BIRINDWA FLESI Etienne</value>
+          </text>
+          <text id="/data/What_is_your_name/barthelemy_ucb:label">
+            <value>BUNANI BIRERE Barthelemy</value>
+          </text>
+          <text id="/data/What_is_your_name/theo_ucb:label">
+            <value>BWAMUCHUMA BILINGI Théo</value>
+          </text>
+          <text id="/data/What_is_your_name/charles_ucb:label">
+            <value>Charles Muderhwa</value>
+          </text>
+          <text id="/data/What_is_your_name/aimee_ucb:label">
+            <value>Cirhibuka Aimee</value>
+          </text>
+          <text id="/data/What_is_your_name/yvette_ucb:label">
+            <value>EKA MUKANIRE Yvette</value>
+          </text>
+          <text id="/data/What_is_your_name/vianney_ucb:label">
+            <value>Mubagwa Musaka Vianney</value>
+          </text>
+          <text id="/data/What_is_your_name/jules_ucb:label">
+            <value>NYUNDA NKURU Jules</value>
+          </text>
+          <text id="/data/What_is_your_name/grace_rc_ucb:label">
+            <value>RANGA CINYEMA Gracia</value>
+          </text>
+          <text id="/data/What_is_your_name/solange_mak_ucb:label">
+            <value>RIZIKI MAKELELE Solange</value>
+          </text>
+          <text id="/data/What_is_your_name/solange_mon_ucb:label">
+            <value>RIZIKI MONGANE Solange</value>
+          </text>
+          <text id="/data/What_is_your_name/arlette_ulpgl:label">
+            <value>Arlette Syambite</value>
+          </text>
+          <text id="/data/What_is_your_name/plaisir_ulpgl:label">
+            <value>Amida SIFA Plaisir</value>
+          </text>
+          <text id="/data/What_is_your_name/christian_Mp_ulpgl:label">
+            <value>Christian Mpabwa</value>
+          </text>
+          <text id="/data/What_is_your_name/christian_ulpgl:label">
+            <value>Christian Mwenyemali Milenge</value>
+          </text>
+          <text id="/data/What_is_your_name/daniel_ulpgl:label">
+            <value>Daniel BUTOKI KIRINDERA</value>
+          </text>
+          <text id="/data/What_is_your_name/eloise_ulpgl:label">
+            <value>Eloise Nkuo Clarisse</value>
+          </text>
+          <text id="/data/What_is_your_name/joelle_ulpgl:label">
+            <value>Joelle MUGHUMALEWA</value>
+          </text>
+          <text id="/data/What_is_your_name/mamy_ulpgl:label">
+            <value>Kavira Mwendevya Mamy</value>
+          </text>
+          <text id="/data/What_is_your_name/levi_ulpgl:label">
+            <value>Levi Bouesi</value>
+          </text>
+          <text id="/data/What_is_your_name/lucie_ulpgl:label">
+            <value>Mapenzi Kissa Lucie</value>
+          </text>
+          <text id="/data/What_is_your_name/muyisa_ulpgl:label">
+            <value>Muyisa Tasakana</value>
+          </text>
+          <text id="/data/What_is_your_name/nadine_ulpgl:label">
+            <value>Mwadjuma Lubuto Nadine</value>
+          </text>
+          <text id="/data/What_is_your_name/georges_ulpgl:label">
+            <value>Namegabe Kubaburhanzi Georges</value>
+          </text>
+          <text id="/data/What_is_your_name/nathalie_ulpgl:label">
+            <value>Nathalie Bishikwabo</value>
+          </text>
+          <text id="/data/What_is_your_name/renilde_ulpgl:label">
+            <value>Nzigire Kalegamire Renilde</value>
+          </text>
+          <text id="/data/What_is_your_name/obed_ulpgl:label">
+            <value>Obed MBUSA MULEMBERI</value>
+          </text>
+          <text id="/data/What_is_your_name/olivier_ulpgl:label">
+            <value>Olivier Kisamba</value>
+          </text>
+          <text id="/data/What_is_your_name/pyame_ulpgl:label">
+            <value>Pyame Mushagalusa Balemirwe</value>
+          </text>
+          <text id="/data/What_is_your_name/thomas_ulpgl:label">
+            <value>Thomas Tcheshe</value>
+          </text>
+          <text id="/data/What_is_your_name/chrysostome_ulpgl:label">
+            <value>Kasereka Muyisa Jean Chrysostome</value>
+          </text>
+          <text id="/data/What_is_your_name/david_ulpgl:label">
+            <value>David Kubuya Baroki</value>
+          </text>
+          <text id="/data/What_is_your_name/safi_ulpgl:label">
+            <value>Kasoki Wasunduku Safi</value>
+          </text>
+          <text id="/data/What_is_your_name/donatiane_ulpgl:label">
+            <value>KAVUGHO SIBANZIRE Donatiane</value>
+          </text>
+          <text id="/data/What_is_your_name/buroko_ulpgl:label">
+            <value>Kanuni Buroko</value>
+          </text>
+          <text id="/data/What_is_your_name/annie_ulpgl:label">
+            <value>Mutongerwa Venge Annie</value>
+          </text>
+          <text id="/data/What_is_your_name/raphael_ulpgl:label">
+            <value>Wema Lukoo Raphael</value>
+          </text>
+          <text id="/data/group_separationquestions:label">
+            <value>separation</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241:label">
+            <value>Is your family missing a child that was separated from you during your displacement?</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241/1:label">
+            <value>Yes</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241/2:label">
+            <value>No</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242:label">
+            <value>Is your family hosting a child separated from his/her family during displacement?</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242/1:label">
+            <value>Yes</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242/2:label">
+            <value>No</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2243:label">
+            <value>How did their separation occur?</value>
+          </text>
+          <text id="/data/approval:label">
+            <value>Hello, my name is ____ I am here as part of a study on security, protection and justice in Eastern Congo. I work with ----------. We are independent of any government, we conduct a series of interviews to better understand the context and priorities in eastern Congo. The information we collect here is confidential and anonymous. We are independent and no one will be identified in the discussion of results. There is no right or wrong answer. We ask you to participate voluntarily in this study. There are no direct benefits for you, but we think your participation will help improve the situation in the East. The results will be published and made available to actors in the East. The interview should last about 20 minutes. Do you agree to participate in this study?</value>
+          </text>
+          <text id="/data/approval/1:label">
+            <value>Yes</value>
+          </text>
+          <text id="/data/approval/2:label">
+            <value>No</value>
+          </text>
+          <text id="/data/electronics_owned:label">
+            <value>Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own?</value>
+          </text>
+          <text id="/data/electronics_owned/tv:label">
+            <value>TV</value>
+          </text>
+          <text id="/data/electronics_owned/radio:label">
+            <value>Radio</value>
+          </text>
+          <text id="/data/electronics_owned/laptop:label">
+            <value>Laptop computer</value>
+          </text>
+          <text id="/data/electronics_owned/tamagotchi:label">
+            <value>An electronic toy displaying a digital image of a creature, which has to be looked after and responded to by the "owner" as if it were a pet</value>
+          </text>
+        </translation>
+        <translation lang="Français">
+          <text id="/data/What_is_your_age:label">
+            <value>Quel âge avez-vous?</value>
+          </text>
+          <text id="/data/What_is_your_name:label">
+            <value>Comment vous appelez-vous?</value>
+          </text>
+          <text id="/data/What_is_your_name/Franck_M:label">
+            <value>Franck Mbuyu Ziaka</value>
+          </text>
+          <text id="/data/What_is_your_name/Janvier_P:label">
+            <value>Janvier Paluku Bwakyanakazi</value>
+          </text>
+          <text id="/data/What_is_your_name/Jeanette_L:label">
+            <value>Jeanette Longhi Faida</value>
+          </text>
+          <text id="/data/What_is_your_name/mariam_K:label">
+            <value>Mariam Kalimasi Jamil</value>
+          </text>
+          <text id="/data/What_is_your_name/Micheline_K:label">
+            <value>Micheline Kitamuliko Masika</value>
+          </text>
+          <text id="/data/What_is_your_name/thierry_K:label">
+            <value>Thierry Katsongo Malikidogo</value>
+          </text>
+          <text id="/data/What_is_your_name/Tite_N:label">
+            <value>Tite Nyangwibe Maneno</value>
+          </text>
+          <text id="/data/What_is_your_name/Winnie_Y:label">
+            <value>Winnie Yaya</value>
+          </text>
+          <text id="/data/What_is_your_name/Francine_W:label">
+            <value>Francine WINGI</value>
+          </text>
+          <text id="/data/What_is_your_name/Gervais_B:label">
+            <value>Gervais BAHOGWERHE BASHIZI</value>
+          </text>
+          <text id="/data/What_is_your_name/Gilardin_B:label">
+            <value>Gilardin BAGUMA</value>
+          </text>
+          <text id="/data/What_is_your_name/Hortense_B:label">
+            <value>Hortense BARHOLERE</value>
+          </text>
+          <text id="/data/What_is_your_name/joseph_S:label">
+            <value>Joseph Salumu Mwamba</value>
+          </text>
+          <text id="/data/What_is_your_name/Lucien_M:label">
+            <value>Lucien MUNYAKA</value>
+          </text>
+          <text id="/data/What_is_your_name/Minerve_B:label">
+            <value>Minerve BASHIGE BYADUNIA</value>
+          </text>
+          <text id="/data/What_is_your_name/Prisca_C:label">
+            <value>Prisca CHINOGERWA</value>
+          </text>
+          <text id="/data/What_is_your_name/Yusuf_M:label">
+            <value>Yusuf MOHAMMED</value>
+          </text>
+          <text id="/data/What_is_your_name/Prince_M:label">
+            <value>Prince MUCINDI</value>
+          </text>
+          <text id="/data/What_is_your_name/benjamin_K:label">
+            <value>Benjamin Kasereba</value>
+          </text>
+          <text id="/data/What_is_your_name/benjamin_M:label">
+            <value>Benjamin Muyeme Tabani</value>
+          </text>
+          <text id="/data/What_is_your_name/Clarice_A:label">
+            <value>Clarice Akubese Masemande</value>
+          </text>
+          <text id="/data/What_is_your_name/Furaha_B:label">
+            <value>Furaha Bahimbire</value>
+          </text>
+          <text id="/data/What_is_your_name/Gerard_C:label">
+            <value>Gerard Cibinda</value>
+          </text>
+          <text id="/data/What_is_your_name/Jean-Christian_M:label">
+            <value>Jean-Christian Mukena</value>
+          </text>
+          <text id="/data/What_is_your_name/London_M:label">
+            <value>London M. Kalume</value>
+          </text>
+          <text id="/data/What_is_your_name/Sylvain_M:label">
+            <value>Sylvain Medho Kalumbo</value>
+          </text>
+          <text id="/data/What_is_your_name/Djulfa_D:label">
+            <value>Djulfa Djuma</value>
+          </text>
+          <text id="/data/What_is_your_name/Christine_F:label">
+            <value>Christine Faida</value>
+          </text>
+          <text id="/data/What_is_your_name/Clement_M:label">
+            <value>Clement Matembera</value>
+          </text>
+          <text id="/data/What_is_your_name/Delphin_M:label">
+            <value>Delphin Muhindo</value>
+          </text>
+          <text id="/data/What_is_your_name/diego_L:label">
+            <value>Diego LunenoBwira</value>
+          </text>
+          <text id="/data/What_is_your_name/Esperance_M:label">
+            <value>Esperance Masika</value>
+          </text>
+          <text id="/data/What_is_your_name/Francine_N:label">
+            <value>Francine Ntambwe</value>
+          </text>
+          <text id="/data/What_is_your_name/Francis_L:label">
+            <value>Francis Lenzo</value>
+          </text>
+          <text id="/data/What_is_your_name/Gauthier_B:label">
+            <value>Gauthier Bisimwa</value>
+          </text>
+          <text id="/data/What_is_your_name/Jacques_M:label">
+            <value>Jacques Mubalama</value>
+          </text>
+          <text id="/data/What_is_your_name/Julie_M:label">
+            <value>Julie Mujinga</value>
+          </text>
+          <text id="/data/What_is_your_name/Patient_M:label">
+            <value>Patient Muhozi</value>
+          </text>
+          <text id="/data/What_is_your_name/Sassou_M:label">
+            <value>Sassou Mahatane</value>
+          </text>
+          <text id="/data/What_is_your_name/aline_ucb:label">
+            <value>BAHATI Aline</value>
+          </text>
+          <text id="/data/What_is_your_name/chance_ucb:label">
+            <value>BAHATI MITIMA Chance</value>
+          </text>
+          <text id="/data/What_is_your_name/evelyne_ucb:label">
+            <value>BALYARMWABO MULAGANO Evelyne</value>
+          </text>
+          <text id="/data/What_is_your_name/grace_bm_ucb:label">
+            <value>BAZIRIA MIHIGO Grace</value>
+          </text>
+          <text id="/data/What_is_your_name/etienne_ucb:label">
+            <value>BIRINDWA FLESI Etienne</value>
+          </text>
+          <text id="/data/What_is_your_name/barthelemy_ucb:label">
+            <value>BUNANI BIRERE Barthelemy</value>
+          </text>
+          <text id="/data/What_is_your_name/theo_ucb:label">
+            <value>BWAMUCHUMA BILINGI Théo</value>
+          </text>
+          <text id="/data/What_is_your_name/charles_ucb:label">
+            <value>Charles Muderhwa</value>
+          </text>
+          <text id="/data/What_is_your_name/aimee_ucb:label">
+            <value>Cirhibuka Aimee</value>
+          </text>
+          <text id="/data/What_is_your_name/yvette_ucb:label">
+            <value>EKA MUKANIRE Yvette</value>
+          </text>
+          <text id="/data/What_is_your_name/vianney_ucb:label">
+            <value>Mubagwa Vianney</value>
+          </text>
+          <text id="/data/What_is_your_name/jules_ucb:label">
+            <value>NYUNDA NKURU Jules</value>
+          </text>
+          <text id="/data/What_is_your_name/grace_rc_ucb:label">
+            <value>RANGA CINYEMA Grace</value>
+          </text>
+          <text id="/data/What_is_your_name/solange_mak_ucb:label">
+            <value>RIZIKI MAKELELE Solange</value>
+          </text>
+          <text id="/data/What_is_your_name/solange_mon_ucb:label">
+            <value>RIZIKI MONGANE Solange</value>
+          </text>
+          <text id="/data/What_is_your_name/arlette_ulpgl:label">
+            <value>Arlette Syambite</value>
+          </text>
+          <text id="/data/What_is_your_name/plaisir_ulpgl:label">
+            <value>Amida SIFA Plaisir</value>
+          </text>
+          <text id="/data/What_is_your_name/christian_Mp_ulpgl:label">
+            <value>Christian Mpabwa</value>
+          </text>
+          <text id="/data/What_is_your_name/christian_ulpgl:label">
+            <value>Christian Mwenyemali Milenge</value>
+          </text>
+          <text id="/data/What_is_your_name/daniel_ulpgl:label">
+            <value>Daniel BUTOKI KIRINDERA</value>
+          </text>
+          <text id="/data/What_is_your_name/eloise_ulpgl:label">
+            <value>Eloise Nkuo Clarisse</value>
+          </text>
+          <text id="/data/What_is_your_name/joelle_ulpgl:label">
+            <value>Joelle MUGHUMALEWA</value>
+          </text>
+          <text id="/data/What_is_your_name/mamy_ulpgl:label">
+            <value>Kavira Mwendevya Mamy</value>
+          </text>
+          <text id="/data/What_is_your_name/levi_ulpgl:label">
+            <value>Levi Bouesi</value>
+          </text>
+          <text id="/data/What_is_your_name/lucie_ulpgl:label">
+            <value>Mapenzi Kissa Lucie</value>
+          </text>
+          <text id="/data/What_is_your_name/muyisa_ulpgl:label">
+            <value>Muyisa Tasakana</value>
+          </text>
+          <text id="/data/What_is_your_name/nadine_ulpgl:label">
+            <value>Mwadjuma Lubuto Nadine</value>
+          </text>
+          <text id="/data/What_is_your_name/georges_ulpgl:label">
+            <value>Namegabe Kubaburhanzi Georges</value>
+          </text>
+          <text id="/data/What_is_your_name/nathalie_ulpgl:label">
+            <value>Nathalie Bishikwabo</value>
+          </text>
+          <text id="/data/What_is_your_name/renilde_ulpgl:label">
+            <value>Nzigire Kalegamire Renilde</value>
+          </text>
+          <text id="/data/What_is_your_name/obed_ulpgl:label">
+            <value>Obed MBUSA MULEMBERI</value>
+          </text>
+          <text id="/data/What_is_your_name/olivier_ulpgl:label">
+            <value>Olivier Kisamba</value>
+          </text>
+          <text id="/data/What_is_your_name/pyame_ulpgl:label">
+            <value>Pyame Mushagalusa Balemirwe</value>
+          </text>
+          <text id="/data/What_is_your_name/thomas_ulpgl:label">
+            <value>Thomas Tcheshe</value>
+          </text>
+          <text id="/data/What_is_your_name/chrysostome_ulpgl:label">
+            <value>Kasereka Muyisa Jean Chrysostome</value>
+          </text>
+          <text id="/data/What_is_your_name/david_ulpgl:label">
+            <value>David Kubuya Baroki</value>
+          </text>
+          <text id="/data/What_is_your_name/safi_ulpgl:label">
+            <value>Kasoki Wasunduku Safi</value>
+          </text>
+          <text id="/data/What_is_your_name/donatiane_ulpgl:label">
+            <value>KAVUGHO SIBANZIRE Donatiane</value>
+          </text>
+          <text id="/data/What_is_your_name/buroko_ulpgl:label">
+            <value>Kanuni Buroko</value>
+          </text>
+          <text id="/data/What_is_your_name/annie_ulpgl:label">
+            <value>Mutongerwa Venge Annie</value>
+          </text>
+          <text id="/data/What_is_your_name/raphael_ulpgl:label">
+            <value>Wema Lukoo Raphael</value>
+          </text>
+          <text id="/data/group_separationquestions:label">
+            <value>séparation</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241:label">
+            <value>Votre famille manque-t-elle un enfant qui a été séparé de vous pendant votre déplacement?</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241/1:label">
+            <value>Oui</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2241/2:label">
+            <value>Non</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242:label">
+            <value>Votre famille héberge-t-elle un enfant séparé de sa famille pendant le déplacement?</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242/1:label">
+            <value>Oui</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2242/2:label">
+            <value>Non</value>
+          </text>
+          <text id="/data/group_separationquestions/q_2243:label">
+            <value>Comment s'est passée leur séparation?</value>
+          </text>
+          <text id="/data/approval:label">
+            <value>Bonjour, mon nom est ____ je suis ici dans le cadre d'une étude sur la sécurité, la protection et la justice à l'Est du Congo. Je travaille avec ----------. Nous sommes indépendants de tout gouvernement, Nous conduisons une série d'entretiens pour mieux comprendre le contexte et les priorités à l'Est du Congo. Les informations que nous collectons ici sont confidentielles et anonymes. Nous sommes indépendants et aucune personne ne sera identifiée dans la discussion des résultats. Il n'y a pas de bonne ou de mauvaise réponse. Nous vous demandons de participer volontairement à cette étude. Il n'y a pas de bénéfices directs pour vous, mais nous pensons que votre participation permettra d'améliorer la situation dans l'Est. Les résultats seront publiés et mis à disposition des acteurs dans l'Est. L'interview devrait durer à peu près 20 minutes. Est-ce que vous acceptez de participer à cette étude ?</value>
+          </text>
+          <text id="/data/approval/1:label">
+            <value>Oui</value>
+          </text>
+          <text id="/data/approval/2:label">
+            <value>Non</value>
+          </text>
+          <text id="/data/electronics_owned:label">
+            <value>Parmi les dispositifs magiques, merveilleux, stupéfiants, révolutionnaires, incomparables, révolutionnaires et révolutionnaires, lesquels possédez-vous?</value>
+          </text>
+          <text id="/data/electronics_owned/tv:label">
+            <value>Télévision</value>
+          </text>
+          <text id="/data/electronics_owned/radio:label">
+            <value>Radio</value>
+          </text>
+          <text id="/data/electronics_owned/laptop:label">
+            <value>Ordinateur portable</value>
+          </text>
+          <text id="/data/electronics_owned/tamagotchi:label">
+            <value>Un jouet électronique affichant une image numérique d'une créature, qui doit être soigné et auquel le "propriétaire" répond comme s'il s'agissait d'un animal de compagnie</value>
+          </text>
+        </translation>
+      </itext>
+      <instance>
+        <data id="long_unicode_labels" version="long_unicode_labels_v1">
+          <start/>
+          <end/>
+          <What_is_your_age/>
+          <What_is_your_name/>
+          <group_separationquestions>
+            <q_2241/>
+            <q_2242/>
+            <q_2243/>
+          </group_separationquestions>
+          <approval/>
+          <electronics_owned/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+      <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+      <bind nodeset="/data/What_is_your_age" required="false()" type="int"/>
+      <bind nodeset="/data/What_is_your_name" required="false()" type="string"/>
+      <bind nodeset="/data/group_separationquestions/q_2241" required="false()" type="string"/>
+      <bind nodeset="/data/group_separationquestions/q_2242" required="false()" type="string"/>
+      <bind nodeset="/data/group_separationquestions/q_2243" relevant=" /data/group_separationquestions/q_2242  = '1'" required="false()" type="string"/>
+      <bind nodeset="/data/approval" type="string"/>
+      <bind nodeset="/data/electronics_owned" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/What_is_your_age">
+      <label ref="jr:itext('/data/What_is_your_age:label')"/>
+    </input>
+    <select1 ref="/data/What_is_your_name">
+      <label ref="jr:itext('/data/What_is_your_name:label')"/>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Franck_M:label')"/>
+        <value>Franck_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Janvier_P:label')"/>
+        <value>Janvier_P</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Jeanette_L:label')"/>
+        <value>Jeanette_L</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/mariam_K:label')"/>
+        <value>mariam_K</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Micheline_K:label')"/>
+        <value>Micheline_K</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/thierry_K:label')"/>
+        <value>thierry_K</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Tite_N:label')"/>
+        <value>Tite_N</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Winnie_Y:label')"/>
+        <value>Winnie_Y</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Francine_W:label')"/>
+        <value>Francine_W</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Gervais_B:label')"/>
+        <value>Gervais_B</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Gilardin_B:label')"/>
+        <value>Gilardin_B</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Hortense_B:label')"/>
+        <value>Hortense_B</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/joseph_S:label')"/>
+        <value>joseph_S</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Lucien_M:label')"/>
+        <value>Lucien_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Minerve_B:label')"/>
+        <value>Minerve_B</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Prisca_C:label')"/>
+        <value>Prisca_C</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Yusuf_M:label')"/>
+        <value>Yusuf_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Prince_M:label')"/>
+        <value>Prince_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/benjamin_K:label')"/>
+        <value>benjamin_K</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/benjamin_M:label')"/>
+        <value>benjamin_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Clarice_A:label')"/>
+        <value>Clarice_A</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Furaha_B:label')"/>
+        <value>Furaha_B</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Gerard_C:label')"/>
+        <value>Gerard_C</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Jean-Christian_M:label')"/>
+        <value>Jean-Christian_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/London_M:label')"/>
+        <value>London_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Sylvain_M:label')"/>
+        <value>Sylvain_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Djulfa_D:label')"/>
+        <value>Djulfa_D</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Christine_F:label')"/>
+        <value>Christine_F</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Clement_M:label')"/>
+        <value>Clement_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Delphin_M:label')"/>
+        <value>Delphin_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/diego_L:label')"/>
+        <value>diego_L</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Esperance_M:label')"/>
+        <value>Esperance_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Francine_N:label')"/>
+        <value>Francine_N</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Francis_L:label')"/>
+        <value>Francis_L</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Gauthier_B:label')"/>
+        <value>Gauthier_B</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Jacques_M:label')"/>
+        <value>Jacques_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Julie_M:label')"/>
+        <value>Julie_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Patient_M:label')"/>
+        <value>Patient_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/Sassou_M:label')"/>
+        <value>Sassou_M</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/aline_ucb:label')"/>
+        <value>aline_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/chance_ucb:label')"/>
+        <value>chance_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/evelyne_ucb:label')"/>
+        <value>evelyne_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/grace_bm_ucb:label')"/>
+        <value>grace_bm_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/etienne_ucb:label')"/>
+        <value>etienne_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/barthelemy_ucb:label')"/>
+        <value>barthelemy_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/theo_ucb:label')"/>
+        <value>theo_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/charles_ucb:label')"/>
+        <value>charles_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/aimee_ucb:label')"/>
+        <value>aimee_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/yvette_ucb:label')"/>
+        <value>yvette_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/vianney_ucb:label')"/>
+        <value>vianney_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/jules_ucb:label')"/>
+        <value>jules_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/grace_rc_ucb:label')"/>
+        <value>grace_rc_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/solange_mak_ucb:label')"/>
+        <value>solange_mak_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/solange_mon_ucb:label')"/>
+        <value>solange_mon_ucb</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/arlette_ulpgl:label')"/>
+        <value>arlette_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/plaisir_ulpgl:label')"/>
+        <value>plaisir_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/christian_Mp_ulpgl:label')"/>
+        <value>christian_Mp_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/christian_ulpgl:label')"/>
+        <value>christian_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/daniel_ulpgl:label')"/>
+        <value>daniel_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/eloise_ulpgl:label')"/>
+        <value>eloise_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/joelle_ulpgl:label')"/>
+        <value>joelle_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/mamy_ulpgl:label')"/>
+        <value>mamy_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/levi_ulpgl:label')"/>
+        <value>levi_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/lucie_ulpgl:label')"/>
+        <value>lucie_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/muyisa_ulpgl:label')"/>
+        <value>muyisa_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/nadine_ulpgl:label')"/>
+        <value>nadine_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/georges_ulpgl:label')"/>
+        <value>georges_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/nathalie_ulpgl:label')"/>
+        <value>nathalie_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/renilde_ulpgl:label')"/>
+        <value>renilde_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/obed_ulpgl:label')"/>
+        <value>obed_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/olivier_ulpgl:label')"/>
+        <value>olivier_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/pyame_ulpgl:label')"/>
+        <value>pyame_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/thomas_ulpgl:label')"/>
+        <value>thomas_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/chrysostome_ulpgl:label')"/>
+        <value>chrysostome_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/david_ulpgl:label')"/>
+        <value>david_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/safi_ulpgl:label')"/>
+        <value>safi_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/donatiane_ulpgl:label')"/>
+        <value>donatiane_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/buroko_ulpgl:label')"/>
+        <value>buroko_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/annie_ulpgl:label')"/>
+        <value>annie_ulpgl</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/What_is_your_name/raphael_ulpgl:label')"/>
+        <value>raphael_ulpgl</value>
+      </item>
+    </select1>
+    <group ref="/data/group_separationquestions">
+      <label ref="jr:itext('/data/group_separationquestions:label')"/>
+      <select1 ref="/data/group_separationquestions/q_2241">
+        <label ref="jr:itext('/data/group_separationquestions/q_2241:label')"/>
+        <item>
+          <label ref="jr:itext('/data/group_separationquestions/q_2241/1:label')"/>
+          <value>1</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/group_separationquestions/q_2241/2:label')"/>
+          <value>2</value>
+        </item>
+      </select1>
+      <select1 ref="/data/group_separationquestions/q_2242">
+        <label ref="jr:itext('/data/group_separationquestions/q_2242:label')"/>
+        <item>
+          <label ref="jr:itext('/data/group_separationquestions/q_2242/1:label')"/>
+          <value>1</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/group_separationquestions/q_2242/2:label')"/>
+          <value>2</value>
+        </item>
+      </select1>
+      <input ref="/data/group_separationquestions/q_2243">
+        <label ref="jr:itext('/data/group_separationquestions/q_2243:label')"/>
+      </input>
+    </group>
+    <select1 ref="/data/approval">
+      <label ref="jr:itext('/data/approval:label')"/>
+      <item>
+        <label ref="jr:itext('/data/approval/1:label')"/>
+        <value>1</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/approval/2:label')"/>
+        <value>2</value>
+      </item>
+    </select1>
+    <select ref="/data/electronics_owned">
+      <label ref="jr:itext('/data/electronics_owned:label')"/>
+      <item>
+        <label ref="jr:itext('/data/electronics_owned/tv:label')"/>
+        <value>tv</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/electronics_owned/radio:label')"/>
+        <value>radio</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/electronics_owned/laptop:label')"/>
+        <value>laptop</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/electronics_owned/tamagotchi:label')"/>
+        <value>tamagotchi</value>
+      </item>
+    </select>
+  </h:body>
+</h:html>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Field Position with Multiple Versions</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="field_position_with_multiple_versions" version="fpmv_1">
+          <group_wy15q80 jr:template="">
+            <Fullname/>
+            <Age/>
+          </group_wy15q80>
+          <group_wy15q80>
+            <Fullname/>
+            <Age/>
+          </group_wy15q80>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/group_wy15q80/Fullname" required="false()" type="string"/>
+      <bind nodeset="/data/group_wy15q80/Age" required="false()" type="date"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/data/group_wy15q80">
+      <label>Person</label>
+      <repeat nodeset="/data/group_wy15q80">
+        <input ref="/data/group_wy15q80/Fullname">
+          <label>Fullname</label>
+        </input>
+        <input ref="/data/group_wy15q80/Age">
+          <label>Age</label>
+        </input>
+      </repeat>
+    </group>
+  </h:body>
+</h:html>

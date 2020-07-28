@@ -1,0 +1,280 @@
+{
+  "submissions": [
+    {
+      "__version__": "rpv1",
+      "_uuid": "5dd6ecda-b993-42fc-95c2-7856a8940acf",
+      "location": "12.34 -23.45",
+      "restaurant_name": "Felipes"
+    },
+    {
+      "__version__": "rpV2",
+      "_uuid": "d6dee2e1-e0e6-4d08-9ad4-d78d77079f85",
+      "location": "12.34 -23.45",
+      "restaurant_name": "Felipes"
+    },
+    {
+      "__version__": "rpV3",
+      "_uuid": "3f2ac742-305a-4b0d-b7ef-f7f57fcd14dc",
+      "eatery_type": "takeaway",
+      "location": "13.42 -25.43",
+      "restaurant_name": "Taco Truck"
+    },
+    {
+      "__version__": "rpV3",
+      "_uuid": "3195b926-1578-4bac-80fc-735129a34090",
+      "eatery_type": "sit_down",
+      "location": "12.43 -24.53",
+      "restaurant_name": "Harvest"
+    },
+    {
+      "__version__": "rpV4",
+      "_uuid": "04cbcf32-ecbd-4801-829b-299463dcd125",
+      "eatery_type": "takeaway sit_down",
+      "location": "13.42 -25.43",
+      "restaurant_name": "Taco Truck"
+    },
+    {
+      "__version__": "rpV4",
+      "_uuid": "1f21b881-db1d-4629-9b82-f4111630187d",
+      "eatery_type": "sit_down",
+      "location": "12.43 -24.53",
+      "restaurant_name": "Harvest"
+    },
+    {
+      "__version__": "rpV4",
+      "_uuid": "fda7e49b-6c84-4cfe-b1a8-3de997ac0880",
+      "eatery_type": "",
+      "location": "12.43 -24.54 1 0",
+      "restaurant_name": "Wololo"
+    },
+    {
+      "__version__": "rpV4",
+      "_uuid": "a4277940-c8f3-4564-ad3b-14e28532a976",
+      "location": "12.43 -24.54 1",
+      "restaurant_name": "Los pollos hermanos"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "restaurant_profile",
+        "title": "Restaurant profile",
+        "version": "rpv1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "imto60iiv",
+          "label": {
+            "tx0": "restaurant name"
+          },
+          "name": "restaurant_name",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "q8xj2bbjg",
+          "label": {
+            "tx0": "location"
+          },
+          "name": "location",
+          "required": true,
+          "type": "geopoint"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "restaurant_profile",
+        "title": "Restaurant profile",
+        "version": "rpV2",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "jlv82cnyt",
+          "label": {
+            "tx0": "restaurant name",
+            "tx1": "nom du restaurant"
+          },
+          "name": "restaurant_name",
+          "type": "text"
+        },
+        {
+          "$anchor": "jeokl2r5m",
+          "label": {
+            "tx0": "location",
+            "tx1": "lieu"
+          },
+          "name": "location",
+          "required": true,
+          "type": "geopoint"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "name": "english"
+        },
+        {
+          "$anchor": "tx1",
+          "name": "french"
+        }
+      ]
+    },
+    {
+      "choices": {
+        "eatery_types": [
+          {
+            "$anchor": "tnxcbhxkz",
+            "label": {
+              "tx0": "sit down",
+              "tx1": "traditionnel"
+            },
+            "value": "sit_down"
+          },
+          {
+            "$anchor": "wdpyzc02d",
+            "label": {
+              "tx0": "take-away",
+              "tx1": "avec vente \u00e0 emporter"
+            },
+            "value": "takeaway"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "restaurant_profile",
+        "title": "Restaurant profile",
+        "version": "rpV3",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "l0yreh0kh",
+          "label": {
+            "tx0": "restaurant name",
+            "tx1": "nom du restaurant"
+          },
+          "name": "restaurant_name",
+          "type": "text"
+        },
+        {
+          "$anchor": "i0lrc1c0c",
+          "label": {
+            "tx0": "location",
+            "tx1": "lieu"
+          },
+          "name": "location",
+          "required": true,
+          "type": "geopoint"
+        },
+        {
+          "$anchor": "reb97d6e2",
+          "label": {
+            "tx0": "type of eatery",
+            "tx1": "type de restaurant"
+          },
+          "name": "eatery_type",
+          "select_from": "eatery_types",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "name": "english"
+        },
+        {
+          "$anchor": "tx1",
+          "name": "french"
+        }
+      ]
+    },
+    {
+      "choices": {
+        "eatery_types": [
+          {
+            "$anchor": "ybwss879x",
+            "label": {
+              "tx0": "sit down",
+              "tx1": "traditionnel"
+            },
+            "value": "sit_down"
+          },
+          {
+            "$anchor": "rn1dhm3rh",
+            "label": {
+              "tx0": "take-away",
+              "tx1": "avec vente \u00e0 emporter"
+            },
+            "value": "takeaway"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "restaurant_profile",
+        "title": "Restaurant profile",
+        "version": "rpV4",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "dbmujp68u",
+          "label": {
+            "tx0": "restaurant name",
+            "tx1": "nom du restaurant"
+          },
+          "name": "restaurant_name",
+          "type": "text"
+        },
+        {
+          "$anchor": "dzqk4aeun",
+          "label": {
+            "tx0": "location",
+            "tx1": "lieu"
+          },
+          "name": "location",
+          "required": true,
+          "type": "geopoint"
+        },
+        {
+          "$anchor": "ecynogkmt",
+          "label": {
+            "tx0": "type of eatery",
+            "tx1": "type de restaurant"
+          },
+          "name": "eatery_type",
+          "select_from": "eatery_types",
+          "type": "select_multiple"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "name": "english"
+        },
+        {
+          "$anchor": "tx1",
+          "name": "french"
+        }
+      ]
+    }
+  ]
+}

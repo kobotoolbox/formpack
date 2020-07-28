@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Household survey with repeatable groups</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="grouped_repeatable" version="rgv1">
+          <start/>
+          <end/>
+          <household_visit>
+            <household_location/>
+            <houshold_member_repeat jr:template="">
+              <household_member_name/>
+            </houshold_member_repeat>
+            <houshold_member_repeat>
+              <household_member_name/>
+            </houshold_member_repeat>
+          </household_visit>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+      <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+      <bind nodeset="/data/household_visit/household_location" required="true()" type="string"/>
+      <bind nodeset="/data/household_visit/houshold_member_repeat/household_member_name" required="true()" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/data/household_visit">
+      <label>Household visit</label>
+      <input ref="/data/household_visit/household_location">
+        <label>household location</label>
+      </input>
+      <group ref="/data/household_visit/houshold_member_repeat">
+        <label>For each household member</label>
+        <repeat nodeset="/data/household_visit/houshold_member_repeat">
+          <input ref="/data/household_visit/houshold_member_repeat/household_member_name">
+            <label>household member name</label>
+          </input>
+        </repeat>
+      </group>
+    </group>
+  </h:body>
+</h:html>

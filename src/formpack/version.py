@@ -18,9 +18,10 @@ from .utils import parse_xml_to_xmljson, normalize_data_type
 from .utils.flatten_content import flatten_content
 from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
+from .utils.content_to_xform import content_to_xform
 
 from a1d05eba1.utils.kfrozendict import kfrozendict
-from a1d05eba1.utils.kfrozendict import freeze as kfrozendict_freeze
+from a1d05eba1.utils.kfrozendict import deepfreeze
 
 from copy import deepcopy
 
@@ -84,27 +85,22 @@ class FormVersion(object):
     def __init__(self, form_pack, schema, content):
         # everything pulled from "schema" in these lines:
         id_string = schema.get('id_string')
-        title = schema.get('title', form_pack.title)
-        _id = schema.get('version')
-        version_id_key = schema.get('version_id_key',
-                                    form_pack.default_version_id_key)
-
-        content = kfrozendict_freeze(content)
-        self.title = title
+        content = deepfreeze(content)
         self.form_pack = form_pack
         self.content = content
         self.full_txs = content.get('translations')
         settings = content.get('settings')
+        self.title = settings.get('title', form_pack.title)
 
         # slug of title
         self.root_node_name = self._get_root_node_name()
 
         # form version id, unique to this version of the form
-        self.id = _id
-        self.version_id_key = version_id_key
+        self.id = settings.get('version')
+        self.version_id_key = settings.get('version_key', '__version__')
 
         # form string id, unique to this form, shared accross versions
-        self.id_string = id_string
+        self.id_string = settings.get('identifier', form_pack.id_string)
         if self.id_string:
             settings = settings.copy(identifier=self.id_string)
         elif self.form_pack.id_string:
@@ -141,7 +137,7 @@ class FormVersion(object):
         choice_lists = form_choice_list_from_json_definition(flat_choice_lists,
                                                              self.full_txs,
                                                              self.translations)
-        survey_rows = (self._load_metas(settings['metas']) +
+        survey_rows = (self._load_metas(content['metas']) +
                        content['survey'],
                        )
 
@@ -200,10 +196,10 @@ class FormVersion(object):
                 _load_meta(metakey, metaval)
         for (metakey, metaval) in metas.items():
             _load_meta(metakey, metaval)
-        return kfrozendict_freeze(meta_rows)
+        return deepfreeze(meta_rows)
 
     def to_dict(self, **opts):
-        return self.content
+        return self.content.unfreeze()
 
     def lookup(self, prop, default=None):
         result = getattr(self, prop, None)
@@ -223,21 +219,20 @@ class FormVersion(object):
         return self.title
 
     def to_xml(self, warnings=None):
-        # todo: collect warnings from pyxform compilation when a list is passed
-        survey = formversion_pyxform(
-            self.to_dict(remove_sheets=['translations', 'translated'],
-                         )
-                                     )
-        title = self._get_title()
-
-        if title is None:
-            raise ValueError('cannot create xml on a survey with no title.')
-
-        survey.update({
-            'name': self.lookup('root_node_name', 'data'),
-            'id_string': self.lookup('id_string'),
-            'title': self.lookup('title'),
+        content = self.content
+        settings = content['settings']
+        default_settings = {
             'version': self.lookup('id'),
-        })
-
-        return survey._to_pretty_xml() #.encode('utf-8')
+            'root': self.lookup('root') or 'data',
+            'identifier': self.lookup('id_string'),
+        }
+        updates = {}
+        for key in default_settings.keys():
+            if default_settings[key] is None:
+                continue
+            if key not in settings:
+                updates[key] = default_settings[key]
+        if len(updates) > 0:
+            settings = settings.copy(**updates)
+            content = content.copy(settings=settings)
+        return content_to_xform(content)

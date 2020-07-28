@@ -1,6 +1,7 @@
 {
     "version": "grouped_translated_v1",
     "content": {
+        "schema": "1+koboxlsform+xlsform_add_anchors",
         "translations": [
             "English",
             "Español"
@@ -133,8 +134,7 @@
         ],
         "translated": [
             "label"
-        ],
-        "schema": "1"
+        ]
     },
     "submissions": [
       {

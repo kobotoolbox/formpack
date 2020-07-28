@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Bird nest survey with nested repeatable groups</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="nested_grouped_repeatable" version="bird_nests_v1">
+          <start/>
+          <end/>
+          <group_tree jr:template="">
+            <What_kind_of_tree_is_this/>
+            <group_nest jr:template="">
+              <How_high_above_the_ground_is_the_nest/>
+              <How_many_eggs_are_in_the_nest/>
+              <group_egg_count/>
+              <group_egg jr:template="">
+                <Describe_the_egg/>
+              </group_egg>
+            </group_nest>
+          </group_tree>
+          <group_tree>
+            <What_kind_of_tree_is_this/>
+            <group_nest>
+              <How_high_above_the_ground_is_the_nest/>
+              <How_many_eggs_are_in_the_nest/>
+              <group_egg_count/>
+              <group_egg>
+                <Describe_the_egg/>
+              </group_egg>
+            </group_nest>
+          </group_tree>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+      <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+      <bind nodeset="/data/group_tree/What_kind_of_tree_is_this" type="string"/>
+      <bind nodeset="/data/group_tree/group_nest/How_high_above_the_ground_is_the_nest" type="int"/>
+      <bind nodeset="/data/group_tree/group_nest/How_many_eggs_are_in_the_nest" type="int"/>
+      <bind calculate=" ../How_many_eggs_are_in_the_nest " nodeset="/data/group_tree/group_nest/group_egg_count" readonly="true()" type="string"/>
+      <bind nodeset="/data/group_tree/group_nest/group_egg/Describe_the_egg" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/data/group_tree">
+      <label>For each tree</label>
+      <repeat nodeset="/data/group_tree">
+        <select1 ref="/data/group_tree/What_kind_of_tree_is_this">
+          <label>What kind of tree is this?</label>
+          <item>
+            <label>Pine</label>
+            <value>pine</value>
+          </item>
+          <item>
+            <label>Oak</label>
+            <value>oak</value>
+          </item>
+          <item>
+            <label>Maple</label>
+            <value>maple</value>
+          </item>
+          <item>
+            <label>Spruce</label>
+            <value>spruce</value>
+          </item>
+        </select1>
+        <group ref="/data/group_tree/group_nest">
+          <label>For each nest</label>
+          <repeat nodeset="/data/group_tree/group_nest">
+            <input ref="/data/group_tree/group_nest/How_high_above_the_ground_is_the_nest">
+              <label>How high above the ground is the nest?</label>
+            </input>
+            <input ref="/data/group_tree/group_nest/How_many_eggs_are_in_the_nest">
+              <label>How many eggs are in the nest?</label>
+            </input>
+            <group ref="/data/group_tree/group_nest/group_egg">
+              <label>For each egg</label>
+              <repeat jr:count=" ../group_egg_count " nodeset="/data/group_tree/group_nest/group_egg">
+                <input ref="/data/group_tree/group_nest/group_egg/Describe_the_egg">
+                  <label>Describe the egg</label>
+                </input>
+              </repeat>
+            </group>
+          </repeat>
+        </group>
+      </repeat>
+    </group>
+  </h:body>
+</h:html>

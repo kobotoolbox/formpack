@@ -1,6 +1,7 @@
 {
     "version": "bird_nests_v1",
     "content": {
+        "translations": [null],
         "choices": [
             {
                 "list_name": "tree_type",

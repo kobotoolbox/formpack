@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>I have points, traces, and shapes!</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="all_geo_types" version="all_geo_types_v1">
+          <start/>
+          <end/>
+          <Just_a_regular_text_question/>
+          <Point/>
+          <Trace/>
+          <Shape/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+      <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+      <bind nodeset="/data/Just_a_regular_text_question" type="string"/>
+      <bind nodeset="/data/Point" type="geopoint"/>
+      <bind nodeset="/data/Trace" type="geotrace"/>
+      <bind nodeset="/data/Shape" type="geoshape"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/Just_a_regular_text_question">
+      <label>Just a regular text question</label>
+    </input>
+    <input ref="/data/Point">
+      <label>Point</label>
+    </input>
+    <input ref="/data/Trace">
+      <label>Trace</label>
+    </input>
+    <input ref="/data/Shape">
+      <label>Shape</label>
+    </input>
+  </h:body>
+</h:html>

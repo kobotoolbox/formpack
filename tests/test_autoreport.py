@@ -36,7 +36,13 @@ class TestAutoReport(unittest.TestCase):
 
         title, schemas, submissions = build_fixture('site_inspection')
         fp = FormPack(schemas, title)
+        assert len(schemas) == 5
+
         self.assertEqual(len(fp.versions), 5)
+
+        assert list(iter(fp.versions.keys())) == [
+            'siv1', 'siv2', 'siv3', 'siv4', 'siv5'
+        ]
 
         fields = {
             field.name: field for field in fp.get_fields_for_versions(
@@ -500,13 +506,15 @@ class TestAutoReport(unittest.TestCase):
         title = 'Just one number'
         schemas = [{
             'content': {
+                'schema': '2',
                 'survey': [
                     {
                         'type': 'integer',
                         'name': 'the_number',
-                        'label': 'Enter the number!'
+                        'label': {'tx0': 'Enter the number!'}
                     }
-                ]
+                ],
+                'translations': [{'name': '', '$anchor': 'tx0'}]
             }
         }]
         submissions = [

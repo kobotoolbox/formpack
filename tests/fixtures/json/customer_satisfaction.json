@@ -1,0 +1,99 @@
+{
+  "submissions": [
+    {
+      "_submission_time": "2016-04-01 19:57:45.306805",
+      "_uuid": "90dd7750f83011e590707c7a9125d07d",
+      "_validation_status": {
+        "by_whom": "user1",
+        "color": "#00ff00",
+        "label": "Approved",
+        "timestamp": 1531158682,
+        "uid": "validation_status_approved"
+      },
+      "customer_enjoyment": "yes",
+      "restaurant_name": "Felipes"
+    },
+    {
+      "_submission_time": "2016-04-02 19:57:45.306805",
+      "_uuid": "90dd7750f83011e590707c7a9125d08d",
+      "_validation_status": {
+        "by_whom": "user1",
+        "color": "#00ff00",
+        "label": "Approved",
+        "timestamp": 1531158682,
+        "uid": "validation_status_approved"
+      },
+      "customer_enjoyment": "no",
+      "restaurant_name": "Dunkin Donuts"
+    },
+    {
+      "_submission_time": "2016-04-03 19:57:45.306805",
+      "_uuid": "90dd7750f83011e590707c7a9125d09d",
+      "_validation_status": {
+        "by_whom": "user1",
+        "color": "#00ff00",
+        "label": "Approved",
+        "timestamp": 1531158682,
+        "uid": "validation_status_approved"
+      },
+      "customer_enjoyment": "no",
+      "restaurant_name": "McDonalds"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "y_n_unk": [
+          {
+            "$anchor": "sk5xipbr7",
+            "label": {
+              "tx0": "Yes"
+            },
+            "value": "yes"
+          },
+          {
+            "$anchor": "hbirfe4au",
+            "label": {
+              "tx0": "No"
+            },
+            "value": "no"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "customer_satisfaction",
+        "title": "Customer Satisfaction"
+      },
+      "survey": [
+        {
+          "$anchor": "nsqhx2zjd",
+          "label": {
+            "tx0": "Restaurant name"
+          },
+          "name": "restaurant_name",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "vu9c9n99x",
+          "label": {
+            "tx0": "Did you enjoy your dining experience?"
+          },
+          "name": "customer_enjoyment",
+          "required": true,
+          "select_from": "y_n_unk",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

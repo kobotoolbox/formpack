@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Sanitation report</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="sanitation_report">
+          <restaurant_name/>
+          <restaurant_rating/>
+          <report_date/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/restaurant_name" required="true()" type="string"/>
+      <bind nodeset="/data/restaurant_rating" required="true()" type="string"/>
+      <bind nodeset="/data/report_date" required="true()" type="dateTime"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/restaurant_name">
+      <label>Restaurant name</label>
+    </input>
+    <select1 ref="/data/restaurant_rating">
+      <label>How did this restaurant do on its sanitation report?</label>
+      <item>
+        <label>A</label>
+        <value>a</value>
+      </item>
+      <item>
+        <label>B</label>
+        <value>b</value>
+      </item>
+      <item>
+        <label>C</label>
+        <value>c</value>
+      </item>
+      <item>
+        <label>D</label>
+        <value>d</value>
+      </item>
+      <item>
+        <label>F</label>
+        <value>f</value>
+      </item>
+    </select1>
+    <input ref="/data/report_date">
+      <label>Report date</label>
+    </input>
+  </h:body>
+</h:html>

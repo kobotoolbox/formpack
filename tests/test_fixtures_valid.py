@@ -4,6 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import unittest
 
+from a1d05eba1 import Content
 from formpack import FormPack
 from .fixtures import build_fixture
 
@@ -89,20 +90,6 @@ class TestFormPackFixtures(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(sorted(fp.to_dict().keys()),
-                         sorted(['id_string', 'title', 'versions']))
-
-        self.assertEqual(fp.to_dict(), {
-            'title': 'Site inspection',
-            'id_string': 'site_inspection',
-            'versions': [s['content'] for s in schemas]
-        })
-
-    # TODO: update this test, it doesn't test anything anymore.
-    def test_xml_instances_loaded(self):
-        """
-        favcolor has submissions_xml specified
-        """
-        fp = FormPack(**build_fixture('favcolor'))
-        self.assertEqual(len(fp.versions), 2)
-
+        v_out = fp.to_version_list()
+        assert v_out == [Content(s['content']).export(flat=False)
+                         for s in schemas]

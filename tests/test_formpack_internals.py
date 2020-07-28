@@ -2,7 +2,10 @@
 
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
+
+import pytest
 import json
+
 from copy import deepcopy
 
 from formpack import FormPack, constants
@@ -23,10 +26,13 @@ def test_fixture_has_translations():
 def test_to_dict():
     schema = build_fixture('restaurant_profile')[1][2]
     _copy = deepcopy(schema)
-    fp = FormPack([schema], 'title')
+    title = schema['content']['settings']['title']
+    fp = FormPack([schema], title=title)
+    assert fp.title == title
     original_content = _copy['content']
     new_content = fp[0].to_dict()
-    assert original_content == new_content
+    assert original_content['translations'] == new_content['translations']
+    assert original_content['settings'] == new_content['settings']
 
 
 def test_to_xml():
@@ -37,8 +43,6 @@ def test_to_xml():
     fp = FormPack(schemas, title)
     for version in fp.versions.keys():
         fp.versions[version].to_xml()
-    # TODO: test output matches what is expected
-
 
 def test_to_xml_fails_when_null_labels():
     # currently, this form will trigger a confusing error from pyxform:
@@ -46,86 +50,52 @@ def test_to_xml_fails_when_null_labels():
 
     # it occurs when a named translation has a <NoneType> value
     # (empty strings are OK)
-    fp = FormPack({'content': {
-                   'survey': [
-                              {'type': 'note',
-                               'name': 'n1',
-                               'label': [None],
-                               },
-                              ],
-                   'translations': ['NamedTranslation'],
-                   'translated': ['label'],
-                   }}, id_string='sdf')
-    fp[0].to_xml()
-
+    with pytest.raises(Exception):
+        fp = FormPack({'content': {
+                       'survey': [
+                                  {'type': 'note',
+                                   'name': 'n1',
+                                   'label': {'tx0': ''},
+                                   },
+                                  ],
+                       'schema': '2',
+                       'translations': [{'$anchor': 'tx0', 'name': ''}],
+                       }}, id_string='sdf')
+        fp[0].to_xml()
 
 def test_null_untranslated_labels():
-    content = json.loads('''
-        {
-          "translations": [
-            "arabic",
-            null
-          ],
-          "choices": [
-            {
-              "list_name": "aid_types",
-              "name": "1",
-              "label": [
-                "سلل غذائية",
-                null
-              ]
-            },
-            {
-              "list_name": "aid_types",
-              "name": "2",
-              "label": [
-                "سلل شتوية",
-                null
-              ]
-            },
-            {
-              "list_name": "aid_types",
-              "name": "3",
-              "label": [
-                "سلل زراعية",
-                null
-              ]
-            },
-            {
-              "list_name": "aid_types",
-              "name": "4",
-              "label": [
-                "قسائم",
-                null
-              ]
-            },
-            {
-              "list_name": "aid_types",
-              "name": "5",
-              "label": [
-                "أخرى",
-                null
-              ]
-            }
-          ],
-          "survey": [
-            {
-              "select_from_list_name": "aid_types",
-              "name": "what_aid_do_you_receive",
-              "required": true,
-              "label": [
-                "إذا كان نعم ماهي المساعدات التي تتلقاها؟",
-                null
-              ],
-              "type": "select_multiple"
-            }
-          ],
-          "translated": [
-            "hint",
-            "label"
-          ]
-        }
-    ''')
+    AR_LABELS = ['إذا كان نعم ماهي المساعدات التي تتلقاها؟']
+    content = {'choices': {'aid_types': [{'$anchor': 'k907ttxoc',
+                                            'label': {'tx0': 'سلل غذائية'},
+                                            'value': '1'},
+                                           {'$anchor': 'kmixnmmph',
+                                            'label': {'tx0': 'سلل شتوية'},
+                                            'value': '2'},
+                                           {'$anchor': 'z1j25g3lu',
+                                            'label': {'tx0': 'سلل زراعية'},
+                                            'value': '3'},
+                                           {'$anchor': 'miaxyojzk',
+                                            'label': {'tx0': 'قسائم'},
+                                            'value': '4'},
+                                           {'$anchor': 'hf57ckd7w',
+                                            'label': {'tx0': 'أخرى'},
+                                            'value': '5'}]},
+                 'metas': {},
+                 'schema': '2+fill_missing_labels',
+                 'settings': {
+                    'identifier': 'arabic_and_null',
+                 },
+                 'survey': [{'$anchor': 'vp8um3sk7',
+                             'label': {'tx0': AR_LABELS[0],
+                              },
+                             'name': 'what_aid_do_you_receive',
+                             'required': True,
+                             'select_from': 'aid_types',
+                             'type': 'select_multiple'}],
+                 'translations': [{'$anchor': 'tx0', 'name': 'arabic'},
+                                  {'$anchor': 'tx1', 'name': ''}]}
+
+
     fp = FormPack({'content': content}, id_string='arabic_and_null')
     fields = fp.get_fields_for_versions()
     field = fields[0]
@@ -152,15 +122,38 @@ def test_get_fields_for_versions_returns_unique_fields():
     fields multiple times. This is was a failing test to reproduce that issue
     """
     fp = FormPack(
-        [{'content': {'survey': [{'name': 'hey', 'type': 'image'},
-                                  {'name': 'two', 'type': 'image'}]},
-          'version': 'vRR7hH6SxTupvtvCqu7n5d'},
-         {'content': {'survey': [{'name': 'one', 'type': 'image'},
-                                  {'name': 'two', 'type': 'image'}]},
-          'version': 'vA8xs9JVi8aiSfypLgyYW2'},
-         {'content': {'survey': [{'name': 'one', 'type': 'image'},
-                                  {'name': 'two', 'type': 'image'}]},
-          'version': 'vNqgh8fJqyjFk6jgiCk4rn'}]
+        [
+            {'content': {
+                'schema': '2',
+                'survey': [
+                    {'name': 'hey', 'type': 'image', 'anchor': 'hey'},
+                    {'name': 'two', 'type': 'image', 'anchor': 'two'},
+                ],
+                'settings': {
+                    'version': 'vRR7hH6SxTupvtvCqu7n5d',
+                }
+            }},
+            {'content': {
+                'schema': '2',
+                'survey': [
+                    {'name': 'one', 'type': 'image', 'anchor': 'one'},
+                    {'name': 'two', 'type': 'image', 'anchor': 'two'},
+                ],
+                'settings': {
+                    'version': 'vA8xs9JVi8aiSfypLgyYW2',
+                }
+            }},
+            {'content': {
+                'schema': '2',
+                'survey': [
+                    {'name': 'one', 'type': 'image', 'anchor': 'one'},
+                    {'name': 'two', 'type': 'image', 'anchor': 'two'},
+                ],
+                'settings': {
+                    'version': 'vNqgh8fJqyjFk6jgiCk4rn',
+                }
+            }},
+        ]
     )
     fields = fp.get_fields_for_versions(fp.versions)
     field_names = [field.name for field in fields]
@@ -170,43 +163,49 @@ def test_get_fields_for_versions_returns_unique_fields():
 def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     schemas = [
         {
-            'version': 'v1',
             'content': {
+                'settings': {'version': 'v1'},
+                'schema': '2',
                 'survey': [
                     {
                         'name': 'constant_question_name',
-                        'type': 'select_one choice',
-                        'label': 'first version question label',
+                        'type': 'select_one',
+                        'select_from': 'choice',
+                        'label': {'tx0': 'first version question label'},
                         'hxl': '#first_version_hxl'
                     },
                 ],
-                'choices': [
-                    {
-                        'list_name': 'choice',
-                        'name': 'constant_choice_name',
-                        'label': 'first version choice label',
-                    },
-                ],
+                'choices': {
+                    'choice': [
+                        {'value': 'constant_choice_name',
+                        'label': {'tx0': 'first version choice label'},
+                        },
+                    ]
+                },
+                'translations': [{'anchor': 'tx0', 'name': ''}],
             }
         },
         {
-            'version': 'v2',
             'content': {
+                'settings': {'version': 'v2'},
+                'schema': '2',
                 'survey': [
                     {
                         'name': 'constant_question_name',
-                        'type': 'select_one choice',
-                        'label': 'second version question label',
+                        'type': 'select_one',
+                        'select_from': 'choice',
+                        'label': {'tx0': 'second version question label'},
                         'hxl': '#second_version_hxl'
                     },
                 ],
-                'choices': [
-                    {
-                        'list_name': 'choice',
-                        'name': 'constant_choice_name',
-                        'label': 'second version choice label',
-                    }
-                ],
+                'choices': {
+                    'choice': [
+                        {'value': 'constant_choice_name',
+                        'label': {'tx0': 'second version choice label'},
+                        }
+                    ]
+                },
+                'translations': [{'anchor': 'tx0', 'name': ''}],
             }
         }
     ]
@@ -221,49 +220,57 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
 def test_get_fields_for_versions_returns_all_choices():
     schemas = [
         {
-            'version': 'v1',
             'content': {
+                'settings': {'version': 'v1'},
+                'schema': '2',
                 'survey': [
                     {
                         'name': 'constant_question_name',
-                        'type': 'select_one choice',
-                        'label': 'first version question label',
+                        'type': 'select_one',
+                        'select_from': 'choice',
+                        'label': {'tx0': 'first version question label'},
+                        'hxl': '#first_version_hxl'
                     },
                 ],
-                'choices': [
-                    {
-                        'list_name': 'choice',
-                        'name': 'first_version_choice_name',
-                        'label': 'first version choice label',
-                    },
-                ],
+                'choices': {
+                    'choice': [
+                        {'value': 'first_version_choice_value',
+                        'label': {'tx0': 'first version choice label'},
+                        },
+                    ]
+                },
+                'translations': [{'anchor': 'tx0', 'name': ''}],
             }
         },
         {
-            'version': 'v2',
             'content': {
+                'settings': {'version': 'v2'},
+                'schema': '2',
                 'survey': [
                     {
                         'name': 'constant_question_name',
-                        'type': 'select_one choice',
-                        'label': 'second version question label',
+                        'type': 'select_one',
+                        'select_from': 'choice',
+                        'label': {'tx0': 'second version question label'},
+                        'hxl': '#second_version_hxl'
                     },
                 ],
-                'choices': [
-                    {
-                        'list_name': 'choice',
-                        'name': 'second_version_choice_name',
-                        'label': 'second version choice label',
-                    }
-                ],
+                'choices': {
+                    'choice': [
+                        {'value': 'second_version_choice_value',
+                        'label': {'tx0': 'second version choice label'},
+                        }
+                    ]
+                },
+                'translations': [{'anchor': 'tx0', 'name': ''}],
             }
         }
     ]
     fp = FormPack(schemas)
     fields = fp.get_fields_for_versions(fp.versions)
     choice_names = fields[0].choice.options.keys()
-    assert 'first_version_choice_name' in choice_names
-    assert 'second_version_choice_name' in choice_names
+    assert 'first_version_choice_value' in choice_names
+    assert 'second_version_choice_value' in choice_names
 
 
 def test_field_position_with_multiple_versions():

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Favorite coffee</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="favorite_coffee" version="fcv1">
+          <favorite_coffee_type/>
+          <brand_of_coffee_machine/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/favorite_coffee_type" required="false()" type="string"/>
+      <bind nodeset="/data/brand_of_coffee_machine" required="false()" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <select ref="/data/favorite_coffee_type">
+      <label>Favorite coffee type</label>
+      <item>
+        <label>French</label>
+        <value>french</value>
+      </item>
+      <item>
+        <label>Italian</label>
+        <value>italian</value>
+      </item>
+      <item>
+        <label>American</label>
+        <value>american</value>
+      </item>
+    </select>
+    <input ref="/data/brand_of_coffee_machine">
+      <label>Brand of coffee machine</label>
+    </input>
+  </h:body>
+</h:html>

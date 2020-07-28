@@ -554,6 +554,6 @@
         "type": "select_multiple"
       }
     ],
-    "schema": "1"
+    "schema": "1+koboxlsform"
   }
 }

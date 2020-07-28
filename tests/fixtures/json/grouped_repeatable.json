@@ -1,0 +1,176 @@
+{
+  "submissions": [
+    {
+      "__version__": "rgv1",
+      "end": "2016-03-14T14:18:35.000-04:00",
+      "household_visit/household_location": "montreal",
+      "household_visit/houshold_member_repeat": [
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "peter"
+        }
+      ],
+      "meta/formUID": "9677d34e6ad14302afed5aa2951c28ac",
+      "meta/instanceID": "uuid:91ab8237-92b1-4a10-929f-45af2bb141c0",
+      "meta/versionID": "rgv1",
+      "start": "2016-03-14T14:15:48.000-04:00"
+    },
+    {
+      "__version__": "rgv1",
+      "end": "2016-03-14T14:15:48.000-04:00",
+      "household_visit/household_location": "marseille",
+      "household_visit/houshold_member_repeat": [
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "kyle"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "linda"
+        }
+      ],
+      "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab",
+      "meta/instanceID": "uuid:91ab8237-92b1-4a10-929f-45af2bb141b9",
+      "meta/versionID": "rgv1",
+      "start": "2016-03-14T14:14:10.000-04:00"
+    },
+    {
+      "__version__": "rgv1",
+      "end": "2016-03-14T14:14:10.000-04:00",
+      "household_visit/household_location": "rocky mountains",
+      "household_visit/houshold_member_repeat": [
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "morty"
+        }
+      ],
+      "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab",
+      "meta/instanceID": "uuid:bd2a1d30-bcff-4c12-8fdd-5cc9b5c2ce7a",
+      "meta/versionID": "rgv1",
+      "start": "2016-03-14T14:13:53.000-04:00"
+    },
+    {
+      "__version__": "rgv1",
+      "end": "2016-03-14T14:13:53.000-04:00",
+      "household_visit/household_location": "toronto",
+      "household_visit/houshold_member_repeat": [
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "tony"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "mary"
+        }
+      ],
+      "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab",
+      "meta/instanceID": "uuid:cfc8d79f-e519-4bb9-9eec-0ba04146e698",
+      "meta/versionID": "rgv1",
+      "start": "2016-03-14T14:12:54.000-04:00"
+    },
+    {
+      "__version__": "rgv1",
+      "end": "2016-03-14T15:19:20.000-04:00",
+      "household_visit/household_location": "new york",
+      "household_visit/houshold_member_repeat": [
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "emma"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "parker"
+        }
+      ],
+      "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab",
+      "meta/instanceID": "uuid:4ee0afe4-d64c-43d4-8349-ec30173f4a2e",
+      "meta/versionID": "rgv1",
+      "start": "2016-03-14T14:18:35.000-04:00"
+    },
+    {
+      "__version__": "rgv1",
+      "end": "2016-03-14T14:12:03.000-04:00",
+      "household_visit/household_location": "boston",
+      "household_visit/houshold_member_repeat": [
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "amadou"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "esteban"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "suzie"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "fiona"
+        },
+        {
+          "household_visit/houshold_member_repeat/household_member_name": "phillip"
+        }
+      ],
+      "meta/formUID": "9677d34e6ad14302afed5aa2951c28ab",
+      "meta/instanceID": "uuid:ce94b951-9a38-4701-8c36-17a4b3ea15c9",
+      "meta/versionID": "rgv1",
+      "start": "2016-03-14T14:11:25.000-04:00"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {
+        "end": true,
+        "start": true
+      },
+      "schema": "2",
+      "settings": {
+        "identifier": "grouped_repeatable",
+        "title": "Household survey with repeatable groups",
+        "version": "rgv1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "reormfoiv",
+          "label": {
+            "tx0": "Household visit"
+          },
+          "name": "household_visit",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "cpl1rdz03",
+          "label": {
+            "tx0": "household location"
+          },
+          "name": "household_location",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "d1i3qwsl7",
+          "label": {
+            "tx0": "For each household member"
+          },
+          "name": "houshold_member_repeat",
+          "type": "begin_repeat"
+        },
+        {
+          "$anchor": "onlor8y9u",
+          "label": {
+            "tx0": "household member name"
+          },
+          "name": "household_member_name",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "/d1i3qwsl7",
+          "type": "end_repeat"
+        },
+        {
+          "$anchor": "/reormfoiv",
+          "type": "end_group"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

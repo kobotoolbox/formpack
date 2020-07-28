@@ -9,7 +9,7 @@ from ..load_fixture_json import load_fixture_json
 
 DATA = {
     'title': 'Grouped Repeatable Alias',
-    'id_string': 'grouped_repeatable',
+    'id_string': 'grouped_repeatable_alias',
     'versions': [
         load_fixture_json('grouped_repeatable_alias/v1'),
     ],

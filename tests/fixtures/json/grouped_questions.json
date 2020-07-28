@@ -1,0 +1,125 @@
+{
+  "submissions": [
+    {
+      "__version__": "gqs",
+      "g1/g1q1": "respondent1's r2",
+      "g1/g1q2": "respondent1's r2.75 :)",
+      "g1/sg1/g1sg1q1": "respondent1's r2.5",
+      "g2/g2q1": "respondent1's r3",
+      "q1": "respondent1's r1",
+      "qz": "respondent1's r4"
+    },
+    {
+      "__version__": "gqs",
+      "g1/g1q1": "respondent2's r2",
+      "g1/g1q2": "respondent2's r2.75 :)",
+      "g1/sg1/g1sg1q1": "respondent2's r2.5",
+      "g2/g2q1": "respondent2's r3",
+      "q1": "respondent2's r1",
+      "qz": "respondent2's r4"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "grouped_questions",
+        "title": "Grouped questions",
+        "version": "gqs",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "twfl0aojj",
+          "label": {
+            "tx0": "Q1"
+          },
+          "name": "q1",
+          "type": "text"
+        },
+        {
+          "$anchor": "jraozmoyz",
+          "label": {
+            "tx0": "Group 1"
+          },
+          "name": "g1",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "qq45rlr45",
+          "label": {
+            "tx0": "G1Q1"
+          },
+          "name": "g1q1",
+          "type": "text"
+        },
+        {
+          "$anchor": "xp003ag9w",
+          "label": {
+            "tx0": "Sub Group 1"
+          },
+          "name": "sg1",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "pi9q3el7l",
+          "label": {
+            "tx0": "G1SG1Q1"
+          },
+          "name": "g1sg1q1",
+          "type": "text"
+        },
+        {
+          "$anchor": "/xp003ag9w",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "gp4so95ro",
+          "label": {
+            "tx0": "G1Q2"
+          },
+          "name": "g1q2",
+          "type": "text"
+        },
+        {
+          "$anchor": "/jraozmoyz",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "egb01npb7",
+          "name": "g2",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "y41riow72",
+          "label": {
+            "tx0": "G2Q1"
+          },
+          "name": "g2q1",
+          "type": "text"
+        },
+        {
+          "$anchor": "/egb01npb7",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "ah8tg3h5i",
+          "label": {
+            "tx0": "QZed"
+          },
+          "name": "qz",
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

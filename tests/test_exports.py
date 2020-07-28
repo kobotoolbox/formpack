@@ -208,6 +208,9 @@ class TestFormPackExport(unittest.TestCase):
     def test_headers_of_translated_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_translated')
         fp = FormPack(schemas, title)
+        fpc0 = fp[0].content
+        assert [tx['name'] for tx in fpc0['translations']] == ['English', 'Español']
+        assert len(fpc0['translations']) == 2
         options = {
             'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
         english_export = fp.export(lang='English', **options).to_dict(
@@ -898,34 +901,35 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_translated')
 
         # Remove a choice's labels
+        c0list = schemas[0]['content']['choices']['symmetry']
         self.assertEqual(
-            schemas[0]['content']['choices'][0]['label'],
-            ['Spherical', 'Esférico'],
+            c0list[0]['label'],
+            {'tx0': 'Spherical', 'tx1': 'Esférico'},
         )
-        del schemas[0]['content']['choices'][0]['label']
+        del c0list[0]['label']
 
         # Remove a group's labels
-        self.assertEqual(
-            schemas[0]['content']['survey'][2]['label'],
-            ['External Characteristics', 'Características externas'],
-        )
-        del schemas[0]['content']['survey'][2]['label']
+        survey = schemas[0]['content']['survey']
+        s_0 = survey[0]
+        s_2 = survey[2]
+
+        assert s_0['type'] == 'begin_group'
+        assert s_0['label']['tx0'] == 'External Characteristics'
+        assert s_0['label']['tx1'] == 'Características externas'
+        del s_0['label']
 
         # Remove a grouped question's labels
-        self.assertEqual(
-            schemas[0]['content']['survey'][4]['label'],
-            ['How many segments does your body have?',
-             '¿Cuántos segmentos tiene tu cuerpo?'],
-        )
-        del schemas[0]['content']['survey'][4]['label']
+        assert s_2['label']['tx0'] == 'How many segments does your body have?'
+        assert s_2['label']['tx1'] == '¿Cuántos segmentos tiene tu cuerpo?'
+        del s_2['label']
 
         # Remove a non-grouped question's labels
         self.assertEqual(
-            schemas[0]['content']['survey'][6]['label'],
-            ['Do you have body fluids that occupy intracellular space?',
-             '¿Tienes fluidos corporales que ocupan espacio intracelular?'],
+            survey[4]['label'],
+            {'tx0': 'Do you have body fluids that occupy intracellular space?',
+             'tx1': '¿Tienes fluidos corporales que ocupan espacio intracelular?'},
         )
-        del schemas[0]['content']['survey'][6]['label']
+        del survey[4]['label']
 
         fp = FormPack(schemas, title)
         options = {
@@ -977,40 +981,34 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_translated')
 
         # Remove a choice's translation
+        choices0 = schemas[0]['content']['choices']['symmetry']
         self.assertEqual(
-            schemas[0]['content']['choices'][0]['label'],
-            ['Spherical', 'Esférico'],
+            choices0[0]['label'],
+            {'tx0': 'Spherical', 'tx1': 'Esférico'},
         )
-        schemas[0]['content']['choices'][0]['label'] = [
-            'Spherical', UNTRANSLATED]
+        choices0[0]['label']['tx1'] = ''
 
         # Remove a group's translation
+        survey = schemas[0]['content']['survey']
         self.assertEqual(
-            schemas[0]['content']['survey'][2]['label'],
-            ['External Characteristics', 'Características externas'],
+            survey[0]['label'],
+            {'tx0': 'External Characteristics',
+             'tx1': 'Características externas'},
         )
-        schemas[0]['content']['survey'][2]['label'] = [
-            'External Characteristics', UNTRANSLATED]
+        survey[0]['label']['tx1'] = ''
+        # del survey[0]['label']['tx1']
 
         # Remove a grouped question's translation
-        self.assertEqual(
-            schemas[0]['content']['survey'][4]['label'],
-            ['How many segments does your body have?',
-             '¿Cuántos segmentos tiene tu cuerpo?'],
-        )
-        schemas[0]['content']['survey'][4]['label'] = [
-            'How many segments does your body have?', UNTRANSLATED]
+        assert survey[2]['label']['tx0'] == 'How many segments does your body have?'
+        assert survey[2]['label']['tx1'] == '¿Cuántos segmentos tiene tu cuerpo?'
+
+        survey[2]['label']['tx1'] = ''
+
 
         # Remove a non-grouped question's translation
-        self.assertEqual(
-            schemas[0]['content']['survey'][6]['label'],
-            ['Do you have body fluids that occupy intracellular space?',
-             '¿Tienes fluidos corporales que ocupan espacio intracelular?'],
-        )
-        schemas[0]['content']['survey'][6]['label'] = [
-            'Do you have body fluids that occupy intracellular space?',
-            UNTRANSLATED
-        ]
+        assert survey[4]['label']['tx0'] == 'Do you have body fluids that occupy intracellular space?'
+        assert survey[4]['label']['tx1'] == '¿Tienes fluidos corporales que ocupan espacio intracelular?'
+        survey[4]['label']['tx1'] = ''
 
         fp = FormPack(schemas, title)
         options = {
@@ -1754,18 +1752,13 @@ class TestFormPackExport(unittest.TestCase):
         fixture_name = 'long_unicode_labels'
         title, schemas, submissions = build_fixture(fixture_name)
         # Remove every language except the first
+        # Easiest way to do this (with schema v2) is to set translations list
+        # to a length of 1 and change the name to ''
         content = schemas[0]['content']
-        first_translation = content['translations'][0]
-        for sheet in 'survey', 'choices':
-            for row in content[sheet]:
-                for col in content['translated']:
-                    try:
-                        # Replace list of translations with first translation
-                        row[col] = row[col][0]
-                    except KeyError:
-                        pass
-        content['translated'] = []
-        content['translations'] = [None]
+        first_translation = content['translations'][0]['name']
+        tx0 = content['translations'][0]
+        tx0['name'] = ''
+        content['translations'] = [tx0]
         # Proceed with the export
         fp = FormPack(schemas, title)
         options = {

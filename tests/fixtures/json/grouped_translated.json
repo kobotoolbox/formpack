@@ -1,0 +1,196 @@
+{
+  "submissions": [
+    {
+      "Do_you_descend_from_unicellular_organism": "no",
+      "Do_you_have_body_flu_intracellular_space": "yes__and_some_",
+      "__version__": "grouped_translated_v1",
+      "_submission_time": "2017-12-28T15:02:02",
+      "_uuid": "6d1b903a-6d50-4504-bd7b-76c1a5098ed9",
+      "end": "2017-12-28T10:01:57.000-05:00",
+      "external_characteristics/How_many_segments_does_your_body_have": "7",
+      "external_characteristics/What_kind_of_symmetry_do_you_have": "spherical radial bilateral",
+      "formhub/uuid": "dd1cc93f2ac54837a559477e2cdb81b2",
+      "meta/instanceID": "uuid:6d1b903a-6d50-4504-bd7b-76c1a5098ed9",
+      "start": "2017-12-28T10:01:27.000-05:00"
+    },
+    {
+      "Do_you_descend_from_unicellular_organism": "no",
+      "Do_you_have_body_flu_intracellular_space": "yes",
+      "__version__": "grouped_translated_v1",
+      "_submission_time": "2017-12-28T15:02:25",
+      "_uuid": "d314118a-17c2-4ba4-aac3-634930535ad6",
+      "end": "2017-12-28T10:02:19.000-05:00",
+      "external_characteristics/How_many_segments_does_your_body_have": "1",
+      "external_characteristics/What_kind_of_symmetry_do_you_have": "bilateral",
+      "formhub/uuid": "dd1cc93f2ac54837a559477e2cdb81b2",
+      "meta/instanceID": "uuid:d314118a-17c2-4ba4-aac3-634930535ad6",
+      "start": "2017-12-28T10:01:57.000-05:00"
+    },
+    {
+      "Do_you_have_body_flu_intracellular_space": "no___unsure",
+      "__version__": "grouped_translated_v1",
+      "_submission_time": "2017-12-28T15:02:48",
+      "_uuid": "f4b838c8-7253-47fe-9627-c47830b7dc9b",
+      "end": "2017-12-28T10:02:42.000-05:00",
+      "formhub/uuid": "dd1cc93f2ac54837a559477e2cdb81b2",
+      "meta/instanceID": "uuid:f4b838c8-7253-47fe-9627-c47830b7dc9b",
+      "start": "2017-12-28T10:02:19.000-05:00"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "fluids": [
+          {
+            "$anchor": "vzw92z80c",
+            "label": {
+              "tx0": "Yes",
+              "tx1": "S\u00ed"
+            },
+            "value": "yes"
+          },
+          {
+            "$anchor": "obz068ef6",
+            "label": {
+              "tx0": "Yes, and some extracellular space",
+              "tx1": "S\u00ed, y alg\u00fan espacio extracelular"
+            },
+            "value": "yes__and_some_"
+          },
+          {
+            "$anchor": "p887yfsva",
+            "label": {
+              "tx0": "No / Unsure",
+              "tx1": "No / Inseguro"
+            },
+            "value": "no___unsure"
+          }
+        ],
+        "symmetry": [
+          {
+            "$anchor": "wevs9do55",
+            "label": {
+              "tx0": "Spherical",
+              "tx1": "Esf\u00e9rico"
+            },
+            "value": "spherical"
+          },
+          {
+            "$anchor": "bk6tgsazj",
+            "label": {
+              "tx0": "Radial",
+              "tx1": "Radial"
+            },
+            "value": "radial"
+          },
+          {
+            "$anchor": "rx17lup56",
+            "label": {
+              "tx0": "Bilateral",
+              "tx1": "Bilateral"
+            },
+            "value": "bilateral"
+          }
+        ],
+        "yes_no": [
+          {
+            "$anchor": "bz93rbvrp",
+            "label": {
+              "tx0": "Yes",
+              "tx1": "S\u00ed"
+            },
+            "value": "yes"
+          },
+          {
+            "$anchor": "q8ft2tm9w",
+            "label": {
+              "tx0": "No",
+              "tx1": "No"
+            },
+            "value": "no"
+          }
+        ]
+      },
+      "metas": {
+        "end": true,
+        "start": true
+      },
+      "schema": "2",
+      "settings": {
+        "identifier": "grouped_translated",
+        "title": "Animal identification survey with translations and groups",
+        "version": "grouped_translated_v1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "e3ciitnak",
+          "label": {
+            "tx0": "External Characteristics",
+            "tx1": "Caracter\u00edsticas externas"
+          },
+          "name": "external_characteristics",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "ph3awqjbj",
+          "label": {
+            "tx0": "What kind of symmetry do you have?",
+            "tx1": "\u00bfQu\u00e9 tipo de simetr\u00eda tiene?"
+          },
+          "name": "What_kind_of_symmetry_do_you_have",
+          "required": false,
+          "select_from": "symmetry",
+          "type": "select_multiple"
+        },
+        {
+          "$anchor": "op9e2cxku",
+          "label": {
+            "tx0": "How many segments does your body have?",
+            "tx1": "\u00bfCu\u00e1ntos segmentos tiene tu cuerpo?"
+          },
+          "name": "How_many_segments_does_your_body_have",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "$anchor": "/e3ciitnak",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "r4zamu7ic",
+          "label": {
+            "tx0": "Do you have body fluids that occupy intracellular space?",
+            "tx1": "\u00bfTienes fluidos corporales que ocupan espacio intracelular?"
+          },
+          "name": "Do_you_have_body_flu_intracellular_space",
+          "required": false,
+          "select_from": "fluids",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "zxn8y9gpf",
+          "label": {
+            "tx0": "Do you descend from an ancestral unicellular organism?",
+            "tx1": "\u00bfDesciende de un organismo unicelular ancestral?"
+          },
+          "name": "Do_you_descend_from_unicellular_organism",
+          "required": false,
+          "select_from": "yes_no",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": "English"
+        },
+        {
+          "$anchor": "tx1",
+          "name": "Espa\u00f1ol"
+        }
+      ]
+    }
+  ]
+}

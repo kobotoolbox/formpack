@@ -1,0 +1,171 @@
+{
+  "submissions": [
+    {
+      "brand_of_coffee_machine": "Breville",
+      "favorite_coffee_type": "french italian",
+      "__version__": "fcv1"
+    },
+    {
+      "brand_of_coffee_machine": "DeLonghi",
+      "favorite_coffee_type": "italian",
+      "__version__": "fcv1"
+    },
+    {
+      "brand_of_coffee_machine": "Nespresso",
+      "favorite_coffee_type": "american",
+      "__version__": "fcv1"
+    },
+    {
+      "brand_of_coffee_machine": "Saico",
+      "favorite_coffee_type": "french",
+      "__version__": "fcv2"
+    },
+    {
+      "brand_of_coffee_machine": "Keurig",
+      "favorite_coffee_type": "american british",
+      "__version__": "fcv2"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "al1hv46": [
+          {
+            "$anchor": "jagpdb9pl",
+            "filters": {
+              "order": 0
+            },
+            "label": {
+              "tx0": "French"
+            },
+            "value": "french"
+          },
+          {
+            "$anchor": "kvpjm2qbk",
+            "filters": {
+              "order": 1
+            },
+            "label": {
+              "tx0": "Italian"
+            },
+            "value": "italian"
+          },
+          {
+            "$anchor": "tee9rtz8u",
+            "filters": {
+              "order": 2
+            },
+            "label": {
+              "tx0": "American"
+            },
+            "value": "american"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "favorite_coffee",
+        "title": "Favorite coffee",
+        "version": "fcv1"
+      },
+      "survey": [
+        {
+          "$anchor": "ufpbqkyqf",
+          "label": {
+            "tx0": "Favorite coffee type"
+          },
+          "name": "favorite_coffee_type",
+          "required": false,
+          "select_from": "al1hv46",
+          "type": "select_multiple"
+        },
+        {
+          "$anchor": "qnd2cz5hm",
+          "label": {
+            "tx0": "Brand of coffee machine"
+          },
+          "name": "brand_of_coffee_machine",
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {
+        "al1hv46": [
+          {
+            "$anchor": "ak8pxzxfg",
+            "filters": {
+              "order": 0
+            },
+            "label": {
+              "tx0": "French"
+            },
+            "value": "french"
+          },
+          {
+            "$anchor": "a05edi5er",
+            "filters": {
+              "order": 1
+            },
+            "label": {
+              "tx0": "American"
+            },
+            "value": "american"
+          },
+          {
+            "$anchor": "nodss4i9z",
+            "filters": {
+              "order": 2
+            },
+            "label": {
+              "tx0": "British"
+            },
+            "value": "british"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "favorite_coffee",
+        "title": "Favorite coffee",
+        "version": "fcv2"
+      },
+      "survey": [
+        {
+          "$anchor": "o56a6qr5u",
+          "label": {
+            "tx0": "Favorite coffee type"
+          },
+          "name": "favorite_coffee_type",
+          "required": false,
+          "select_from": "al1hv46",
+          "type": "select_multiple"
+        },
+        {
+          "$anchor": "oevess2mw",
+          "label": {
+            "tx0": "Brand of coffee machine"
+          },
+          "name": "brand_of_coffee_machine",
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

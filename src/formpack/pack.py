@@ -2,7 +2,6 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import difflib
 import json
 from copy import deepcopy
 
@@ -105,14 +104,10 @@ class FormPack(object):
             unique accross an entire FormPack. It can be None, but only for
             one version in the FormPack.
         """
-        cschema = deepcopy(schema)
+        validated_content = Content(schema['content']).export(schema='2',
+                                                              flat=False,
+                                                              remove_nulls=False)
 
-        _content = cschema.pop('content')
-        content = {**_content, 'schema': '1+formpack'}
-
-        validated_content = Content(content).export(schema='2',
-                                                    flat=False,
-                                                    remove_nulls=False)
         if self.id_string:
             validated_content['settings']['identifier'] = self.id_string
         if self.title:
@@ -282,6 +277,13 @@ class FormPack(object):
         all_fields += copy_fields
 
         return all_fields
+
+    def to_version_list(self):
+        return [
+            vv.to_dict()
+            for vv in self.versions.values()
+        ]
+
 
     def to_dict(self, **kwargs):
         out = {

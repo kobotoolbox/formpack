@@ -1,0 +1,174 @@
+{
+  "submissions": [
+    {
+      "Just_a_regular_text_question": "Greenmount",
+      "Point": "39.306938 -76.60869 11 22",
+      "Shape": "39.305938 -76.608294 0 0;39.309365 -76.609211 0 0;39.311288 -76.609332 0 0;39.31155 -76.604171 0 0;39.306138 -76.603656 0 0;39.305938 -76.608294 0 0",
+      "Trace": "39.306032 -76.608323 1 0;39.308701 -76.608953 2 0;39.311313 -76.60938 3 0;39.3116 -76.604223 4 0;39.306077 -76.603804 5 0",
+      "__version__": "all_geo_types_v1",
+      "_geolocation": [
+        39.306938,
+        -76.60869
+      ],
+      "_id": 14221036,
+      "_status": "submitted_via_web",
+      "_submission_time": "2019-07-19T22:47:15",
+      "_submitted_by": null,
+      "_uuid": "8cd7b882-c913-42cd-9c80-467d0711f4fb",
+      "end": "2019-07-19T18:47:10.516-04:00",
+      "start": "2019-07-19T18:42:37.313-04:00"
+    },
+    {
+      "Just_a_regular_text_question": "Chacabuco",
+      "Outer_Point": "-34.619206 -58.355287 0 0",
+      "__version__": "all_geo_types_v2",
+      "_geolocation": [
+        -34.631098,
+        -58.442238
+      ],
+      "_id": 14221037,
+      "_status": "submitted_via_web",
+      "_submission_time": "2019-07-19T23:03:12",
+      "_submitted_by": null,
+      "_uuid": "4a5ad9e6-87e3-4d03-bc0c-9e4b42b84eca",
+      "end": "2019-07-19T19:03:07.602-04:00",
+      "geo_group/Point": "-34.631098 -58.442238 0 0",
+      "geo_group/Shape": "-34.6347 -58.447229 0 0;-34.636607 -58.445613 0 0;-34.635194 -58.438946 0 0;-34.631063 -58.442056 0 0;-34.6347 -58.447229 0 0",
+      "geo_group/Trace": "-34.631089 -58.44218 0 0;-34.635079 -58.439112 0 0;-34.636562 -58.445635 0 0;-34.634929 -58.44713 0 0",
+      "meta/instanceID": "uuid:4a5ad9e6-87e3-4d03-bc0c-9e4b42b84eca",
+      "start": "2019-07-19T18:49:05.982-04:00"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {
+        "start": true,
+        "end": true
+      },
+      "schema": "2",
+      "settings": {
+        "identifier": "all_geo_types",
+        "title": "I have points, traces, and shapes!",
+        "version": "all_geo_types_v1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "zleaqrcl5",
+          "label": {
+            "tx0": "Just a regular text question"
+          },
+          "name": "Just_a_regular_text_question",
+          "type": "text"
+        },
+        {
+          "$anchor": "zyaxy93s4",
+          "label": {
+            "tx0": "Point"
+          },
+          "name": "Point",
+          "type": "geopoint"
+        },
+        {
+          "$anchor": "od5km00l9",
+          "label": {
+            "tx0": "Trace"
+          },
+          "name": "Trace",
+          "type": "geotrace"
+        },
+        {
+          "$anchor": "sriy8orcz",
+          "label": {
+            "tx0": "Shape"
+          },
+          "name": "Shape",
+          "type": "geoshape"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {},
+      "metas": {
+        "start": true,
+        "end": true
+      },
+      "schema": "2",
+      "settings": {
+        "identifier": "all_geo_types",
+        "title": "I have points, traces, and shapes!",
+        "version": "all_geo_types_v2",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "lhcz0mjo9",
+          "label": {
+            "tx0": "Just a regular text question"
+          },
+          "name": "Just_a_regular_text_question",
+          "type": "text"
+        },
+        {
+          "$anchor": "nhkwhsg1a",
+          "label": {
+            "tx0": "Geo Group"
+          },
+          "name": "geo_group",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "i6j0a0c6q",
+          "label": {
+            "tx0": "Point"
+          },
+          "name": "Point",
+          "type": "geopoint"
+        },
+        {
+          "$anchor": "igzcu5c19",
+          "label": {
+            "tx0": "Trace"
+          },
+          "name": "Trace",
+          "type": "geotrace"
+        },
+        {
+          "$anchor": "vmuz1chcg",
+          "label": {
+            "tx0": "Shape"
+          },
+          "name": "Shape",
+          "type": "geoshape"
+        },
+        {
+          "$anchor": "/nhkwhsg1a",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "jfpcrcv4h",
+          "label": {
+            "tx0": "Outer Point"
+          },
+          "name": "Outer_Point",
+          "type": "geopoint"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

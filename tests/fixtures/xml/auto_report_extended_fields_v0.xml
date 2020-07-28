@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Auto report with extended fields</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="auto_report_extended_fields" version="rpfrv2">
+          <restaurant_name/>
+          <restaurant_type/>
+          <when/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/restaurant_name" type="string"/>
+      <bind nodeset="/data/restaurant_type" type="string"/>
+      <bind nodeset="/data/when" type="date"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/restaurant_name">
+      <label>Restaurant name</label>
+    </input>
+    <select1 ref="/data/restaurant_type">
+      <label>Type of restaurant</label>
+      <item>
+        <label>Italian</label>
+        <value>italian</value>
+      </item>
+      <item>
+        <label>French</label>
+        <value>french</value>
+      </item>
+      <item>
+        <label>Vietnamese</label>
+        <value>vietnamese</value>
+      </item>
+      <item>
+        <label>Chinese</label>
+        <value>chinese</value>
+      </item>
+      <item>
+        <label>Thai</label>
+        <value>thai</value>
+      </item>
+      <item>
+        <label>American</label>
+        <value>american</value>
+      </item>
+    </select1>
+    <input ref="/data/when">
+      <label>When</label>
+    </input>
+  </h:body>
+</h:html>

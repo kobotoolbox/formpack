@@ -2,33 +2,38 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 import io
+import json
 import os
 import importlib
 from copy import deepcopy
 
 
+from a1d05eba1 import Content
+
+import os
+
+_FILE = os.path.abspath(__file__)
+_DIR = os.path.dirname(_FILE)
+JSON_FIXTURES_DIR = os.path.join(_DIR, 'json')
+
 def build_fixture(modulename, data_variable_name="DATA"):
-    fixtures = deepcopy(getattr(importlib.import_module('..%s' % modulename, __name__), data_variable_name))
-
-    if 'submissions_xml' in fixtures:
-        # This fixture contains XML submissions, which apparently aren't used
-        # for anything yet; see
-        # `TestFormPackFixtures.test_xml_instances_loaded()`.
-        # Example XML fixture: tests/fixtures/favcolor/xml_instances.json
-        return fixtures
-
-    title = fixtures.get('title')
-
-    # separate the submissions from the schema
-    schemas = [dict(v) for v in fixtures['versions']]
-    submissions = []
-    for schema in schemas:
-        version = schema.get('version')
-        version_id_key = schema.get('version_id_key', '__version__')
-        for submission in schema.pop('submissions'):
-            submission.update({version_id_key: version})
-            submissions.append(submission)
-    return title, schemas, submissions
+    fixture_path = os.path.join(JSON_FIXTURES_DIR, '{}.json'.format(modulename))
+    schemas = []
+    with open(fixture_path, 'r') as ff:
+        infile = json.loads(ff.read())
+        _versions = infile['versions']
+        _titles = []
+        _ids = []
+        for vv in _versions:
+            _titles.append(vv['settings']['title'])
+            _ids.append(vv['settings']['identifier'])
+            schemas.append({
+                'content': vv,
+            })
+        assert len(set(_titles)) == 1
+        assert len(set(_ids)) == 1
+        _submissions = infile['submissions']
+    return _titles[0], schemas, _submissions
 
 
 def open_fixture_file(modulename, filename, *args, **kwargs):

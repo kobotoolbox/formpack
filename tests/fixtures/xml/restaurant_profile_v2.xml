@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Restaurant profile</h:title>
+    <model odk:xforms-version="1.0.0">
+      <itext>
+        <translation lang="english">
+          <text id="/data/restaurant_name:label">
+            <value>restaurant name</value>
+          </text>
+          <text id="/data/location:label">
+            <value>location</value>
+          </text>
+          <text id="/data/eatery_type:label">
+            <value>type of eatery</value>
+          </text>
+          <text id="/data/eatery_type/sit_down:label">
+            <value>sit down</value>
+          </text>
+          <text id="/data/eatery_type/takeaway:label">
+            <value>take-away</value>
+          </text>
+        </translation>
+        <translation lang="french">
+          <text id="/data/restaurant_name:label">
+            <value>nom du restaurant</value>
+          </text>
+          <text id="/data/location:label">
+            <value>lieu</value>
+          </text>
+          <text id="/data/eatery_type:label">
+            <value>type de restaurant</value>
+          </text>
+          <text id="/data/eatery_type/sit_down:label">
+            <value>traditionnel</value>
+          </text>
+          <text id="/data/eatery_type/takeaway:label">
+            <value>avec vente à emporter</value>
+          </text>
+        </translation>
+      </itext>
+      <instance>
+        <data id="restaurant_profile" version="rpV3">
+          <restaurant_name/>
+          <location/>
+          <eatery_type/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/restaurant_name" type="string"/>
+      <bind nodeset="/data/location" required="true()" type="geopoint"/>
+      <bind nodeset="/data/eatery_type" type="string"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/restaurant_name">
+      <label ref="jr:itext('/data/restaurant_name:label')"/>
+    </input>
+    <input ref="/data/location">
+      <label ref="jr:itext('/data/location:label')"/>
+    </input>
+    <select1 ref="/data/eatery_type">
+      <label ref="jr:itext('/data/eatery_type:label')"/>
+      <item>
+        <label ref="jr:itext('/data/eatery_type/sit_down:label')"/>
+        <value>sit_down</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/eatery_type/takeaway:label')"/>
+        <value>takeaway</value>
+      </item>
+    </select1>
+  </h:body>
+</h:html>

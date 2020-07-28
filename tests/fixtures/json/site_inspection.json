@@ -1,0 +1,1005 @@
+{
+  "submissions": [
+    {
+      "__version__": "siv1",
+      "did_you_find_the_site": "yes",
+      "inspector": "clouseau",
+      "is_plant_life_encroaching": "yes",
+      "is_the_gate_secure": "no",
+      "ping": 123,
+      "please_rate_the_impact_of_any_defects_observed": "moderate",
+      "rssi": 65,
+      "was_there_damage_to_the_site": "yes",
+      "was_there_damage_to_the_site_dupe": "yes"
+    },
+    {
+      "__version__": "siv1",
+      "did_you_find_the_site": "no",
+      "inspector": "burger",
+      "please_rate_the_impact_of_any_defects_observed": "severe"
+    },
+    {
+      "__version__": "siv2",
+      "did_you_find_the_site": 1,
+      "inspector": "clouseau",
+      "is_plant_life_encroaching": 1,
+      "is_the_gate_secure": 0,
+      "ping": 456,
+      "please_rate_the_impact_of_any_defects_observed": "moderate",
+      "rssi": 23,
+      "was_there_damage_to_the_site": 1,
+      "was_there_damage_to_the_site_dupe": 1
+    },
+    {
+      "__version__": "siv2",
+      "did_you_find_the_site": 0,
+      "inspector": "burger",
+      "please_rate_the_impact_of_any_defects_observed": "severe"
+    },
+    {
+      "__version__": "siv3",
+      "did_you_find_the_site": 1,
+      "inspector": "clouseau",
+      "is_plant_life_encroaching": 1,
+      "is_the_gate_secure": 0,
+      "ping": 567,
+      "please_rate_the_impact_of_any_defects_observed": "moderate",
+      "rssi": 34,
+      "was_there_damage_to_the_site": 1
+    },
+    {
+      "__version__": "siv3",
+      "did_you_find_the_site": 0,
+      "inspector": "burger",
+      "please_rate_the_impact_of_any_defects_observed": "severe"
+    },
+    {
+      "__version__": "siv4",
+      "did_you_find_the_site": 0,
+      "inspector": "clouseau",
+      "please_rate_the_impact_of_any_defects_observed": "low"
+    },
+    {
+      "__version__": "siv4",
+      "did_you_find_the_site": 1,
+      "inspector": "burger",
+      "is_plant_life_encroaching": 0,
+      "is_the_gate_secure": 1,
+      "ping": 12,
+      "please_rate_the_impact_of_any_defects_observed": "low",
+      "rssi": 99,
+      "was_there_damage_to_the_site": 0
+    },
+    {
+      "__version__": "siv5",
+      "did_you_find_the_site": 0,
+      "inspector": "clouseau",
+      "please_rate_the_impact_of_any_defects_observed": "moderate"
+    },
+    {
+      "__version__": "siv5",
+      "did_you_find_the_site": 1,
+      "inspector": "burger",
+      "is_plant_life_encroaching": 1,
+      "is_the_gate_secure": 1,
+      "ping": 34,
+      "please_rate_the_impact_of_any_defects_observed": "low",
+      "rssi": 98,
+      "was_there_damage_to_the_site": 0
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "l_m_s": [
+          {
+            "$anchor": "t1of1t65i",
+            "label": {
+              "tx0": "low"
+            },
+            "value": "low"
+          },
+          {
+            "$anchor": "ibqxty4bl",
+            "label": {
+              "tx0": "moderate"
+            },
+            "value": "moderate"
+          },
+          {
+            "$anchor": "gxsashk84",
+            "label": {
+              "tx0": "severe"
+            },
+            "value": "severe"
+          }
+        ],
+        "y_n": [
+          {
+            "$anchor": "h97ssyes2",
+            "label": {
+              "tx0": "yes"
+            },
+            "value": "yes"
+          },
+          {
+            "$anchor": "junoig59u",
+            "label": {
+              "tx0": "no"
+            },
+            "value": "no"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "site_inspection",
+        "title": "Site inspection",
+        "version": "siv1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "n8oaf55ce",
+          "label": {
+            "tx0": "inspector"
+          },
+          "name": "inspector",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "hi0l64gur",
+          "label": {
+            "tx0": "did you find the site"
+          },
+          "name": "did_you_find_the_site",
+          "required": true,
+          "select_from": "y_n",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "yu76zz5gq",
+          "label": {
+            "tx0": "site condition"
+          },
+          "name": "group_site_condition",
+          "relevant": {
+            "raw": "${did_you_find_the_site} = 'yes'"
+          },
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "bculkz8d0",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site",
+          "required": true,
+          "select_from": "y_n",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "q2k7pfv25",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site_dupe",
+          "required": true,
+          "select_from": "y_n",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "vxx95cd87",
+          "label": {
+            "tx0": "proprietary tool name"
+          },
+          "name": "group_proprietary_tool",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "y32re3opj",
+          "label": {
+            "tx0": "ping"
+          },
+          "name": "ping",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "n7cpv1qpq",
+          "label": {
+            "tx0": "rssi"
+          },
+          "name": "rssi",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "/vxx95cd87",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "bvbxldado",
+          "label": {
+            "tx0": "gate"
+          },
+          "name": "group_gate",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "pz74rh0y1",
+          "label": {
+            "tx0": "is the gate secure?"
+          },
+          "name": "is_the_gate_secure",
+          "required": true,
+          "select_from": "y_n",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/bvbxldado",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "p96cedlqa",
+          "label": {
+            "tx0": "is plant life encroaching?"
+          },
+          "name": "is_plant_life_encroaching",
+          "required": true,
+          "select_from": "y_n",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/yu76zz5gq",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "dv2mscu3k",
+          "label": {
+            "tx0": "please rate the impact of any defects observed"
+          },
+          "name": "please_rate_the_impact_of_any_defects_observed",
+          "required": true,
+          "select_from": "l_m_s",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {
+        "l_m_s": [
+          {
+            "$anchor": "esj60fb59",
+            "label": {
+              "tx0": "low"
+            },
+            "value": "low"
+          },
+          {
+            "$anchor": "u9x9ur0ep",
+            "label": {
+              "tx0": "moderate"
+            },
+            "value": "moderate"
+          },
+          {
+            "$anchor": "kv3dw0fi9",
+            "label": {
+              "tx0": "severe"
+            },
+            "value": "severe"
+          }
+        ],
+        "zero_one": [
+          {
+            "$anchor": "wm9nbb1ye",
+            "label": {
+              "tx0": "no"
+            },
+            "value": "0"
+          },
+          {
+            "$anchor": "j0cw5c2t3",
+            "label": {
+              "tx0": "yes"
+            },
+            "value": "1"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "site_inspection",
+        "title": "Site inspection",
+        "version": "siv2",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "cg96e8rmh",
+          "label": {
+            "tx0": "inspector"
+          },
+          "name": "inspector",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "cvwz455m2",
+          "label": {
+            "tx0": "did you find the site"
+          },
+          "name": "did_you_find_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "m9p62woni",
+          "label": {
+            "tx0": "site condition"
+          },
+          "name": "group_site_condition",
+          "relevant": {
+            "raw": "${did_you_find_the_site} = 'yes'"
+          },
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "sh3t70fvz",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "jq6jnboo1",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site_dupe",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "xt24fmujf",
+          "label": {
+            "tx0": "proprietary tool name"
+          },
+          "name": "group_proprietary_tool",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "g8c15qvy6",
+          "label": {
+            "tx0": "ping"
+          },
+          "name": "ping",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "oumcc6fiv",
+          "label": {
+            "tx0": "rssi"
+          },
+          "name": "rssi",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "/xt24fmujf",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "lbiwkegdu",
+          "label": {
+            "tx0": "gate"
+          },
+          "name": "group_gate",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "hkw2sdiq3",
+          "label": {
+            "tx0": "is the gate secure?"
+          },
+          "name": "is_the_gate_secure",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/lbiwkegdu",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "xhi0pyj57",
+          "label": {
+            "tx0": "is plant life encroaching?"
+          },
+          "name": "is_plant_life_encroaching",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/m9p62woni",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "z32bh1a4d",
+          "label": {
+            "tx0": "please rate the impact of any defects observed"
+          },
+          "name": "please_rate_the_impact_of_any_defects_observed",
+          "required": true,
+          "select_from": "l_m_s",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {
+        "l_m_s": [
+          {
+            "$anchor": "j48a5bhis",
+            "label": {
+              "tx0": "low"
+            },
+            "value": "low"
+          },
+          {
+            "$anchor": "sq4csfkuj",
+            "label": {
+              "tx0": "moderate"
+            },
+            "value": "moderate"
+          },
+          {
+            "$anchor": "bdx0uyfqj",
+            "label": {
+              "tx0": "severe"
+            },
+            "value": "severe"
+          }
+        ],
+        "zero_one": [
+          {
+            "$anchor": "bn1g2ok2d",
+            "label": {
+              "tx0": "no"
+            },
+            "value": "0"
+          },
+          {
+            "$anchor": "sbt0u917h",
+            "label": {
+              "tx0": "yes"
+            },
+            "value": "1"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "site_inspection",
+        "title": "Site inspection",
+        "version": "siv3",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "l4xcoeblc",
+          "label": {
+            "tx0": "inspector"
+          },
+          "name": "inspector",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "mzb5txr0s",
+          "label": {
+            "tx0": "did you find the site"
+          },
+          "name": "did_you_find_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "z2us0y0q1",
+          "label": {
+            "tx0": "site condition"
+          },
+          "name": "group_site_condition",
+          "relevant": {
+            "raw": "${did_you_find_the_site} = 'yes'"
+          },
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "u191irhkz",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "s2jc3u2me",
+          "label": {
+            "tx0": "proprietary tool name"
+          },
+          "name": "group_proprietary_tool",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "pvxtfioc6",
+          "label": {
+            "tx0": "ping"
+          },
+          "name": "ping",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "lsn5wn0l5",
+          "label": {
+            "tx0": "rssi"
+          },
+          "name": "rssi",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "/s2jc3u2me",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "fqg4420lw",
+          "label": {
+            "tx0": "gate"
+          },
+          "name": "group_gate",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "kbp06jld4",
+          "label": {
+            "tx0": "is the gate secure?"
+          },
+          "name": "is_the_gate_secure",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/fqg4420lw",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "zyu9zbqln",
+          "label": {
+            "tx0": "is plant life encroaching?"
+          },
+          "name": "is_plant_life_encroaching",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/z2us0y0q1",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "hp70dczc0",
+          "label": {
+            "tx0": "please rate the impact of any defects observed"
+          },
+          "name": "please_rate_the_impact_of_any_defects_observed",
+          "required": true,
+          "select_from": "l_m_s",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {
+        "l_m_s": [
+          {
+            "$anchor": "h6kzdn27d",
+            "label": {
+              "tx0": "low"
+            },
+            "value": "low"
+          },
+          {
+            "$anchor": "tu2b3fpwu",
+            "label": {
+              "tx0": "moderate"
+            },
+            "value": "moderate"
+          },
+          {
+            "$anchor": "kla7kzeeq",
+            "label": {
+              "tx0": "severe"
+            },
+            "value": "severe"
+          }
+        ],
+        "zero_one": [
+          {
+            "$anchor": "pwm9pfixu",
+            "label": {
+              "tx0": "no"
+            },
+            "value": "0"
+          },
+          {
+            "$anchor": "zhq6ypgqo",
+            "label": {
+              "tx0": "yes"
+            },
+            "value": "1"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "site_inspection",
+        "title": "Site inspection",
+        "version": "siv4",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "ytyv1ms3a",
+          "label": {
+            "tx0": "inspector"
+          },
+          "name": "inspector",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "rzdaftvdt",
+          "label": {
+            "tx0": "did you find the site"
+          },
+          "name": "did_you_find_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "s3xf0klik",
+          "label": {
+            "tx0": "site condition"
+          },
+          "name": "group_site_condition",
+          "relevant": {
+            "raw": "${did_you_find_the_site} = 'yes'"
+          },
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "bi9n7fhek",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "kuskd571m",
+          "label": {
+            "tx0": "network quality"
+          },
+          "name": "group_network_quality",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "r6zrz92cg",
+          "label": {
+            "tx0": "ping"
+          },
+          "name": "ping",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "otznu2m59",
+          "label": {
+            "tx0": "rssi"
+          },
+          "name": "rssi",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "/kuskd571m",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "plc7fgll3",
+          "label": {
+            "tx0": "gate"
+          },
+          "name": "group_gate",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "iph3haauh",
+          "label": {
+            "tx0": "is the gate secure?"
+          },
+          "name": "is_the_gate_secure",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/plc7fgll3",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "bsuzhcgyh",
+          "label": {
+            "tx0": "is plant life encroaching?"
+          },
+          "name": "is_plant_life_encroaching",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/s3xf0klik",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "w1bq3wsq6",
+          "label": {
+            "tx0": "please rate the impact of any defects observed"
+          },
+          "name": "please_rate_the_impact_of_any_defects_observed",
+          "required": true,
+          "select_from": "l_m_s",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {
+        "l_m_s": [
+          {
+            "$anchor": "cq8t4jb9f",
+            "label": {
+              "tx0": "low"
+            },
+            "value": "low"
+          },
+          {
+            "$anchor": "qgs9kdpnd",
+            "label": {
+              "tx0": "moderate"
+            },
+            "value": "moderate"
+          },
+          {
+            "$anchor": "auv5f6qwq",
+            "label": {
+              "tx0": "severe"
+            },
+            "value": "severe"
+          }
+        ],
+        "zero_one": [
+          {
+            "$anchor": "nd2ssdz74",
+            "label": {
+              "tx0": "no"
+            },
+            "value": "0"
+          },
+          {
+            "$anchor": "zzzpvur5d",
+            "label": {
+              "tx0": "yes"
+            },
+            "value": "1"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "site_inspection",
+        "title": "Site inspection",
+        "version": "siv5",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "t66h5soth",
+          "label": {
+            "tx0": "inspector"
+          },
+          "name": "inspector",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "$anchor": "hn717bsnf",
+          "label": {
+            "tx0": "did you find the site"
+          },
+          "name": "did_you_find_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "mk4g59vsx",
+          "label": {
+            "tx0": "site condition"
+          },
+          "name": "group_site_condition",
+          "relevant": {
+            "raw": "${did_you_find_the_site} = 'yes'"
+          },
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "w5yh2dipp",
+          "label": {
+            "tx0": "was there damage to the site?"
+          },
+          "name": "was_there_damage_to_the_site",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "s96th0vyk",
+          "label": {
+            "tx0": "network quality"
+          },
+          "name": "group_network_quality",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "im96kasf1",
+          "label": {
+            "tx0": "ping"
+          },
+          "name": "ping",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "b2w5t84xc",
+          "label": {
+            "tx0": "rssi"
+          },
+          "name": "rssi",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "$anchor": "/s96th0vyk",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "b9kd9aozv",
+          "label": {
+            "tx0": "gate"
+          },
+          "name": "group_gate",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "e6cwtj2td",
+          "label": {
+            "tx0": "is the gate secure?"
+          },
+          "name": "is_the_gate_secure",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/b9kd9aozv",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "/mk4g59vsx",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "z8qvanf74",
+          "label": {
+            "tx0": "perimeter"
+          },
+          "name": "group_perimeter",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "a361xy40q",
+          "label": {
+            "tx0": "is plant life encroaching?"
+          },
+          "name": "is_plant_life_encroaching",
+          "required": true,
+          "select_from": "zero_one",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "/z8qvanf74",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "xi4926aws",
+          "label": {
+            "tx0": "please rate the impact of any defects observed"
+          },
+          "name": "please_rate_the_impact_of_any_defects_observed",
+          "required": true,
+          "select_from": "l_m_s",
+          "type": "select_one"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "submissions": [],
+  "versions": [
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "fields_for_versions_list_index_out_of_range",
+        "title": "Fields for versions list index out of range",
+        "version": "ffvlioor_v1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "unw8904sy",
+          "label": {
+            "tx0": "first but not one"
+          },
+          "name": "first_but_not_one",
+          "type": "text"
+        },
+        {
+          "$anchor": "wcqpeb9pl",
+          "label": {
+            "tx0": "one"
+          },
+          "name": "one",
+          "type": "text"
+        },
+        {
+          "$anchor": "o0qmimz1m",
+          "label": {
+            "tx0": "third"
+          },
+          "name": "third",
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    },
+    {
+      "choices": {},
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "fields_for_versions_list_index_out_of_range",
+        "title": "Fields for versions list index out of range",
+        "version": "ffvlioor_v2",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "s71b2d788",
+          "label": {
+            "tx0": "one"
+          },
+          "name": "one",
+          "type": "text"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

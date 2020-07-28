@@ -325,6 +325,7 @@
         ]
       }
     ],
+    "translations": [null],
     "survey": [
       {
         "select_from_list_name": "russian_words",

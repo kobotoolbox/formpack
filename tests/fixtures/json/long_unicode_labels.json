@@ -1,0 +1,914 @@
+{
+  "submissions": [],
+  "versions": [
+    {
+      "choices": {
+        "electronics": [
+          {
+            "$anchor": "h2ckm5418",
+            "label": {
+              "tx0": "Televisheni",
+              "tx1": "TV",
+              "tx2": "T\u00e9l\u00e9vision"
+            },
+            "value": "tv"
+          },
+          {
+            "$anchor": "x1hqjujxe",
+            "label": {
+              "tx0": "Radi",
+              "tx1": "Radio",
+              "tx2": "Radio"
+            },
+            "value": "radio"
+          },
+          {
+            "$anchor": "onystl18y",
+            "label": {
+              "tx0": "Kompyuta ya kompyuta",
+              "tx1": "Laptop computer",
+              "tx2": "Ordinateur portable"
+            },
+            "value": "laptop"
+          },
+          {
+            "$anchor": "x4i1o70vr",
+            "label": {
+              "tx0": "Toy ya elektroniki inayoonyesha picha ya kiumbe ya kiumbe wa digital, ambayo inapaswa kuzingatiwa na kuitibiwa na \"mmiliki \" kama ni pet",
+              "tx1": "An electronic toy displaying a digital image of a creature, which has to be looked after and responded to by the \"owner\" as if it were a pet",
+              "tx2": "Un jouet \u00e9lectronique affichant une image num\u00e9rique d'une cr\u00e9ature, qui doit \u00eatre soign\u00e9 et auquel le \"propri\u00e9taire\" r\u00e9pond comme s'il s'agissait d'un animal de compagnie"
+            },
+            "value": "tamagotchi"
+          }
+        ],
+        "name": [
+          {
+            "$anchor": "k61pswugq",
+            "label": {
+              "tx0": "Franck Mbuyu Ziaka",
+              "tx1": "Franck Mbuyu Ziaka",
+              "tx2": "Franck Mbuyu Ziaka"
+            },
+            "value": "Franck_M"
+          },
+          {
+            "$anchor": "frmhd76uj",
+            "label": {
+              "tx0": "Janvier Paluku Bwakyanakazi",
+              "tx1": "Janvier Paluku Bwakyanakazi",
+              "tx2": "Janvier Paluku Bwakyanakazi"
+            },
+            "value": "Janvier_P"
+          },
+          {
+            "$anchor": "x1htnvld6",
+            "label": {
+              "tx0": "Jeanette Longhi Faida",
+              "tx1": "Jeanette Longhi Faida",
+              "tx2": "Jeanette Longhi Faida"
+            },
+            "value": "Jeanette_L"
+          },
+          {
+            "$anchor": "m2i6ei35m",
+            "label": {
+              "tx0": "Mariam Kalimasi Jamil",
+              "tx1": "Mariam Kalimasi Jamil",
+              "tx2": "Mariam Kalimasi Jamil"
+            },
+            "value": "mariam_K"
+          },
+          {
+            "$anchor": "pcwjhf3lw",
+            "label": {
+              "tx0": "Micheline Kitamuliko Masika",
+              "tx1": "Micheline Kitamuliko Masika",
+              "tx2": "Micheline Kitamuliko Masika"
+            },
+            "value": "Micheline_K"
+          },
+          {
+            "$anchor": "hcztpyq4x",
+            "label": {
+              "tx0": "Thierry Katsongo Malikidogo",
+              "tx1": "Thierry Katsongo Malikidogo",
+              "tx2": "Thierry Katsongo Malikidogo"
+            },
+            "value": "thierry_K"
+          },
+          {
+            "$anchor": "kfj2yu0cl",
+            "label": {
+              "tx0": "Tite Nyangwibe Maneno",
+              "tx1": "Tite Nyangwibe Maneno",
+              "tx2": "Tite Nyangwibe Maneno"
+            },
+            "value": "Tite_N"
+          },
+          {
+            "$anchor": "j742drecp",
+            "label": {
+              "tx0": "Winnie Yaya",
+              "tx1": "Winnie Yaya",
+              "tx2": "Winnie Yaya"
+            },
+            "value": "Winnie_Y"
+          },
+          {
+            "$anchor": "q4vdjjoyh",
+            "label": {
+              "tx0": "Francine WINGI",
+              "tx1": "Francine WINGI",
+              "tx2": "Francine WINGI"
+            },
+            "value": "Francine_W"
+          },
+          {
+            "$anchor": "awwmdoiee",
+            "label": {
+              "tx0": "Gervais BAHOGWERHE BASHIZI",
+              "tx1": "Gervais BAHOGWERHE BASHIZI",
+              "tx2": "Gervais BAHOGWERHE BASHIZI"
+            },
+            "value": "Gervais_B"
+          },
+          {
+            "$anchor": "u17a9zl9x",
+            "label": {
+              "tx0": "Gilardin BAGUMA",
+              "tx1": "Gilardin BAGUMA",
+              "tx2": "Gilardin BAGUMA"
+            },
+            "value": "Gilardin_B"
+          },
+          {
+            "$anchor": "wo7pvvzam",
+            "label": {
+              "tx0": "Hortense BARHOLERE",
+              "tx1": "Hortense BARHOLERE",
+              "tx2": "Hortense BARHOLERE"
+            },
+            "value": "Hortense_B"
+          },
+          {
+            "$anchor": "m6zwo6xth",
+            "label": {
+              "tx0": "Joseph Salumu Mwamba",
+              "tx1": "Joseph Salumu Mwamba",
+              "tx2": "Joseph Salumu Mwamba"
+            },
+            "value": "joseph_S"
+          },
+          {
+            "$anchor": "qtdi0e1ov",
+            "label": {
+              "tx0": "Lucien MUNYAKA",
+              "tx1": "Lucien MUNYAKA",
+              "tx2": "Lucien MUNYAKA"
+            },
+            "value": "Lucien_M"
+          },
+          {
+            "$anchor": "xama5af5y",
+            "label": {
+              "tx0": "Minerve BASHIGE BYADUNIA",
+              "tx1": "Minerve BASHIGE BYADUNIA",
+              "tx2": "Minerve BASHIGE BYADUNIA"
+            },
+            "value": "Minerve_B"
+          },
+          {
+            "$anchor": "ijih6q3no",
+            "label": {
+              "tx0": "Prisca CHINOGERWA",
+              "tx1": "Prisca CHINOGERWA",
+              "tx2": "Prisca CHINOGERWA"
+            },
+            "value": "Prisca_C"
+          },
+          {
+            "$anchor": "w1w0dq73m",
+            "label": {
+              "tx0": "Yusuf MOHAMMED",
+              "tx1": "Yusuf MOHAMMED",
+              "tx2": "Yusuf MOHAMMED"
+            },
+            "value": "Yusuf_M"
+          },
+          {
+            "$anchor": "umnfdvhmi",
+            "label": {
+              "tx0": "Prince MUCINDI",
+              "tx1": "Prince MUCINDI",
+              "tx2": "Prince MUCINDI"
+            },
+            "value": "Prince_M"
+          },
+          {
+            "$anchor": "n6q06eint",
+            "label": {
+              "tx0": "Benjamin Kasereba",
+              "tx1": "Benjamin Kasereba",
+              "tx2": "Benjamin Kasereba"
+            },
+            "value": "benjamin_K"
+          },
+          {
+            "$anchor": "z7ae4vl71",
+            "label": {
+              "tx0": "Benjamin Muyeme Tabani",
+              "tx1": "Benjamin Muyeme Tabani",
+              "tx2": "Benjamin Muyeme Tabani"
+            },
+            "value": "benjamin_M"
+          },
+          {
+            "$anchor": "p7btu1rmi",
+            "label": {
+              "tx0": "Clarice Akubese Masemande",
+              "tx1": "Clarice Akubese Nasemande Avuta Mbafele",
+              "tx2": "Clarice Akubese Masemande"
+            },
+            "value": "Clarice_A"
+          },
+          {
+            "$anchor": "p24aofa92",
+            "label": {
+              "tx0": "Furaha Bahimbire",
+              "tx1": "Furaha Bahimbire",
+              "tx2": "Furaha Bahimbire"
+            },
+            "value": "Furaha_B"
+          },
+          {
+            "$anchor": "rsljq76hr",
+            "label": {
+              "tx0": "Gerard Cibinda",
+              "tx1": "Gerard Cibinda",
+              "tx2": "Gerard Cibinda"
+            },
+            "value": "Gerard_C"
+          },
+          {
+            "$anchor": "rh6eaea8h",
+            "label": {
+              "tx0": "Jean-Christian Mukena",
+              "tx1": "Jean Christian Mukena Muntu",
+              "tx2": "Jean-Christian Mukena"
+            },
+            "value": "Jean-Christian_M"
+          },
+          {
+            "$anchor": "qkm5axd1c",
+            "label": {
+              "tx0": "London M. Kalume",
+              "tx1": "London M. Kalume",
+              "tx2": "London M. Kalume"
+            },
+            "value": "London_M"
+          },
+          {
+            "$anchor": "r7xi2b19m",
+            "label": {
+              "tx0": "Sylvain Medho Kalumbo",
+              "tx1": "Sylvain Medho Kalumbo",
+              "tx2": "Sylvain Medho Kalumbo"
+            },
+            "value": "Sylvain_M"
+          },
+          {
+            "$anchor": "pl51rf7nr",
+            "label": {
+              "tx0": "Djulfa Djuma",
+              "tx1": "Djulfa Djuma",
+              "tx2": "Djulfa Djuma"
+            },
+            "value": "Djulfa_D"
+          },
+          {
+            "$anchor": "glgwun8wq",
+            "label": {
+              "tx0": "Christine Faida",
+              "tx1": "Christine Faida Kabino",
+              "tx2": "Christine Faida"
+            },
+            "value": "Christine_F"
+          },
+          {
+            "$anchor": "ncsq9fbit",
+            "label": {
+              "tx0": "Clement Matembera",
+              "tx1": "Clement Matembera",
+              "tx2": "Clement Matembera"
+            },
+            "value": "Clement_M"
+          },
+          {
+            "$anchor": "g018bpc5g",
+            "label": {
+              "tx0": "Delphin Muhindo",
+              "tx1": "Delphin Muhindo",
+              "tx2": "Delphin Muhindo"
+            },
+            "value": "Delphin_M"
+          },
+          {
+            "$anchor": "l2zk72ir7",
+            "label": {
+              "tx0": "Diego LunenoBwira",
+              "tx1": "Diego Luneno Bwira",
+              "tx2": "Diego LunenoBwira"
+            },
+            "value": "diego_L"
+          },
+          {
+            "$anchor": "muplu33np",
+            "label": {
+              "tx0": "Esperance Masika",
+              "tx1": "Esperance Masika",
+              "tx2": "Esperance Masika"
+            },
+            "value": "Esperance_M"
+          },
+          {
+            "$anchor": "lyhwg8174",
+            "label": {
+              "tx0": "Francine Ntambwe",
+              "tx1": "Francine Zalia Ntambwe",
+              "tx2": "Francine Ntambwe"
+            },
+            "value": "Francine_N"
+          },
+          {
+            "$anchor": "dkef2f5lf",
+            "label": {
+              "tx0": "Francis Lenzo",
+              "tx1": "Francis Lenzo",
+              "tx2": "Francis Lenzo"
+            },
+            "value": "Francis_L"
+          },
+          {
+            "$anchor": "w0tqois9k",
+            "label": {
+              "tx0": "Gauthier Bisimwa",
+              "tx1": "Gauthier Bisimwa",
+              "tx2": "Gauthier Bisimwa"
+            },
+            "value": "Gauthier_B"
+          },
+          {
+            "$anchor": "kwqbmdqjx",
+            "label": {
+              "tx0": "Jacques Mubalama",
+              "tx1": "Jacques Mubalama Bishikwabo",
+              "tx2": "Jacques Mubalama"
+            },
+            "value": "Jacques_M"
+          },
+          {
+            "$anchor": "irmp48qpw",
+            "label": {
+              "tx0": "Julie Mujinga",
+              "tx1": "Julie Mujinga",
+              "tx2": "Julie Mujinga"
+            },
+            "value": "Julie_M"
+          },
+          {
+            "$anchor": "ki13u4vzo",
+            "label": {
+              "tx0": "Patient Muhozi",
+              "tx1": "Patient Muhozi",
+              "tx2": "Patient Muhozi"
+            },
+            "value": "Patient_M"
+          },
+          {
+            "$anchor": "l5fi7ta1s",
+            "label": {
+              "tx0": "Sassou Mahatane",
+              "tx1": "Sassou Mahatane",
+              "tx2": "Sassou Mahatane"
+            },
+            "value": "Sassou_M"
+          },
+          {
+            "$anchor": "lyjeddcfh",
+            "label": {
+              "tx0": "BAHATI Aline",
+              "tx1": "BAHATI Aline",
+              "tx2": "BAHATI Aline"
+            },
+            "value": "aline_ucb"
+          },
+          {
+            "$anchor": "hei88spkc",
+            "label": {
+              "tx0": "BAHATI MITIMA Chance",
+              "tx1": "BAHATI MITIMA Chanceline",
+              "tx2": "BAHATI MITIMA Chance"
+            },
+            "value": "chance_ucb"
+          },
+          {
+            "$anchor": "henfeo8p9",
+            "label": {
+              "tx0": "BALYARMWABO MULAGANO Evelyne",
+              "tx1": "BALYARMWABO MULAGANO Evelyne",
+              "tx2": "BALYARMWABO MULAGANO Evelyne"
+            },
+            "value": "evelyne_ucb"
+          },
+          {
+            "$anchor": "s49anazrt",
+            "label": {
+              "tx0": "BAZIRIA MIHIGO Grace",
+              "tx1": "BAZIRIA MIHIGO Grace",
+              "tx2": "BAZIRIA MIHIGO Grace"
+            },
+            "value": "grace_bm_ucb"
+          },
+          {
+            "$anchor": "q67pzthpt",
+            "label": {
+              "tx0": "BIRINDWA FLESI Etienne",
+              "tx1": "BIRINDWA FLESI Etienne",
+              "tx2": "BIRINDWA FLESI Etienne"
+            },
+            "value": "etienne_ucb"
+          },
+          {
+            "$anchor": "uqtw5jdvl",
+            "label": {
+              "tx0": "BUNANI BIRERE Barthelemy",
+              "tx1": "BUNANI BIRERE Barthelemy",
+              "tx2": "BUNANI BIRERE Barthelemy"
+            },
+            "value": "barthelemy_ucb"
+          },
+          {
+            "$anchor": "meu58b5fb",
+            "label": {
+              "tx0": "BWAMUCHUMA BILINGI Th\u00e9o",
+              "tx1": "BWAMUCHUMA BILINGI Th\u00e9o",
+              "tx2": "BWAMUCHUMA BILINGI Th\u00e9o"
+            },
+            "value": "theo_ucb"
+          },
+          {
+            "$anchor": "emervu2c5",
+            "label": {
+              "tx0": "Charles Muderhwa",
+              "tx1": "Charles Muderhwa",
+              "tx2": "Charles Muderhwa"
+            },
+            "value": "charles_ucb"
+          },
+          {
+            "$anchor": "q0cv1oj2c",
+            "label": {
+              "tx0": "Cirhibuka Aimee",
+              "tx1": "Cirhibuka Aimee",
+              "tx2": "Cirhibuka Aimee"
+            },
+            "value": "aimee_ucb"
+          },
+          {
+            "$anchor": "cieayu0tt",
+            "label": {
+              "tx0": "EKA MUKANIRE Yvette",
+              "tx1": "EKA MUKANIRE Yvette",
+              "tx2": "EKA MUKANIRE Yvette"
+            },
+            "value": "yvette_ucb"
+          },
+          {
+            "$anchor": "o12khiztg",
+            "label": {
+              "tx0": "Mubagwa Vianney",
+              "tx1": "Mubagwa Musaka Vianney",
+              "tx2": "Mubagwa Vianney"
+            },
+            "value": "vianney_ucb"
+          },
+          {
+            "$anchor": "mj28a7gu9",
+            "label": {
+              "tx0": "NYUNDA NKURU Jules",
+              "tx1": "NYUNDA NKURU Jules",
+              "tx2": "NYUNDA NKURU Jules"
+            },
+            "value": "jules_ucb"
+          },
+          {
+            "$anchor": "owobh03pb",
+            "label": {
+              "tx0": "RANGA CINYEMA Grace",
+              "tx1": "RANGA CINYEMA Gracia",
+              "tx2": "RANGA CINYEMA Grace"
+            },
+            "value": "grace_rc_ucb"
+          },
+          {
+            "$anchor": "c9suncm7v",
+            "label": {
+              "tx0": "RIZIKI MAKELELE Solange",
+              "tx1": "RIZIKI MAKELELE Solange",
+              "tx2": "RIZIKI MAKELELE Solange"
+            },
+            "value": "solange_mak_ucb"
+          },
+          {
+            "$anchor": "tqbee22y1",
+            "label": {
+              "tx0": "RIZIKI MONGANE Solange",
+              "tx1": "RIZIKI MONGANE Solange",
+              "tx2": "RIZIKI MONGANE Solange"
+            },
+            "value": "solange_mon_ucb"
+          },
+          {
+            "$anchor": "y0fqw361r",
+            "label": {
+              "tx0": "Arlette Syambite",
+              "tx1": "Arlette Syambite",
+              "tx2": "Arlette Syambite"
+            },
+            "value": "arlette_ulpgl"
+          },
+          {
+            "$anchor": "ctbtdu4yt",
+            "label": {
+              "tx0": "Amida SIFA Plaisir",
+              "tx1": "Amida SIFA Plaisir",
+              "tx2": "Amida SIFA Plaisir"
+            },
+            "value": "plaisir_ulpgl"
+          },
+          {
+            "$anchor": "xz9i6myhl",
+            "label": {
+              "tx0": "Christian Mpabwa",
+              "tx1": "Christian Mpabwa",
+              "tx2": "Christian Mpabwa"
+            },
+            "value": "christian_Mp_ulpgl"
+          },
+          {
+            "$anchor": "rmpy338fj",
+            "label": {
+              "tx0": "Christian Mwenyemali Milenge",
+              "tx1": "Christian Mwenyemali Milenge",
+              "tx2": "Christian Mwenyemali Milenge"
+            },
+            "value": "christian_ulpgl"
+          },
+          {
+            "$anchor": "sfla1kw1s",
+            "label": {
+              "tx0": "Daniel BUTOKI KIRINDERA",
+              "tx1": "Daniel BUTOKI KIRINDERA",
+              "tx2": "Daniel BUTOKI KIRINDERA"
+            },
+            "value": "daniel_ulpgl"
+          },
+          {
+            "$anchor": "wuvcd06az",
+            "label": {
+              "tx0": "Eloise Nkuo Clarisse",
+              "tx1": "Eloise Nkuo Clarisse",
+              "tx2": "Eloise Nkuo Clarisse"
+            },
+            "value": "eloise_ulpgl"
+          },
+          {
+            "$anchor": "g15lzqbwt",
+            "label": {
+              "tx0": "Joelle MUGHUMALEWA",
+              "tx1": "Joelle MUGHUMALEWA",
+              "tx2": "Joelle MUGHUMALEWA"
+            },
+            "value": "joelle_ulpgl"
+          },
+          {
+            "$anchor": "c4bfyjl1x",
+            "label": {
+              "tx0": "Kavira Mwendevya Mamy",
+              "tx1": "Kavira Mwendevya Mamy",
+              "tx2": "Kavira Mwendevya Mamy"
+            },
+            "value": "mamy_ulpgl"
+          },
+          {
+            "$anchor": "gzokkwv5z",
+            "label": {
+              "tx0": "Levi Bouesi",
+              "tx1": "Levi Bouesi",
+              "tx2": "Levi Bouesi"
+            },
+            "value": "levi_ulpgl"
+          },
+          {
+            "$anchor": "krx7s742y",
+            "label": {
+              "tx0": "Mapenzi Kissa Lucie",
+              "tx1": "Mapenzi Kissa Lucie",
+              "tx2": "Mapenzi Kissa Lucie"
+            },
+            "value": "lucie_ulpgl"
+          },
+          {
+            "$anchor": "pmvr3cxrj",
+            "label": {
+              "tx0": "Muyisa Tasakana",
+              "tx1": "Muyisa Tasakana",
+              "tx2": "Muyisa Tasakana"
+            },
+            "value": "muyisa_ulpgl"
+          },
+          {
+            "$anchor": "ft4qthxrk",
+            "label": {
+              "tx0": "Mwadjuma Lubuto Nadine",
+              "tx1": "Mwadjuma Lubuto Nadine",
+              "tx2": "Mwadjuma Lubuto Nadine"
+            },
+            "value": "nadine_ulpgl"
+          },
+          {
+            "$anchor": "cbf183oqk",
+            "label": {
+              "tx0": "Namegabe Kubaburhanzi Georges",
+              "tx1": "Namegabe Kubaburhanzi Georges",
+              "tx2": "Namegabe Kubaburhanzi Georges"
+            },
+            "value": "georges_ulpgl"
+          },
+          {
+            "$anchor": "v03v3vgmh",
+            "label": {
+              "tx0": "Nathalie Bishikwabo",
+              "tx1": "Nathalie Bishikwabo",
+              "tx2": "Nathalie Bishikwabo"
+            },
+            "value": "nathalie_ulpgl"
+          },
+          {
+            "$anchor": "lt8uqj9v1",
+            "label": {
+              "tx0": "Nzigire Kalegamire Renilde",
+              "tx1": "Nzigire Kalegamire Renilde",
+              "tx2": "Nzigire Kalegamire Renilde"
+            },
+            "value": "renilde_ulpgl"
+          },
+          {
+            "$anchor": "gfw4yur5w",
+            "label": {
+              "tx0": "Obed MBUSA MULEMBERI",
+              "tx1": "Obed MBUSA MULEMBERI",
+              "tx2": "Obed MBUSA MULEMBERI"
+            },
+            "value": "obed_ulpgl"
+          },
+          {
+            "$anchor": "jseoi2u96",
+            "label": {
+              "tx0": "Olivier Kisamba",
+              "tx1": "Olivier Kisamba",
+              "tx2": "Olivier Kisamba"
+            },
+            "value": "olivier_ulpgl"
+          },
+          {
+            "$anchor": "g7xjy66ce",
+            "label": {
+              "tx0": "Pyame Mushagalusa Balemirwe",
+              "tx1": "Pyame Mushagalusa Balemirwe",
+              "tx2": "Pyame Mushagalusa Balemirwe"
+            },
+            "value": "pyame_ulpgl"
+          },
+          {
+            "$anchor": "vn10msl9e",
+            "label": {
+              "tx0": "Thomas Tcheshe",
+              "tx1": "Thomas Tcheshe",
+              "tx2": "Thomas Tcheshe"
+            },
+            "value": "thomas_ulpgl"
+          },
+          {
+            "$anchor": "hnjccpi9h",
+            "label": {
+              "tx0": "Kasereka Muyisa Jean Chrysostome",
+              "tx1": "Kasereka Muyisa Jean Chrysostome",
+              "tx2": "Kasereka Muyisa Jean Chrysostome"
+            },
+            "value": "chrysostome_ulpgl"
+          },
+          {
+            "$anchor": "fuvfrsjn9",
+            "label": {
+              "tx0": "David Kubuya Baroki",
+              "tx1": "David Kubuya Baroki",
+              "tx2": "David Kubuya Baroki"
+            },
+            "value": "david_ulpgl"
+          },
+          {
+            "$anchor": "tulv4nvkq",
+            "label": {
+              "tx0": "Kasoki Wasunduku Safi",
+              "tx1": "Kasoki Wasunduku Safi",
+              "tx2": "Kasoki Wasunduku Safi"
+            },
+            "value": "safi_ulpgl"
+          },
+          {
+            "$anchor": "dc4hgfvzf",
+            "label": {
+              "tx0": "KAVUGHO SIBANZIRE Donatiane",
+              "tx1": "KAVUGHO SIBANZIRE Donatiane",
+              "tx2": "KAVUGHO SIBANZIRE Donatiane"
+            },
+            "value": "donatiane_ulpgl"
+          },
+          {
+            "$anchor": "ivwc0llt5",
+            "label": {
+              "tx0": "Kanuni Buroko",
+              "tx1": "Kanuni Buroko",
+              "tx2": "Kanuni Buroko"
+            },
+            "value": "buroko_ulpgl"
+          },
+          {
+            "$anchor": "p02hvz12z",
+            "label": {
+              "tx0": "Mutongerwa Venge Annie",
+              "tx1": "Mutongerwa Venge Annie",
+              "tx2": "Mutongerwa Venge Annie"
+            },
+            "value": "annie_ulpgl"
+          },
+          {
+            "$anchor": "vymm5d7dn",
+            "label": {
+              "tx0": "Wema Lukoo Raphael",
+              "tx1": "Wema Lukoo Raphael",
+              "tx2": "Wema Lukoo Raphael"
+            },
+            "value": "raphael_ulpgl"
+          }
+        ],
+        "yesno": [
+          {
+            "$anchor": "t3ahnwluo",
+            "label": {
+              "tx0": "Ndiyo",
+              "tx1": "Yes",
+              "tx2": "Oui"
+            },
+            "value": "1"
+          },
+          {
+            "$anchor": "mqzpp0o8m",
+            "label": {
+              "tx0": "Hapana",
+              "tx1": "No",
+              "tx2": "Non"
+            },
+            "value": "2"
+          }
+        ]
+      },
+      "metas": {
+        "end": true,
+        "start": true
+      },
+      "schema": "2",
+      "settings": {
+        "identifier": "long_unicode_labels",
+        "title": "long unicode labels to test SPSS export",
+        "version": "long_unicode_labels_v1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "mkwwjklp4",
+          "label": {
+            "tx0": "Je! Umri wako ni wapi?",
+            "tx1": "What is your age?",
+            "tx2": "Quel \u00e2ge avez-vous?"
+          },
+          "name": "What_is_your_age",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "$anchor": "rv087rx2o",
+          "label": {
+            "tx0": "Jina lako nani?",
+            "tx1": "What is your name?",
+            "tx2": "Comment vous appelez-vous?"
+          },
+          "name": "What_is_your_name",
+          "required": false,
+          "select_from": "name",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "uarl6yh4g",
+          "label": {
+            "tx0": "kujitenga",
+            "tx1": "separation",
+            "tx2": "s\u00e9paration"
+          },
+          "name": "group_separationquestions",
+          "type": "begin_group"
+        },
+        {
+          "$anchor": "hqy7jtmav",
+          "label": {
+            "tx0": "Je! Familia yako inakosa mtoto aliyeachwa na wewe wakati wa kuondoka kwako?",
+            "tx1": "Is your family missing a child that was separated from you during your displacement?",
+            "tx2": "Votre famille manque-t-elle un enfant qui a \u00e9t\u00e9 s\u00e9par\u00e9 de vous pendant votre d\u00e9placement?"
+          },
+          "name": "q_2241",
+          "required": false,
+          "select_from": "yesno",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "xi25wsnv7",
+          "label": {
+            "tx0": "Je! Familia yako inahudumia mtoto kutengwa na familia yake wakati wa kuondoka?",
+            "tx1": "Is your family hosting a child separated from his/her family during displacement?",
+            "tx2": "Votre famille h\u00e9berge-t-elle un enfant s\u00e9par\u00e9 de sa famille pendant le d\u00e9placement?"
+          },
+          "name": "q_2242",
+          "required": false,
+          "select_from": "yesno",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "qv2ftqrmo",
+          "label": {
+            "tx0": "Je! Kujitenga kwao kulikuwaje?",
+            "tx1": "How did their separation occur?",
+            "tx2": "Comment s'est pass\u00e9e leur s\u00e9paration?"
+          },
+          "name": "q_2243",
+          "relevant": {
+            "raw": "${q_2242} = '1'"
+          },
+          "required": false,
+          "type": "text"
+        },
+        {
+          "$anchor": "/uarl6yh4g",
+          "type": "end_group"
+        },
+        {
+          "$anchor": "dub02slko",
+          "label": {
+            "tx0": "Jambo, jina langu ni ____niko hapa kuuliza habari kuhusu amani, sheria na ujenzi mupya mashariki ya jamuhuri ya kidemokratia ya kongo. Natumika pamoja na -------. Atuna ushirika na serkali yoyote. Tunaendesha maongezi kamili juu ya kusikia na kujuwa hali na yale yanaofaa kuhusu kongo la kidemokrasiya. Maongezi ambayo tunaendesha ni kwa siri na bila kuchukuwa majina yoyote. Tuko huru na hakuna mutu yeyote ambaye atatambulishwa mahali pa kutolea habari kuhusu maongezi haya. Akuna jibu nzuri na hakuna lililo mbaya. Tuna kusihi kushiriki kwa utashi wako maongezi haya. Unaweza kataa kushiriki na kwakuto jibiya kwako kwa ulizo lolote. Hakuna malipo yoyote kwa ajili yako alakini tunafikiri ya kwamba kushiriki kwako ita rahisisha babadiliko mzuri ya hali ya mashariki mwa kongo la kidemokrasiya. Matokeo ya tajulishwa nayatatolewa kwa watumishi mbalimbali katika mashariki mwa kongo. Maongezi kwa kuuliza yatakamata muda wa dakika makumi mbili. Je unakubali kushiriki utafiti huu ao una maulizo?",
+            "tx1": "Hello, my name is ____ I am here as part of a study on security, protection and justice in Eastern Congo. I work with ----------. We are independent of any government, we conduct a series of interviews to better understand the context and priorities in eastern Congo. The information we collect here is confidential and anonymous. We are independent and no one will be identified in the discussion of results. There is no right or wrong answer. We ask you to participate voluntarily in this study. There are no direct benefits for you, but we think your participation will help improve the situation in the East. The results will be published and made available to actors in the East. The interview should last about 20 minutes. Do you agree to participate in this study?",
+            "tx2": "Bonjour, mon nom est ____ je suis ici dans le cadre d'une \u00e9tude sur la s\u00e9curit\u00e9, la protection et la justice \u00e0 l\u2019Est du Congo. Je travaille avec ----------. Nous sommes ind\u00e9pendants de tout gouvernement, Nous conduisons une s\u00e9rie d'entretiens pour mieux comprendre le contexte et les priorit\u00e9s \u00e0 l\u2019Est du Congo. Les informations que nous collectons ici sont confidentielles et anonymes. Nous sommes ind\u00e9pendants et aucune personne ne sera identifi\u00e9e dans la discussion des r\u00e9sultats. Il n'y a pas de bonne ou de mauvaise r\u00e9ponse. Nous vous demandons de participer volontairement \u00e0 cette \u00e9tude. Il n\u2019y a pas de b\u00e9n\u00e9fices directs pour vous, mais nous pensons que votre participation permettra d\u2019am\u00e9liorer la situation dans l\u2019Est. Les r\u00e9sultats seront publi\u00e9s et mis \u00e0 disposition des acteurs dans l\u2019Est. L\u2019interview devrait durer \u00e0 peu pr\u00e8s 20 minutes. Est-ce que vous acceptez de participer \u00e0 cette \u00e9tude ?"
+          },
+          "name": "approval",
+          "select_from": "yesno",
+          "type": "select_one"
+        },
+        {
+          "$anchor": "ftlbva5uz",
+          "label": {
+            "tx0": "Je, ni yapi ya kichawi, ya ajabu, ya kushangaza, ya kubadilisha maisha, ya kugeuka kwa mtazamo, ya kupanua akili, ya mapinduzi, ya vifaa ambavyo hunavyo?",
+            "tx1": "Which of the following magical, wonderful, stupendous, life-changing, paradigm-shifting, mind-expanding, revolutionary, incomparable devices do you own?",
+            "tx2": "Parmi les dispositifs magiques, merveilleux, stup\u00e9fiants, r\u00e9volutionnaires, incomparables, r\u00e9volutionnaires et r\u00e9volutionnaires, lesquels poss\u00e9dez-vous?"
+          },
+          "name": "electronics_owned",
+          "select_from": "electronics",
+          "type": "select_multiple"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": "Swahili"
+        },
+        {
+          "$anchor": "tx1",
+          "name": "English"
+        },
+        {
+          "$anchor": "tx2",
+          "name": "Fran\u00e7ais"
+        }
+      ]
+    }
+  ]
+}

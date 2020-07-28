@@ -1,0 +1,99 @@
+{
+  "submissions": [
+    {
+      "__version__": "dietv1",
+      "dietary_accommodations": "gluten_free",
+      "restaurant_name": "Melba's"
+    },
+    {
+      "__version__": "dietv1",
+      "dietary_accommodations": "vegan vegetarian",
+      "restaurant_name": "Land of Kush"
+    },
+    {
+      "__version__": "dietv1",
+      "dietary_accommodations": "gluten_free vegan vegetarian lactose_free",
+      "restaurant_name": "Sweet 27"
+    }
+  ],
+  "versions": [
+    {
+      "choices": {
+        "dietary_needs": [
+          {
+            "$anchor": "dc9mxyk2m",
+            "label": {
+              "tx0": "Gluten-free"
+            },
+            "value": "gluten_free"
+          },
+          {
+            "$anchor": "zkej0gbim",
+            "label": {
+              "tx0": "Vegan"
+            },
+            "value": "vegan"
+          },
+          {
+            "$anchor": "d17ozad6q",
+            "label": {
+              "tx0": "Vegetarian"
+            },
+            "value": "vegetarian"
+          },
+          {
+            "$anchor": "n96y22y1h",
+            "label": {
+              "tx0": "Lactose-free"
+            },
+            "value": "lactose_free"
+          }
+        ]
+      },
+      "metas": {},
+      "schema": "2",
+      "settings": {
+        "identifier": "dietary_needs",
+        "title": "Dietary needs",
+        "version": "dietv1",
+        "version_key": "__version__"
+      },
+      "survey": [
+        {
+          "$anchor": "dnr47qsa5",
+          "label": {
+            "tx0": "Restaurant name"
+          },
+          "name": "restaurant_name",
+          "required": true,
+          "tags": [
+            "hxl:#loc",
+            "hxl:+name"
+          ],
+          "type": "text"
+        },
+        {
+          "$anchor": "vlncdrzhk",
+          "label": {
+            "tx0": "Accommodating of dietary needs"
+          },
+          "name": "dietary_accommodations",
+          "required": true,
+          "select_from": "dietary_needs",
+          "tags": [
+            "hxl:#indicator",
+            "hxl:+diet"
+          ],
+          "type": "select_multiple"
+        }
+      ],
+      "translations": [
+        {
+          "$anchor": "tx0",
+          "initial": true,
+          "name": ""
+        }
+      ]
+    }
+  ]
+}

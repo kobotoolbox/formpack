@@ -109,7 +109,7 @@ class FormField(FormDataDef):
         # even if `lang` can be None, we don't want the `label` to be None.
         label = self.labels.get(lang, self.name)
         # If `label` is None, no matches are found, so return `field` name.
-        return self.name if label is None else label
+        return self.name if label in [None, ''] else label
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)

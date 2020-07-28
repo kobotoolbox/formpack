@@ -18,6 +18,7 @@ def _wc(id_string, version_id, surv):
 
 DATA = {
     'title': 'Favorite color',
+    'id_string': 'favcolor',
     'versions': [
         _wc('favcolor', 'favcolor_v1', [
             {'type': 'text', 'name': 'what_is_your_name_',

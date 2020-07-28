@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Auto report</h:title>
+    <model odk:xforms-version="1.0.0">
+      <instance>
+        <data id="auto_report" version="rpfrv1">
+          <restaurant_name/>
+          <location/>
+          <note/>
+          <when/>
+          <howmany/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/restaurant_name" type="string"/>
+      <bind nodeset="/data/location" type="geopoint"/>
+      <bind nodeset="/data/note" readonly="true()" type="string"/>
+      <bind nodeset="/data/when" type="date"/>
+      <bind nodeset="/data/howmany" type="int"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/restaurant_name">
+      <label>Restaurant name</label>
+    </input>
+    <input ref="/data/location">
+      <label>Location</label>
+    </input>
+    <input ref="/data/note">
+      <label>Note</label>
+    </input>
+    <input ref="/data/when">
+      <label>When</label>
+    </input>
+    <input ref="/data/howmany">
+      <label>How many</label>
+    </input>
+  </h:body>
+</h:html>
