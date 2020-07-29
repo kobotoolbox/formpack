@@ -114,6 +114,10 @@ class FormPack(object):
         self.title = titles[-1]
         self.id_string = settings_ids[-1]
 
+    @property
+    def available_translations(self):
+        return [tt['name'] for tt in self[-1].content['translations']]
+
     def load_version(self, content):
         """ Load one version and attach it to this Formpack
 
