@@ -111,7 +111,7 @@ class FormPack(object):
         if len(version_ids) > 1 and None in version_ids:
             raise ValueError('cannot have two versions without '
                              'a "version" id specified')
-        self.title = titles[-1]
+        self.title = titles[-1] if len(titles) > 0 else 'Submissions'
         self.id_string = settings_ids[-1]
 
     @property
