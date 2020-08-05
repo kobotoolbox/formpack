@@ -2,16 +2,13 @@ from pyxform.xls2json import workbook_to_json
 
 from pyxform.builder import create_survey_element_from_dict
 
-from a1d05eba1 import Content
-from a1d05eba1.utils.kfrozendict import kfrozendict
-from a1d05eba1.utils.kfrozendict import deepfreeze
+from ..content import Content, kfrozendict, deepfreeze
 
 
 def content_to_xform(content):
     content = deepfreeze(content)
 
-    settings = content['settings']
-    cc = Content(content.copy(settings=settings))
+    cc = Content(content, validate=True)
 
     # tx_names is passed to the pyxform object to ensure the itext
     # translations show up in the correct order

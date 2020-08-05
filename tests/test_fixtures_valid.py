@@ -9,9 +9,11 @@ import unittest
 from glob import glob
 from jsonschema import ValidationError
 
-from a1d05eba1 import Content
 from formpack import FormPack
+from formpack.content import Content
+
 from .fixtures import build_fixture
+
 
 CURDIR = os.path.dirname(os.path.abspath(__file__))
 JSONS_DIR = os.path.abspath(os.path.join(CURDIR, 'fixtures', 'json'))

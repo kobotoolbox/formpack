@@ -20,7 +20,7 @@ from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 from .utils.content_to_xform import content_to_xform
 
-from a1d05eba1.utils.kfrozendict import deepfreeze
+from .content import deepfreeze
 
 from copy import deepcopy
 
@@ -180,6 +180,15 @@ class FormVersion(object):
         return self.title
 
     def to_xml(self, warnings=None):
+        return content_to_xform(
+            self._to_xform_content(warnings)
+        )
+
+    def _to_xform_content(self, warnings=None):
+        '''
+        a method used internally to build a structure that sends pyxform what
+        it needs to generate the XForm
+        '''
         content = self.content
         settings = content['settings']
         default_settings = {
@@ -196,4 +205,4 @@ class FormVersion(object):
         if len(updates) > 0:
             settings = settings.copy(**updates)
             content = content.copy(settings=settings)
-        return content_to_xform(content)
+        return content

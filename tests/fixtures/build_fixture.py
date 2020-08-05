@@ -7,14 +7,12 @@ import os
 import importlib
 from copy import deepcopy
 
-
-from a1d05eba1 import Content
-
-import os
+from formpack.content import Content
 
 _FILE = os.path.abspath(__file__)
 _DIR = os.path.dirname(_FILE)
 JSON_FIXTURES_DIR = os.path.join(_DIR, 'json')
+
 
 def build_fixture(modulename, data_variable_name="DATA"):
     fixture_path = os.path.join(JSON_FIXTURES_DIR, '{}.json'.format(modulename))

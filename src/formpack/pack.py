@@ -12,8 +12,7 @@ from .utils.future import OrderedDict
 from .constants import UNSPECIFIED_TRANSLATION
 from formpack.schema.fields import CopyField
 
-from a1d05eba1 import Content
-from a1d05eba1.utils.kfrozendict import kfrozendict
+from .content import Content, kfrozendict
 
 
 class FormPack(object):

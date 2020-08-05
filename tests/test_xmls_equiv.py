@@ -1,26 +1,21 @@
 import os
-from os.path import join as _join
 import sys
-
 import json
 
-from a1d05eba1 import Content
-from a1d05eba1.utils.form_to_yaml_string import form_to_yaml_string
+from .fixtures.build_fixture import build_fixture
+
+from formpack import FormPack
+from formpack.content import Content
 
 CURDIR = os.path.dirname(os.path.abspath(__file__))
-XMLS_DIR = os.path.abspath(_join(CURDIR, 'fixtures', 'xml'))
-V2_FIXDIR = os.path.abspath(_join(CURDIR, 'v2_fixtures'))
+XMLS_DIR = os.path.abspath(os.path.join(CURDIR, 'fixtures', 'xml'))
+V2_FIXDIR = os.path.abspath(os.path.join(CURDIR, 'v2_fixtures'))
 
 def mkdir_p(dirpath):
     if not os.path.exists(dirpath):
         os.mkdir(dirpath)
     return dirpath
 
-from .fixtures.build_fixture import build_fixture
-from formpack import FormPack
-
-
-import shutil
 
 MODULES = [
     'literacy_test',
@@ -46,22 +41,15 @@ MODULES = [
     'site_inspection',
     ]
 
-import os
-
 def test_xml_equivs():
-    # print()
-    # print('xml equivs:')
-
-    for (zinx, mn) in enumerate(MODULES):
-        (title, versions, submissions) = build_fixture(mn)
+    for module in MODULES:
+        (title, versions, submissions) = build_fixture(module)
         fp = FormPack(versions)
-        # print('\t-', mn)
         for (index, vkey) in enumerate(fp.versions.keys()):
             fversion = fp.versions[vkey]
-            expected_xml_f = _join(XMLS_DIR, '{}_v{}.xml'.format(mn, index))
-
+            expected_xml_f = os.path.join(XMLS_DIR,
+                                          '{}_v{}.xml'.format(module, index))
             with open(expected_xml_f, 'r') as ff:
                 expected_xml = ff.read()
             xml_output = fversion.to_xml()
             assert xml_output == expected_xml
-            # print('\t\t', index, ' ', mn,)
