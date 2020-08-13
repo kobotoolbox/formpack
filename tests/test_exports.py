@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 import xlrd
 from backports import csv
-from path import tempdir
+from path import TempDir as tempdir
 from copy import deepcopy
 
 from formpack import FormPack
