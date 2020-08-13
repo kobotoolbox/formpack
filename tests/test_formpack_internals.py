@@ -83,7 +83,6 @@ def test_null_untranslated_labels():
                                             'label': {'tx0': 'أخرى'},
                                             'value': '5'}]},
                  'metas': {},
-                 'schema': '2+fill_missing_labels',
                  'settings': {
                     'identifier': 'arabic_and_null',
                     'title': 'Arabic and Null'
@@ -131,6 +130,7 @@ def test_get_fields_for_versions_returns_unique_fields():
                     {'name': 'hey', 'type': 'image', '$anchor': 'hey'},
                     {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
+                'translations': [{'$anchor': 'tx0', 'name':''}],
                 'settings': {
                     'identifier': 'xx',
                     'title': 'Xx Title',
@@ -142,6 +142,7 @@ def test_get_fields_for_versions_returns_unique_fields():
                     {'name': 'one', 'type': 'image', '$anchor': 'one'},
                     {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
+                'translations': [{'$anchor': 'tx0', 'name':''}],
                 'settings': {
                     'identifier': 'xx',
                     'title': 'Xx Title',
@@ -153,6 +154,7 @@ def test_get_fields_for_versions_returns_unique_fields():
                     {'name': 'one', 'type': 'image', '$anchor': 'one'},
                     {'name': 'two', 'type': 'image', '$anchor': 'two'},
                 ],
+                'translations': [{'$anchor': 'tx0', 'name':''}],
                 'settings': {
                     'identifier': 'xx',
                     'title': 'Xx Title',

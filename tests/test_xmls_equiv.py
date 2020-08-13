@@ -28,7 +28,7 @@ MODULES = [
     'auto_report_extended_fields',
     'customer_satisfaction',
     'dietary_needs',
-    'favorite_coffee', # missing fixture file
+    'favorite_coffee',
     'field_position_with_multiple_versions',
     'fields_for_versions_list_index_out_of_range',
     'grouped_questions',

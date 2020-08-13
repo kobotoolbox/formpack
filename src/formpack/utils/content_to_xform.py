@@ -17,7 +17,7 @@ def content_to_xform(content):
         if tx is not None:
             tx_names.append(tx)
 
-    flat_json = cc.export(schema='xlsform')
+    flat_json = cc.export_to('xlsform')
     flat_json.pop('schema')
     wbjson = workbook_to_json(flat_json)
     survey = create_survey_element_from_dict(wbjson)
