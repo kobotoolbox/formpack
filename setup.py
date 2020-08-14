@@ -18,8 +18,8 @@ requirements = [
     'lxml',
     'path.py',
     'pyquery',
-    gh_package.format('XLSForm', 'pyxform', PYXFORM_COMMIT),
-    gh_package.format('dorey', 'a1d05eba1', A1D05EB_COMMIT),
+    # gh_package.format('XLSForm', 'pyxform', PYXFORM_COMMIT),
+    # gh_package.format('dorey', 'a1d05eba1', A1D05EB_COMMIT),
     'statistics',
     'XlsxWriter',
     'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
