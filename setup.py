@@ -8,47 +8,25 @@ from setuptools import setup, find_packages
 import sys
 
 
-if sys.version_info[0] == 2:
+PYXFORM_COMMIT = 'afb64e2fe1abae4e978a86e8b202a2be1b3eff79'
+A1D05EB_COMMIT = '504c6ddca639d885403c09edec01c11edb7e77c8'
+gh_package = '{1}@git+https://github.com/{0}/{1}.git#{2}'
 
-    requirements = [
-        'begins',
-        'cyordereddict',
-        'jsonschema',
-        'lxml',
-        'path.py<12',  # Pinned for Python 2 compatibility
-        'pyquery',
-        'pyxform',
-        'statistics',
-        'XlsxWriter',
-        'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
-        'geojson-rewind==0.1.1+py2.jnm',  # Stop using fork after dropping Python 2 support
-    ]
+requirements = [
+    'begins',
+    'jsonschema',
+    'lxml',
+    'path.py',
+    'pyquery',
+    gh_package.format('XLSForm', 'pyxform', PYXFORM_COMMIT),
+    gh_package.format('dorey', 'a1d05eba1', A1D05EB_COMMIT),
+    'statistics',
+    'XlsxWriter',
+    'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
+    'geojson-rewind',
+]
 
-    dep_links = [
-        # "Be careful with the version" part of `#egg=project-version`, according to
-        # https://setuptools.readthedocs.io/en/latest/setuptools.html#dependencies-that-aren-t-in-pypi.
-        # "It should match the one inside the project files," i.e. the `version`
-        # argument to `setup()` in `setup.py`. It should also adhere to PEP 440.
-        'https://github.com/jnm/geojson-rewind/tarball/master#egg=geojson-rewind-0.1.1+py2.jnm'
-    ]
-
-else:
-
-    requirements = [
-        'begins',
-        'jsonschema',
-        'lxml',
-        'path.py',
-        'pyquery',
-        'pyxform',
-        'statistics',
-        'XlsxWriter',
-        'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
-        'geojson-rewind',
-    ]
-
-    dep_links = [
-    ]
+dep_links = []
 
 
 setup(name='formpack',
