@@ -5,6 +5,9 @@
 # any forked packages here, prior to `-e .`
 -e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
 
+-e git+https://github.com/XLSForm/pyxform.git#afb64e2fe1abae4e978a86e8b202a2be1b3eff79
+-e git+https://github.com/dorey/a1d05eba1.git#504c6ddca639d885403c09edec01c11edb7e77c8
+
 # Install this package
 -e .
 

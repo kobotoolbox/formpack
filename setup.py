@@ -8,9 +8,9 @@ from setuptools import setup, find_packages
 import sys
 
 
-PYXFORM_COMMIT = 'afb64e2fe1abae4e978a86e8b202a2be1b3eff79'
-A1D05EB_COMMIT = '6bb19b4075e1fd1cc14ef90a27e0108c336961f3'
 gh_package = '{1}@git+https://github.com/{0}/{1}.git#{2}'
+PYXFORM_DEP = ('XLSForm', 'pyxform', 'afb64e2fe1abae4e978a86e8b202a2be1b3eff79')
+A1D05EB_DEP = ('dorey', 'a1d05eba1', '504c6ddca639d885403c09edec01c11edb7e77c8')
 
 requirements = [
     'begins',
@@ -18,8 +18,8 @@ requirements = [
     'lxml',
     'path.py',
     'pyquery',
-    # gh_package.format('XLSForm', 'pyxform', PYXFORM_COMMIT),
-    # gh_package.format('dorey', 'a1d05eba1', A1D05EB_COMMIT),
+    gh_package.format(*PYXFORM_DEP),
+    gh_package.format(*A1D05EB_DEP),
     'statistics',
     'XlsxWriter',
     'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
