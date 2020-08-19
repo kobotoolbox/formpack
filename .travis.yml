@@ -7,6 +7,8 @@ install:
   - "virtualenv e"
   - "source e/bin/activate"
   - "pip install -r dev-requirements.txt"
+  - "pip uninstall pyxform"
+  - "pip install pyxform -e git+https://github.com/XLSForm/pyxform.git#afb64e2fe1abae4e978a86e8b202a2be1b3eff79#egg=pyxform"
 before_script: cd src
 script:
   - "pytest ../tests --cov=. -vv"
