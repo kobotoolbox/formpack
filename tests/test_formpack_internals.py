@@ -5,8 +5,10 @@ from __future__ import (unicode_literals, print_function,
 import json
 from copy import deepcopy
 
+import pytest
 from nose.tools import raises
 
+import pyxform
 from formpack import FormPack, constants
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture
@@ -42,8 +44,8 @@ def test_to_xml():
     # TODO: test output matches what is expected
 
 
-def test_to_xml_fails_when_null_labels():
-    # currently, this form will trigger a confusing error from pyxform:
+def test_to_xml_fails_when_question_has_null_label():
+    # previously, this form would trigger a confusing error from pyxform:
     #  - Exception: (<type 'NoneType'>, None)
 
     # it occurs when a named translation has a <NoneType> value
@@ -58,7 +60,40 @@ def test_to_xml_fails_when_null_labels():
                    'translations': ['NamedTranslation'],
                    'translated': ['label'],
                    }}, id_string='sdf')
-    fp[0].to_xml()
+
+    with pytest.raises(
+        pyxform.errors.PyXFormError,
+        match="^The survey element named 'n1' has no label or hint.$",
+    ):
+        fp[0].to_xml()
+
+
+def test_to_xml_omits_empty_group_labels():
+    fp = FormPack(
+        {
+            'content': {
+                'survey': [
+                    {'type': 'begin_group', 'name': 'group1'},
+                    {'type': 'note', 'name': 'n1', 'label': ['n1 in group1']},
+                    {'type': 'end_group'},  # group1
+                    {'type': 'begin_group', 'name': 'group2', 'label': ['']},
+                    {'type': 'begin_group', 'name': 'group3', 'label': [None]},
+                    {'type': 'note', 'name': 'n2',
+                        'label': ['n2 in group2/group3']},
+                    {'type': 'end_group'},  # group3
+                    {'type': 'end_group'},  # group2
+                ],
+                'translations': ['NamedTranslation'],
+                'translated': ['label'],
+            }
+        },
+        id_string='unlabeled_groups',
+    )
+    xml = fp[0].to_xml()
+    assert '''<label ref="jr:itext('/data/group1:label')"/>''' not in xml
+    assert '''<label ref="jr:itext('/data/group2:label')"/>''' not in xml
+    assert '''<label ref="jr:itext('/data/group2/group3:label')"/>''' not in xml
+
 
 from formpack.schema.datadef import FormGroup
 
