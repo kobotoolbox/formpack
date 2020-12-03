@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 import xlrd
 from backports import csv
-from path import tempdir
+from path import TempDir
 
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
@@ -1295,7 +1295,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'rgv1'}
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1306,7 +1306,7 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
                                '_over_the_lazy_dog_v1'}
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1322,7 +1322,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('hxl_grouped_repeatable')
         fp = FormPack(schemas, title)
         options = {'versions': 'hxl_rgv1', 'tag_cols_for_header': ['hxl']}
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1440,7 +1440,7 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'test.xlsx'
             fp.export().to_xlsx(xls, submissions)
             assert xls.isfile()
