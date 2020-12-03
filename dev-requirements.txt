@@ -8,8 +8,9 @@
 # Install this package
 -e .
 
-# pyquery 1.4.2 and later do not support Python 2
+# Python 2 compatibility
 pyquery<1.4.2
+pyxform<1.0.0
 
 # Install testing / development requirements
 coverage==4.5.2
