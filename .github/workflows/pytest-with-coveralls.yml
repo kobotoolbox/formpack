@@ -35,5 +35,6 @@ jobs:
         cd src
         pytest ../tests --cov=. -vv
     - name: Run coveralls
-      run: |
-        coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
