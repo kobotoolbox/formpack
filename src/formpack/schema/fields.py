@@ -10,6 +10,7 @@ import statistics
 
 from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
+from ..utils import singlemode
 from ..utils.future import range, OrderedDict
 from ..utils.ordered_collection import OrderedDefaultdict
 
@@ -447,7 +448,7 @@ class NumField(FormField):
             stats['stdev'] = statistics.stdev(self.flatten_dataset(metrics),
                                               xbar=stats['mean'])
             # requires a non empty dataset and a unique mode
-            stats['mode'] = statistics.mode(self.flatten_dataset(metrics))
+            stats['mode'] = singlemode(self.flatten_dataset(metrics))
         except statistics.StatisticsError:
             pass
 
@@ -489,7 +490,7 @@ class NumField(FormField):
                 val_stats['stdev'] = statistics.stdev(values,
                                                       xbar=val_stats['mean'])
                 # requires a non empty dataset and a unique mode
-                val_stats['mode'] = statistics.mode(values)
+                val_stats['mode'] = singlemode(values)
             except statistics.StatisticsError:
                 pass
 
