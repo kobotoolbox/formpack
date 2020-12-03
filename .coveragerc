@@ -1,6 +1,7 @@
 [run]
-branch = true
+branch = True
 source = formpack
+relative_files = True
 
 [report]
 fail_under = 60

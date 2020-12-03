@@ -31,8 +31,6 @@ jobs:
       if: "matrix.python-version != '2.7'"
       run: pip install -r dev-requirements-py3.txt
     - name: Run pytest
-      run: |
-        cd src
-        pytest ../tests --cov=. -vv
+      run: pytest --cov=src -vv
     - name: Run coveralls
       uses: AndreMiras/coveralls-python-action@develop
