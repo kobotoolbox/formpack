@@ -484,7 +484,16 @@ class Export(object):
                     for row in rows:
                         yield format_line(row, sep, quote)
 
-    def to_geojson(self, submissions, label_mapping=None):
+    def to_geojson(
+        self,
+        submissions,
+        label_mapping=None,
+        flatten=False,
+        include_form_data=True,
+        form_data_in_properties=False,
+        export_to_file=False,
+        fields=[]
+    ):
         """
         Some cool geojsonification.
 
@@ -528,13 +537,16 @@ class Export(object):
         self.reset() # since we're not using `parse_submissions()`
 
         results = []
+        all_features = []
         for submission in submissions:
             feature_collection = {
                 'type': 'FeatureCollection',
                 'name': first_section_name,
-                'form_data': submission,
-                'features': [],
             }
+            if include_form_data and not form_data_in_properties:
+                feature_collection['form_data'] = submission
+            feature_collection['features'] = []
+
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
             version = self.get_version_for_submission(submission)
@@ -568,10 +580,17 @@ class Export(object):
                         # of the form
                         continue
 
-                    feature_properties = OrderedDict()
-                    for line_item, row_item in zip(labels, row):
-                        if geo_field.name in line_item:
-                            feature_properties.update({line_item: row_item})
+                    if len(fields) == 0:
+                        feature_properties = OrderedDict(zip(labels, row))
+                    else:
+                        feature_properties = OrderedDict()
+                        for line_item, row_item in zip(labels, row):
+                            if form_data_in_properties:
+                                if line_item in fields:
+                                    feature_properties.update({line_item: row_item})
+                            else:
+                                if geo_field.name in line_item:
+                                    feature_properties.update({line_item: row_item})
 
                     label = (
                         label_mapping.get(geo_field.name, None)
@@ -579,7 +598,6 @@ class Export(object):
                         else None
                     )
                     feature_properties.update({'label': label})
-                    print('***** label_mapping', str(label_mapping), flush=True)
 
                     feature = {
                         "type": "Feature",
@@ -587,17 +605,29 @@ class Export(object):
                         "properties": feature_properties,
                     }
 
-                    feature_collection['features'].append(feature)
-            results.append(feature_collection)
+                    if flatten:
+                        all_features.append(feature)
+                    else:
+                        feature_collection['features'].append(feature)
+            if not flatten:
+                results.append(feature_collection)
 
-        return json.dumps(
-            {
-                'count': len(results),
-                'next': None,
-                'previous': None,
-                'results': results,
+        out = {
+            'count': len(results),
+            'next': None,
+            'previous': None,
+            'results': results,
+        }
+        if flatten:
+            out = {
+                'type': 'FeatureCollection',
+                'name': first_section_name,
+                'features': all_features,
             }
-        )
+        if export_to_file and not flatten:
+            out = results
+
+        return json.dumps(out)
 
     def to_table(self, submissions):
 
