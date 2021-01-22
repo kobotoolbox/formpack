@@ -52,3 +52,5 @@ TAG_COLUMNS_AND_SEPARATORS = {
     # column names, values are separators.
     'hxl': '',
 }
+
+GEO_QUESTION_TYPES = ('geopoint', 'geotrace', 'geoshape')

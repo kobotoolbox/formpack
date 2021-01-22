@@ -9,7 +9,11 @@ from inspect import isclass
 
 import xlsxwriter
 
-from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
+from ..constants import (
+    UNSPECIFIED_TRANSLATION,
+    TAG_COLUMNS_AND_SEPARATORS,
+    GEO_QUESTION_TYPES,
+)
 from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
@@ -480,32 +484,40 @@ class Export(object):
                     for row in rows:
                         yield format_line(row, sep, quote)
 
-    def to_geojson(self, submissions, geo_question_name=None):
+    def to_geojson(self, submissions, label_mapping=None):
         """
-        Returns a GeoJSON `FeatureCollection` as a string, where each
-        submission is a `Feature` with `geometry` taken from the response to
-        the question identified by `geo_question_name`. All question/response
-        pairs are included in the `properties` of each `Feature`. As with
-        `to_csv()`, repeating groups are not included.
+        Some cool geojsonification.
 
         Example:
             {
-              "name": "[name of the first section]",
-              "type": "FeatureCollection"
-              "features": [
-                {
-                  "geometry": {
-                    "coordinates": [longitude, latitude, accuracy],
-                    "type": "Point"
-                  },
-                  "properties": {
-                    "question_name": "response value",
-                    …
-                  },
-                  "type": "Feature"
-                },
-                …
-              ],
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "name": "[name of the first section]",
+                        "type": "FeatureCollection",
+                        "form_data": "{...}",
+                        "features": [
+                            {
+                                "geometry": {
+                                    "coordinates": [
+                                        longitude,
+                                        latitude,
+                                        accuracy,
+                                    ],
+                                    "type": "Point",
+                                },
+                                "properties": {
+                                    "question_name": "response value",
+                                    "label": "Question Name",
+                                },
+                                "type": "Feature",
+                            },
+                            ...,
+                        ],
+                    }
+                ],
             }
         """
 
@@ -513,21 +525,16 @@ class Export(object):
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
 
-        # Manually write the beginning and end of the GeoJSON file so that we
-        # can yield one GeoJSON `Feature` object at a time
-        feature_array_preamble = '\n'.join([
-            '{',
-            '"type": "FeatureCollection",',
-            '"name": "{name}",'.format(name=first_section_name),
-            '"features": [',
-        ])
-        feature_array_epilogue = '\n]\n}'
-        yield feature_array_preamble
-
         self.reset() # since we're not using `parse_submissions()`
 
-        first = True
+        results = []
         for submission in submissions:
+            feature_collection = {
+                'type': 'FeatureCollection',
+                'name': first_section_name,
+                'form_data': submission,
+                'features': [],
+            }
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
             version = self.get_version_for_submission(submission)
@@ -535,49 +542,62 @@ class Export(object):
             if not formatted_chunks:
                 continue
 
-            # Find the requested field
             all_fields = version.sections[first_section_name].fields.values()
-            geo_fields = [f for f in all_fields if f.name == geo_question_name]
-            try:
-                geo_field = geo_fields[0]
-            except IndexError:
-                # Requested field doesn't exist in the form version used by
-                # this submission; skip it
-                continue
+            all_geo_fields = [
+                f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
+            ]
 
-            rows = formatted_chunks[first_section_name]
-            for row in rows:
-                try:
-                    geo_response = submission[geo_field.path]
-                except KeyError:
-                    # Discard submissions with missing geo data
-                    continue
-                try:
-                    feature_geometry = field_and_response_to_geometry(
-                        geo_field, geo_response)
-                except FormPackGeoJsonError:
-                    # Discard submissions with invalid geo data
-                    continue
-                except RuntimeError:
-                    # If we're here, the field has an non-geo type. Continue in
-                    # the hope that other submissions belong to better versions
-                    # of the form
-                    continue
-                feature_properties = OrderedDict(zip(labels, row))
-                feature = {
-                    "type": "Feature",
-                    "geometry": feature_geometry,
-                    "properties": feature_properties,
-                }
+            for geo_field in all_geo_fields:
+                rows = formatted_chunks[first_section_name]
+                for row in rows:
+                    try:
+                        geo_response = submission[geo_field.path]
+                    except KeyError:
+                        # Discard submissions with missing geo data
+                        continue
+                    try:
+                        feature_geometry = field_and_response_to_geometry(
+                            geo_field, geo_response
+                        )
+                    except FormPackGeoJsonError:
+                        # Discard submissions with invalid geo data
+                        continue
+                    except RuntimeError:
+                        # If we're here, the field has an non-geo type. Continue in
+                        # the hope that other submissions belong to better versions
+                        # of the form
+                        continue
 
-                if first:
-                    separator = '\n'
-                    first = False
-                else:
-                    separator = ',\n'
-                yield separator + json.dumps(feature, sort_keys=True)
+                    feature_properties = OrderedDict()
+                    for line_item, row_item in zip(labels, row):
+                        if geo_field.name in line_item:
+                            feature_properties.update({line_item: row_item})
 
-        yield feature_array_epilogue
+                    label = (
+                        label_mapping.get(geo_field.name, None)
+                        if label_mapping is not None
+                        else None
+                    )
+                    feature_properties.update({'label': label})
+                    print('***** label_mapping', str(label_mapping), flush=True)
+
+                    feature = {
+                        "type": "Feature",
+                        "geometry": feature_geometry,
+                        "properties": feature_properties,
+                    }
+
+                    feature_collection['features'].append(feature)
+            results.append(feature_collection)
+
+        return json.dumps(
+            {
+                'count': len(results),
+                'next': None,
+                'previous': None,
+                'results': results,
+            }
+        )
 
     def to_table(self, submissions):
 
