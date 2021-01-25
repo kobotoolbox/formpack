@@ -530,6 +530,9 @@ class Export(object):
             }
         """
 
+        if flatten and include_form_data:
+            form_data_in_properties = True
+
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
@@ -580,17 +583,13 @@ class Export(object):
                         # of the form
                         continue
 
-                    if len(fields) == 0:
+                    if include_form_data and form_data_in_properties:
                         feature_properties = OrderedDict(zip(labels, row))
                     else:
                         feature_properties = OrderedDict()
                         for line_item, row_item in zip(labels, row):
-                            if form_data_in_properties:
-                                if line_item in fields:
-                                    feature_properties.update({line_item: row_item})
-                            else:
-                                if geo_field.name in line_item:
-                                    feature_properties.update({line_item: row_item})
+                            if geo_field.name in line_item:
+                                feature_properties.update({line_item: row_item})
 
                     label = (
                         label_mapping.get(geo_field.name, None)
