@@ -487,46 +487,39 @@ class Export(object):
     def to_geojson(
         self,
         submissions,
-        flatten=False,
+        flatten=True,
         include_form_data=True,
         form_data_in_properties=False,
-        export_to_file=False,
         fields=[]
     ):
         """
         Some cool geojsonification.
 
         Example:
-            {
-                "count": 1,
-                "next": None,
-                "previous": None,
-                "results": [
-                    {
-                        "name": "[name of the first section]",
-                        "type": "FeatureCollection",
-                        "form_data": "{...}",
-                        "features": [
-                            {
-                                "geometry": {
-                                    "coordinates": [
-                                        longitude,
-                                        latitude,
-                                        accuracy,
-                                    ],
-                                    "type": "Point",
-                                },
-                                "properties": {
-                                    "question_name": "response value",
-                                    "label": "Question Name",
-                                },
-                                "type": "Feature",
+            [
+                {
+                    "name": "[name of the first section]",
+                    "type": "FeatureCollection",
+                    "form_data": "{...}",
+                    "features": [
+                        {
+                            "geometry": {
+                                "coordinates": [
+                                    longitude,
+                                    latitude,
+                                    accuracy,
+                                ],
+                                "type": "Point",
                             },
-                            ...,
-                        ],
-                    }
-                ],
-            }
+                            "properties": {
+                                "question_name": "response value",
+                            },
+                            "type": "Feature",
+                        },
+                        ...,
+                    ],
+                }
+            ]
         """
 
         if flatten and include_form_data:
@@ -545,6 +538,7 @@ class Export(object):
                 'type': 'FeatureCollection',
                 'name': first_section_name,
             }
+
             if include_form_data and not form_data_in_properties:
                 feature_collection['form_data'] = submission
             feature_collection['features'] = []
@@ -560,6 +554,7 @@ class Export(object):
             all_geo_fields = [
                 f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
             ]
+            all_geo_field_names = [f.name for f in all_geo_fields]
 
             for geo_field in all_geo_fields:
                 rows = formatted_chunks[first_section_name]
@@ -582,23 +577,29 @@ class Export(object):
                         # of the form
                         continue
 
+                    use_osm_labels = True
+                    language = 'English (en)'
+                    OSM_LANGUAGE = 'OSM (osm)'
                     feature_properties = OrderedDict()
                     for line_item, row_item in zip(labels, row):
-                        f = None
-                        try:
-                            f = next(filter(lambda x: x.name == line_item, all_fields))
-                        except:
+                        filtered_fields = list(filter(lambda x: x.name == line_item, all_fields))
+                        if len(filtered_fields) == 0:
                             continue
-                        lab = f.labels.get('OSM (osm)')
-                        if hasattr(f, 'choice'):
-                            try:
-                                val = f.choice.options[row_item]['labels'].get('English (en)')
-                            except:
-                                val = row_item
+                        field = filtered_fields[0]
+                        label = (
+                            field.labels.get(OSM_LANGUAGE)
+                            if use_osm_labels
+                            else line_item
+                            if not line_item.startswith('_')
+                            and line_item not in all_geo_field_names
+                            else None
+                        )
+                        if hasattr(field, 'choice') and len(row_item) != 0:
+                            value = field.choice.options[row_item]['labels'].get(language)
                         else:
-                            val = row_item
-                        if lab is not None and val is not None and len(val) > 0:
-                            feature_properties.update({lab: val})
+                            value = row_item if len(str(row_item)) > 0 else None
+                        if label is not None and value is not None:
+                            feature_properties.update({label: value})
 
                     feature = {
                         "type": "Feature",
@@ -613,22 +614,13 @@ class Export(object):
             if not flatten:
                 results.append(feature_collection)
 
-        out = {
-            'count': len(results),
-            'next': None,
-            'previous': None,
-            'results': results,
-        }
         if flatten:
-            out = {
+            return json.dumps({
                 'type': 'FeatureCollection',
                 'name': first_section_name,
                 'features': all_features,
-            }
-        if export_to_file and not flatten:
-            out = results
-
-        return json.dumps(out)
+            })
+        return json.dumps(results)
 
     def to_table(self, submissions):
 
