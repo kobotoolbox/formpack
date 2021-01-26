@@ -487,7 +487,6 @@ class Export(object):
     def to_geojson(
         self,
         submissions,
-        label_mapping=None,
         flatten=False,
         include_form_data=True,
         form_data_in_properties=False,
@@ -583,20 +582,23 @@ class Export(object):
                         # of the form
                         continue
 
-                    if include_form_data and form_data_in_properties:
-                        feature_properties = OrderedDict(zip(labels, row))
-                    else:
-                        feature_properties = OrderedDict()
-                        for line_item, row_item in zip(labels, row):
-                            if geo_field.name in line_item:
-                                feature_properties.update({line_item: row_item})
-
-                    label = (
-                        label_mapping.get(geo_field.name, None)
-                        if label_mapping is not None
-                        else None
-                    )
-                    feature_properties.update({'label': label})
+                    feature_properties = OrderedDict()
+                    for line_item, row_item in zip(labels, row):
+                        f = None
+                        try:
+                            f = next(filter(lambda x: x.name == line_item, all_fields))
+                        except:
+                            continue
+                        lab = f.labels.get('OSM (osm)')
+                        if hasattr(f, 'choice'):
+                            try:
+                                val = f.choice.options[row_item]['labels'].get('English (en)')
+                            except:
+                                val = row_item
+                        else:
+                            val = row_item
+                        if lab is not None and val is not None and len(val) > 0:
+                            feature_properties.update({lab: val})
 
                     feature = {
                         "type": "Feature",
