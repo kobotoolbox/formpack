@@ -6,13 +6,15 @@ import json
 import zipfile
 from collections import defaultdict
 from inspect import isclass
+from typing import Iterator, Union
 
 import xlsxwriter
 
 from ..constants import (
-    UNSPECIFIED_TRANSLATION,
-    TAG_COLUMNS_AND_SEPARATORS,
     GEO_QUESTION_TYPES,
+    OSM_LANGUAGE,
+    TAG_COLUMNS_AND_SEPARATORS,
+    UNSPECIFIED_TRANSLATION,
 )
 from ..schema import CopyField
 from ..submission import FormSubmission
@@ -486,12 +488,13 @@ class Export(object):
 
     def to_geojson(
         self,
-        submissions,
-        flatten=True,
-        include_form_data=True,
-        form_data_in_properties=False,
-        fields=[]
-    ):
+        submissions: Iterator,
+        flatten: bool = True,
+        include_form_data: bool = True,
+        form_data_in_properties: bool = False,
+        language: Union[str, None] = None,
+        use_osm_labels: bool = True,
+    ) -> str:
         """
         Some cool geojsonification.
 
@@ -529,7 +532,7 @@ class Export(object):
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
 
-        self.reset() # since we're not using `parse_submissions()`
+        self.reset()  # since we're not using `parse_submissions()`
 
         results = []
         all_features = []
@@ -577,27 +580,42 @@ class Export(object):
                         # of the form
                         continue
 
-                    use_osm_labels = True
-                    language = 'English (en)'
-                    OSM_LANGUAGE = 'OSM (osm)'
                     feature_properties = OrderedDict()
                     for line_item, row_item in zip(labels, row):
-                        filtered_fields = list(filter(lambda x: x.name == line_item, all_fields))
+                        filtered_fields = list(
+                            filter(lambda x: x.name == line_item, all_fields)
+                        )
                         if len(filtered_fields) == 0:
                             continue
                         field = filtered_fields[0]
-                        label = (
-                            field.labels.get(OSM_LANGUAGE)
-                            if use_osm_labels
-                            else line_item
+                        default_label = (
+                            line_item
                             if not line_item.startswith('_')
                             and line_item not in all_geo_field_names
                             else None
                         )
+                        label = (
+                            field.labels.get(OSM_LANGUAGE)
+                            if use_osm_labels
+                            else None
+                        )
+                        if label is None:
+                            label = default_label
+
                         if hasattr(field, 'choice') and len(row_item) != 0:
-                            value = field.choice.options[row_item]['labels'].get(language)
+                            if language is not None:
+                                value = field.choice.options[row_item][
+                                    'labels'
+                                ].get(language)
+                            else:
+                                value = list(
+                                    field.choice.options[row_item][
+                                        'labels'
+                                    ].values()
+                                )[0]
                         else:
                             value = row_item if len(str(row_item)) > 0 else None
+
                         if label is not None and value is not None:
                             feature_properties.update({label: value})
 
@@ -615,11 +633,13 @@ class Export(object):
                 results.append(feature_collection)
 
         if flatten:
-            return json.dumps({
-                'type': 'FeatureCollection',
-                'name': first_section_name,
-                'features': all_features,
-            })
+            return json.dumps(
+                {
+                    'type': 'FeatureCollection',
+                    'name': first_section_name,
+                    'features': all_features,
+                }
+            )
         return json.dumps(results)
 
     def to_table(self, submissions):
