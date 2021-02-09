@@ -54,4 +54,3 @@ TAG_COLUMNS_AND_SEPARATORS = {
 }
 
 GEO_QUESTION_TYPES = ('geopoint', 'geotrace', 'geoshape')
-OSM_LANGUAGE = 'OSM (osm)'

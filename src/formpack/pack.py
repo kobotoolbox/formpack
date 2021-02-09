@@ -337,7 +337,7 @@ class FormPack(object):
     def export(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/', hierarchy_in_labels=False,
                versions=-1, multiple_select="both",
                force_index=False, copy_fields=(), title=None,
-               tag_cols_for_header=None):
+               tag_cols_for_header=None, filter_fields=[]):
         """
         Create an export for given versions of the form
         """
@@ -348,7 +348,8 @@ class FormPack(object):
                       version_id_keys=self.version_id_keys(versions),
                       title=title, multiple_select=multiple_select,
                       force_index=force_index, copy_fields=copy_fields,
-                      tag_cols_for_header=tag_cols_for_header)
+                      tag_cols_for_header=tag_cols_for_header,
+                      filter_fields=filter_fields,)
 
     def autoreport(self, versions=-1):
         """

@@ -13,7 +13,6 @@ import xlsxwriter
 
 from ..constants import (
     GEO_QUESTION_TYPES,
-    OSM_LANGUAGE,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
@@ -34,7 +33,7 @@ class Export(object):
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=None):
+                 title="submissions", tag_cols_for_header=None, filter_fields=[]):
         """
 
         :param formpack: FormPack
@@ -62,8 +61,10 @@ class Export(object):
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
+        self.filter_fields = filter_fields
         self.__r_groups_submission_mapping_values = {}
 
+        #tag_cols_for_header = None
         if tag_cols_for_header is None:
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
@@ -192,11 +193,14 @@ class Export(object):
             raise RuntimeError(
                 '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
 
+
         section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
         section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
         section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
+        if len(self.filter_fields) > 0:
+            all_fields = [f for f in all_fields if f.path in self.filter_fields]
         all_sections = {}
 
         # List of fields we generate ourselves to add at the very end
@@ -310,6 +314,12 @@ class Export(object):
         _indexes = self._indexes
         row = self._row_cache[_section_name]
         _fields = tuple(current_section.fields.values())
+        if len(self.filter_fields) > 0:
+            _fields = tuple(
+                field
+                for field in current_section.fields.values()
+                if field.path in self.filter_fields
+            )
 
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section
@@ -499,18 +509,18 @@ class Export(object):
                     "type": "FeatureCollection",
                     "features": [
                         {
+                            "type": "Feature",
                             "geometry": {
+                                "type": "Point",
                                 "coordinates": [
                                     longitude,
                                     latitude,
                                     accuracy,
                                 ],
-                                "type": "Point",
                             },
                             "properties": {
                                 "question_name": "response value",
                             },
-                            "type": "Feature",
                         },
                         ...,
                     ],
@@ -654,7 +664,7 @@ class Export(object):
             sheet_.write_row(
                 row=row_index,
                 col=0,
-                data=data
+                data=list(map(str, data))
             )
             row_index += 1
             sheet_row_positions[sheet_] = row_index
