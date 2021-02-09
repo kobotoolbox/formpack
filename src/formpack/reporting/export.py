@@ -3,6 +3,7 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 import json
+import re
 import zipfile
 from collections import defaultdict
 from inspect import isclass
@@ -531,6 +532,8 @@ class Export(object):
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
+        _, all_xml_labels, _ = self.get_fields_labels_tags_for_all_versions()
+        xml_labels = all_xml_labels[first_section_name]
 
         self.reset()  # since we're not using `parse_submissions()`
 
@@ -581,43 +584,39 @@ class Export(object):
                         continue
 
                     feature_properties = OrderedDict()
-                    for line_item, row_item in zip(labels, row):
-                        filtered_fields = list(
-                            filter(lambda x: x.name == line_item, all_fields)
-                        )
+                    for xml_label, label, row_value in zip(
+                        xml_labels, labels, row
+                    ):
+                        filtered_fields = [
+                            f for f in all_fields if f.name == xml_label
+                        ]
                         if len(filtered_fields) == 0:
                             continue
                         field = filtered_fields[0]
-                        default_label = (
-                            line_item
-                            if not line_item.startswith('_')
-                            and line_item not in all_geo_field_names
-                            else None
-                        )
-                        label = (
-                            field.labels.get(OSM_LANGUAGE)
-                            if use_osm_labels
-                            else None
-                        )
-                        if label is None:
-                            label = default_label
 
-                        if hasattr(field, 'choice') and len(row_item) != 0:
-                            if language is not None:
-                                value = field.choice.options[row_item][
-                                    'labels'
-                                ].get(language)
-                            else:
+                        if not all(
+                            re.search(fr'{geo}', label) is None
+                            for geo in all_geo_field_names
+                        ) or (
+                            len(str(row_value)) == 0
+                            or label in ('_id', '_index')
+                        ):
+                            continue
+
+                        if hasattr(field, 'choice'):
+                            value_or_none = field.choice.options[row_value][
+                                'labels'
+                            ].get(self.lang)
+                            if value_or_none is None:
                                 value = list(
-                                    field.choice.options[row_item][
+                                    field.choice.options[row_value][
                                         'labels'
                                     ].values()
                                 )[0]
                         else:
-                            value = row_item if len(str(row_item)) > 0 else None
+                            value = row_value
 
-                        if label is not None and value is not None:
-                            feature_properties.update({label: value})
+                        feature_properties.update({label: value})
 
                     feature = {
                         "type": "Feature",
