@@ -488,15 +488,7 @@ class Export(object):
                     for row in rows:
                         yield format_line(row, sep, quote)
 
-    def to_geojson(
-        self,
-        submissions: Iterator,
-        flatten: bool = True,
-        include_form_data: bool = True,
-        form_data_in_properties: bool = False,
-        language: Union[str, None] = None,
-        use_osm_labels: bool = True,
-    ) -> str:
+    def to_geojson(self, submissions: Iterator, flatten: bool = True) -> str:
         """
         Some cool geojsonification.
 
@@ -505,7 +497,6 @@ class Export(object):
                 {
                     "name": "[name of the first section]",
                     "type": "FeatureCollection",
-                    "form_data": "{...}",
                     "features": [
                         {
                             "geometry": {
@@ -527,9 +518,6 @@ class Export(object):
             ]
         """
 
-        if flatten and include_form_data:
-            form_data_in_properties = True
-
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
@@ -543,11 +531,8 @@ class Export(object):
             feature_collection = {
                 'type': 'FeatureCollection',
                 'name': first_section_name,
+                'features': [],
             }
-
-            if include_form_data and not form_data_in_properties:
-                feature_collection['form_data'] = submission
-            feature_collection['features'] = []
 
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
