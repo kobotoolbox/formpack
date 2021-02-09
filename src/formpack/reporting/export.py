@@ -249,6 +249,7 @@ class Export(object):
                 tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
                 tags.extend([{}] * (len(field.value_names) - 1))
 
+
             names = [name for name_list in name_lists for name in name_list]
 
             # add auto fields:
@@ -532,8 +533,7 @@ class Export(object):
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
-        _, all_xml_labels, _ = self.get_fields_labels_tags_for_all_versions()
-        xml_labels = all_xml_labels[first_section_name]
+        sections = self.sections[first_section_name]
 
         self.reset()  # since we're not using `parse_submissions()`
 
@@ -584,11 +584,9 @@ class Export(object):
                         continue
 
                     feature_properties = OrderedDict()
-                    for xml_label, label, row_value in zip(
-                        xml_labels, labels, row
-                    ):
+                    for section, label, row_value in zip(sections, labels, row):
                         filtered_fields = [
-                            f for f in all_fields if f.name == xml_label
+                            f for f in all_fields if f.name == section
                         ]
                         if len(filtered_fields) == 0:
                             continue
