@@ -533,16 +533,33 @@ class Export(object):
         labels = self.labels[first_section_name]
         sections = self.sections[first_section_name]
 
+        feature_array_preamble = '\n'.join([
+            '{',
+            '"type": "FeatureCollection",',
+            '"name": "{name}",'.format(name=first_section_name),
+            '"features": [',
+        ])
+        feature_array_epilogue = '\n]\n}'
+        array_preamble = '[\n'
+        array_epilogue = '\n]'
+        comma_new_line = ',\n'
+        new_line = '\n'
+
+        if flatten:
+            yield feature_array_preamble
+        else:
+            yield array_preamble
+
         self.reset()  # since we're not using `parse_submissions()`
 
-        results = []
-        all_features = []
+        first = True
         for submission in submissions:
-            feature_collection = {
-                'type': 'FeatureCollection',
-                'name': first_section_name,
-                'features': [],
-            }
+            if not flatten:
+                if first:
+                    yield feature_array_preamble
+                    first = False
+                else:
+                    yield comma_new_line + feature_array_preamble
 
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
@@ -557,6 +574,7 @@ class Export(object):
             ]
             all_geo_field_names = [f.name for f in all_geo_fields]
 
+            first_geo = True
             for geo_field in all_geo_fields:
                 rows = formatted_chunks[first_section_name]
                 for row in rows:
@@ -618,21 +636,26 @@ class Export(object):
                     }
 
                     if flatten:
-                        all_features.append(feature)
-                    else:
-                        feature_collection['features'].append(feature)
+                        if first:
+                            separator = new_line
+                            first = False
+                        else:
+                            separator = comma_new_line
+                    if not flatten:
+                        if first_geo:
+                            separator = new_line
+                            first_geo = False
+                        else:
+                            separator = comma_new_line
+                    yield separator + json.dumps(feature)
+
             if not flatten:
-                results.append(feature_collection)
+                yield feature_array_epilogue
 
         if flatten:
-            return json.dumps(
-                {
-                    'type': 'FeatureCollection',
-                    'name': first_section_name,
-                    'features': all_features,
-                }
-            )
-        return json.dumps(results)
+            yield feature_array_epilogue
+        else:
+            yield array_epilogue
 
     def to_table(self, submissions):
 
