@@ -7,7 +7,7 @@ import re
 import zipfile
 from collections import defaultdict
 from inspect import isclass
-from typing import Iterator, Union
+from typing import Iterator, Generator
 
 import xlsxwriter
 
@@ -199,8 +199,16 @@ class Export(object):
         section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
+
+        # Ensure that fields are filtered if they've been specified, otherwise
+        # carry on as usual
         if len(self.filter_fields) > 0:
-            all_fields = [f for f in all_fields if f.path in self.filter_fields]
+            all_fields = [
+                field
+                for field in all_fields
+                if field.path in self.filter_fields
+            ]
+
         all_sections = {}
 
         # List of fields we generate ourselves to add at the very end
@@ -314,6 +322,9 @@ class Export(object):
         _indexes = self._indexes
         row = self._row_cache[_section_name]
         _fields = tuple(current_section.fields.values())
+
+        # Ensure that fields are filtered if they've been specified, otherwise
+        # carry on as usual
         if len(self.filter_fields) > 0:
             _fields = tuple(
                 field
@@ -396,9 +407,11 @@ class Export(object):
                                 '_submission_{}'.format(extra_mapping_field)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
 
+            # Coerce the tags from lists to comma-seperated strings. If the
+            # list is empty, then they will be fomatted correctly depending on
+            # their export type
             if '_tags' in row:
                 row['_tags'] = ', '.join(row['_tags'])
-
             if '_notes' in row:
                 if len(row['_notes']) == 0:
                     row['_notes'] = ''
@@ -505,15 +518,29 @@ class Export(object):
                     for row in rows:
                         yield format_line(row, sep, quote)
 
-    def to_geojson(self, submissions: Iterator, flatten: bool = True) -> str:
+    def to_geojson(
+        self, submissions: Iterator, flatten: bool = True
+    ) -> Generator:
         """
-        Some cool geojsonification.
+        Returns a GeoJSON `FeatureCollection` as a generator object, where each
+        submission is a `Feature` with `geometry` taken from the response to
+        the question. All question/response pairs are included in the
+        `properties` of each `Feature` if they are not a geo question
+        themselves or are not empty. As with `to_csv()`, repeating groups are
+        not included. There are two modes that the method can run in:
+        `flatten=True` and `flatten=False`. If `True`, all geo responses will
+        be a `Feature` within a single `FeatureCollection` — regardless of
+        whether there are multiple geo questions within a single survey
+        response. If `False`, each survey response will have its own
+        `FeatureCollection` and all geo responses within that survey will be
+        `Feature`s within that.
 
         Example:
+        If `flatten=False`:
             [
                 {
-                    "name": "[name of the first section]",
                     "type": "FeatureCollection",
+                    "name": "[name of the first section]",
                     "features": [
                         {
                             "type": "Feature",
@@ -529,10 +556,40 @@ class Export(object):
                                 "question_name": "response value",
                             },
                         },
-                        ...,
+                        ...
                     ],
-                }
+                },
+                {
+                    ...
+                },
+                ...
             ]
+
+        If `flatten=True`:
+            {
+                "type": "FeatureCollection",
+                "name": "[name of the first section]",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                longitude,
+                                latitude,
+                                accuracy,
+                            ],
+                        },
+                        "properties": {
+                            "question_name": "response value",
+                        },
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ],
+            }
         """
 
         # Consider the first section only (discard repeating groups)
@@ -540,6 +597,7 @@ class Export(object):
         labels = self.labels[first_section_name]
         sections = self.sections[first_section_name]
 
+        # Set up some convenient properties when `yield`ing
         feature_array_preamble = '\n'.join([
             '{',
             '"type": "FeatureCollection",',
@@ -581,6 +639,8 @@ class Export(object):
             ]
             all_geo_field_names = [f.name for f in all_geo_fields]
 
+            # Iterate through all geo questions and format only those that have
+            # been answered
             first_geo = True
             for geo_field in all_geo_fields:
                 rows = formatted_chunks[first_section_name]
@@ -605,6 +665,8 @@ class Export(object):
 
                     feature_properties = OrderedDict()
                     for section, label, row_value in zip(sections, labels, row):
+                        # Grab the `Field` object since it holds precious info
+                        # that we need to format the response correctly
                         filtered_fields = [
                             f for f in all_fields if f.name == section
                         ]
@@ -612,6 +674,12 @@ class Export(object):
                             continue
                         field = filtered_fields[0]
 
+                        # Skip all geo fields, including the current one, as
+                        # it's unecessary to repeat in the Feature's properties.
+                        # Points contain fields such as `_<field>_latitude`,
+                        # etc. so we skip over those too. Also skip over those
+                        # fields that are blank or are included regardless of
+                        # the specified filtered fields.
                         if not all(
                             re.search(fr'{geo}', label) is None
                             for geo in all_geo_field_names
@@ -621,6 +689,8 @@ class Export(object):
                         ):
                             continue
 
+                        # Grab the translated label for choice questions if it's
+                        # available.
                         if hasattr(field, 'choice'):
                             value_or_none = field.choice.options[row_value][
                                 'labels'
@@ -688,13 +758,17 @@ class Export(object):
         sheet_row_positions = defaultdict(lambda: 0)
 
         def _append_row_to_sheet(sheet_, data):
+            # Ensure the data is stringified, otherwise export will fail.
+            # Required after allowing for `_notes` and `_tags` in the export
+            _data = list(map(str, data))
+
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
             sheet_.write_row(
                 row=row_index,
                 col=0,
-                data=list(map(str, data))
+                data=_data
             )
             row_index += 1
             sheet_row_positions[sheet_] = row_index
