@@ -396,6 +396,13 @@ class Export(object):
                                 '_submission_{}'.format(extra_mapping_field)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
 
+            if '_tags' in row:
+                row['_tags'] = ', '.join(row['_tags'])
+
+            if '_notes' in row:
+                if len(row['_notes']) == 0:
+                    row['_notes'] = ''
+
             rows.append(list(row.values()))
 
             # Process all repeat groups of this level
