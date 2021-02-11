@@ -5,7 +5,7 @@
 -e .
 
 # Install testing / development requirements
-coverage==4.5.2
+coverage==5.3
 nose==1.3.7
 tox==3.7.0
 flake8==3.6.0
