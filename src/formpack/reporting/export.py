@@ -681,7 +681,7 @@ class Export(object):
                         # fields that are blank or are included regardless of
                         # the specified filtered fields.
                         if not all(
-                            re.search(fr'{geo}', label) is None
+                            re.search(fr'_?{geo}_?', label) is None
                             for geo in all_geo_field_names
                         ) or (
                             len(str(row_value)) == 0
