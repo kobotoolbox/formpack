@@ -758,9 +758,10 @@ class Export(object):
         sheet_row_positions = defaultdict(lambda: 0)
 
         def _append_row_to_sheet(sheet_, data):
-            # Ensure the data is stringified, otherwise export will fail.
-            # Required after allowing for `_notes` and `_tags` in the export
-            _data = list(map(str, data))
+            # Ensure list or dict data is stringified, otherwise export will
+            # fail. Required after allowing for `_notes` and `_tags` in the
+            # export
+            _data = [str(d) if isinstance(d, (list, dict)) else d for d in data]
 
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
