@@ -675,7 +675,7 @@ class Export(object):
                         field = filtered_fields[0]
 
                         # Skip all geo fields, including the current one, as
-                        # it's unecessary to repeat in the Feature's properties.
+                        # it's unnecessary to repeat in the Feature's properties.
                         # Points contain fields such as `_<field>_latitude`,
                         # etc. so we skip over those too. Also skip over those
                         # fields that are blank or are included regardless of
@@ -718,7 +718,7 @@ class Export(object):
                             first = False
                         else:
                             separator = comma_new_line
-                    if not flatten:
+                    else:
                         if first_geo:
                             separator = new_line
                             first_geo = False
