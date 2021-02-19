@@ -216,15 +216,17 @@ class FormField(FormDataDef):
         for val, counter in metrics.items():
             none_submissions = counter.pop(None, 0)
             not_provided += none_submissions
-            # `counter[None]` corresponds to submissions with no values for current field (`self`)
-            # If `val` is None, some submissions don't have any values for the `splitted_by_field`.
+            # `counter[None]` corresponds to submissions with no values for
+            # current field (`self`),
+            # If `val` is None, some submissions do not have any values for
+            # the `splitted_by_field`.
             # We should consider all these submissions as `not_provided`
             if val is None:
                 not_provided += sum(counter.values())
             else:
-                # `counter['__submissions__'] contains the count of all submissions,
-                # including those where no response was provided.
-                # We need to substract all submissions with no response
+                # `counter['__submissions__'] contains the count of all
+                # submissions, including those where no response was provided.
+                # We need to subtract all submissions with no response
                 provided += counter.pop('__submissions__', 0) - none_submissions
 
         return {
