@@ -4,51 +4,63 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import re
-import sys
 from setuptools import setup, find_packages
+import sys
 
 
-def get_requirements(path):
+if sys.version_info[0] == 2:
 
-    setuppy_format = \
-        'https://github.com/{user}/{repo}/tarball/master#egg={egg}'
+    requirements = [
+        'begins',
+        'cyordereddict',
+        'jsonschema',
+        'lxml',
+        'path.py<12',  # Pinned for Python 2 compatibility
+        'pyquery',
+        'pyxform',
+        'statistics',
+        'XlsxWriter',
+        'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
+        'geojson-rewind==0.1.1+py2.jnm',  # Stop using fork after dropping Python 2 support
+    ]
 
-    setuppy_pattern = \
-        r'github.com/(?P<user>[^/.]+)/(?P<repo>[^.]+).git#egg=(?P<egg>.+)'
+    dep_links = [
+        # "Be careful with the version" part of `#egg=project-version`, according to
+        # https://setuptools.readthedocs.io/en/latest/setuptools.html#dependencies-that-aren-t-in-pypi.
+        # "It should match the one inside the project files," i.e. the `version`
+        # argument to `setup()` in `setup.py`. It should also adhere to PEP 440.
+        'https://github.com/jnm/geojson-rewind/tarball/master#egg=geojson-rewind-0.1.1+py2.jnm'
+    ]
 
-    dep_links = []
-    install_requires = []
-    with open(path) as f:
-        for line in f:
+else:
 
-            if line.startswith('-e'):
-                url_infos = re.search(setuppy_pattern, line).groupdict()
-                dep_links.append(setuppy_format.format(**url_infos))
-                egg_name = '=='.join(url_infos['egg'].rsplit('-', 1))
-                install_requires.append(egg_name)
-            else:
-                install_requires.append(line.strip())
+    requirements = [
+        'begins',
+        'jsonschema',
+        'lxml',
+        'path.py',
+        'pyquery',
+        'pyxform',
+        'statistics',
+        'XlsxWriter',
+        'backports.csv',  # Remove after dropping Python 2 support (and rewrite `imports`)
+        'geojson-rewind',
+    ]
 
-    return install_requires, dep_links
+    dep_links = [
+    ]
 
-
-requirements, dep_links = get_requirements('requirements.txt')
-dev_requirements, dev_dep_links = get_requirements('dev-requirements.txt')
-
-if 'develop' in sys.argv:
-    requirements += dev_requirements
-    dep_links += dev_dep_links
 
 setup(name='formpack',
-      version='1.4',
-      description='Manipulation tools for kobocat forms',
-      author='Alex Dorey',
-      author_email='alex.dorey@kobotoolbox.org',
+      version='2.1.0',
+      description='Manipulation tools for KoBo forms',
+      author='the formpack contributors (https://github.com/kobotoolbox/formpack/graphs/contributors)',
       url='https://github.com/kobotoolbox/formpack/',
       packages=[str(pkg) for pkg in find_packages('src')],
-      package_dir={'': b'src'},
+      package_dir={'': str('src')},  # coercing to `str` only necessary for Python 2, see
+                                     # https://github.com/sdss/python_template/issues/9
       install_requires=requirements,
+      dependency_links=dep_links,
       include_package_data=True,
       zip_safe=False,
       )

@@ -1,21 +1,20 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import unittest
 import pytest
-from collections import OrderedDict
+
 from formpack.constants import OR_OTHER_COLUMN
-from formpack.utils.xls_to_ss_structure import _parsed_sheet
 from formpack.utils.flatten_content import (flatten_content,
                                             flatten_tag_list,
                                             translated_col_list)
+from formpack.utils.future import OrderedDict
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import (flatten_to_spreadsheet_content,
                                                 _order_cols,
                                                 _flatten_tags,
                                                 _order_sheet_names)
+from formpack.utils.xls_to_ss_structure import _parsed_sheet
 
 
 def _to_dicts(list_of_ordered_dicts):
@@ -24,11 +23,11 @@ def _to_dicts(list_of_ordered_dicts):
 
 
 def test_internal_method_parsed_sheet_normal():
-    '''
+    """
     in xls_to_ss_structure, the internal method
     _parsed_sheet(...) accepts a list of lists and
     returns a list of dicts
-    '''
+    """
     sheet_dicts = _parsed_sheet([['h1', 'h2'],
                                  ['r1v1', 'r1v2'],
                                  ['r2v1', 'r2v2']])
@@ -41,12 +40,12 @@ def test_internal_method_parsed_sheet_normal():
 
 
 def test_internal_method_parsed_sheet_normalx():
-    '''
+    """
     edge cases:
      * sheet has only column headers (no values)
      * sheet has no rows
     should return an empty list
-    '''
+    """
     sheet_dicts = _to_dicts(_parsed_sheet([['h1', 'h2']]))
     assert sheet_dicts == []
 
@@ -339,7 +338,7 @@ def test_flatten_to_spreadsheet_content():
     }
     _c = flatten_to_spreadsheet_content(_e)
     assert isinstance(_c, OrderedDict)
-    assert _c.keys() == ['survey', 'choices', 'settings']
+    assert list(_c) == ['survey', 'choices', 'settings']
 
 
 def test_flatten_tags_util_method():

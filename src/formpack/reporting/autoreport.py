@@ -1,12 +1,13 @@
 # coding: utf-8
-
-from __future__ import (division, print_function, unicode_literals)
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
 
 import logging
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 from ..constants import UNSPECIFIED_TRANSLATION
 from ..submission import FormSubmission
+from ..utils.ordered_collection import OrderedCounter
 
 
 class AutoReportStats(object):
@@ -29,12 +30,12 @@ class AutoReport(object):
         self.versions = form_versions
 
     def _get_version_id_from_submission(self, submission):
-        '''
+        """
         Get the version ID from the provided submission, or `None` if not found.
 
         :param dict submission: An individual data submission.
-        :rtype: basestring or NoneType
-        '''
+        :rtype: `formpack.utils.string.str_types` or NoneType
+        """
         version_id_keys = set(self.formpack.version_id_keys()).\
             intersection(set(submission.keys()))
         if len(version_id_keys) == 0:
@@ -50,10 +51,10 @@ class AutoReport(object):
 
     def _calculate_stats(self, submissions, fields, versions, lang):
 
-        metrics = {field.name: Counter() for field in fields}
+        metrics = {field.name: OrderedCounter() for field in fields}
 
         submissions_count = 0
-        submission_counts_by_version = Counter()
+        submission_counts_by_version = OrderedCounter()
 
         for entry in submissions:
 
@@ -99,18 +100,18 @@ class AutoReport(object):
 
         # We want only the most used values so we build a separate counter
         # for it to filter them
-        splitters_rank = Counter()
+        splitters_rank = OrderedCounter()
         # Extract the split_by field from the values to get stats on
 
         # total number of submissions
         submissions_count = 0
-        submission_counts_by_version = Counter()
+        submission_counts_by_version = OrderedCounter()
 
         fields = [f for f in fields if f != split_by_field]
 
         # Then we map fields, values and splitters:
         #          {field_name1: {
-        #                  'value1': Counter(
+        #                  'value1': OrderedCounter(
         #                      (splitter1, x),
         #                      (splitter2, y)
         #                       ...
@@ -120,7 +121,7 @@ class AutoReport(object):
         #              field_name2...},
         #         ...}
         #
-        metrics = {f.name: defaultdict(Counter) for f in fields}
+        metrics = {f.name: defaultdict(OrderedCounter) for f in fields}
 
         for sbmssn in submissions:
 
@@ -182,8 +183,9 @@ class AutoReport(object):
 
         if len(top_splitters) > 5:
             top_splitters.pop()
+
         # TODO: Figure out a better way of reproducibly ordering values.
-        top_splitters.sort(key=lambda (val, _): val)
+        top_splitters.sort(key=lambda val_: val_[0])
 
         def stats_generator():
             for field in fields:

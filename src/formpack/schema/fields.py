@@ -1,29 +1,18 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-import re
 
-from operator import itemgetter
+from collections import defaultdict
 from functools import partial
-
-try:
-    xrange = xrange
-except NameError:  # python 3
-    xrange = range
-
-from collections import defaultdict, OrderedDict
-
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    pass
+from operator import itemgetter
 
 import statistics
 
-from ..utils.xform_tools import normalize_data_type
-from ..constants import UNSPECIFIED_TRANSLATION
 from .datadef import FormDataDef, FormChoice
+from ..constants import UNSPECIFIED_TRANSLATION
+from ..utils import singlemode
+from ..utils.future import range, OrderedDict
+from ..utils.ordered_collection import OrderedDefaultdict
 
 
 class FormField(FormDataDef):
@@ -90,7 +79,8 @@ class FormField(FormDataDef):
     def _get_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both",
                    _hierarchy_end=None):
-        """Return the label for this field
+        """
+        Return the label for this field
 
         Args:
             lang (str, optional): Lang to translate the label to if possible.
@@ -112,7 +102,7 @@ class FormField(FormDataDef):
             path = []
             for level in self.hierarchy[1:_hierarchy_end]:
                 _t = level.labels.get(lang)
-                if isinstance(_t, list) and len(_t) is 1:
+                if isinstance(_t, list) and len(_t) == 1:
                     _t = _t[0]
                 # sometimes, level.labels returns a list
                 if _t:
@@ -301,8 +291,8 @@ class ExtendedFormField(FormField):
 
 
         :param stats: dict {'total_count': <int>, 'provided': <int>, 'show_graph': <bool>, 'not_provided': <int>}
-        :param metrics: defaultdict {'field value': Counter('value1', 'value2', ..., 'value3')}
-        :param top_splitters: list 5 most commons values among Counter collections
+        :param metrics: defaultdict {'field value': OrderedCounter('value1', 'value2', ..., 'value3')}
+        :param top_splitters: list 5 most commons values among OrderedCounter collections
         :param lang: string
         :return: defaultdict
 
@@ -378,9 +368,7 @@ class TextField(ExtendedFormField):
 
         values = sorted(substats.items(), key=sum_frequencies, reverse=True)
 
-        stats.update({
-            'values': values[:limit]
-        })
+        stats.update({'values': values[:limit]})
 
         return stats
 
@@ -388,9 +376,10 @@ class TextField(ExtendedFormField):
 class DateField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
-        """ Return total count for all, and freq and % for 'date' date types
+        """
+        Return total count for all, and freq and % for 'date' date types
 
-            Dates are sorted from old to new.
+        Dates are sorted from old to new.
         """
 
         stats = super(DateField, self).get_stats(metrics, lang, limit)
@@ -447,7 +436,7 @@ class NumField(FormField):
 
         """
         for value, freq in sorted(dataset.items()):
-            for x in xrange(freq):
+            for x in range(freq):
                 yield value
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -469,7 +458,7 @@ class NumField(FormField):
             stats['stdev'] = statistics.stdev(self.flatten_dataset(metrics),
                                               xbar=stats['mean'])
             # requires a non empty dataset and a unique mode
-            stats['mode'] = statistics.mode(self.flatten_dataset(metrics))
+            stats['mode'] = singlemode(self.flatten_dataset(metrics))
         except statistics.StatisticsError:
             pass
 
@@ -482,11 +471,12 @@ class NumField(FormField):
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
 
-        substats = {}
+        substats = OrderedDict()
 
         # transpose the metrics data structure to look like
         # {splitter1: [x, y, z], splitter2...}}
-        inversed_metrics = defaultdict(list)
+        inversed_metrics = OrderedDefaultdict(list)
+
         for val, counter in metrics.items():
             if val is None:
                 continue
@@ -510,7 +500,7 @@ class NumField(FormField):
                 val_stats['stdev'] = statistics.stdev(values,
                                                       xbar=val_stats['mean'])
                 # requires a non empty dataset and a unique mode
-                val_stats['mode'] = statistics.mode(values)
+                val_stats['mode'] = singlemode(values)
             except statistics.StatisticsError:
                 pass
 
@@ -860,8 +850,7 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
     def __init__(self, *args, **kwargs):
         self.parameters_in_use = [
             param for param in self.PREPENDED_PARAMETERS if param is not None]
-        return super(FormChoiceFieldWithMultipleSelect, self).__init__(
-            *args, **kwargs)
+        super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
 
     @property
     def parameter_value_names(self):

@@ -1,25 +1,23 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-from collections import OrderedDict
 import json
-from io import BytesIO
-from path import tempdir
-from textwrap import dedent
 import unittest
-import xlrd
-
-from nose.tools import raises
+from io import BytesIO, TextIOWrapper
+from textwrap import dedent
 from zipfile import ZipFile
 
-from .fixtures import build_fixture, open_fixture_file
-from formpack import FormPack
+import xlrd
+from backports import csv
+from path import TempDir
 
+from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.schema.fields import ValidationStatusCopyField
-
+from formpack.utils.future import OrderedDict
+from formpack.utils.iterator import get_first_occurrence
+from .fixtures import build_fixture, open_fixture_file
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')
@@ -29,7 +27,7 @@ class TestFormPackExport(unittest.TestCase):
     maxDiff = None
 
     def assertTextEqual(self, text1, text2):
-        self.assertEquals(dedent(text1).strip(), dedent(text2).strip())
+        self.assertEqual(dedent(text1).strip(), dedent(text2).strip())
 
     def test_generator_export(self):
 
@@ -82,7 +80,7 @@ class TestFormPackExport(unittest.TestCase):
 
         # by default, exports use the question 'name' attribute
         headers = fp.export(versions=0).to_dict(submissions)['Restaurant profile']['fields']
-        self.assertEquals(headers, ['restaurant_name',
+        self.assertEqual(headers, ['restaurant_name',
                                      'location',
                                      '_location_latitude',
                                      '_location_longitude',
@@ -95,7 +93,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=translations[0], versions=1)
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEquals(headers, ['restaurant name',
+        self.assertEqual(headers, ['restaurant name',
                                     'location',
                                     '_location_latitude',
                                     '_location_longitude',
@@ -105,7 +103,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=translations[1], versions=1)
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEquals(headers, ['nom du restaurant',
+        self.assertEqual(headers, ['nom du restaurant',
                                     'lieu',
                                     '_lieu_latitude',
                                     '_lieu_longitude',
@@ -116,7 +114,7 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=UNTRANSLATED, versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEquals(headers, ['restaurant name',
+        self.assertEqual(headers, ['restaurant name',
                                     'location',
                                     '_location_latitude',
                                     '_location_longitude',
@@ -133,14 +131,14 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'rpV3'}
 
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEquals(export['fields'], ['restaurant_name',
+        self.assertEqual(export['fields'], ['restaurant_name',
                                              'location',
                                              '_location_latitude',
                                              '_location_longitude',
                                              '_location_altitude',
                                              '_location_precision',
                                              'eatery_type'])
-        self.assertEquals(export['data'], [['Taco Truck',
+        self.assertEqual(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
                                              '-25.43',
@@ -159,7 +157,7 @@ class TestFormPackExport(unittest.TestCase):
         # are translated into that language
         options['lang'] = fp[1].translations[0]
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEquals(export['data'], [['Taco Truck',
+        self.assertEqual(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
                                              '-25.43',
@@ -176,7 +174,7 @@ class TestFormPackExport(unittest.TestCase):
 
         options['lang'] = fp[1].translations[1]
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEquals(export['data'], [['Taco Truck',
+        self.assertEqual(export['data'], [['Taco Truck',
                                              '13.42 -25.43',
                                              '13.42',
                                              '-25.43',
@@ -199,7 +197,7 @@ class TestFormPackExport(unittest.TestCase):
         # by default, groups are stripped.
         export = fp.export(**options).to_dict(submissions)
         headers = export['Grouped questions']['fields']
-        self.assertEquals(headers, ['q1', 'g1q1', 'g1sg1q1',
+        self.assertEqual(headers, ['q1', 'g1q1', 'g1sg1q1',
                                     'g1q2', 'g2q1', 'qz'])
 
     def test_headers_of_translated_group_exports(self):
@@ -209,7 +207,7 @@ class TestFormPackExport(unittest.TestCase):
             'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
         english_export = fp.export(lang='English', **options).to_dict(
             submissions)
-        self.assertEquals(
+        self.assertEqual(
             english_export[title]['fields'],
             [
                 'start',
@@ -225,7 +223,7 @@ class TestFormPackExport(unittest.TestCase):
         )
         spanish_export = fp.export(lang='Español', **options).to_dict(
             submissions)
-        self.assertEquals(
+        self.assertEqual(
             spanish_export[title]['fields'],
             [
                 'start',
@@ -759,7 +757,6 @@ class TestFormPackExport(unittest.TestCase):
         ])
         self.assertEqual(export_dict, expected_dict)
 
-
     def test_repeats_alias(self):
         title, schemas, submissions = build_fixture('grouped_repeatable_alias')
         fp = FormPack(schemas, title)
@@ -1149,9 +1146,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
         rows = list(fp.export(**options).to_csv(submissions))
-        assert rows[1] == (u'"#loc+name";"#indicator+diet";'
-                           u'"#indicator+diet";"#indicator+diet";'
-                           u'"#indicator+diet";"#indicator+diet"')
+        assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";"";""')
 
     # disabled for now
     # @raises(RuntimeError)
@@ -1300,7 +1295,7 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'rgv1'}
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1311,15 +1306,15 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
                                '_over_the_lazy_dog_v1'}
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
             book = xlrd.open_workbook(xls)
             assert book.sheet_names() == [
-                u'long survey name_ the quick,...',
-                u'long_group_name__Victor_jagt...',
-                u'long_group_name__Victor_... (1)'
+                'long survey name_ the quick,...',
+                'long_group_name__Victor_jagt...',
+                'long_group_name__Victor_... (1)'
             ]
 
 
@@ -1327,7 +1322,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('hxl_grouped_repeatable')
         fp = FormPack(schemas, title)
         options = {'versions': 'hxl_rgv1', 'tag_cols_for_header': ['hxl']}
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1336,11 +1331,11 @@ class TestFormPackExport(unittest.TestCase):
             sheet = book.sheet_by_name('Household survey with HXL an...')
             row_values = [cell.value for cell in sheet.row(1)]
             assert row_values == [
-                u'#date+start', u'#date+end', u'#loc+name', u'']
+                '#date+start', '#date+end', '#loc+name', '']
             # Verify repeating group
             sheet = book.sheet_by_name('houshold_member_repeat')
             row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == [u'#beneficiary', u'', u'']
+            assert row_values == ['#beneficiary', '', '']
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
@@ -1445,7 +1440,7 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'test.xlsx'
             fp.export().to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1737,8 +1732,16 @@ class TestFormPackExport(unittest.TestCase):
         zipped = ZipFile(raw_zip, 'r')
         for name in expected_label_file_names:
             with open_fixture_file(fixture_name, name, 'r') as expected:
-                actual = zipped.open(name, 'r')
-                assert actual.read() == expected.read()
+                actual = TextIOWrapper(zipped.open(name, 'r'), newline=None,
+                                       encoding='utf-8')
+                actual_content = actual.read()
+                expected_content = expected.read()
+
+                # ToDo remove condition when Python2 support is dropped
+                if isinstance(actual_content, bytes):
+                    actual_content = actual_content.decode('utf-8')
+
+                assert actual_content == expected_content
         zipped.close()
         raw_zip.close()
 
@@ -1778,8 +1781,16 @@ class TestFormPackExport(unittest.TestCase):
         zipped = ZipFile(raw_zip, 'r')
         with open_fixture_file(
                 fixture_name, fixture_label_file_name, 'r') as expected:
-            actual = zipped.open(expected_label_file_name, 'r')
-            assert actual.read() == expected.read()
+            actual = TextIOWrapper(zipped.open(expected_label_file_name, 'r'),
+                                   newline=None,
+                                   encoding='utf-8')
+            actual_content = actual.read()
+            expected_content = expected.read()
+            # ToDo remove condition when Python2 support is dropped
+            if isinstance(actual_content, bytes):
+                actual_content = actual_content.decode('utf-8')
+
+            assert actual_content == expected_content
         zipped.close()
         raw_zip.close()
 
@@ -1813,3 +1824,219 @@ class TestFormPackExport(unittest.TestCase):
             '1',
             'Keurig'
         ])
+
+    def assert_geojson_feature_properties_match_csv(self, geojson_str,
+                                                    export_obj, submissions):
+        geojson_obj = json.loads(geojson_str)
+        feature_props = [f['properties'] for f in geojson_obj['features']]
+        csv_reader = csv.DictReader(
+            export_obj.to_csv(submissions), delimiter=';')
+        for index, csv_dict in enumerate(csv_reader):
+            self.assertDictEqual(feature_props[index], csv_dict)
+
+
+    def test_geojson_point(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Point')
+        geojson_str = ''.join(geojson_gen)
+
+        # Check the `properties` of each `feature` against the CSV export
+        self.assert_geojson_feature_properties_match_csv(
+            geojson_str, export, submissions)
+
+        # Remove the `properties` we've already checked, and compare the rest
+        geojson_obj = json.loads(geojson_str)
+        for feature in geojson_obj['features']:
+            del feature['properties']
+        self.assertDictEqual(
+            geojson_obj,
+            {
+                'features': [
+                    {
+                        'geometry': {
+                            'coordinates': [
+                                -76.60869,
+                                39.306938,
+                                11.0,
+                            ],
+                            'type': 'Point',
+                        },
+                        'type': 'Feature',
+                    },
+                    {
+                        'geometry': {
+                            'coordinates': [
+                                -58.442238,
+                                -34.631098,
+                                0.0,
+                            ],
+                            'type': 'Point',
+                        },
+                        'type': 'Feature',
+                    },
+                ],
+                'name': 'I have points, traces, and shapes!',
+                'type': 'FeatureCollection',
+            }
+        )
+
+    def test_geojson_trace(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Trace')
+        geojson_str = ''.join(geojson_gen)
+
+        # Check the `properties` of each `feature` against the CSV export
+        self.assert_geojson_feature_properties_match_csv(
+            geojson_str, export, submissions)
+
+        # Remove the `properties` we've already checked, and compare the rest
+        geojson_obj = json.loads(geojson_str)
+        for feature in geojson_obj['features']:
+            del feature['properties']
+        self.assertDictEqual(
+            geojson_obj,
+            {
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
+                    {
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-76.608323, 39.306032, 1.0],
+                                [-76.608953, 39.308701, 2.0],
+                                [-76.60938, 39.311313, 3.0],
+                                [-76.604223, 39.3116, 4.0],
+                                [-76.603804, 39.306077, 5.0],
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                    {
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-58.44218, -34.631089, 0.0],
+                                [-58.439112, -34.635079, 0.0],
+                                [-58.445635, -34.636562, 0.0],
+                                [-58.44713, -34.634929, 0.0],
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                ],
+            }
+        )
+
+    def test_geojson_shape(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Shape')
+        geojson_str = ''.join(geojson_gen)
+
+        # Check the `properties` of each `feature` against the CSV export
+        self.assert_geojson_feature_properties_match_csv(
+            geojson_str, export, submissions)
+
+        # Remove the `properties` we've already checked, and compare the rest
+        geojson_obj = json.loads(geojson_str)
+        for feature in geojson_obj['features']:
+            del feature['properties']
+        self.assertDictEqual(
+            geojson_obj,
+            {
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
+                    {
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
+                                [
+                                    [-76.608294, 39.305938, 0.0],
+                                    [-76.603656, 39.306138, 0.0],
+                                    [-76.604171, 39.31155, 0.0],
+                                    [-76.609332, 39.311288, 0.0],
+                                    [-76.609211, 39.309365, 0.0],
+                                    [-76.608294, 39.305938, 0.0],
+                                ]
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                    {
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
+                                [
+                                    [-58.447229, -34.6347, 0.0],
+                                    [-58.445613, -34.636607, 0.0],
+                                    [-58.438946, -34.635194, 0.0],
+                                    [-58.442056, -34.631063, 0.0],
+                                    [-58.447229, -34.6347, 0.0],
+                                ]
+                            ],
+                        },
+                        'type': 'Feature',
+                    },
+                ],
+            }
+        )
+
+    def test_geojson_invalid(self):
+        title, schemas, _ = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        # Can't test an invalid `geopoint` by itself; it'll blow up
+        # `FormGPSField.format()`
+        submissions = [
+            {'Trace': '1 2 3 4'}, # Not enough points
+            {'Trace': '1 2 3 4;1'}, # Second point is bogus
+            {'Trace': '1 2 3 4;1 2 banana'}, # Second point is still bogus
+            {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;13 14 15 16'}, # Not closed
+            # The following are okay and must appear in the export
+            {'Trace': '1 2 3 4;5 6 7 8'},
+            {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;1 2 3 4'},
+        ]
+        for s in submissions:
+            s[fp.default_version_id_key] = get_first_occurrence(fp.versions)
+        export = fp.export(versions=fp.versions.keys())
+        geojson_obj = json.loads(''.join(
+            export.to_geojson(submissions, geo_question_name='Trace')
+        ))
+        self.assertEqual(len(geojson_obj['features']), 1)
+        self.assertDictEqual(
+            geojson_obj['features'][0]['geometry'],
+            {
+                "coordinates": [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
+                "type": "LineString"
+            }
+        )
+        geojson_obj = json.loads(''.join(
+            export.to_geojson(submissions, geo_question_name='Shape')
+        ))
+        self.assertEqual(len(geojson_obj['features']), 1)
+        self.assertDictEqual(
+            geojson_obj['features'][0]['geometry'],
+            {
+                "coordinates": [[
+                    [2.0, 1.0, 3.0],
+                    [10.0, 9.0, 11.0],
+                    [6.0, 5.0, 7.0],
+                    [2.0, 1.0, 3.0],
+                ]],
+                "type": "Polygon"
+            }
+        )

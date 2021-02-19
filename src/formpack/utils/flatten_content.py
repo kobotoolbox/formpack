@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
 
 import re
-from copy import deepcopy
 from collections import defaultdict, OrderedDict
-from array_to_xpath import array_to_xpath
+from copy import deepcopy
+from functools import reduce
+
+from .array_to_xpath import array_to_xpath
+from .future import range
+from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
 
@@ -13,11 +18,11 @@ def flatten_content_in_place(survey_content,
                              remove_columns=None,
                              remove_sheets=None,
                              ):
-    '''
+    """
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
     will pass through to pyxform and to XLS exports
-    '''
+    """
     if isinstance(remove_columns, list):
         raise Exception('bad')
     if remove_columns is None:
@@ -60,13 +65,13 @@ def flatten_content(survey_content, in_place=False, **opts):
 
 
 def _stringify_type__depr(json_qtype):
-    '''
+    """
     NOTE: This particular representation of select_* types is being
           deprecated. [Oct 2016]
 
     {'select_one': 'xyz'} -> 'select_one xyz'
     {'select_multiple': 'xyz'} -> 'select_mutliple xyz'
-    '''
+    """
     _type_keys = ['select_one', 'select_multiple']
     if len(json_qtype.keys()) != 1:
         raise ValueError('Type object must have exactly one key: %s' %
@@ -79,24 +84,24 @@ def _stringify_type__depr(json_qtype):
 
 
 def flatten_tag_list(tag_list, tag_cols_and_seps=None):
-    '''
+    """
     takes a list of tags and reassigns them to the tag column in which they
     appear on import of xls
-    '''
+    """
     return _flatten_tags({'tags': tag_list}, tag_cols_and_seps)
 
 
 def _flatten_tags(row, tag_cols_and_seps=None):
-    '''
+    """
     takes a "tags" column with an array of tags and
     reassigns them to the tag column in which they appear
     on import of xls
-    '''
+    """
     if tag_cols_and_seps is None:
         tag_cols_and_seps = {}
 
-    for col in ['tags'] + tag_cols_and_seps.keys():
-        if col in row and isinstance(row[col], basestring):
+    for col in ['tags'] + list(tag_cols_and_seps.keys()):
+        if col in row and isinstance(row[col], str_types):
             return
 
     tag_list = row.pop('tags', [])
@@ -108,7 +113,7 @@ def _flatten_tags(row, tag_cols_and_seps=None):
 
     for tag in tag_list:
         matched = False
-        for (col, re_str) in tag_res.items():
+        for col, re_str in tag_res.items():
             mtch = re.match(re_str, tag)
             if mtch:
                 additionals[col].append(mtch.groups()[0])
@@ -116,7 +121,7 @@ def _flatten_tags(row, tag_cols_and_seps=None):
         if not matched:
             additionals['tags'].append(tag)
 
-    for (col, items) in additionals.items():
+    for col, items in additionals.items():
         separator = tag_cols_and_seps.get(col, ' ')
         row[col] = separator.join(items)
 
@@ -151,23 +156,24 @@ def _flatten_translated_fields(row, translations, translated_cols,
 
     _placed_cols = set()
 
-    def _place_col_in_order(col, base_col=None):
+    def _place_col_in_order(col_, base_col=None):
         if col_order is False:
             return
-        if col in col_order:
-            if col not in _placed_cols:
-                _placed_cols.update([col])
+        if col_ in col_order:
+            if col_ not in _placed_cols:
+                _placed_cols.update([col_])
             return
         else:
             if base_col in col_order:
                 _i = col_order.index(base_col)
-                col_order.insert(_i, col)
-                _placed_cols.update([col])
+                col_order.insert(_i, col_)
+                _placed_cols.update([col_])
             else:
-                col_order.append(col)
-                _placed_cols.update([col])
+                col_order.append(col_)
+                _placed_cols.update([col_])
 
     o_row = deepcopy(row)
+    translations_range = list(range(0, len(translations)))
     for key in (k for k in translated_cols if k in row):
         items = row[key]
         if not isinstance(items, list):
@@ -179,7 +185,7 @@ def _flatten_translated_fields(row, translations, translated_cols,
                     key,
                 ), o_row)
         del row[key]
-        for i in xrange(0, len(translations)):
+        for i in translations_range:
             _t = translations[i]
             try:
                 value = items[i]
@@ -224,13 +230,3 @@ def _flatten_survey_row(row):
                 row['type'] = '{} {} or_other'.format(_type, _list_name)
             else:
                 row['type'] = '{} {}'.format(_type, _list_name)
-
-    # TODO: remove this once https://github.com/XLSForm/pyxform/issues/236 is
-    # fixed?
-    try:
-        _order = row['order']
-    except KeyError:
-        pass
-    else:
-        if not isinstance(_order, basestring):
-            row['order'] = '{}'.format(_order)

@@ -1,9 +1,0 @@
-begins==0.9
-cyordereddict==1.0.0
-jsonschema==2.6.0
-lxml==4.3.0
-path.py==11.5.0
-pyquery==1.4.0
-pyxform==0.13.1
-statistics==1.0.3.5
-XlsxWriter==1.1.2

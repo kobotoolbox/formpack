@@ -7,9 +7,9 @@ from __future__ import (unicode_literals, print_function,
 from ..load_fixture_json import load_fixture_json
 
 DATA = {
-    u'title': 'Auto report with extended fields',
-    u'id_string': 'auto_report_extended_fields',
-    u'versions': [
+    'title': 'Auto report with extended fields',
+    'id_string': 'auto_report_extended_fields',
+    'versions': [
         load_fixture_json('auto_report_extended_fields/v1')
     ],
 }

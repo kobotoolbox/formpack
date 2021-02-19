@@ -1,4 +1,9 @@
+# coding: utf-8
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
 from jsonschema import validate
+
 from .utils.replace_aliases import (
     LABEL_OPTIONAL_TYPES,
     MAIN_TYPES,
@@ -113,5 +118,5 @@ def validate_row(row, row_number):
 
 
 def validate_content(content):
-    for (i, row) in enumerate(content['survey']):
+    for i, row in enumerate(content['survey']):
         validate_row(row, row_number=i)

@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
@@ -16,7 +15,7 @@ class TestB64Attachment(unittest.TestCase):
             ['data:image/jpeg;base64,xyz', True],
             ['abcdefghijklmnopqrstuvwxyz', False],
         ]
-        for (item_str, tf) in expectations:
+        for item_str, tf in expectations:
             self.assertEqual(B64Attachment._is_attachment(item_str), tf)
 
     def test_extensions(self):
@@ -24,7 +23,7 @@ class TestB64Attachment(unittest.TestCase):
             ['data:image/png;base64,wxyz', 'image', 'png'],
             ['data:image/jpeg;base64,xyz', 'image', 'jpeg'],
         ]
-        for (item_str, exp_mtype, exp_ext) in expectations:
+        for item_str, exp_mtype, exp_ext in expectations:
             (mtype, ext, contents) = B64Attachment._attachment_split(item_str)
             self.assertEqual(exp_ext, ext)
             self.assertEqual(exp_mtype, mtype)

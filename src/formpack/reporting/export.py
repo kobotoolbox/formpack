@@ -1,26 +1,24 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
+import json
+import zipfile
+from collections import defaultdict
 from inspect import isclass
 
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
-
-from collections import defaultdict
-
-import zipfile
 import xlsxwriter
 
-from ..submission import FormSubmission
+from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 from ..schema import CopyField
+from ..submission import FormSubmission
+from ..utils.exceptions import FormPackGeoJsonError
+from ..utils.flatten_content import flatten_tag_list
+from ..utils.future import iteritems, itervalues, OrderedDict
+from ..utils.geojson import field_and_response_to_geometry
+from ..utils.iterator import get_first_occurrence
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
-from ..utils.flatten_content import flatten_tag_list
-from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
 
 
 class Export(object):
@@ -66,8 +64,8 @@ class Export(object):
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            for version in iter(form_versions.values()):
-                first_section = next(iter(version.sections.values()))
+            for version in itervalues(form_versions):
+                first_section = next(itervalues(version.sections))
                 for copy_field in copy_fields:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
@@ -93,25 +91,55 @@ class Export(object):
             self._row_cache[section_name] = OrderedDict.fromkeys(fields, '')
             self._empty_row[section_name] = dict(self._row_cache[section_name])
 
+    def get_version_for_submission(self, submission):
+        """
+        Return the `FormVersion` for this submission, or `None` if none can be
+        found
+        """
+        version_id = None
+        # find the first version_id present in the submission
+        for _key in self.version_id_keys:
+            if _key in submission:
+                version_id = submission.get(_key)
+                break
+        try:
+            return self.versions[version_id]
+        except KeyError:
+            return None
+
+    def parse_one_submission(self, submission, version=None):
+        """
+        Parse a single submission and return a formatted 'chunks' structure;
+        see format_one_submission() for details
+
+        Args:
+            version (FormVersion): optional, explicit version to use for this
+                submission instead of inferring the version from the submission
+                itself
+        """
+        if not version:
+            version = self.get_version_for_submission(submission)
+        if not version:
+            # TODO: somehow include this submission anyway; see
+            # https://github.com/kobotoolbox/formpack/issues/164
+            return None
+        # `format_one_submission()` will recurse through all the sections; get
+        # the first one to start
+        section = get_first_occurrence(version.sections.values())
+        submission = FormSubmission(submission)
+        return self.format_one_submission([submission.data], section)
+
     def parse_submissions(self, submissions):
-        """Return the a generators yielding formatted chunks of the data set"""
+        """
+        Return a generator yielding formatted 'chunks' for each submission from
+        the data set
+        """
         self.reset()
-        versions = self.versions
-        for entry in submissions:
-            version_id = None
-
-            # find the first version_id present in the submission
-            for _key in self.version_id_keys:
-                if _key in entry:
-                    version_id = entry.get(_key)
-                    break
-
-            try:
-                section = versions[version_id].sections[self.title]
-                submission = FormSubmission(entry)
-                yield self.format_one_submission([submission.data], section)
-            except KeyError:
-                pass
+        for submission in submissions:
+            formatted_chunks = self.parse_one_submission(submission)
+            if not formatted_chunks:
+                continue
+            yield formatted_chunks
 
     def reset(self):
         """ Reset sections and indexes to initial values """
@@ -157,21 +185,19 @@ class Export(object):
             raise RuntimeError(
                 '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
 
-        section_fields = OrderedDict()  # {section: [(name, field), (name...))]}
-        section_labels = OrderedDict()  # {section: [field_label, field_label]}
-        section_tags = OrderedDict()  # {section: [{column_name: tag_string, ...}, ...]}
+        section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
+        section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
+        section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_sections = {}
 
-        # List of fields we generate ourself to add at the very ends
+        # List of fields we generate ourselves to add at the very end
         # of the field list
         auto_fields = OrderedDict()
 
         for field in all_fields:
-            section_fields.setdefault(field.section.name, []).append(
-                (field.name, field)
-            )
+            section_fields.setdefault(field.section.name, []).append(field)
             section_labels.setdefault(field.section.name, []).append(
                 field.get_labels(lang, group_sep,
                                  hierarchy_in_labels,
@@ -197,29 +223,24 @@ class Export(object):
                         auto_field_names.append(
                             "_submission_{}".format(copy_field))
 
-
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
         # have several values. We needed them grouped to insert them at the
         # proper index, but now we want just list of all of them.
 
         # Flatten all the names for all the value of all the fields
-        for section, fields in list(section_fields.items()):
+        for section, fields in section_fields.items():
             name_lists = []
             tags = []
-            for _field_data in fields:
-                if len(_field_data) != 2:
-                    # e.g. [u'location', u'_location_latitude',...]
-                    continue
-                (field_name, field) = _field_data
+            for field in fields:
                 name_lists.append(field.value_names)
 
                 # Add the tags for this field. If the field has multiple
-                # labels, add the tags once for each label
-                tags.extend(
-                    [flatten_tag_list(field.tags, tag_cols_and_seps)] *
-                        len(field.value_names)
-                )
+                # labels, add the tag for the first label *only*. Insert blanks
+                # for the subsequent fields. See
+                # https://github.com/kobotoolbox/formpack/issues/208
+                tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
+                tags.extend([{}] * (len(field.value_names) - 1))
 
             names = [name for name_list in name_lists for name in name_list]
 
@@ -248,7 +269,7 @@ class Export(object):
         # containing all the formatted data.
         # If you have repeat groups, you will have one section per repeat
         # group. Section are hierarchical, and can have a parent and one
-        # or more children. format_one_submission() is called recursivelly
+        # or more children. format_one_submission() is called recursively
         # with each section to process them all.
 
         # 'chunks' is a mapping of section names with associated formatted data
@@ -350,11 +371,11 @@ class Export(object):
                     for extra_mapping_field in self.copy_fields:
                         if isclass(extra_mapping_field):
                             row[
-                                u"_submission_{}".format(extra_mapping_field.FIELD_NAME)
+                                '_submission_{}'.format(extra_mapping_field.FIELD_NAME)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
                         else:
                             row[
-                                u"_submission_{}".format(extra_mapping_field)
+                                '_submission_{}'.format(extra_mapping_field)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
 
             rows.append(list(row.values()))
@@ -368,7 +389,7 @@ class Export(object):
                 if nested_data:
                     chunk = self.format_one_submission(entry[child_section.path],
                                                        child_section)
-                    for key, value in chunk.iteritems():
+                    for key, value in iteritems(chunk):
                         if key in chunks:
                             chunks[key].extend(value)
                         else:
@@ -399,9 +420,9 @@ class Export(object):
         return rows
 
     def to_dict(self, submissions):
-        '''
-            This defeats the purpose of using generators, but it's useful for tests
-        '''
+        """
+        This defeats the purpose of using generators, but it's useful for tests
+        """
 
         d = OrderedDict()
 
@@ -415,12 +436,12 @@ class Export(object):
         return d
 
     def to_csv(self, submissions, sep=";", quote='"'):
-        '''
-            Return a generator yielding csv lines.
+        """
+        Return a generator yielding csv lines.
 
-            We don't use the csv module to avoid buffering the lines
-            in memory.
-        '''
+        We don't use the csv module to avoid buffering the lines
+        in memory.
+        """
 
         sections = list(self.labels.items())
 
@@ -428,17 +449,17 @@ class Export(object):
         #     raise RuntimeError("CSV export does not support repeatable groups")
 
         def escape_quote(value, quote):
-            '''
-                According to https://www.ietf.org/rfc/rfc4180.txt,
+            """
+            According to https://www.ietf.org/rfc/rfc4180.txt,
 
-                    If double-quotes are used to enclose fields, then a
-                    double-quote appearing inside a field must be escaped by
-                    preceding it with another double quote.
+                If double-quotes are used to enclose fields, then a
+                double-quote appearing inside a field must be escaped by
+                preceding it with another double quote.
 
-                We will follow this convention by doubling `quote` wherever it
-                appears in `value`, regardless of what `quote` is. Perhaps this
-                is not the best idea.
-            '''
+            We will follow this convention by doubling `quote` wherever it
+            appears in `value`, regardless of what `quote` is. Perhaps this
+            is not the best idea.
+            """
             return value.replace(quote, quote * 2)
 
         def format_line(line, sep, quote):
@@ -458,6 +479,105 @@ class Export(object):
                 if section == section_name:
                     for row in rows:
                         yield format_line(row, sep, quote)
+
+    def to_geojson(self, submissions, geo_question_name=None):
+        """
+        Returns a GeoJSON `FeatureCollection` as a string, where each
+        submission is a `Feature` with `geometry` taken from the response to
+        the question identified by `geo_question_name`. All question/response
+        pairs are included in the `properties` of each `Feature`. As with
+        `to_csv()`, repeating groups are not included.
+
+        Example:
+            {
+              "name": "[name of the first section]",
+              "type": "FeatureCollection"
+              "features": [
+                {
+                  "geometry": {
+                    "coordinates": [longitude, latitude, accuracy],
+                    "type": "Point"
+                  },
+                  "properties": {
+                    "question_name": "response value",
+                    …
+                  },
+                  "type": "Feature"
+                },
+                …
+              ],
+            }
+        """
+
+        # Consider the first section only (discard repeating groups)
+        first_section_name = get_first_occurrence(self.sections.keys())
+        labels = self.labels[first_section_name]
+
+        # Manually write the beginning and end of the GeoJSON file so that we
+        # can yield one GeoJSON `Feature` object at a time
+        feature_array_preamble = '\n'.join([
+            '{',
+            '"type": "FeatureCollection",',
+            '"name": "{name}",'.format(name=first_section_name),
+            '"features": [',
+        ])
+        feature_array_epilogue = '\n]\n}'
+        yield feature_array_preamble
+
+        self.reset() # since we're not using `parse_submissions()`
+
+        first = True
+        for submission in submissions:
+            # We need direct access to the field objects (available inside the
+            # version) and the unformatted submission data
+            version = self.get_version_for_submission(submission)
+            formatted_chunks = self.parse_one_submission(submission, version)
+            if not formatted_chunks:
+                continue
+
+            # Find the requested field
+            all_fields = version.sections[first_section_name].fields.values()
+            geo_fields = [f for f in all_fields if f.name == geo_question_name]
+            try:
+                geo_field = geo_fields[0]
+            except IndexError:
+                # Requested field doesn't exist in the form version used by
+                # this submission; skip it
+                continue
+
+            rows = formatted_chunks[first_section_name]
+            for row in rows:
+                try:
+                    geo_response = submission[geo_field.path]
+                except KeyError:
+                    # Discard submissions with missing geo data
+                    continue
+                try:
+                    feature_geometry = field_and_response_to_geometry(
+                        geo_field, geo_response)
+                except FormPackGeoJsonError:
+                    # Discard submissions with invalid geo data
+                    continue
+                except RuntimeError:
+                    # If we're here, the field has an non-geo type. Continue in
+                    # the hope that other submissions belong to better versions
+                    # of the form
+                    continue
+                feature_properties = OrderedDict(zip(labels, row))
+                feature = {
+                    "type": "Feature",
+                    "geometry": feature_geometry,
+                    "properties": feature_properties,
+                }
+
+                if first:
+                    separator = '\n'
+                    first = False
+                else:
+                    separator = ',\n'
+                yield separator + json.dumps(feature, sort_keys=True)
+
+        yield feature_array_epilogue
 
     def to_table(self, submissions):
 
@@ -481,6 +601,7 @@ class Export(object):
         sheet_name_mapping = {}
 
         sheet_row_positions = defaultdict(lambda: 0)
+
         def _append_row_to_sheet(sheet_, data):
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
@@ -523,9 +644,9 @@ class Export(object):
         workbook.close()
 
     def to_html(self, submissions):
-        '''
-            Yield lines of and HTML table strings.
-        '''
+        """
+        Yield lines of and HTML table strings.
+        """
 
         yield "<table>"
 
@@ -572,15 +693,17 @@ class Export(object):
         return None
 
     def to_spss_labels(self, output_file):
-        '''
+        """
         Write SPSS commands that set question and choice labels, creating a ZIP
         file containing one SPSS file per translation. This includes *no* data!
 
         :param output_file: a file-like object opened for writing
-        '''
+        """
         all_versions = self.formpack.versions.values()
         all_translations = set()
-        map(all_translations.update, [v.translations for v in all_versions])
+        for v in all_versions:
+            all_translations.update(v.translations)
+
         all_fields = self.formpack.get_fields_for_versions()
 
         with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as z_out:
@@ -642,8 +765,8 @@ class Export(object):
                 MAXIMUM_FILENAME_LENGTH = 240
                 overrun = (
                     len(title)
-                        + len(rest_of_filename)
-                        - MAXIMUM_FILENAME_LENGTH
+                    + len(rest_of_filename)
+                    - MAXIMUM_FILENAME_LENGTH
                 )
                 if overrun > 0:
                     # TODO: trim the title in a right-to-left-friendly way

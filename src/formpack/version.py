@@ -1,30 +1,24 @@
 # coding: utf-8
-
 from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
-
-
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
-
-from .validators import validate_content
-
 from .constants import UNTRANSLATED
-from .submission import FormSubmission
-from .utils.xform_tools import formversion_pyxform
-from .utils import parse_xml_to_xmljson, normalize_data_type
 from .errors import SchemaError
-from .utils.flatten_content import flatten_content
-from .schema import (FormField, FormGroup, FormSection, FormChoice)
 from .errors import TranslationError
+from .schema import (FormField, FormGroup, FormSection, FormChoice)
+from .submission import FormSubmission
+from .utils import parse_xml_to_xmljson, normalize_data_type
+from .utils.flatten_content import flatten_content
+from .utils.future import OrderedDict
+from .utils.xform_tools import formversion_pyxform
+from .validators import validate_content
+from pyxform import aliases as pyxform_aliases
 
+YES_NO = pyxform_aliases.yes_no
 
 class LabelStruct(object):
-    '''
+    """
     LabelStruct stores labels + translations assigned to `field.labels`
-    '''
+    """
 
     def __init__(self, labels=[], translations=[]):
         if len(labels) != len(translations):
@@ -93,12 +87,12 @@ class FormVersion(object):
 
         content = self.schema['content']
 
-        self.translations = map(lambda t: t if t is not None else UNTRANSLATED,
-                                content.get('translations', [None]))
+        self.translations = [t if t is not None else UNTRANSLATED
+                             for t in content.get('translations', [None])]
 
         # TODO: put those parts in a separate method and unit test it
         survey = content.get('survey', [])
-        fields_by_name = dict(map(lambda row: (row.get('name'), row), survey))
+        fields_by_name = dict([(row.get('name'), row) for row in survey])
 
         # Analyze the survey schema and extract the informations we need
         # to build the export: the sections, the choices, the fields
@@ -126,8 +120,12 @@ class FormVersion(object):
         section_stack = []
 
         for data_definition in survey:
+            if 'disabled' in data_definition:
+                if YES_NO.get(str(data_definition['disabled']), False):
+                    continue
+
             data_type = data_definition.get('type')
-            if not data_type: # handle broken data type definition
+            if not data_type:  # handle broken data type definition
                 continue
 
             data_type = normalize_data_type(data_type)
@@ -208,7 +206,7 @@ class FormVersion(object):
     # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
     # to fix https://github.com/kobotoolbox/formpack/issues/150
     #
-    #def __repr__(self):
+    # def __repr__(self):
     #    return '<FormVersion %s>' % self._stats()
 
     def _stats(self):
@@ -217,8 +215,8 @@ class FormVersion(object):
         _stats['version'] = self.id
         _stats['row_count'] = len(self.schema.get('content', {}).get('survey', []))
         # returns stats in the format [ key="value" ]
-        return '\n\t'.join(map(lambda key: '%s="%s"' % (key, str(_stats[key])),
-                               _stats.keys()))
+        return '\n\t'.join(['%s="%s"' % (key, str(_stats[key]))
+                            for key in _stats.keys()])
 
     def to_dict(self, **opts):
         return flatten_content(self.schema['content'], **opts)
@@ -252,9 +250,9 @@ class FormVersion(object):
         return self.lookup('id_string')
 
     def _get_title(self):
-        '''
+        """
         if formversion has no name, uses form's name
-        '''
+        """
         if self.title is None:
             return self.form_pack.title
         return self.title
@@ -298,4 +296,5 @@ class FormVersion(object):
             'title': self.lookup('title'),
             'version': self.lookup('id'),
         })
-        return survey._to_pretty_xml().encode('utf-8')
+
+        return survey._to_pretty_xml() #.encode('utf-8')

@@ -2,18 +2,23 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+from functools import reduce
+
+from .string import unicode, str_types
+
+
 SPACE_PADDING = {
-    u'+': u' + ',
-    u'-': u' - ',
-    u',': u', ',
-    u'=': u' = ',
-    u'>': u' > ',
-    u'<': u' < ',
-    u'<=': u' <= ',
-    u'>=': u' >= ',
-    u'!=': u' != ',
-    u'and': u' and ',
-    u'or': u' or ',
+    '+': ' + ',
+    '-': ' - ',
+    ',': ', ',
+    '=': ' = ',
+    '>': ' > ',
+    '<': ' < ',
+    '<=': ' <= ',
+    '>=': ' >= ',
+    '!=': ' != ',
+    'and': ' and ',
+    'or': ' or ',
 }
 
 
@@ -22,7 +27,7 @@ def _case_fn(args):
         raise ValueError('empty @case expression')
 
     def _pop_arg():
-        return False if len(args) is 0 else args.pop()
+        return False if len(args) == 0 else args.pop()
 
     # last item in args specifies the default value
     expr = _pop_arg()
@@ -42,28 +47,28 @@ def _case_fn(args):
 
 
 DEFAULT_FNS = {
-    u'@lookup': lambda x: "${%s}" % x,
-    u'@response_not_equal': lambda args: [{'@lookup': args[0]}, '!=', args[1]],
-    u'@join': lambda p: reduce(lambda x, v: x + [v, p[0]], p[1], [])[:-1],
-    u'@and': lambda args: {'@join': ['and', args]},
-    u'@or': lambda args: {'@join': ['or', args]},
-    u'@not': lambda args: ['not', {'@parens': args}],
-    u'@if': lambda args: ['if', {'@comma_parens': [args]}],
-    u'@predicate': lambda args: ['[', args, ']'],
-    u'@parens': lambda args: ['('] + args + [')'],
-    u'@comma_parens': lambda args: {
+    '@lookup': lambda x: "${%s}" % x,
+    '@response_not_equal': lambda args: [{'@lookup': args[0]}, '!=', args[1]],
+    '@join': lambda p: reduce(lambda x, v: x + [v, p[0]], p[1], [])[:-1],
+    '@and': lambda args: {'@join': ['and', args]},
+    '@or': lambda args: {'@join': ['or', args]},
+    '@not': lambda args: ['not', {'@parens': args}],
+    '@if': lambda args: ['if', {'@comma_parens': [args]}],
+    '@predicate': lambda args: ['[', args, ']'],
+    '@parens': lambda args: ['('] + args + [')'],
+    '@comma_parens': lambda args: {
         '@parens': reduce(
                 lambda arr, itm: arr + [itm, ','], args[0], []
             )[:-1]
     },
-    u'@axis': lambda args: [args[0], '::', args[1]],
-    u'@position': lambda args: ['position', {'@parens': [args]}],
-    u'@selected_at': lambda args: ['selected-at', {'@comma_parens': [args]}],
-    u'@count_selected': lambda args: ['count-selected', {'@parens': args}],
-    u'@multiselected': lambda args: [['selected', {'@parens': [
+    '@axis': lambda args: [args[0], '::', args[1]],
+    '@position': lambda args: ['position', {'@parens': [args]}],
+    '@selected_at': lambda args: ['selected-at', {'@comma_parens': [args]}],
+    '@count_selected': lambda args: ['count-selected', {'@parens': args}],
+    '@multiselected': lambda args: [['selected', {'@parens': [
                                      {'@lookup': args[0]}, ',', args[1]]}]],
-    u'@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
-    u'@case': _case_fn,
+    '@not_multiselected': lambda p: {'@not': [{'@multiselected': p}]},
+    '@case': _case_fn,
 }
 
 # this will be phased out shortly, since most fields are expandable in some way
@@ -84,7 +89,7 @@ def array_to_flattened_array(outer_arr, _fns):
             # recurse
             for item in arr:
                 arr2x(item)
-        elif isinstance(arr, basestring) or isinstance(arr, int) or \
+        elif isinstance(arr, str_types) or isinstance(arr, int) or \
                 isinstance(arr, float):
             # parameter is string or number and can be added directly
             out.append(arr)
@@ -126,6 +131,7 @@ def flattened_array_to_padded_string(flattened):
         else:
             out_string += unicode(p)
     return out_string
+
 
 array_to_xpath.array_to_flattened_array = array_to_flattened_array
 array_to_xpath.flattened_array_to_padded_string = \

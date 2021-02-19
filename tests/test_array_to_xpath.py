@@ -10,10 +10,10 @@ _fns = {}
 
 
 def test_custom_directive():
-    assert u'dlrow olleh' == array_to_xpath({
-        u'@string_reverse': u'hello world'
+    assert 'dlrow olleh' == array_to_xpath({
+        '@string_reverse': 'hello world'
     }, {
-        u'@string_reverse': lambda args: [args[::-1]]
+        '@string_reverse': lambda args: [args[::-1]]
     })
 
 
@@ -24,79 +24,79 @@ def test_equiv_1():
 
 
 def test_equiv_2():
-    inp = [u'a', u'b']
+    inp = ['a', 'b']
     expected = "ab"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_3():
-    inp = [u'a', {u'something': u'b'}, u'c']
+    inp = ['a', {'something': 'b'}, 'c']
     expected = "abc"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_4():
-    inp = [u'a', {u'something_b': u'b', u'something_c': u'c'}, u'd', [[u'e', u'f', {u'x': u'g'}]]]
+    inp = ['a', {'something_b': 'b', 'something_c': 'c'}, 'd', [['e', 'f', {'x': 'g'}]]]
     expected = "abcdefg"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_5():
-    inp = [u'a', {u'# pound sign starts a comment': u'never added'}, u'b']
+    inp = ['a', {'# pound sign starts a comment': 'never added'}, 'b']
     expected = "ab"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_6():
-    inp = [u'a', [u'(', u')']]
+    inp = ['a', ['(', ')']]
     expected = "a()"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_7():
-    inp = [u'a', [u'(', [u'1', u'2', u'3'], u')']]
+    inp = ['a', ['(', ['1', '2', '3'], ')']]
     expected = "a(123)"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_8():
-    inp = [u'a', [u'(', [u'x', u'+', u'y', u',', u'z'], u')'], u'b']
+    inp = ['a', ['(', ['x', '+', 'y', ',', 'z'], ')'], 'b']
     expected = "a(x + y, z)b"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_9():
-    inp = [u'a', [u'(', [u'x', u'+', u'y', u',', u'z'], u')']]
+    inp = ['a', ['(', ['x', '+', 'y', ',', 'z'], ')']]
     expected = "a(x + y, z)"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_10():
-    inp = [{u'@lookup': u'abc'}]
+    inp = [{'@lookup': 'abc'}]
     expected = "${abc}"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_11():
-    inp = [{u'@lookup': u'abc'}]
+    inp = [{'@lookup': 'abc'}]
     expected = "${abc}"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_12():
-    inp = [{u'@response_not_equal': [u'question_a', u"'a'"]}]
+    inp = [{'@response_not_equal': ['question_a', "'a'"]}]
     expected = "${question_a} != 'a'"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_13():
-    inp = [{u'@and': [[{u'@lookup': u'a'}, u'=', u"'a'"], [{u'@lookup': u'b'}, u'=', u"'b'"], [{u'@lookup': u'c'}, u'=', u"'c'"]]}, u'and', {u'@or': [[{u'@lookup': u'x'}, u'=', u"'x'"], [{u'@lookup': u'y'}, u'=', u"'y'"]]}]
+    inp = [{'@and': [[{'@lookup': 'a'}, '=', "'a'"], [{'@lookup': 'b'}, '=', "'b'"], [{'@lookup': 'c'}, '=', "'c'"]]}, 'and', {'@or': [[{'@lookup': 'x'}, '=', "'x'"], [{'@lookup': 'y'}, '=', "'y'"]]}]
     expected = "${a} = 'a' and ${b} = 'b' and ${c} = 'c' and ${x} = 'x' or ${y} = 'y'"
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_14():
-    inp = [{u'aa__q1': [{u'@lookup': u'question_a'}, u'!=', u"'a'"]}, u'and', [u'${question_b}', u'<=', 123], u'and', [{u'@not_multiselected': [u'question_c', u"'option_2'"]}], u'and', [{u'@lookup': u'question_d'}, u'=', u"'option_2'"]]
+    inp = [{'aa__q1': [{'@lookup': 'question_a'}, '!=', "'a'"]}, 'and', ['${question_b}', '<=', 123], 'and', [{'@not_multiselected': ['question_c', "'option_2'"]}], 'and', [{'@lookup': 'question_d'}, '=', "'option_2'"]]
     expected = "${question_a} != 'a' and ${question_b} <= 123 and not(selected(${question_c}, 'option_2')) and ${question_d} = 'option_2'"
     assert expected == array_to_xpath(inp, _fns)
 
@@ -343,23 +343,23 @@ def test_if_expr():
     ]) == "if(condition, 'val1', 'val2')"
 
 default_fn_tests = {
-    u'@lookup': test_lookup,
-    u'@response_not_equal': test_response_not_equal,
-    u'@join': test_join,
-    u'@and': test_and,
-    u'@or': test_or,
-    u'@not': test_not,
-    u'@predicate': test_predicate,
-    u'@parens': test_parens,
-    u'@axis': test_axis,
-    u'@position': test_position,
-    u'@selected_at': test_selected_at,
-    u'@count_selected': test_count_selected,
-    u'@multiselected': test_multiselected,
-    u'@not_multiselected': test_not_multiselected,
-    u'@case': test_case_expression,
-    u'@comma_parens': test_comma_parens,
-    u'@if': test_if_expr,
+    '@lookup': test_lookup,
+    '@response_not_equal': test_response_not_equal,
+    '@join': test_join,
+    '@and': test_and,
+    '@or': test_or,
+    '@not': test_not,
+    '@predicate': test_predicate,
+    '@parens': test_parens,
+    '@axis': test_axis,
+    '@position': test_position,
+    '@selected_at': test_selected_at,
+    '@count_selected': test_count_selected,
+    '@multiselected': test_multiselected,
+    '@not_multiselected': test_not_multiselected,
+    '@case': test_case_expression,
+    '@comma_parens': test_comma_parens,
+    '@if': test_if_expr,
 }
 
 

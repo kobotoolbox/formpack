@@ -3,7 +3,7 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-'''
+"""
 formpack.pack.FormPack
 
 A FormPack object pulls data associated with a single form or a multi-versioned
@@ -17,6 +17,6 @@ of the ODK-flavored XForms including:
  * translated forms
  * media attachments
  * complex data types
-'''
+"""
 
 from .pack import FormPack

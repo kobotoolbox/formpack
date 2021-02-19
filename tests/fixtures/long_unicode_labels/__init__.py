@@ -16,9 +16,9 @@ fail!
 from ..load_fixture_json import load_fixture_json
 
 DATA = {
-    u'title': u'long unicode labels to test SPSS export',
-    u'id_string': 'long_labels',
-    u'versions': [
+    'title': 'long unicode labels to test SPSS export',
+    'id_string': 'long_labels',
+    'versions': [
         load_fixture_json('long_unicode_labels/v1'),
     ],
 }

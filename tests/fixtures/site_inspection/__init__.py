@@ -19,9 +19,9 @@ Inspired by support request #2808
 from ..load_fixture_json import load_fixture_json
 
 DATA = {
-    u'title': 'Site inspection',
-    u'id_string': 'site_inspection',
-    u'versions': [
+    'title': 'Site inspection',
+    'id_string': 'site_inspection',
+    'versions': [
         load_fixture_json('site_inspection/v1'),
         load_fixture_json('site_inspection/v2'),
         load_fixture_json('site_inspection/v3'),
@@ -32,9 +32,9 @@ DATA = {
 
 
 DATA_WITH_COPY_FIELDS = {
-    u'title': 'Site inspection',
-    u'id_string': 'site_inspection',
-    u'versions': [
+    'title': 'Site inspection',
+    'id_string': 'site_inspection',
+    'versions': [
         load_fixture_json('site_inspection/v1'),
         load_fixture_json('site_inspection/v2'),
         load_fixture_json('site_inspection/v3'),
