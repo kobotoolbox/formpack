@@ -7,7 +7,7 @@ import re
 import zipfile
 from collections import defaultdict
 from inspect import isclass
-from typing import Iterator, Generator
+from typing import Iterator, Generator, Union
 
 import xlsxwriter
 
@@ -33,7 +33,7 @@ class Export(object):
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=None, filter_fields=[]):
+                 title="submissions", tag_cols_for_header=None, filter_fields=()):
         """
 
         :param formpack: FormPack
@@ -64,7 +64,6 @@ class Export(object):
         self.filter_fields = filter_fields
         self.__r_groups_submission_mapping_values = {}
 
-        #tag_cols_for_header = None
         if tag_cols_for_header is None:
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
@@ -202,7 +201,7 @@ class Export(object):
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
-        if len(self.filter_fields) > 0:
+        if self.filter_fields:
             all_fields = [
                 field
                 for field in all_fields
@@ -407,13 +406,18 @@ class Export(object):
                                 '_submission_{}'.format(extra_mapping_field)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
 
-            # Coerce the tags from lists to comma-seperated strings. If the
-            # list is empty, then they will be fomatted correctly depending on
-            # their export type
+            # Ensure list or dict data is stringified, otherwise export will
+            # fail. Required after allowing for `_notes` and `_tags` in the
+            # export
             if '_tags' in row:
-                row['_tags'] = ', '.join(row['_tags'])
+                if isinstance(row['_tags'], list):
+                    row['_tags'] = ', '.join(row['_tags'])
+                else:
+                    row['_tags'] = ''
             if '_notes' in row:
-                if len(row['_notes']) == 0:
+                if isinstance(row['_notes'], dict):
+                    row['_notes'] = str(row['_notes'])
+                else:
                     row['_notes'] = ''
 
             rows.append(list(row.values()))
@@ -519,7 +523,10 @@ class Export(object):
                         yield format_line(row, sep, quote)
 
     def to_geojson(
-        self, submissions: Iterator, flatten: bool = True
+        self,
+        submissions: Iterator,
+        flatten: bool = True,
+        geo_question_name: Union[str, None] = None,
     ) -> Generator:
         """
         Returns a GeoJSON `FeatureCollection` as a generator object, where each
@@ -536,39 +543,11 @@ class Export(object):
         `Feature`s within that.
 
         Example:
-        If `flatten=False`:
-            [
-                {
-                    "type": "FeatureCollection",
-                    "name": "[name of the first section]",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [
-                                    longitude,
-                                    latitude,
-                                    accuracy,
-                                ],
-                            },
-                            "properties": {
-                                "question_name": "response value",
-                            },
-                        },
-                        ...
-                    ],
-                },
-                {
-                    ...
-                },
-                ...
-            ]
 
         If `flatten=True`:
             {
                 "type": "FeatureCollection",
-                "name": "[name of the first section]",
+                "name": "name of the first section",
                 "features": [
                     {
                         "type": "Feature",
@@ -577,18 +556,18 @@ class Export(object):
                             "coordinates": [
                                 longitude,
                                 latitude,
-                                accuracy,
-                            ],
+                                accuracy
+                            ]
                         },
                         "properties": {
-                            "question_name": "response value",
+                            ...
                         },
                     },
                     {
                         ...
                     },
                     ...
-                ],
+                ]
             }
         """
 
@@ -607,8 +586,8 @@ class Export(object):
         feature_array_epilogue = '\n]\n}'
         array_preamble = '[\n'
         array_epilogue = '\n]'
-        comma_new_line = ',\n'
-        new_line = '\n'
+        comma_newline = ',\n'
+        newline = '\n'
 
         if flatten:
             yield feature_array_preamble
@@ -624,7 +603,7 @@ class Export(object):
                     yield feature_array_preamble
                     first = False
                 else:
-                    yield comma_new_line + feature_array_preamble
+                    yield comma_newline + feature_array_preamble
 
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
@@ -643,6 +622,15 @@ class Export(object):
             # been answered
             first_geo = True
             for geo_field in all_geo_fields:
+                # Handle the API query param of geo_question_name if present by
+                # passing all geo fields that don't match the specified
+                # question rather than filtering outside of the loop
+                if (
+                    geo_question_name is not None
+                    and geo_question_name != geo_field.name
+                ):
+                    continue
+
                 rows = formatted_chunks[first_section_name]
                 for row in rows:
                     try:
@@ -664,13 +652,13 @@ class Export(object):
                         continue
 
                     feature_properties = OrderedDict()
-                    for section, label, row_value in zip(sections, labels, row):
+                    for name, label, row_value in zip(sections, labels, row):
                         # Grab the `Field` object since it holds precious info
                         # that we need to format the response correctly
                         filtered_fields = [
-                            f for f in all_fields if f.name == section
+                            f for f in all_fields if f.name == name
                         ]
-                        if len(filtered_fields) == 0:
+                        if not filtered_fields:
                             continue
                         field = filtered_fields[0]
 
@@ -680,13 +668,9 @@ class Export(object):
                         # etc. so we skip over those too. Also skip over those
                         # fields that are blank or are included regardless of
                         # the specified filtered fields.
-                        if not all(
-                            re.search(fr'_?{geo}_?', label) is None
-                            for geo in all_geo_field_names
-                        ) or (
-                            len(str(row_value)) == 0
-                            or label in ('_id', '_index')
-                        ):
+                        if label in all_geo_field_names:
+                            continue
+                        if not row_value or label in ('_id', '_index'):
                             continue
 
                         # Grab the translated label for choice questions if it's
@@ -714,16 +698,16 @@ class Export(object):
 
                     if flatten:
                         if first:
-                            separator = new_line
+                            separator = newline
                             first = False
                         else:
-                            separator = comma_new_line
+                            separator = comma_newline
                     else:
                         if first_geo:
-                            separator = new_line
+                            separator = newline
                             first_geo = False
                         else:
-                            separator = comma_new_line
+                            separator = comma_newline
                     yield separator + json.dumps(feature)
 
             if not flatten:
