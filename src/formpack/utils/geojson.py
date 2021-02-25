@@ -53,8 +53,8 @@ def field_and_response_to_geometry(field, response):
             raise FormPackGeoJsonError('Non-numeric data for a coordinate')
 
         # Swap the coordinates because that's what GeoJSON wants 🙄
-        latitude, longitude, _, accuracy = coordinates
-        return longitude, latitude, accuracy
+        latitude, longitude, altitude, accuracy = coordinates
+        return longitude, latitude, altitude
 
     geometry = {}
 

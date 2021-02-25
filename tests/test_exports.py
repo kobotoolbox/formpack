@@ -1832,58 +1832,49 @@ class TestFormPackExport(unittest.TestCase):
         assert len(fp.versions) == 2
 
         export = fp.export(versions=fp.versions.keys())
-        geojson_gen = export.to_geojson(submissions)
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Point')
         geojson_str = ''.join(geojson_gen)
-
-        # Remove the `properties` we've already checked, and compare the rest
         geojson_obj = json.loads(geojson_str)
-        for feature in geojson_obj['features']:
-            del feature['properties']
 
-        # Get only points
-        geojson_obj_points = self._get_geo_type_for_geojson_object(
-            geojson_obj, 'Point'
-        )
-
-        assert geojson_obj_points == {
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'I have points, traces, and shapes!',
             'features': [
                 {
+                    'type': 'Feature',
                     'geometry': {
+                        'type': 'Point',
                         'coordinates': [
                             -76.60869,
                             39.306938,
-                            22.0,
+                            11.0,
                         ],
-                        'type': 'Point',
                     },
-                    'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:42:37.313-04:00',
+                        'end': '2019-07-19T18:47:10.516-04:00',
+                        'Just_a_regular_text_question': 'Greenmount',
+                    },
                 },
                 {
+                    'type': 'Feature',
                     'geometry': {
+                        'type': 'Point',
                         'coordinates': [
                             -58.442238,
                             -34.631098,
                             0.0,
                         ],
-                        'type': 'Point',
                     },
-                    'type': 'Feature',
-                },
-                {
-                    'geometry': {
-                        'coordinates': [
-                            -58.355287,
-                            -34.619206,
-                            0.0,
-                        ],
-                        'type': 'Point',
+                    'properties': {
+                        'start': '2019-07-19T18:49:05.982-04:00',
+                        'end': '2019-07-19T19:03:07.602-04:00',
+                        'Just_a_regular_text_question': 'Chacabuco',
                     },
-                    'type': 'Feature',
                 },
             ],
-            'name': 'I have points, traces, and shapes!',
-            'type': 'FeatureCollection',
         }
+
 
     def test_geojson_trace(self):
         title, schemas, submissions = build_fixture('all_geo_types')
@@ -1891,49 +1882,51 @@ class TestFormPackExport(unittest.TestCase):
         assert len(fp.versions) == 2
 
         export = fp.export(versions=fp.versions.keys())
-        geojson_gen = export.to_geojson(submissions)
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Trace')
         geojson_str = ''.join(geojson_gen)
-
-        # Remove the `properties` we've already checked, and compare the rest
         geojson_obj = json.loads(geojson_str)
-        for feature in geojson_obj['features']:
-            del feature['properties']
 
-        geojson_obj_traces = self._get_geo_type_for_geojson_object(
-            geojson_obj, 'LineString'
-        )
-
-        assert geojson_obj_traces == {
-                'type': 'FeatureCollection',
-                'name': 'I have points, traces, and shapes!',
-                'features': [
-                    {
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': [
-                                [-76.608323, 39.306032, 0.0],
-                                [-76.608953, 39.308701, 0.0],
-                                [-76.60938, 39.311313, 0.0],
-                                [-76.604223, 39.3116, 0.0],
-                                [-76.603804, 39.306077, 0.0],
-                            ],
-                        },
-                        'type': 'Feature',
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'I have points, traces, and shapes!',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': [
+                            [-76.608323, 39.306032, 1.0],
+                            [-76.608953, 39.308701, 2.0],
+                            [-76.60938, 39.311313, 3.0],
+                            [-76.604223, 39.3116, 4.0],
+                            [-76.603804, 39.306077, 5.0],
+                        ],
                     },
-                    {
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': [
-                                [-58.44218, -34.631089, 0.0],
-                                [-58.439112, -34.635079, 0.0],
-                                [-58.445635, -34.636562, 0.0],
-                                [-58.44713, -34.634929, 0.0],
-                            ],
-                        },
-                        'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:42:37.313-04:00',
+                        'end': '2019-07-19T18:47:10.516-04:00',
+                        'Just_a_regular_text_question': 'Greenmount',
                     },
-                ],
-            }
+                },
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': [
+                            [-58.44218, -34.631089, 0.0],
+                            [-58.439112, -34.635079, 0.0],
+                            [-58.445635, -34.636562, 0.0],
+                            [-58.44713, -34.634929, 0.0],
+                        ],
+                    },
+                    'properties': {
+                        'start': '2019-07-19T18:49:05.982-04:00',
+                        'end': '2019-07-19T19:03:07.602-04:00',
+                        'Just_a_regular_text_question': 'Chacabuco',
+                    },
+                },
+            ],
+        }
 
     def test_geojson_shape(self):
         title, schemas, submissions = build_fixture('all_geo_types')
@@ -1941,52 +1934,54 @@ class TestFormPackExport(unittest.TestCase):
         assert len(fp.versions) == 2
 
         export = fp.export(versions=fp.versions.keys())
-        geojson_gen = export.to_geojson(submissions)
+        geojson_gen = export.to_geojson(submissions, geo_question_name='Shape')
         geojson_str = ''.join(geojson_gen)
-
-        # Remove the `properties` we've already checked, and compare the rest
         geojson_obj = json.loads(geojson_str)
-        for feature in geojson_obj['features']:
-            del feature['properties']
 
-        geojson_obj_shapes = self._get_geo_type_for_geojson_object(
-            geojson_obj, 'Polygon'
-        )
-
-        assert geojson_obj_shapes == {
+        assert geojson_obj == {
             'type': 'FeatureCollection',
             'name': 'I have points, traces, and shapes!',
             'features': [
                 {
+                    'type': 'Feature',
                     'geometry': {
                         'type': 'Polygon',
                         'coordinates': [
                             [
-                                [-76.608294, 39.305938, 0.0],
-                                [-76.603656, 39.306138, 0.0],
-                                [-76.604171, 39.31155, 0.0],
-                                [-76.609332, 39.311288, 0.0],
-                                [-76.609211, 39.309365, 0.0],
-                                [-76.608294, 39.305938, 0.0],
+                                [-76.608294, 39.305938, 0],
+                                [-76.603656, 39.306138, 0],
+                                [-76.604171, 39.31155, 0],
+                                [-76.609332, 39.311288, 0],
+                                [-76.609211, 39.309365, 0],
+                                [-76.608294, 39.305938, 0],
                             ]
                         ],
                     },
-                    'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:42:37.313-04:00',
+                        'end': '2019-07-19T18:47:10.516-04:00',
+                        'Just_a_regular_text_question': 'Greenmount',
+                    },
                 },
                 {
+                    'type': 'Feature',
                     'geometry': {
                         'type': 'Polygon',
                         'coordinates': [
                             [
-                                [-58.447229, -34.6347, 0.0],
-                                [-58.445613, -34.636607, 0.0],
-                                [-58.438946, -34.635194, 0.0],
-                                [-58.442056, -34.631063, 0.0],
-                                [-58.447229, -34.6347, 0.0],
+                                [-58.447229, -34.6347, 0],
+                                [-58.445613, -34.636607, 0],
+                                [-58.438946, -34.635194, 0],
+                                [-58.442056, -34.631063, 0],
+                                [-58.447229, -34.6347, 0],
                             ]
                         ],
                     },
-                    'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:49:05.982-04:00',
+                        'end': '2019-07-19T19:03:07.602-04:00',
+                        'Just_a_regular_text_question': 'Chacabuco',
+                    },
                 },
             ],
         }
@@ -2015,16 +2010,16 @@ class TestFormPackExport(unittest.TestCase):
         ))
         assert len(geojson_obj['features']) == 2
         assert geojson_obj['features'][0]['geometry'] == {
-            "coordinates": [[2.0, 1.0, 4.0], [6.0, 5.0, 8.0]],
+            "coordinates": [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
             "type": "LineString",
         }
         assert geojson_obj['features'][1]['geometry'] == {
             "coordinates": [
                 [
-                    [2.0, 1.0, 4.0],
-                    [10.0, 9.0, 12.0],
-                    [6.0, 5.0, 8.0],
-                    [2.0, 1.0, 4.0],
+                    [2.0, 1.0, 3.0],
+                    [10.0, 9.0, 11.0],
+                    [6.0, 5.0, 7.0],
+                    [2.0, 1.0, 3.0],
                 ]
             ],
             "type": "Polygon",
@@ -2050,44 +2045,44 @@ class TestFormPackExport(unittest.TestCase):
 
         assert geojson_obj == [
             {
-                "type": "FeatureCollection",
-                "name": "I have points, traces, and shapes!",
-                "features": [
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [-76.60869, 39.306938, 22.0],
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-76.60869, 39.306938, 11.0],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:42:37.313-04:00",
-                            "end": "2019-07-19T18:47:10.516-04:00",
-                            "Just_a_regular_text_question": "Greenmount",
+                        'properties': {
+                            'start': '2019-07-19T18:42:37.313-04:00',
+                            'end': '2019-07-19T18:47:10.516-04:00',
+                            'Just_a_regular_text_question': 'Greenmount',
                         },
                     },
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": [
-                                [-76.608323, 39.306032, 0.0],
-                                [-76.608953, 39.308701, 0.0],
-                                [-76.60938, 39.311313, 0.0],
-                                [-76.604223, 39.3116, 0.0],
-                                [-76.603804, 39.306077, 0.0],
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-76.608323, 39.306032, 1.0],
+                                [-76.608953, 39.308701, 2.0],
+                                [-76.60938, 39.311313, 3.0],
+                                [-76.604223, 39.3116, 4.0],
+                                [-76.603804, 39.306077, 5.0],
                             ],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:42:37.313-04:00",
-                            "end": "2019-07-19T18:47:10.516-04:00",
-                            "Just_a_regular_text_question": "Greenmount",
+                        'properties': {
+                            'start': '2019-07-19T18:42:37.313-04:00',
+                            'end': '2019-07-19T18:47:10.516-04:00',
+                            'Just_a_regular_text_question': 'Greenmount',
                         },
                     },
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": [
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
                                 [
                                     [-76.608294, 39.305938, 0.0],
                                     [-76.603656, 39.306138, 0.0],
@@ -2098,52 +2093,52 @@ class TestFormPackExport(unittest.TestCase):
                                 ]
                             ],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:42:37.313-04:00",
-                            "end": "2019-07-19T18:47:10.516-04:00",
-                            "Just_a_regular_text_question": "Greenmount",
+                        'properties': {
+                            'start': '2019-07-19T18:42:37.313-04:00',
+                            'end': '2019-07-19T18:47:10.516-04:00',
+                            'Just_a_regular_text_question': 'Greenmount',
                         },
                     },
                 ],
             },
             {
-                "type": "FeatureCollection",
-                "name": "I have points, traces, and shapes!",
-                "features": [
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [-58.442238, -34.631098, 0.0],
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-58.442238, -34.631098, 0.0],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:49:05.982-04:00",
-                            "end": "2019-07-19T19:03:07.602-04:00",
-                            "Just_a_regular_text_question": "Chacabuco",
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
                         },
                     },
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": [
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
                                 [-58.44218, -34.631089, 0.0],
                                 [-58.439112, -34.635079, 0.0],
                                 [-58.445635, -34.636562, 0.0],
                                 [-58.44713, -34.634929, 0.0],
                             ],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:49:05.982-04:00",
-                            "end": "2019-07-19T19:03:07.602-04:00",
-                            "Just_a_regular_text_question": "Chacabuco",
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
                         },
                     },
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": [
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
                                 [
                                     [-58.447229, -34.6347, 0.0],
                                     [-58.445613, -34.636607, 0.0],
@@ -2153,36 +2148,25 @@ class TestFormPackExport(unittest.TestCase):
                                 ]
                             ],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:49:05.982-04:00",
-                            "end": "2019-07-19T19:03:07.602-04:00",
-                            "Just_a_regular_text_question": "Chacabuco",
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
                         },
                     },
                     {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [-58.355287, -34.619206, 0.0],
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-58.355287, -34.619206, 0.0],
                         },
-                        "properties": {
-                            "start": "2019-07-19T18:49:05.982-04:00",
-                            "end": "2019-07-19T19:03:07.602-04:00",
-                            "Just_a_regular_text_question": "Chacabuco",
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
                         },
                     },
                 ],
             },
         ]
-
-    @staticmethod
-    def _get_geo_type_for_geojson_object(geojson_obj, geo_type):
-        return {
-            **geojson_obj,
-            'features': [
-                f
-                for f in geojson_obj['features']
-                if f['geometry']['type'] == geo_type
-            ],
-        }
 

@@ -192,7 +192,6 @@ class Export(object):
             raise RuntimeError(
                 '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
 
-
         section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
         section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
         section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
@@ -259,7 +258,6 @@ class Export(object):
                 # https://github.com/kobotoolbox/formpack/issues/208
                 tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
                 tags.extend([{}] * (len(field.value_names) - 1))
-
 
             names = [name for name_list in name_lists for name in name_list]
 
@@ -742,18 +740,13 @@ class Export(object):
         sheet_row_positions = defaultdict(lambda: 0)
 
         def _append_row_to_sheet(sheet_, data):
-            # Ensure list or dict data is stringified, otherwise export will
-            # fail. Required after allowing for `_notes` and `_tags` in the
-            # export
-            _data = [str(d) if isinstance(d, (list, dict)) else d for d in data]
-
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
             sheet_.write_row(
                 row=row_index,
                 col=0,
-                data=_data
+                data=data
             )
             row_index += 1
             sheet_row_positions[sheet_] = row_index
