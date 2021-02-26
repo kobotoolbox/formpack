@@ -413,7 +413,7 @@ class Export(object):
                 else:
                     row['_tags'] = ''
             if '_notes' in row:
-                if isinstance(row['_notes'], dict):
+                if row['_notes']:
                     row['_notes'] = str(row['_notes'])
                 else:
                     row['_notes'] = ''
