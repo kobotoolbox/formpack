@@ -3,7 +3,6 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 import json
-import re
 import zipfile
 from collections import defaultdict
 from inspect import isclass
@@ -322,7 +321,7 @@ class Export(object):
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
-        if len(self.filter_fields) > 0:
+        if self.filter_fields:
             _fields = tuple(
                 field
                 for field in current_section.fields.values()
@@ -554,7 +553,7 @@ class Export(object):
                             "coordinates": [
                                 longitude,
                                 latitude,
-                                accuracy
+                                altitude
                             ]
                         },
                         "properties": {

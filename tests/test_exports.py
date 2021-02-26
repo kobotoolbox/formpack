@@ -3,7 +3,6 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import json
-import re
 import unittest
 from io import BytesIO, TextIOWrapper
 from textwrap import dedent
