@@ -6,7 +6,7 @@ import json
 import zipfile
 from collections import defaultdict
 from inspect import isclass
-from typing import Iterator, Generator, Union
+from typing import Iterator, Generator, Optional
 
 import xlsxwriter
 
@@ -523,7 +523,7 @@ class Export(object):
         self,
         submissions: Iterator,
         flatten: bool = True,
-        geo_question_name: Union[str, None] = None,
+        geo_question_name: Optional[str] = None,
     ) -> Generator:
         """
         Returns a GeoJSON `FeatureCollection` as a generator object, where each
@@ -620,7 +620,7 @@ class Export(object):
             first_geo = True
             for geo_field in all_geo_fields:
                 # Handle the API query param of geo_question_name if present by
-                # passing all geo fields that don't match the specified
+                # skipping all geo fields that don't match the specified
                 # question rather than filtering outside of the loop
                 if (
                     geo_question_name is not None
@@ -660,14 +660,9 @@ class Export(object):
                         field = filtered_fields[0]
 
                         # Skip all geo fields, including the current one, as
-                        # it's unnecessary to repeat in the Feature's properties.
-                        # Points contain fields such as `_<field>_latitude`,
-                        # etc. so we skip over those too. Also skip over those
-                        # fields that are blank or are included regardless of
-                        # the specified filtered fields.
-                        if label in all_geo_field_names:
-                            continue
-                        if not row_value or label in ('_id', '_index'):
+                        # it's unnecessary to repeat in the Feature's
+                        # properties. Also skip over fields that are blank
+                        if label in all_geo_field_names or not row_value:
                             continue
 
                         # Grab the translated label for choice questions if it's
