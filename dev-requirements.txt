@@ -10,7 +10,8 @@
 
 # Python 2 compatibility
 pyquery<1.4.2
-pyxform<1.0.0
+#pyxform<1.0.0
+-e git+https://github.com/XLSForm/pyxform.git@master#egg=pyxform
 
 # Install testing / development requirements
 coverage==5.3
