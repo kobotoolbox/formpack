@@ -388,6 +388,15 @@ class Export(object):
             if '_index' in row:
                 row['_index'] = _indexes[_section_name]
 
+            # If the submission has been tagged, join those tags together into
+            # a comma-separated string
+            for tags_col in ('_tags', '_submission__tags'):
+                if tags_col in row:
+                    tags = row[tags_col]
+                    row[tags_col] = (
+                        ', '.join(tags) if isinstance(tags, list) else tags
+                    )
+
             if '_parent_table_name' in row:
                 row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
@@ -402,20 +411,6 @@ class Export(object):
                             row[
                                 '_submission_{}'.format(extra_mapping_field)
                             ] = extra_mapping_values.get(extra_mapping_field, "")
-
-            # Ensure list or dict data is stringified, otherwise export will
-            # fail. Required after allowing for `_notes` and `_tags` in the
-            # export
-            if '_tags' in row:
-                if isinstance(row['_tags'], list):
-                    row['_tags'] = ', '.join(row['_tags'])
-                else:
-                    row['_tags'] = ''
-            if '_notes' in row:
-                if row['_notes']:
-                    row['_notes'] = str(row['_notes'])
-                else:
-                    row['_notes'] = ''
 
             rows.append(list(row.values()))
 
@@ -734,13 +729,17 @@ class Export(object):
         sheet_row_positions = defaultdict(lambda: 0)
 
         def _append_row_to_sheet(sheet_, data):
+            # Ensure all list objects are coerced to strings otherwise
+            # xlswriter will fail to export
+            data_ = [str(d) if isinstance(d, list) else d for d in data]
+
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
             sheet_.write_row(
                 row=row_index,
                 col=0,
-                data=data
+                data=data_
             )
             row_index += 1
             sheet_row_positions[sheet_] = row_index
