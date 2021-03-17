@@ -1794,6 +1794,83 @@ class TestFormPackExport(unittest.TestCase):
         zipped.close()
         raw_zip.close()
 
+    def test_select_multiple_summary(self):
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        export = fp.export(
+            multiple_select='summary', versions=fp.versions.keys()
+        ).to_dict(submissions)
+        expected = OrderedDict([(
+            'Dietary needs',
+            {
+                'fields': ['restaurant_name', 'dietary_accommodations'],
+                'data': [
+                    ["Melba's", 'gluten_free'],
+                    ['Land of Kush', 'vegan vegetarian'],
+                    ['Sweet 27', 'gluten_free vegan vegetarian lactose_free'],
+                ],
+            },
+        )])
+        assert export == expected
+
+    def test_select_multiple_details(self):
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        export = fp.export(
+            multiple_select='details', versions=fp.versions.keys()
+        ).to_dict(submissions)
+        expected = OrderedDict([(
+            'Dietary needs',
+            {
+                'fields': [
+                    'restaurant_name',
+                    'dietary_accommodations/gluten_free',
+                    'dietary_accommodations/vegan',
+                    'dietary_accommodations/vegetarian',
+                    'dietary_accommodations/lactose_free',
+                ],
+                'data': [
+                    ["Melba's", '1', '0', '0', '0'],
+                    ['Land of Kush', '0', '1', '1', '0'],
+                    ['Sweet 27', '1', '1', '1', '1'],
+                ],
+            },
+        )])
+        assert export == expected
+
+    def test_select_multiple_both(self):
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        export = fp.export(
+            multiple_select='both', versions=fp.versions.keys()
+        ).to_dict(submissions)
+        expected = OrderedDict([(
+            'Dietary needs',
+            {
+                'fields': [
+                    'restaurant_name',
+                    'dietary_accommodations',
+                    'dietary_accommodations/gluten_free',
+                    'dietary_accommodations/vegan',
+                    'dietary_accommodations/vegetarian',
+                    'dietary_accommodations/lactose_free',
+                ],
+                'data': [
+                    ["Melba's", 'gluten_free', '1', '0', '0', '0'],
+                    ['Land of Kush', 'vegan vegetarian', '0', '1', '1', '0'],
+                    [
+                        'Sweet 27',
+                        'gluten_free vegan vegetarian lactose_free',
+                        '1',
+                        '1',
+                        '1',
+                        '1',
+                    ],
+                ],
+            },
+        )])
+        assert export == expected
+
     def test_select_multiple_with_different_options_in_multiple_versions(self):
         title, schemas, submissions = build_fixture('favorite_coffee')
         fp = FormPack(schemas, title)
