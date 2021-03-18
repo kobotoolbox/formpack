@@ -56,6 +56,7 @@ class Export(object):
         self.group_sep = group_sep
         self.title = title
         self.versions = form_versions
+        self.multiple_select = multiple_select
         self.copy_fields = copy_fields
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
@@ -80,11 +81,12 @@ class Export(object):
                     first_section.fields[dumb_field.name] = dumb_field
 
         # this deals with merging all form versions headers and labels
-        params = (
-            lang, group_sep, hierarchy_in_labels, multiple_select,
+        res = self.get_fields_labels_tags_for_all_versions(
+            lang,
+            group_sep,
+            hierarchy_in_labels,
             tag_cols_for_header,
         )
-        res = self.get_fields_labels_tags_for_all_versions(*params)
         self.sections, self.labels, self.tags = res
 
         self.reset()
@@ -162,7 +164,6 @@ class Export(object):
                                                 lang=UNSPECIFIED_TRANSLATION,
                                                 group_sep="/",
                                                 hierarchy_in_labels=False,
-                                                multiple_select="both",
                                                 tag_cols_for_header=None):
         """ Return 3 mappings containing field, labels, and tags by section
 
@@ -217,7 +218,7 @@ class Export(object):
             section_labels.setdefault(field.section.name, []).append(
                 field.get_labels(lang, group_sep,
                                  hierarchy_in_labels,
-                                 multiple_select)
+                                 self.multiple_select)
             )
             all_sections[field.section.name] = field.section
 
@@ -249,14 +250,16 @@ class Export(object):
             name_lists = []
             tags = []
             for field in fields:
-                name_lists.append(field.value_names)
+                name_lists.append(
+                    field.get_value_names(multiple_select=self.multiple_select)
+                )
 
                 # Add the tags for this field. If the field has multiple
                 # labels, add the tag for the first label *only*. Insert blanks
                 # for the subsequent fields. See
                 # https://github.com/kobotoolbox/formpack/issues/208
                 tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
-                tags.extend([{}] * (len(field.value_names) - 1))
+                tags.extend([{}] * (len(field.get_value_names()) - 1))
 
             names = [name for name_list in name_lists for name in name_list]
 
@@ -359,21 +362,19 @@ class Export(object):
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
 
-                    try:
-                        # get submission value for this field
-                        val = entry[field.path]
-                        # get a mapping of {"col_name": "val", ...}
-                        cells = field.format(val, _lang)
+                    # get submission value for this field
+                    val = entry.get(field.path)
+                    # get a mapping of {"col_name": "val", ...}
+                    cells = field.format(
+                        val, _lang, multiple_select=self.multiple_select
+                    )
 
-                        # save fields value if they match parent mapping fields.
-                        # Useful to map children to their parent when flattening groups.
-                        if field.path in self.copy_fields:
-                            if _section_name not in self.__r_groups_submission_mapping_values:
-                                self.__r_groups_submission_mapping_values[_section_name] = {}
-                            self.__r_groups_submission_mapping_values[_section_name].update(cells)
-
-                    except KeyError:
-                        cells = field.empty_result
+                    # save fields value if they match parent mapping fields.
+                    # Useful to map children to their parent when flattening groups.
+                    if field.path in self.copy_fields:
+                        if _section_name not in self.__r_groups_submission_mapping_values:
+                            self.__r_groups_submission_mapping_values[_section_name] = {}
+                        self.__r_groups_submission_mapping_values[_section_name].update(cells)
 
                     # fill in the canvas
                     row.update(cells)
