@@ -11,6 +11,7 @@ import re
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .future import iteritems, OrderedDict
 from .iterator import get_first_occurrence
+from .ordered_set import OrderedSet
 from .replace_aliases import META_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
@@ -158,7 +159,7 @@ def _get_special_survey_cols(content):
         'hint::English',
     For more examples, see tests.
     """
-    uniq_cols = OrderedDict()
+    uniq_cols = OrderedSet()
     special = OrderedDict()
 
     known_translated_cols = content.get('translated', [])
@@ -169,7 +170,7 @@ def _get_special_survey_cols(content):
             # to be parsed and translated in a previous iteration
             _cols = [r for r in row.keys() if r not in known_translated_cols]
 
-            uniq_cols.update(OrderedDict.fromkeys(_cols))
+            uniq_cols.update(_cols)
 
     def _mark_special(**kwargs):
         column_name = kwargs.pop('column_name')
@@ -178,7 +179,7 @@ def _get_special_survey_cols(content):
     _pluck_uniq_cols('survey')
     _pluck_uniq_cols('choices')
 
-    for column_name in uniq_cols.keys():
+    for column_name in uniq_cols:
         if column_name in ['label', 'hint']:
             _mark_special(column_name=column_name,
                           column=column_name,
