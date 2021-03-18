@@ -250,16 +250,17 @@ class Export(object):
             name_lists = []
             tags = []
             for field in fields:
-                name_lists.append(
-                    field.get_value_names(multiple_select=self.multiple_select)
+                value_names = field.get_value_names(
+                    multiple_select=self.multiple_select
                 )
+                name_lists.append(value_names)
 
                 # Add the tags for this field. If the field has multiple
                 # labels, add the tag for the first label *only*. Insert blanks
                 # for the subsequent fields. See
                 # https://github.com/kobotoolbox/formpack/issues/208
                 tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
-                tags.extend([{}] * (len(field.get_value_names()) - 1))
+                tags.extend([{}] * (len(value_names) - 1))
 
             names = [name for name_list in name_lists for name in name_list]
 
