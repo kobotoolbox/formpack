@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
-from collections import Counter, Callable
+from collections import Counter
+from collections.abc import Callable
 
 from .future import iteritems, OrderedDict
 from .string import orderable_with_none
