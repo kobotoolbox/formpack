@@ -1148,6 +1148,25 @@ class TestFormPackExport(unittest.TestCase):
         rows = list(fp.export(**options).to_csv(submissions))
         assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";"";""')
 
+    def test_csv_with_tag_headers_select_multiple_summary_or_details(self):
+        """
+        The tag header row needs to change in accordance with the
+        `multiple_select` export option
+        """
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
+
+        rows = list(
+            fp.export(multiple_select='summary', **options).to_csv(submissions)
+        )
+        assert rows[1] == ('"#loc+name";"#indicator+diet"')
+
+        rows = list(
+            fp.export(multiple_select='details', **options).to_csv(submissions)
+        )
+        assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";""')
+
     # disabled for now
     # @raises(RuntimeError)
     # def test_csv_on_repeatable_groups(self):
