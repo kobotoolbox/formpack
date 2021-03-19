@@ -112,28 +112,3 @@ VALID_BOOLEANS = [
     FALSE,
     TRUE,
 ]
-
-KOBO_LOCKING_RESTRICTIONS = [
-    'choice_add',
-    'choice_delete',
-    'choice_edit',
-    'choice_order_edit',
-    'question_delete',
-    'question_label_edit',
-    'question_settings_edit',
-    'question_skip_logic_edit',
-    'question_validation_edit',
-    'group_delete',
-    'group_label_edit',
-    'group_question_add',
-    'group_question_delete',
-    'group_question_order_edit',
-    'group_settings_edit',
-    'group_skip_logic_edit',
-    'form_replace',
-    'group_add',
-    'question_add',
-    'question_order_edit',
-    'translations_manage',
-    'form_appearance',
-]
