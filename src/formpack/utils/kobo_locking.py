@@ -41,12 +41,6 @@ KOBO_LOCKING_RESTRICTIONS = (
     'form_appearance',
 )
 
-def _validate_locks(locks: dict) -> dict:
-    if 'restriction' not in locks:
-        raise KeyError
-
-    return locks
-
 def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     """
     Return the locking profiles if there are any in a dictionary structure from
@@ -83,28 +77,32 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     if KOBO_LOCK_SHEET not in survey_dict:
         return
 
-    locks = _validate_locks(survey_dict.get(KOBO_LOCK_SHEET))
+    locks = survey_dict.get(KOBO_LOCK_SHEET)
     # Get a unique list of profile names if they have at least one value set to
     # `true` (or whatever valid "positive selection" value) from the matrix of
     # values
-    profiles = set(itertools.chain(*[list(lock.keys()) for lock in locks]))
+    profiles = set(itertools.chain(*[lock.keys() for lock in locks]))
+
+    if 'restriction' not in profiles:
+        raise KeyError('The column name `restriction` must be present')
+
     # Remove the `restriction` column header from the list to only have the
     # predefined profile names
     profiles.remove('restriction')
+
     # Set up an indexed dictionary for convenience -- return only its values
     locking_profiles = {
         name: dict(name=name, restrictions=[]) for name in profiles
     }
 
     for lock in locks:
+        restriction = lock.get('restriction')
         # ensure that valid lock values are being used
-        if lock not in KOBO_LOCKING_RESTRICTIONS:
+        if restriction not in KOBO_LOCKING_RESTRICTIONS:
             raise KeyError
         for name in profiles:
             if lock.get(name) in POSITIVE_SELECTIONS:
-                locking_profiles[name]['restrictions'].append(
-                    lock.get('restriction')
-                )
+                locking_profiles[name]['restrictions'].append(restriction)
 
     return list(locking_profiles.values())
 
