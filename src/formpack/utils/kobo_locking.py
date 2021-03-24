@@ -6,39 +6,10 @@ import io
 import itertools
 
 from .xls_to_ss_structure import xls_to_dicts
-
-KOBO_LOCK_SHEET = 'kobo--locking-profiles'
-POSITIVE_SELECTIONS = (
-    'yes',
-    "Yes",
-    'YES',
-    'true',
-    'True',
-    'TRUE',
-)
-KOBO_LOCKING_RESTRICTIONS = (
-    'choice_add',
-    'choice_delete',
-    'choice_edit',
-    'choice_order_edit',
-    'question_delete',
-    'question_label_edit',
-    'question_settings_edit',
-    'question_skip_logic_edit',
-    'question_validation_edit',
-    'group_delete',
-    'group_label_edit',
-    'group_question_add',
-    'group_question_delete',
-    'group_question_order_edit',
-    'group_settings_edit',
-    'group_skip_logic_edit',
-    'form_replace',
-    'group_add',
-    'question_add',
-    'question_order_edit',
-    'translations_manage',
-    'form_appearance',
+from formpack.constants import (
+    KOBO_LOCKING_RESTRICTIONS,
+    KOBO_LOCK_SHEET,
+    POSITIVE_SELECTIONS,
 )
 
 def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
@@ -110,6 +81,9 @@ def revert_kobo_lock_structre(content: dict) -> None:
     """
     Revert the structure of the locks to one that is ready to be exported into
     an XLSForm again -- the reverse of `get_kobo_locking_profiles`
+
+    It is essentially a preprocessor used within KPI before converting all the
+    sheets and content to OrderedDicts and exporting to XLS.
     """
     if KOBO_LOCK_SHEET not in content:
         return

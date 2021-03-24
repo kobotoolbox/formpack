@@ -4,11 +4,14 @@ import base64
 from io import BytesIO
 from unittest import TestCase
 
-import xlrd
+import xlwt
+
+from formpack.constants import KOBO_LOCK_SHEET
 from formpack.utils.kobo_locking import (
     get_kobo_locking_profiles,
     revert_kobo_lock_structre,
 )
+
 
 class TestKoboLocking(TestCase):
     def setUp(self):
@@ -37,7 +40,20 @@ class TestKoboLocking(TestCase):
             ['translations_manage', 'true', '', ''],
             ['form_appearance', 'true', '', ''],
         ]
-        expected_content_kobo_locks = [
+
+    def _construct_xls_for_import(self, sheet_name, sheet_content):
+        workbook_to_import = xlwt.Workbook()
+        worksheet = workbook_to_import.add_sheet(sheet_name)
+        for row_num, row_list in enumerate(sheet_content):
+            for col_num, cell_value in enumerate(row_list):
+                worksheet.write(row_num, col_num, cell_value)
+        xls_import_io = BytesIO()
+        workbook_to_import.save(xls_import_io)
+        xls_import_io.seek(0)
+        return xls_import_io
+
+    def test_get_kobo_locking_profiles(self):
+        expected_locking_profiles = [
             {
                 'name': 'core',
                 'restrictions': [
@@ -89,23 +105,104 @@ class TestKoboLocking(TestCase):
             },
         ]
 
-    def _construct_xls_for_import(self, sheet_name, sheet_content):
-        # Construct a binary XLS file that we'll import later
-        wb = Workbook()
-        sheet = wb.active
-        sheet.title = sheet_name
-        for i, row in enumerate(sheet_content):
-            for j, value in enumerate(row):
-                sheet.cell(column=j+1, row=i+1, value=value)
-        x = BytesIO()
-        wb.save(x)
-        x.seek(0)
-        encoded_xls = base64.b64encode(x.read())
-        return encoded_xls
-
-    def test_get_kobo_locking_profiles(self):
         xls = self._construct_xls_for_import(
-            'kobo--locking-profiles', self.locking_profiles
+            KOBO_LOCK_SHEET, self.locking_profiles
         )
-        get_kobo_locking_profiles(BytesIO(xls))
+        actual_locking_profiles = get_kobo_locking_profiles(xls)
+        for profiles in expected_locking_profiles:
+            name = profiles['name']
+            expected_restrictions = profiles['restrictions']
+            actual_restrictions = [
+                val['restrictions']
+                for val in actual_locking_profiles
+                if val['name'] == name
+            ][0]
+            assert expected_restrictions == actual_restrictions
+
+    def test_revert_kobo_lock_structre(self):
+        expected_reverted_locking_profiles = [
+            {'restriction': 'choice_add', 'core': 'true', 'flex': 'true'},
+            {'restriction': 'choice_delete', 'delete': 'true'},
+            {'restriction': 'choice_edit'},
+            {'restriction': 'choice_order_edit', 'core': 'true'},
+            {
+                'restriction': 'question_delete',
+                'core': 'true',
+                'flex': 'true',
+                'delete': 'true',
+            },
+            {
+                'restriction': 'question_label_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {
+                'restriction': 'question_settings_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {
+                'restriction': 'question_skip_logic_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {
+                'restriction': 'question_validation_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {'restriction': 'group_delete', 'core': 'true', 'delete': 'true'},
+            {'restriction': 'group_label_edit'},
+            {
+                'restriction': 'group_question_add',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {
+                'restriction': 'group_question_delete',
+                'core': 'true',
+                'flex': 'true',
+                'delete': 'true',
+            },
+            {
+                'restriction': 'group_question_order_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {
+                'restriction': 'group_settings_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {
+                'restriction': 'group_skip_logic_edit',
+                'core': 'true',
+                'flex': 'true',
+            },
+            {'restriction': 'form_replace', 'core': 'true'},
+            {'restriction': 'group_add', 'core': 'true'},
+            {'restriction': 'question_add', 'core': 'true'},
+            {'restriction': 'question_order_edit', 'core': 'true'},
+            {'restriction': 'translations_manage', 'core': 'true'},
+            {'restriction': 'form_appearance', 'core': 'true'},
+        ]
+        xls = self._construct_xls_for_import(
+            KOBO_LOCK_SHEET, self.locking_profiles
+        )
+        actual_reverted_locks = {
+            KOBO_LOCK_SHEET: get_kobo_locking_profiles(xls)
+        }
+        revert_kobo_lock_structre(actual_reverted_locks)
+
+        def _get_sorted_restrictions(restrictions):
+            return sorted(restrictions, key=lambda k:k['restriction'])
+
+        actual = _get_sorted_restrictions(
+            actual_reverted_locks[KOBO_LOCK_SHEET]
+        )
+        expected = _get_sorted_restrictions(
+            expected_reverted_locking_profiles
+        )
+        assert len(actual) == len(expected)
+        assert actual == expected
 
