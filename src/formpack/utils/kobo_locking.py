@@ -84,6 +84,46 @@ def revert_kobo_lock_structre(content: dict) -> None:
 
     It is essentially a preprocessor used within KPI before converting all the
     sheets and content to OrderedDicts and exporting to XLS.
+
+    For example, this JSON structure:
+    [
+        {
+            "name": "profile_1",
+            "restrictions": [
+                "choice_add",
+                "choice_edit",
+                "choice_order_edit"
+            ],
+        },
+        {
+            "name": "profile_2",
+            "restrictions": [
+                "choice_delete",
+                "choice_order_edit"
+            ],
+        }
+    ]
+
+    Will be transformed into:
+    [
+        {
+            'restriction': 'choice_add',
+            'profile_1': 'true',
+        },
+        {
+            'restriction': 'choice_edit',
+            'profile_1': 'true',
+        },
+        {
+            'restriction': 'choice_order_edit',
+            'profile_1': 'true',
+            'profile_2': 'true',
+        },
+        {
+            'restriction': 'choice_delete',
+            'profile_2': 'true',
+        },
+    ]
     """
     if KOBO_LOCK_SHEET not in content:
         return
