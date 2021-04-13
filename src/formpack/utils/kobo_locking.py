@@ -6,12 +6,13 @@ import io
 import itertools
 from collections import OrderedDict
 
+from pyxform import aliases as pyxform_aliases
+
 from .xls_to_ss_structure import xls_to_dicts
 from formpack.constants import (
     KOBO_LOCKING_RESTRICTIONS,
     KOBO_LOCK_COLUMN,
     KOBO_LOCK_SHEET,
-    POSITIVE_SELECTIONS,
 )
 
 def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
@@ -74,7 +75,8 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
         if restriction not in KOBO_LOCKING_RESTRICTIONS:
             raise KeyError
         for name in profiles:
-            if lock.get(name) in POSITIVE_SELECTIONS:
+            bool_value = lock.get(name, False)
+            if pyxform_aliases.yes_no.get(bool_value, False):
                 locking_profiles[name]['restrictions'].append(restriction)
 
     return list(locking_profiles.values())
