@@ -115,13 +115,15 @@ VALID_BOOLEANS = [
 
 # Kobo locking constants
 KOBO_LOCK_SHEET = 'kobo--locking-profiles'
+KOBO_LOCK_COLUMN = 'kobo--locking-profile'
 POSITIVE_SELECTIONS = [
     'yes',
-    "Yes",
+    'Yes',
     'YES',
     'true',
     'True',
     'TRUE',
+    True
     ]
 KOBO_LOCKING_RESTRICTIONS = [
     'choice_add',

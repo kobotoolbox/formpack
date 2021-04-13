@@ -263,6 +263,9 @@ def replace_aliases_in_place(content, allowed_types=None):
 
     if settings:
         content['settings'] = dict([
-            (settings_header_columns.get(key, key), val)
+            (
+                settings_header_columns.get(key, key),
+                pyxform_aliases.yes_no.get(val, val),
+            )
             for key, val in settings.items()
         ])

@@ -4,10 +4,12 @@ from __future__ import (unicode_literals, print_function,
 
 import io
 import itertools
+from collections import OrderedDict
 
 from .xls_to_ss_structure import xls_to_dicts
 from formpack.constants import (
     KOBO_LOCKING_RESTRICTIONS,
+    KOBO_LOCK_COLUMN,
     KOBO_LOCK_SHEET,
     POSITIVE_SELECTIONS,
 )
@@ -20,10 +22,10 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     # kobo--locking-profiles
     |    restriction    | profile_1 | profile_2 |
     |-------------------|-----------|-----------|
-    | choice_add        | true      |           |
-    | choice_delete     |           | true      |
-    | choice_edit       | true      |           |
-    | choice_order_edit | true      | true      |
+    | choice_add        | True      |           |
+    | choice_delete     |           | True      |
+    | choice_edit       | True      |           |
+    | choice_order_edit | True      | True      |
 
     Will be transformed into the following JSON structure:
     [
@@ -50,7 +52,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
 
     locks = survey_dict.get(KOBO_LOCK_SHEET)
     # Get a unique list of profile names if they have at least one value set to
-    # `true` (or whatever valid "positive selection" value) from the matrix of
+    # `True` (or whatever valid "positive selection" value) from the matrix of
     # values
     profiles = set(itertools.chain(*[lock.keys() for lock in locks]))
 
@@ -108,20 +110,20 @@ def revert_kobo_lock_structre(content: dict) -> None:
     [
         {
             'restriction': 'choice_add',
-            'profile_1': 'true',
+            'profile_1': True,
         },
         {
             'restriction': 'choice_edit',
-            'profile_1': 'true',
+            'profile_1': True,
         },
         {
             'restriction': 'choice_order_edit',
-            'profile_1': 'true',
-            'profile_2': 'true',
+            'profile_1': True,
+            'profile_2': True,
         },
         {
             'restriction': 'choice_delete',
-            'profile_2': 'true',
+            'profile_2': True,
         },
     ]
     """
@@ -134,7 +136,18 @@ def revert_kobo_lock_structre(content: dict) -> None:
             name = item['name']
             restrictions = item['restrictions']
             if res in restrictions:
-                profile[name] = 'true'
+                profile[name] = True
         locking_profiles.append(profile)
     content[KOBO_LOCK_SHEET] = locking_profiles
+
+def strip_kobo_locking_profile(content: OrderedDict) -> None:
+    """
+    Strip all `kobo--locking-profile` values from a survey. Used when creating
+    blocks or adding questions to the library from a locked survey or template.
+    The locks should only be applied on survey and template types.
+    """
+    survey = content.get('survey')
+    for item in survey:
+      if KOBO_LOCK_COLUMN in item:
+          item.pop(KOBO_LOCK_COLUMN)
 
