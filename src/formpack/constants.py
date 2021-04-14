@@ -133,6 +133,7 @@ KOBO_LOCKING_RESTRICTIONS = [
     'group_question_order_edit',
     'group_settings_edit',
     'group_skip_logic_edit',
+    'group_split',
     'form_replace',
     'group_add',
     'question_add',
