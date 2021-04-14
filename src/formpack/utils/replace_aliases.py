@@ -23,7 +23,7 @@ TF_COLUMNS = [
     'required',
 ]
 
-KOBO_SPECIFIC_PATTERN = r'^kobo(--|–|—)'
+KOBO_SPECIFIC_SUB_PATTERN = r'^kobo(–|—)'
 KOBO_SPECIFIC_PREFERRED = 'kobo--'
 
 def aliases_to_ordered_dict(_d):
@@ -214,7 +214,7 @@ def kobo_specific_sub(key: str) -> str:
         `kobo–something` -> `kobo--something`,
         `kobo—something` -> `kobo--soemthing`
     """
-    return re.sub(KOBO_SPECIFIC_PATTERN, KOBO_SPECIFIC_PREFERRED, key)
+    return re.sub(KOBO_SPECIFIC_SUB_PATTERN, KOBO_SPECIFIC_PREFERRED, key)
 
 def dealias_type(type_str, strict=False, allowed_types=None):
     if allowed_types is None:
@@ -262,7 +262,7 @@ def replace_aliases_in_place(content, allowed_types=None):
                 del row[key]
 
         for key, val in row.copy().items():
-            if re.search(KOBO_SPECIFIC_PATTERN, key) is not None:
+            if re.search(KOBO_SPECIFIC_SUB_PATTERN, key) is not None:
                 new_key = kobo_specific_sub(key)
                 row[new_key] = val
                 del row[key]
