@@ -34,6 +34,7 @@ class TestKoboLocking(TestCase):
             ['group_question_order_edit', 'locked', 'locked', ''],
             ['group_settings_edit', 'locked', 'locked', ''],
             ['group_skip_logic_edit', 'locked', 'locked', ''],
+            ['group_split', 'locked', 'locked', ''],
             ['form_replace', 'locked', '', ''],
             ['group_add', 'locked', '', ''],
             ['question_add', 'locked', '', ''],
@@ -71,6 +72,7 @@ class TestKoboLocking(TestCase):
                     'group_question_order_edit',
                     'group_settings_edit',
                     'group_skip_logic_edit',
+                    'group_split',
                     'form_replace',
                     'group_add',
                     'question_add',
@@ -102,6 +104,7 @@ class TestKoboLocking(TestCase):
                     'group_question_order_edit',
                     'group_settings_edit',
                     'group_skip_logic_edit',
+                    'group_split',
                 ],
             },
         ]
@@ -156,6 +159,11 @@ class TestKoboLocking(TestCase):
                 'restriction': 'group_delete',
                 'core': 'locked',
                 'delete': 'locked',
+            },
+            {
+                'restriction': 'group_split',
+                'core': 'locked',
+                'flex': 'locked',
             },
             {'restriction': 'group_label_edit'},
             {
