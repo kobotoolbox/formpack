@@ -209,7 +209,7 @@ def kobo_specific_sub(key: str) -> str:
     """
     Ensure that kobo-specific names (kobo--*) that happen to start with n-dash
     or m-dash characters are substituted with two single dashes for
-    consistency. This accomodates for some software that will automattically
+    consistency. This accommodates for some software that will automatically
     substitute two dashes for a single n-dash or m-dash character. For example:
         `kobo–something` -> `kobo--something`,
         `kobo—something` -> `kobo--soemthing`
