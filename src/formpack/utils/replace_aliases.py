@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function,
 from collections import defaultdict
 from copy import deepcopy
 import json
+import re
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
@@ -22,6 +23,8 @@ TF_COLUMNS = [
     'required',
 ]
 
+KOBO_SPECIFIC_PATTERN = r'^kobo(--|–|—)'
+KOBO_SPECIFIC_PREFERRED = 'kobo--'
 
 def aliases_to_ordered_dict(_d):
     """
@@ -202,6 +205,17 @@ survey_header_columns = _unpack_headers(pyxform_aliases.survey_header,
                                         formpack_preferred_survey_headers)
 
 
+def kobo_specific_sub(key: str) -> str:
+    """
+    Ensure that kobo-specific names (kobo--*) that happen to start with n-dash
+    or m-dash characters are substituted with two single dashes for
+    consistency. This accomodates for some software that will automattically
+    substitute two dashes for a single n-dash or m-dash character. For example:
+        `kobo–something` -> `kobo--something`,
+        `kobo—something` -> `kobo--soemthing`
+    """
+    return re.sub(KOBO_SPECIFIC_PATTERN, KOBO_SPECIFIC_PREFERRED, key)
+
 def dealias_type(type_str, strict=False, allowed_types=None):
     if allowed_types is None:
         allowed_types = {}
@@ -247,6 +261,12 @@ def replace_aliases_in_place(content, allowed_types=None):
                 row[val] = row[key]
                 del row[key]
 
+        for key, val in row.copy().items():
+            if re.search(KOBO_SPECIFIC_PATTERN, key) is not None:
+                new_key = kobo_specific_sub(key)
+                row[new_key] = val
+                del row[key]
+
     for row in content.get('choices', []):
         if 'list name' in row:
             row['list_name'] = row.pop('list name')
@@ -264,7 +284,7 @@ def replace_aliases_in_place(content, allowed_types=None):
     if settings:
         content['settings'] = dict([
             (
-                settings_header_columns.get(key, key),
+                kobo_specific_sub(settings_header_columns.get(key, key)),
                 pyxform_aliases.yes_no.get(val, val),
             )
             for key, val in settings.items()

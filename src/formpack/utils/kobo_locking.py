@@ -6,8 +6,6 @@ import io
 import itertools
 from collections import OrderedDict
 
-from pyxform import aliases as pyxform_aliases
-
 from .xls_to_ss_structure import xls_to_dicts
 from formpack.constants import (
     KOBO_LOCKING_RESTRICTIONS,
@@ -48,6 +46,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     ]
     """
     survey_dict = xls_to_dicts(xls_file_object)
+
     if KOBO_LOCK_SHEET not in survey_dict:
         return
 
