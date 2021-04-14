@@ -10,6 +10,7 @@ from formpack.constants import KOBO_LOCK_SHEET
 from formpack.utils.kobo_locking import (
     get_kobo_locking_profiles,
     revert_kobo_lock_structre,
+    strip_kobo_locking_profile,
 )
 
 
@@ -151,7 +152,11 @@ class TestKoboLocking(TestCase):
                 'core': 'locked',
                 'flex': 'locked',
             },
-            {'restriction': 'group_delete', 'core': 'locked', 'delete': 'locked'},
+            {
+                'restriction': 'group_delete',
+                'core': 'locked',
+                'delete': 'locked',
+            },
             {'restriction': 'group_label_edit'},
             {
                 'restriction': 'group_question_add',
@@ -195,14 +200,71 @@ class TestKoboLocking(TestCase):
         revert_kobo_lock_structre(actual_reverted_locks)
 
         def _get_sorted_restrictions(restrictions):
-            return sorted(restrictions, key=lambda k:k['restriction'])
+            return sorted(restrictions, key=lambda k: k['restriction'])
 
         actual = _get_sorted_restrictions(
             actual_reverted_locks[KOBO_LOCK_SHEET]
         )
-        expected = _get_sorted_restrictions(
-            expected_reverted_locking_profiles
-        )
+        expected = _get_sorted_restrictions(expected_reverted_locking_profiles)
         assert len(actual) == len(expected)
         assert actual == expected
 
+    def test_strip_kobo_locks_from_survey_content(self):
+        content = {
+            'survey': [
+                {
+                    'name': 'today',
+                    'type': 'today',
+                    '$kuid': 'pitYOxYwh',
+                    '$autoname': 'today',
+                },
+                {
+                    'name': 'gender',
+                    'type': 'select_one',
+                    '$kuid': '6bPK3a1G1',
+                    'label': ["Respondent's gender?"],
+                    'required': True,
+                    '$autoname': 'gender',
+                    'kobo--locking-profile': 'flex',
+                    'select_from_list_name': 'gender',
+                },
+                {
+                    'name': 'age',
+                    'type': 'integer',
+                    '$kuid': 'Ms8NYWNpT',
+                    'label': ["Respondent's age?"],
+                    'required': True,
+                    '$autoname': 'age',
+                },
+                {
+                    'name': 'confirm',
+                    'type': 'select_one',
+                    '$kuid': 'SBHBly6cC',
+                    'label': ['Is your age really ${age}?'],
+                    'relevant': '${age}!=' '',
+                    'required': True,
+                    '$autoname': 'confirm',
+                    'kobo--locking-profile': 'delete',
+                    'select_from_list_name': 'yesno',
+                },
+                {
+                    'name': 'group_1',
+                    'type': 'begin_group',
+                    '$kuid': 'pUGHAi9Wv',
+                    'label': ['A message from our sponsors'],
+                    '$autoname': 'group_1',
+                    'kobo--locking-profile': 'core',
+                },
+                {
+                    'name': 'note_1',
+                    'type': 'note',
+                    '$kuid': 'KXV08ZVMS',
+                    'label': ['Hi there 👋'],
+                    '$autoname': 'note_1',
+                },
+                {'type': 'end_group', '$kuid': '04eEDul2R'},
+            ]
+        }
+        strip_kobo_locking_profile(content)
+        for item in content['survey']:
+            assert 'kobo--locking-profile' not in item
