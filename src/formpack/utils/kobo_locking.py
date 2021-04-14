@@ -23,10 +23,10 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     # kobo--locking-profiles
     |    restriction    | profile_1 | profile_2 |
     |-------------------|-----------|-----------|
-    | choice_add        | True      |           |
-    | choice_delete     |           | True      |
-    | choice_edit       | True      |           |
-    | choice_order_edit | True      | True      |
+    | choice_add        | locked    |           |
+    | choice_delete     |           | locked    |
+    | choice_edit       | locked    |           |
+    | choice_order_edit | locked    | locked    |
 
     Will be transformed into the following JSON structure:
     [
@@ -53,7 +53,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
 
     locks = survey_dict.get(KOBO_LOCK_SHEET)
     # Get a unique list of profile names if they have at least one value set to
-    # `True` (or whatever valid "positive selection" value) from the matrix of
+    # `'locked'` (or whatever valid "positive selection" value) from the matrix of
     # values
     profiles = set(itertools.chain(*[lock.keys() for lock in locks]))
 
@@ -75,8 +75,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
         if restriction not in KOBO_LOCKING_RESTRICTIONS:
             raise KeyError
         for name in profiles:
-            bool_value = lock.get(name, False)
-            if pyxform_aliases.yes_no.get(bool_value, False):
+            if lock.get(name, '').lower() == 'locked':
                 locking_profiles[name]['restrictions'].append(restriction)
 
     return list(locking_profiles.values())
@@ -112,20 +111,20 @@ def revert_kobo_lock_structre(content: dict) -> None:
     [
         {
             'restriction': 'choice_add',
-            'profile_1': True,
+            'profile_1': 'locked',
         },
         {
             'restriction': 'choice_edit',
-            'profile_1': True,
+            'profile_1': 'locked',
         },
         {
             'restriction': 'choice_order_edit',
-            'profile_1': True,
-            'profile_2': True,
+            'profile_1': 'locked',
+            'profile_2': 'locked',
         },
         {
             'restriction': 'choice_delete',
-            'profile_2': True,
+            'profile_2': 'locked',
         },
     ]
     """
@@ -138,7 +137,7 @@ def revert_kobo_lock_structre(content: dict) -> None:
             name = item['name']
             restrictions = item['restrictions']
             if res in restrictions:
-                profile[name] = True
+                profile[name] = 'locked'
         locking_profiles.append(profile)
     content[KOBO_LOCK_SHEET] = locking_profiles
 
