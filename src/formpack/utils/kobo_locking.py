@@ -10,6 +10,7 @@ from .xls_to_ss_structure import xls_to_dicts
 from formpack.constants import (
     KOBO_LOCKING_RESTRICTIONS,
     KOBO_LOCK_COLUMN,
+    KOBO_LOCK_KEY,
     KOBO_LOCK_SHEET,
 )
 
@@ -74,7 +75,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
         if restriction not in KOBO_LOCKING_RESTRICTIONS:
             raise KeyError
         for name in profiles:
-            if lock.get(name, '').lower() == 'locked':
+            if lock.get(name, '').lower() == KOBO_LOCK_KEY:
                 locking_profiles[name]['restrictions'].append(restriction)
 
     return list(locking_profiles.values())
@@ -136,7 +137,7 @@ def revert_kobo_lock_structre(content: dict) -> None:
             name = item['name']
             restrictions = item['restrictions']
             if res in restrictions:
-                profile[name] = 'locked'
+                profile[name] = KOBO_LOCK_KEY
         locking_profiles.append(profile)
     content[KOBO_LOCK_SHEET] = locking_profiles
 
