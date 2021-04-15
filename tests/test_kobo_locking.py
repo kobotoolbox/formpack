@@ -20,7 +20,8 @@ class TestKoboLocking(TestCase):
             ['restriction', 'core', 'flex', 'delete'],
             ['choice_add', 'locked', 'locked', ''],
             ['choice_delete', '', '', 'locked'],
-            ['choice_edit', '', '', ''],
+            ['choice_value_edit', '', '', ''],
+            ['choice_label_edit', '', '', ''],
             ['choice_order_edit', 'locked', '', ''],
             ['question_delete', 'locked', 'locked', 'locked'],
             ['question_label_edit', 'locked', 'locked', ''],
@@ -127,7 +128,8 @@ class TestKoboLocking(TestCase):
         expected_reverted_locking_profiles = [
             {'restriction': 'choice_add', 'core': 'locked', 'flex': 'locked'},
             {'restriction': 'choice_delete', 'delete': 'locked'},
-            {'restriction': 'choice_edit'},
+            {'restriction': 'choice_label_edit'},
+            {'restriction': 'choice_value_edit'},
             {'restriction': 'choice_order_edit', 'core': 'locked'},
             {
                 'restriction': 'question_delete',

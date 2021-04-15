@@ -120,7 +120,8 @@ KOBO_LOCK_SHEET = 'kobo--locking-profiles'
 KOBO_LOCKING_RESTRICTIONS = [
     'choice_add',
     'choice_delete',
-    'choice_edit',
+    'choice_label_edit',
+    'choice_value_edit',
     'choice_order_edit',
     'question_delete',
     'question_label_edit',
