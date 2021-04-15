@@ -1300,8 +1300,6 @@ class TestFormPackExport(unittest.TestCase):
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
 
-    def test_jdu(self):
-        assert 1 == 1
 
     def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
@@ -1339,8 +1337,6 @@ class TestFormPackExport(unittest.TestCase):
             sheet = book.sheet_by_name('houshold_member_repeat')
             row_values = [cell.value for cell in sheet.row(1)]
             assert row_values == ['#beneficiary', '', '']
-
-
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
