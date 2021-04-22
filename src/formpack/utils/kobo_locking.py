@@ -157,7 +157,7 @@ def _validate_locking_profiles(profiles):
     """
     if 'restriction' not in profiles:
         raise FormPackLibraryLockingError(
-            'The column name `restriction` must be present'
+            'The column name `restriction` must be present.'
         )
 
     # Remove the `restriction` column header from the list to only have the
@@ -166,7 +166,7 @@ def _validate_locking_profiles(profiles):
 
     if not profiles:
         raise FormPackLibraryLockingError(
-            'At least one locking profile must be defined'
+            'At least one locking profile must be defined.'
         )
 
     if KOBO_LOCK_KEY in profiles:
