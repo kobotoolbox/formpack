@@ -141,6 +141,7 @@ KOBO_LOCKING_RESTRICTIONS = [
     'group_add',
     'question_add',
     'question_order_edit',
-    'translations_manage',
+    'translations_add',
     'form_appearance',
+    'form_meta_edit',
 ]

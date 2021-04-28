@@ -41,8 +41,9 @@ class TestKoboLocking(TestCase):
             ['group_add', 'locked', '', ''],
             ['question_add', 'locked', '', ''],
             ['question_order_edit', 'locked', '', ''],
-            ['translations_manage', 'locked', '', ''],
+            ['translations_add', 'locked', '', ''],
             ['form_appearance', 'locked', '', ''],
+            ['form_meta_edit', '', '', ''],
         ]
 
     def _construct_xls_for_import(self, sheet_name, sheet_content):
@@ -79,7 +80,7 @@ class TestKoboLocking(TestCase):
                     'group_add',
                     'question_add',
                     'question_order_edit',
-                    'translations_manage',
+                    'translations_add',
                     'form_appearance',
                 ],
             },
@@ -199,7 +200,7 @@ class TestKoboLocking(TestCase):
             {'restriction': 'group_add', 'core': 'locked'},
             {'restriction': 'question_add', 'core': 'locked'},
             {'restriction': 'question_order_edit', 'core': 'locked'},
-            {'restriction': 'translations_manage', 'core': 'locked'},
+            {'restriction': 'translations_add', 'core': 'locked'},
             {'restriction': 'form_appearance', 'core': 'locked'},
         ]
         xls = self._construct_xls_for_import(
