@@ -202,6 +202,7 @@ class TestKoboLocking(TestCase):
             {'restriction': 'question_order_edit', 'core': 'locked'},
             {'restriction': 'translations_add', 'core': 'locked'},
             {'restriction': 'form_appearance', 'core': 'locked'},
+            {'restriction': 'form_meta_edit'},
         ]
         xls = self._construct_xls_for_import(
             KOBO_LOCK_SHEET, self.locking_profiles
