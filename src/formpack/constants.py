@@ -114,6 +114,7 @@ VALID_BOOLEANS = [
 ]
 
 # Kobo locking constants
+KOBO_LOCK_ALL = 'kobo--lock_all'
 KOBO_LOCK_COLUMN = 'kobo--locking-profile'
 KOBO_LOCK_KEY = 'locked'
 KOBO_LOCK_SHEET = 'kobo--locking-profiles'
