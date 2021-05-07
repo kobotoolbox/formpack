@@ -3,6 +3,7 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 from collections import defaultdict
+from dateutil.parser import parse
 from functools import partial
 from operator import itemgetter
 
@@ -163,13 +164,13 @@ class FormField(FormDataDef):
             "select_one": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
-            "date": DateField,
+            "datetime": DateField,
             "text": TextField,
             "barcode": TextField,
 
             # calculate is usually not text but for our purpose it's good
             # enough
-            "calculate": TextField,
+            "calculate": CalculateField,
             "acknowledge": TextField,
             "integer": NumField,
             'decimal': NumField,
@@ -420,6 +421,24 @@ class DateField(ExtendedFormField):
 
         return stats
 
+    def parse_values(self, raw_value):
+        try:
+            _date = parse(raw_value)
+        except ValueError:
+            yield raw_value
+        yield _date.strftime('%Y-%m-%d %H:%M:%S%z')
+
+
+class CalculateField(FormField):
+
+    def parse_values(self, raw_value):
+        _val = raw_value
+        try:
+            _val = float(raw_value)
+        except ValueError:
+            pass
+        yield _val
+
 
 class NumField(FormField):
 
@@ -526,6 +545,20 @@ class CopyField(FormField):
     def get_labels(self, *args, **kwargs):
         """ Labels are the just the value name. Groups are ignored """
         return [self.name]
+
+
+class SubmissionTimeCopyField(CopyField):
+
+    FIELD_NAME = "_submission_time"
+
+    def __init__(self, section=None, *args, **kwargs):
+        super(SubmissionTimeCopyField, self).__init__(
+            self.FIELD_NAME,
+            section=section,
+            *args, **kwargs)
+
+    def parse_values(self, raw_value):
+        yield parse(raw_value).strftime('%Y-%m-%d %H:%M:%S')
 
 
 class ValidationStatusCopyField(CopyField):
