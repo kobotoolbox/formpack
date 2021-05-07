@@ -5,6 +5,7 @@ from __future__ import (unicode_literals, print_function, absolute_import,
 import json
 import zipfile
 from collections import defaultdict
+from dateutil.parser import parse
 from inspect import isclass
 from typing import Iterator, Generator, Optional
 
@@ -87,7 +88,7 @@ class Export(object):
             hierarchy_in_labels,
             tag_cols_for_header,
         )
-        self.sections, self.labels, self.tags = res
+        self.sections, self.labels, self.tags, self.xls_types = res
 
         self.reset()
 
@@ -195,6 +196,7 @@ class Export(object):
         section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
         section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
         section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
+        section_xls_types = OrderedDict()
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
 
@@ -220,6 +222,7 @@ class Export(object):
                                  hierarchy_in_labels,
                                  self.multiple_select)
             )
+            section_xls_types.setdefault(field.section.name, []).append(field.xls_type)
             all_sections[field.section.name] = field.section
 
         for section_name, section in all_sections.items():
@@ -280,7 +283,7 @@ class Export(object):
 
             section_labels[section] = labels
 
-        return section_fields, section_labels, section_tags
+        return section_fields, section_labels, section_tags, section_xls_types
 
     def format_one_submission(self, submission, current_section):
 
@@ -724,6 +727,8 @@ class Export(object):
     def to_xlsx(self, filename, submissions):
         workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
         workbook.use_zip64()
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd',
+                                                  'align': 'left'})
 
         sheets = {}
 
@@ -731,19 +736,44 @@ class Export(object):
 
         sheet_row_positions = defaultdict(lambda: 0)
 
-        def _append_row_to_sheet(sheet_, data):
+        def _get_writer_func(sheet_, type_):
+            name_ = f'write_{type_}'
+            if hasattr(sheet_, name_) and callable(getattr(sheet_, name_)):
+                return getattr(sheet_, name_)
+            return getattr(sheet_, 'write_string')
+
+        def _append_row_to_sheet(sheet_, data, xls_types=None):
             # Ensure all list objects are coerced to strings otherwise
             # xlswriter will fail to export
+            # TODO: figure out why this is still required
             data_ = [str(d) if isinstance(d, list) else d for d in data]
+
 
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
-            sheet_.write_row(
-                row=row_index,
-                col=0,
-                data=data_
-            )
+            if xls_types is None:
+                sheet_.write_row(
+                    row=row_index,
+                    col=0,
+                    data=data_
+                )
+            else:
+                # TODO: handle the index better rather than just slapping on another 'number' to the types
+                xls_types.append('number')
+                for i, a in enumerate(zip(data_, xls_types)):
+                    item, type_ = a
+                    args = []
+                    if not item:
+                        sheet_.write_blank(row_index, i, None)
+                    func = _get_writer_func(sheet_, type_)
+                    try:
+                        if type_ == 'datetime':
+                            item = parse(item)
+                            args.append(date_format)
+                        func(row_index, i, item, *args)
+                    except TypeError:
+                        sheet_.write_string(row_index, i, str(item))
             row_index += 1
             sheet_row_positions[sheet_] = row_index
 
@@ -763,7 +793,7 @@ class Export(object):
 
                     _append_row_to_sheet(
                         current_sheet,
-                        self.labels[section_name]
+                        self.labels[section_name],
                     )
 
                     # Include specified tag columns as extra header rows
@@ -772,7 +802,7 @@ class Export(object):
                         _append_row_to_sheet(current_sheet, tag_row)
 
                 for row in rows:
-                    _append_row_to_sheet(current_sheet, row)
+                    _append_row_to_sheet(current_sheet, row, self.xls_types[section_name])
 
         workbook.close()
 

@@ -20,13 +20,14 @@ class FormField(FormDataDef):
     """ A form field definition knowing how to find and format data """
 
     def __init__(self, name, labels, data_type, hierarchy=None,
-                 section=None, can_format=True, has_stats=None,
+                 section=None, can_format=True, has_stats=None, xls_type='string',
                  *args, **kwargs):
 
         self.data_type = data_type
         self.section = section
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
+        self.xls_type = xls_type
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -164,7 +165,8 @@ class FormField(FormDataDef):
             "select_one": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "geopoint": FormGPSField,
-            "datetime": DateField,
+            "date": DateField,
+            "datetime": DateTimeField,
             "text": TextField,
             "barcode": TextField,
 
@@ -371,6 +373,11 @@ class TextField(ExtendedFormField):
 
 class DateField(ExtendedFormField):
 
+    XLS_TYPE = 'datetime'
+
+    def __init__(self, *args, **kwargs):
+        super(DateField, self).__init__(xls_type=self.XLS_TYPE, *args, **kwargs)
+
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
         """
         Return total count for all, and freq and % for 'date' date types
@@ -426,10 +433,25 @@ class DateField(ExtendedFormField):
             _date = parse(raw_value)
         except ValueError:
             yield raw_value
+        yield _date.strftime('%Y-%m-%d')
+
+
+class DateTimeField(DateField):
+
+    def parse_values(self, raw_value):
+        try:
+            _date = parse(raw_value)
+        except ValueError:
+            yield raw_value
         yield _date.strftime('%Y-%m-%d %H:%M:%S%z')
 
 
-class CalculateField(FormField):
+class CalculateField(TextField):
+
+    XLS_TYPE = 'number'
+
+    def __init__(self, *args, **kwargs):
+        super(CalculateField, self).__init__(xls_type=self.XLS_TYPE, *args, **kwargs)
 
     def parse_values(self, raw_value):
         _val = raw_value
@@ -441,6 +463,11 @@ class CalculateField(FormField):
 
 
 class NumField(FormField):
+
+    XLS_TYPE = 'number'
+
+    def __init__(self, *args, **kwargs):
+        super(NumField, self).__init__(xls_type=self.XLS_TYPE, *args, **kwargs)
 
     def flatten_dataset(self, dataset):
         """ Generate sorted numbers as listed in the given metrics counter
@@ -547,14 +574,32 @@ class CopyField(FormField):
         return [self.name]
 
 
+class IdCopyField(CopyField):
+
+    FIELD_NAME = "_id"
+    XLS_TYPE = 'number'
+
+    def __init__(self, section=None, *args, **kwargs):
+        super(IdCopyField, self).__init__(
+            self.FIELD_NAME,
+            section=section,
+            xls_type=self.XLS_TYPE,
+            *args, **kwargs)
+
+    def parse_values(self, raw_value):
+        yield int(raw_value)
+
+
 class SubmissionTimeCopyField(CopyField):
 
     FIELD_NAME = "_submission_time"
+    XLS_TYPE = 'datetime'
 
     def __init__(self, section=None, *args, **kwargs):
         super(SubmissionTimeCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
+            xls_type=self.XLS_TYPE,
             *args, **kwargs)
 
     def parse_values(self, raw_value):
