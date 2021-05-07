@@ -726,9 +726,9 @@ class Export(object):
 
     def to_xlsx(self, filename, submissions):
         workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
+        #workbook = xlsxwriter.Workbook(filename, {'constant_memory': True, 'remove_timezone': True})
         workbook.use_zip64()
-        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd',
-                                                  'align': 'left'})
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
 
         sheets = {}
 
@@ -748,32 +748,32 @@ class Export(object):
             # TODO: figure out why this is still required
             data_ = [str(d) if isinstance(d, list) else d for d in data]
 
-
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
-            if xls_types is None:
-                sheet_.write_row(
-                    row=row_index,
-                    col=0,
-                    data=data_
-                )
-            else:
-                # TODO: handle the index better rather than just slapping on another 'number' to the types
-                xls_types.append('number')
-                for i, a in enumerate(zip(data_, xls_types)):
-                    item, type_ = a
-                    args = []
-                    if not item:
-                        sheet_.write_blank(row_index, i, None)
-                    func = _get_writer_func(sheet_, type_)
-                    try:
-                        if type_ == 'datetime':
-                            item = parse(item)
-                            args.append(date_format)
-                        func(row_index, i, item, *args)
-                    except TypeError:
-                        sheet_.write_string(row_index, i, str(item))
+            #if xls_types is None:
+            sheet_.write_row(
+                row=row_index,
+                col=0,
+                data=data_
+            )
+            #else:
+            #    # TODO: handle the index better rather than just slapping on another 'number' to the types
+            #    xls_types.append('number')
+            #    for i, a in enumerate(zip(data_, xls_types)):
+            #        item, type_ = a
+            #        args = []
+            #        # TODO: make sure this works as expected
+            #        if not item:
+            #            sheet_.write_blank(row_index, i, None)
+            #        func = _get_writer_func(sheet_, type_)
+            #        try:
+            #            #if type_ == 'datetime':
+            #            #    item = parse(item)
+            #            #    args.append(date_format)
+            #            func(row_index, i, item, *args)
+            #        except TypeError:
+            #            sheet_.write_string(row_index, i, str(item))
             row_index += 1
             sheet_row_positions[sheet_] = row_index
 

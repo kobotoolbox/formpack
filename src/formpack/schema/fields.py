@@ -167,6 +167,8 @@ class FormField(FormDataDef):
             "geopoint": FormGPSField,
             "date": DateField,
             "datetime": DateTimeField,
+            "start": DateTimeField,
+            "end": DateTimeField,
             "text": TextField,
             "barcode": TextField,
 
@@ -375,8 +377,10 @@ class DateField(ExtendedFormField):
 
     XLS_TYPE = 'datetime'
 
-    def __init__(self, *args, **kwargs):
-        super(DateField, self).__init__(xls_type=self.XLS_TYPE, *args, **kwargs)
+    def __init__(self, xls_type=None, *args, **kwargs):
+        if xls_type is None:
+            xls_type = self.XLS_TYPE
+        super(DateField, self).__init__(xls_type=xls_type, *args, **kwargs)
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
         """
@@ -797,6 +801,16 @@ class FormChoiceField(ExtendedFormField):
         combined_options.update(self.choice.options)
         self.choice.options = combined_options
 
+    @staticmethod
+    def _try_int_or_float(val):
+        try:
+            x = int(val)
+        except ValueError:
+            x = float(val)
+        finally:
+            x = val
+        return x
+
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
@@ -842,6 +856,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ("both", "details"):
             for option_name in self.choice.options.keys():
                 names.append(self.name + '/' + option_name)
+
         return names
 
     def __repr__(self):
@@ -885,6 +900,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ("both", "details"):
             for choice in val.split():
                 cells[self.name + "/" + choice] = "1"
+
         return cells
 
     def parse_values(self, raw_values):
