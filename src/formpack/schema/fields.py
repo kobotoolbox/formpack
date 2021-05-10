@@ -21,14 +21,13 @@ class FormField(FormDataDef):
     """ A form field definition knowing how to find and format data """
 
     def __init__(self, name, labels, data_type, hierarchy=None,
-                 section=None, can_format=True, has_stats=None, xls_type='string',
+                 section=None, can_format=True, has_stats=None,
                  *args, **kwargs):
 
         self.data_type = data_type
         self.section = section
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
-        self.xls_type = xls_type
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -611,6 +610,40 @@ class SubmissionTimeCopyField(CopyField):
         except ValueError:
             pass
         return {self.name: _date}
+
+
+class NotesCopyField(CopyField):
+
+    FIELD_NAME = "_notes"
+
+    def __init__(self, section=None, *args, **kwargs):
+        super(NotesCopyField, self).__init__(
+            self.FIELD_NAME,
+            section=section,
+            *args, **kwargs)
+
+    def format(self, val, *args, **kwargs):
+        if not val:
+            val = ''
+        return {self.name: str(val)}
+
+
+class TagsCopyField(CopyField):
+
+    FIELD_NAME = "_tags"
+
+    def __init__(self, section=None, *args, **kwargs):
+        super(TagsCopyField, self).__init__(
+            self.FIELD_NAME,
+            section=section,
+            *args, **kwargs)
+
+    def format(self, val, *args, **kwargs):
+        if val and isinstance(val, list):
+            val_ = ', '.join(val)
+        else:
+            val_ = ''
+        return {self.name: val_}
 
 
 class ValidationStatusCopyField(CopyField):
