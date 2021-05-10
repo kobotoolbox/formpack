@@ -720,7 +720,6 @@ class Export(object):
                 'default_date_format': 'yyyy-mm-dd',
             },
         )
-        #workbook = xlsxwriter.Workbook(filename, {'constant_memory': True, 'remove_timezone': True})
         workbook.use_zip64()
 
         sheets = {}
@@ -729,17 +728,10 @@ class Export(object):
 
         sheet_row_positions = defaultdict(lambda: 0)
 
-        def _get_writer_func(sheet_, type_):
-            name_ = f'write_{type_}'
-            if hasattr(sheet_, name_) and callable(getattr(sheet_, name_)):
-                return getattr(sheet_, name_)
-            return getattr(sheet_, 'write_string')
-
         def _append_row_to_sheet(sheet_, data):
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
-            #if xls_types is None:
             sheet_.write_row(
                 row=row_index,
                 col=0,
@@ -764,7 +756,7 @@ class Export(object):
 
                     _append_row_to_sheet(
                         current_sheet,
-                        self.labels[section_name],
+                        self.labels[section_name]
                     )
 
                     # Include specified tag columns as extra header rows
