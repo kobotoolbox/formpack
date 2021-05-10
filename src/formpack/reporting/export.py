@@ -368,10 +368,9 @@ class Export(object):
 
                     # get submission value for this field
                     val = entry.get(field.path)
-                    _val = next(field.parse_values(val))
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
-                        _val, _lang, multiple_select=self.multiple_select
+                        val, _lang, multiple_select=self.multiple_select
                     )
 
                     # save fields value if they match parent mapping fields.
@@ -725,10 +724,15 @@ class Export(object):
         return table
 
     def to_xlsx(self, filename, submissions):
-        workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
+        workbook = xlsxwriter.Workbook(
+            filename,
+            {
+                'constant_memory': True,
+                'default_date_format': 'yyyy-mm-dd',
+            },
+        )
         #workbook = xlsxwriter.Workbook(filename, {'constant_memory': True, 'remove_timezone': True})
         workbook.use_zip64()
-        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
 
         sheets = {}
 

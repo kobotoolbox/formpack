@@ -3,6 +3,7 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 from collections import defaultdict
+from datetime import datetime
 from dateutil.parser import parse
 from functools import partial
 from operator import itemgetter
@@ -206,6 +207,18 @@ class FormField(FormDataDef):
             val = ''
         return {self.name: val}
 
+    def _try_get_number(self, val):
+        _val = val
+        try:
+            _val = int(_val)
+        except ValueError:
+            pass
+        try:
+            _val = float(_val)
+        except ValueError:
+            pass
+        return _val
+
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
         not_provided = metrics.pop(None, 0)
@@ -375,13 +388,6 @@ class TextField(ExtendedFormField):
 
 class DateField(ExtendedFormField):
 
-    XLS_TYPE = 'datetime'
-
-    def __init__(self, xls_type=None, *args, **kwargs):
-        if xls_type is None:
-            xls_type = self.XLS_TYPE
-        super(DateField, self).__init__(xls_type=xls_type, *args, **kwargs)
-
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
         """
         Return total count for all, and freq and % for 'date' date types
@@ -432,46 +438,37 @@ class DateField(ExtendedFormField):
 
         return stats
 
-    def parse_values(self, raw_value):
+    def format(self, val, *args, **kwargs):
+        _date = val
         try:
-            _date = parse(raw_value)
+            _date = parse(val).date()
         except ValueError:
-            yield raw_value
-        yield _date.strftime('%Y-%m-%d')
+            pass
+        return {self.name: _date}
 
 
 class DateTimeField(DateField):
 
-    def parse_values(self, raw_value):
+    def format(self, val, *args, **kwargs):
+        _date = val
         try:
-            _date = parse(raw_value)
+            _date = parse(val)
         except ValueError:
-            yield raw_value
-        yield _date.strftime('%Y-%m-%d %H:%M:%S%z')
+            pass
+        if isinstance(_date, datetime) and _date.tzinfo is not None:
+            _date = _date.strftime('%Y-%m-%d %H:%M:%S%z')
+        return {self.name: _date}
 
 
 class CalculateField(TextField):
 
-    XLS_TYPE = 'number'
-
-    def __init__(self, *args, **kwargs):
-        super(CalculateField, self).__init__(xls_type=self.XLS_TYPE, *args, **kwargs)
-
-    def parse_values(self, raw_value):
-        _val = raw_value
-        try:
-            _val = float(raw_value)
-        except ValueError:
-            pass
-        yield _val
+    def format(self, val, *args, **kwargs):
+        if val is None:
+            val = ''
+        return {self.name: self._try_get_number(val)}
 
 
 class NumField(FormField):
-
-    XLS_TYPE = 'number'
-
-    def __init__(self, *args, **kwargs):
-        super(NumField, self).__init__(xls_type=self.XLS_TYPE, *args, **kwargs)
 
     def flatten_dataset(self, dataset):
         """ Generate sorted numbers as listed in the given metrics counter
@@ -561,6 +558,11 @@ class NumField(FormField):
         else:
             yield float(raw_values)
 
+    def format(self, val, *args, **kwargs):
+        if val is None:
+            val = ''
+        return {self.name: self._try_get_number(val)}
+
 
 class CopyField(FormField):
     """ Just copy the data over. No translation. No manipulation """
@@ -581,33 +583,34 @@ class CopyField(FormField):
 class IdCopyField(CopyField):
 
     FIELD_NAME = "_id"
-    XLS_TYPE = 'number'
 
     def __init__(self, section=None, *args, **kwargs):
         super(IdCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
-            xls_type=self.XLS_TYPE,
             *args, **kwargs)
 
-    def parse_values(self, raw_value):
-        yield int(raw_value)
+    def format(self, val, *args, **kwargs):
+        return {self.name: int(val)}
 
 
 class SubmissionTimeCopyField(CopyField):
 
     FIELD_NAME = "_submission_time"
-    XLS_TYPE = 'datetime'
 
     def __init__(self, section=None, *args, **kwargs):
         super(SubmissionTimeCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
-            xls_type=self.XLS_TYPE,
             *args, **kwargs)
 
-    def parse_values(self, raw_value):
-        yield parse(raw_value).strftime('%Y-%m-%d %H:%M:%S')
+    def format(self, val, *args, **kwargs):
+        _date = val
+        try:
+            _date = parse(val)
+        except ValueError:
+            pass
+        return {self.name: _date}
 
 
 class ValidationStatusCopyField(CopyField):
@@ -744,7 +747,7 @@ class FormChoiceField(ExtendedFormField):
         if val is None:
             val = ''
         val = self.get_translation(val, lang)
-        return {self.name: val}
+        return {self.name: self._try_get_number(val)}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -800,16 +803,6 @@ class FormChoiceField(ExtendedFormField):
         combined_options = choice.options.copy()
         combined_options.update(self.choice.options)
         self.choice.options = combined_options
-
-    @staticmethod
-    def _try_int_or_float(val):
-        try:
-            x = int(val)
-        except ValueError:
-            x = float(val)
-        finally:
-            x = val
-        return x
 
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
@@ -882,7 +875,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             )
 
         cells = dict.fromkeys(
-            self.get_value_names(multiple_select=multiple_select), "0"
+            self.get_value_names(multiple_select=multiple_select), 0
         )
         if multiple_select in ("both", "summary"):
             res = []
@@ -895,11 +888,16 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                     res.append(label)
                 else:
                     res.append(v)
-            cells[self.name] = " ".join(res)
+
+            if len(res) == 1:
+                res_ = self._try_get_number(res[0])
+            else:
+                res_ = " ".join(res)
+            cells[self.name] = res_
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
-                cells[self.name + "/" + choice] = "1"
+                cells[self.name + "/" + choice] = 1
 
         return cells
 
