@@ -110,6 +110,8 @@ META_TYPES = [
     'phonenumber',
     'imei',
     'subscriberid',
+    # geo
+    'start-geopoint',
 ]
 
 LABEL_OPTIONAL_TYPES = [

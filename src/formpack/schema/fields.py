@@ -167,16 +167,17 @@ class FormField(FormDataDef):
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "select_multiple_from_file": TextField, # temporary
             "geopoint": FormGPSField,
-            "date": DateField,
-            "datetime": DateTimeField,
-            "start": DateTimeField,
-            "end": DateTimeField,
             "text": TextField,
             "barcode": TextField,
             "rank": TextField,
 
-            # calculate is usually not text but for our purpose it's good
-            # enough
+            # date and time
+            "date": DateField,
+            "datetime": DateTimeField,
+            "start": DateTimeField,
+            "end": DateTimeField,
+            "today": DateTimeField,
+
             "calculate": CalculateField,
             "acknowledge": TextField,
             "integer": NumField,
@@ -754,7 +755,7 @@ class FormGPSField(FormField):
 
         values = [val, "", "", "", ""]
         for i, value in enumerate(val.split(), 1):
-            values[i] = value
+            values[i] = self._try_get_number(value)
 
         return dict(zip(self.get_value_names(), values))
 
