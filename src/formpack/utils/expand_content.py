@@ -247,6 +247,9 @@ def _expand_type_to_dict(type_str):
         r'^(select_one)\s+(\S+)$',
         r'^(select_multiple)\s+(\S+)$',
         r'^(select_one_external)\s+(\S+)$',
+        r'^(select_one_from_file)\s+(\S+)$',
+        r'^(select_multiple_from_file)\s+(\S+)$',
+        r'^(rank)\s+(\S+)$',
     ]:
         match = re.match(_re, type_str)
         if match:

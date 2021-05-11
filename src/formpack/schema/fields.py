@@ -163,7 +163,9 @@ class FormField(FormDataDef):
 
         data_type_classes = {
             "select_one": FormChoiceField,
+            "select_one_from_file": TextField, # temporary
             "select_multiple": FormChoiceFieldWithMultipleSelect,
+            "select_multiple_from_file": TextField, # temporary
             "geopoint": FormGPSField,
             "date": DateField,
             "datetime": DateTimeField,
@@ -171,6 +173,7 @@ class FormField(FormDataDef):
             "end": DateTimeField,
             "text": TextField,
             "barcode": TextField,
+            "rank": TextField,
 
             # calculate is usually not text but for our purpose it's good
             # enough

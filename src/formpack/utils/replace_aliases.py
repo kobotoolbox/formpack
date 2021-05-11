@@ -66,25 +66,33 @@ types = aliases_to_ordered_dict({
     'geopoint': ['gps'],
 })
 
-selects = aliases_to_ordered_dict({
-    'select_multiple': [
-        'select all that apply',
-        'select multiple',
-        'select many',
-        'select_many',
-        'select all that apply from',
-        'add select multiple prompt using',
-    ],
-    'select_one_external': [
-        'select one external',
-    ],
-    'select_one': [
-        'select one',
-        'select one from',
-        'add select one prompt using',
-        'select1',
-    ],
-})
+selects = aliases_to_ordered_dict(
+    {
+        'select_multiple': [
+            'select all that apply',
+            'select multiple',
+            'select many',
+            'select_many',
+            'select all that apply from',
+            'add select multiple prompt using',
+        ],
+        'select_multiple_from_file': [
+            'select multiple from file',
+        ],
+        'select_one_external': [
+            'select one external',
+        ],
+        'select_one': [
+            'select one',
+            'select one from',
+            'add select one prompt using',
+            'select1',
+        ],
+        'select_one_from_file': [
+            'select one from file',
+        ],
+    }
+)
 # Python3: Cast to a list because it's merged into other dicts
 # (i.e `SELECT_SCHEMA` in validators.py)
 SELECT_TYPES = list(selects.keys())
@@ -139,6 +147,9 @@ MAIN_TYPES = [
     # no response
     'acknowledge',
     'note',
+
+    # other
+    'rank',
 ] + GEO_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
