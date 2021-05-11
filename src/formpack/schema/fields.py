@@ -173,10 +173,10 @@ class FormField(FormDataDef):
 
             # date and time
             "date": DateField,
+            "today": DateField,
             "datetime": DateTimeField,
             "start": DateTimeField,
             "end": DateTimeField,
-            "today": DateTimeField,
 
             "calculate": CalculateField,
             "acknowledge": TextField,

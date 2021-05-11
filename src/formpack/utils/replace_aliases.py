@@ -104,6 +104,8 @@ META_TYPES = [
     'deviceid',
     'phone_number',
     'simserial',
+    'audit',
+    'background-audio',
     # meta values
     'username',
     # reconsider:
@@ -139,7 +141,6 @@ MAIN_TYPES = [
     'image',
     'audio',
     'file',
-    'background-audio',
     # enter time values
     'date',
     'datetime',
