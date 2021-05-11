@@ -445,9 +445,11 @@ class DateField(ExtendedFormField):
     def format(self, val, *args, **kwargs):
         _date = val
         try:
-            _date = parse(val).date()
+            _date = parse(val)
         except ValueError:
             pass
+        if isinstance(_date, datetime):
+            _date = _date.date()
         return {self.name: _date}
 
 
