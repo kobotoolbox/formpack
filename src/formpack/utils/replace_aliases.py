@@ -138,6 +138,8 @@ MAIN_TYPES = [
     'video',
     'image',
     'audio',
+    'file',
+    'background-audio',
     # enter time values
     'date',
     'datetime',
@@ -150,9 +152,14 @@ MAIN_TYPES = [
     'acknowledge',
     'note',
 
+    # external data source
+    'xml-external',
+    'csv-external',
+
     # other
     'rank',
     'range',
+    'hidden',
 ] + GEO_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
