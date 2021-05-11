@@ -181,6 +181,7 @@ class FormField(FormDataDef):
             "acknowledge": TextField,
             "integer": NumField,
             'decimal': NumField,
+            "range": NumField,
 
             # legacy type, treat them as text
             "select_one_external": partial(TextField, data_type=data_type),

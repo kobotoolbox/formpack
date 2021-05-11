@@ -150,6 +150,7 @@ MAIN_TYPES = [
 
     # other
     'rank',
+    'range',
 ] + GEO_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
