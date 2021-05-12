@@ -917,7 +917,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             )
 
         cells = dict.fromkeys(
-            self.get_value_names(multiple_select=multiple_select), 0
+            self.get_value_names(multiple_select=multiple_select), False
         )
         if multiple_select in ("both", "summary"):
             res = []
@@ -939,7 +939,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
-                cells[self.name + "/" + choice] = 1
+                cells[self.name + "/" + choice] = True
 
         return cells
 
