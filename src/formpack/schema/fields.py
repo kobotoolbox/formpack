@@ -211,12 +211,14 @@ class FormField(FormDataDef):
             val = ''
         return {self.name: val}
 
-    def _try_get_number(self, val):
+    def try_get_number(self, val):
         _val = val
         try:
             _val = int(_val)
         except ValueError:
             pass
+        if isinstance(_val, int):
+            return _val
         try:
             _val = float(_val)
         except ValueError:
@@ -471,7 +473,7 @@ class CalculateField(TextField):
     def format(self, val, *args, **kwargs):
         if val is None:
             val = ''
-        return {self.name: self._try_get_number(val)}
+        return {self.name: self.try_get_number(val)}
 
 
 class NumField(FormField):
@@ -567,7 +569,7 @@ class NumField(FormField):
     def format(self, val, *args, **kwargs):
         if val is None:
             val = ''
-        return {self.name: self._try_get_number(val)}
+        return {self.name: self.try_get_number(val)}
 
 
 class CopyField(FormField):
@@ -757,7 +759,7 @@ class FormGPSField(FormField):
 
         values = [val, "", "", "", ""]
         for i, value in enumerate(val.split(), 1):
-            values[i] = self._try_get_number(value)
+            values[i] = self.try_get_number(value)
 
         return dict(zip(self.get_value_names(), values))
 
@@ -787,7 +789,7 @@ class FormChoiceField(ExtendedFormField):
         if val is None:
             val = ''
         val = self.get_translation(val, lang)
-        return {self.name: self._try_get_number(val)}
+        return {self.name: self.try_get_number(val)}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -930,7 +932,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                     res.append(v)
 
             if len(res) == 1:
-                res_ = self._try_get_number(res[0])
+                res_ = self.try_get_number(res[0])
             else:
                 res_ = " ".join(res)
             cells[self.name] = res_
