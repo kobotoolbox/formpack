@@ -167,6 +167,7 @@ class FormField(FormDataDef):
             "select_multiple": FormChoiceFieldWithMultipleSelect,
             "select_multiple_from_file": TextField, # temporary
             "geopoint": FormGPSField,
+            "start-geopoint": FormGPSField,
             "text": TextField,
             "barcode": TextField,
             "rank": TextField,
