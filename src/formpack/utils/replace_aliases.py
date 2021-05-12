@@ -66,6 +66,7 @@ types = aliases_to_ordered_dict({
     'geopoint': ['gps'],
 })
 
+# keys used in `_expand_type_to_dict()` to handle choices argument
 selects = aliases_to_ordered_dict(
     {
         'select_multiple': [
@@ -90,6 +91,9 @@ selects = aliases_to_ordered_dict(
         ],
         'select_one_from_file': [
             'select one from file',
+        ],
+        'rank': [
+            'rank',
         ],
     }
 )
@@ -158,7 +162,6 @@ MAIN_TYPES = [
     'csv-external',
 
     # other
-    'rank',
     'range',
     'hidden',
 ] + GEO_TYPES
