@@ -33,7 +33,8 @@ class Export(object):
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=None, filter_fields=()):
+                 title="submissions", tag_cols_for_header=None, filter_fields=(),
+                 xls_types=False):
         """
 
         :param formpack: FormPack
@@ -63,6 +64,7 @@ class Export(object):
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
         self.filter_fields = filter_fields
+        self.xls_types = xls_types
         self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -368,7 +370,10 @@ class Export(object):
                     val = entry.get(field.path)
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
-                        val, _lang, multiple_select=self.multiple_select
+                        val=val,
+                        lang=_lang,
+                        multiple_select=self.multiple_select,
+                        xls_types=True,
                     )
 
                     # save fields value if they match parent mapping fields.

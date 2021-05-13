@@ -445,7 +445,10 @@ class DateField(ExtendedFormField):
 
         return stats
 
-    def format(self, val, *args, **kwargs):
+    def format(self, val, xls_types=False, *args, **kwargs):
+        if not xls_types:
+            return {self.name: val}
+
         _date = val
         try:
             _date = parse(val)
@@ -458,7 +461,10 @@ class DateField(ExtendedFormField):
 
 class DateTimeField(DateField):
 
-    def format(self, val, *args, **kwargs):
+    def format(self, val, xls_types=False, *args, **kwargs):
+        if not xls_types:
+            return {self.name: val}
+
         _date = val
         try:
             _date = parse(val)
@@ -471,7 +477,10 @@ class DateTimeField(DateField):
 
 class CalculateField(TextField):
 
-    def format(self, val, *args, **kwargs):
+    def format(self, val, xls_types=False, *args, **kwargs):
+        if not xls_types:
+            return {self.name: val}
+
         if val is None:
             val = ''
         return {self.name: self.try_get_number(val)}
@@ -567,7 +576,10 @@ class NumField(FormField):
         else:
             yield float(raw_values)
 
-    def format(self, val, *args, **kwargs):
+    def format(self, val, xls_types=False, *args, **kwargs):
+        if not xls_types:
+            return {self.name: val}
+
         if val is None:
             val = ''
         return {self.name: self.try_get_number(val)}
@@ -731,7 +743,7 @@ class FormGPSField(FormField):
 
         return names
 
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION, *args, **kwargs):
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, xls_types=False, *args, **kwargs):
         """Same than other format(), but dealing with 2 to 4 values
 
         The GPS value can contain 2, 3 or 4 numerical separated by a
@@ -760,7 +772,10 @@ class FormGPSField(FormField):
 
         values = [val, "", "", "", ""]
         for i, value in enumerate(val.split(), 1):
-            values[i] = self.try_get_number(value)
+            if xls_types:
+                values[i] = self.try_get_number(value)
+            else:
+                values[i] = value
 
         return dict(zip(self.get_value_names(), values))
 
@@ -786,11 +801,15 @@ class FormChoiceField(ExtendedFormField):
         else:
             return translation
 
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
+    def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both", xls_types=False):
         if val is None:
             val = ''
         val = self.get_translation(val, lang)
-        return {self.name: self.try_get_number(val)}
+
+        if xls_types:
+            val = self.try_get_number(val)
+
+        return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -918,7 +937,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             )
 
         cells = dict.fromkeys(
-            self.get_value_names(multiple_select=multiple_select), False
+            self.get_value_names(multiple_select=multiple_select), "0"
         )
         if multiple_select in ("both", "summary"):
             res = []
@@ -940,7 +959,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
-                cells[self.name + "/" + choice] = True
+                cells[self.name + "/" + choice] = "1"
 
         return cells
 
