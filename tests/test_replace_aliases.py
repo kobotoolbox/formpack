@@ -22,7 +22,7 @@ def test_select_one_aliases_replaced():
 
 
 def test_replace_select_one_from_file():
-    s1 = {'survey': [{'type': 'select_one_from_file dogs.csv'}]}
+    s1 = {'survey': [{'type': 'select one from file dogs.csv'}]}
     replace_aliases(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_one_from_file dogs.csv'
 
@@ -62,8 +62,8 @@ def test_select_multiple_aliases_replaced():
     assert dealias_type('select_multiple dogs') == 'select_multiple dogs'
 
 
-def test_replace_multiple_one_from_file():
-    s1 = {'survey': [{'type': 'select_multiple_from_file dogs.csv'}]}
+def test_replace_select_multiple_from_file():
+    s1 = {'survey': [{'type': 'select multiple from file dogs.csv'}]}
     replace_aliases(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_multiple_from_file dogs.csv'
 
