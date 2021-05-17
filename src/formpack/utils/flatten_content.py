@@ -72,7 +72,13 @@ def _stringify_type__depr(json_qtype):
     {'select_one': 'xyz'} -> 'select_one xyz'
     {'select_multiple': 'xyz'} -> 'select_mutliple xyz'
     """
-    _type_keys = ['select_one', 'select_multiple']
+    _type_keys = [
+        'select_one',
+        'select_multiple',
+        'select_one_from_file',
+        'select_multiple_from_file',
+        'rank',
+    ]
     if len(json_qtype.keys()) != 1:
         raise ValueError('Type object must have exactly one key: %s' %
                          ', '.join(_type_keys))

@@ -133,6 +133,27 @@ def test_flatten_select_multiple_type():
     assert ss_struct[0]['type'] == 'select_multiple yn'
 
 
+def test_flatten_select_one_from_file_type():
+    a1 = _wrap_type({'select_one_from_file': 'yn.csv'})
+    flatten_content(a1, in_place=True)
+    ss_struct = a1['survey']
+    assert ss_struct[0]['type'] == 'select_one_from_file yn.csv'
+
+
+def test_flatten_select_multiple_from_file_type():
+    a1 = _wrap_type({'select_multiple_from_file': 'yn.csv'})
+    flatten_content(a1, in_place=True)
+    ss_struct = a1['survey']
+    assert ss_struct[0]['type'] == 'select_multiple_from_file yn.csv'
+
+
+def test_flatten_rank_type():
+    a1 = _wrap_type({'rank': 'yn'})
+    flatten_content(a1, in_place=True)
+    ss_struct = a1['survey']
+    assert ss_struct[0]['type'] == 'rank yn'
+
+
 def test_json_hash():
     # consistent output
     assert json_hash({'a': 'z', 'b': 'y', 'c': 'x'}) == 'f6117d60'
