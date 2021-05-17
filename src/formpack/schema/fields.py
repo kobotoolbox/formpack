@@ -161,11 +161,16 @@ class FormField(FormDataDef):
 
         data_type_classes = {
             "select_one": FormChoiceField,
+            "select_one_from_file": FormChoiceField,
             "select_multiple": FormChoiceFieldWithMultipleSelect,
+            # TODO: Get this to work with FormChoiceFieldWithMultipleSelect
+            "select_multiple_from_file": TextField,
             "geopoint": FormGPSField,
+            "start-geopoint": FormGPSField,
             "date": DateField,
             "text": TextField,
             "barcode": TextField,
+            "rank": TextField,
 
             # calculate is usually not text but for our purpose it's good
             # enough
@@ -173,6 +178,7 @@ class FormField(FormDataDef):
             "acknowledge": TextField,
             "integer": NumField,
             'decimal': NumField,
+            "range": NumField,
 
             # legacy type, treat them as text
             "select_one_external": partial(TextField, data_type=data_type),
