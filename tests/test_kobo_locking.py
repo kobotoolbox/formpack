@@ -41,7 +41,7 @@ class TestKoboLocking(TestCase):
             ['group_add', 'locked', '', ''],
             ['question_add', 'locked', '', ''],
             ['question_order_edit', 'locked', '', ''],
-            ['translations_add', 'locked', '', ''],
+            ['language_edit', 'locked', '', ''],
             ['form_appearance', 'locked', '', ''],
             ['form_meta_edit', '', '', ''],
         ]
@@ -80,7 +80,7 @@ class TestKoboLocking(TestCase):
                     'group_add',
                     'question_add',
                     'question_order_edit',
-                    'translations_add',
+                    'language_edit',
                     'form_appearance',
                 ],
             },
@@ -200,7 +200,7 @@ class TestKoboLocking(TestCase):
             {'restriction': 'group_add', 'core': 'locked'},
             {'restriction': 'question_add', 'core': 'locked'},
             {'restriction': 'question_order_edit', 'core': 'locked'},
-            {'restriction': 'translations_add', 'core': 'locked'},
+            {'restriction': 'language_edit', 'core': 'locked'},
             {'restriction': 'form_appearance', 'core': 'locked'},
             {'restriction': 'form_meta_edit'},
         ]
