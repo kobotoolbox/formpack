@@ -92,9 +92,7 @@ selects = aliases_to_ordered_dict(
         'select_one_from_file': [
             'select one from file',
         ],
-        'rank': [
-            'rank',
-        ],
+        'rank': [],
     }
 )
 # Python3: Cast to a list because it's merged into other dicts
@@ -109,7 +107,6 @@ META_TYPES = [
     'phone_number',
     'simserial',
     'audit',
-    'background-audio',
     # meta values
     'username',
     # reconsider:
@@ -145,6 +142,7 @@ MAIN_TYPES = [
     'image',
     'audio',
     'file',
+    'background-audio',
     # enter time values
     'date',
     'datetime',

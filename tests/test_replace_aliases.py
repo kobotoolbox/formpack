@@ -27,19 +27,6 @@ def test_replace_select_one_from_file():
     assert s1['survey'][0]['type'] == 'select_one_from_file dogs.csv'
 
 
-def test_select_one_from_file_alias_replaced():
-    assert (
-        dealias_type('select one from file dogs.csv')
-        == 'select_one_from_file dogs.csv'
-    )
-
-
-def test_replace_rank():
-    s1 = {'survey': [{'type': 'rank dogs'}]}
-    replace_aliases(s1, in_place=True)
-    assert s1['survey'][0]['type'] == 'rank dogs'
-
-
 def test_true_false_value_replaced():
     # only replaced on columns with TF_COLUMNS
     s1 = {'survey': [
@@ -66,13 +53,6 @@ def test_replace_select_multiple_from_file():
     s1 = {'survey': [{'type': 'select multiple from file dogs.csv'}]}
     replace_aliases(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_multiple_from_file dogs.csv'
-
-
-def test_select_multiple_from_file_alias_replaced():
-    assert (
-        dealias_type('select multiple from file dogs.csv')
-        == 'select_multiple_from_file dogs.csv'
-    )
 
 
 def test_misc_types():

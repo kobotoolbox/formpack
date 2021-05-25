@@ -11,7 +11,7 @@ import re
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .future import iteritems, OrderedDict
 from .iterator import get_first_occurrence
-from .replace_aliases import META_TYPES, selects
+from .replace_aliases import META_TYPES, SELECT_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
@@ -244,7 +244,7 @@ def _expand_type_to_dict(type_str):
     if type_str in ['select_one', 'select_multiple']:
         out['type'] = type_str
         return out
-    for select_type in selects.keys():
+    for select_type in SELECT_TYPES:
         match = re.match(
             SELECT_PATTERN.format(select_type=select_type), type_str
         )
