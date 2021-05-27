@@ -11,7 +11,7 @@ import re
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .future import iteritems, OrderedDict
 from .iterator import get_first_occurrence
-from .replace_aliases import META_TYPES
+from .replace_aliases import META_TYPES, SELECT_TYPES
 from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
@@ -231,6 +231,7 @@ def _get_special_survey_cols(content):
 
 
 def _expand_type_to_dict(type_str):
+    SELECT_PATTERN = r'^({select_type})\s+(\S+)$'
     out = {}
     match = re.search('( or.other)$', type_str)
     if match:
@@ -243,12 +244,10 @@ def _expand_type_to_dict(type_str):
     if type_str in ['select_one', 'select_multiple']:
         out['type'] = type_str
         return out
-    for _re in [
-        r'^(select_one)\s+(\S+)$',
-        r'^(select_multiple)\s+(\S+)$',
-        r'^(select_one_external)\s+(\S+)$',
-    ]:
-        match = re.match(_re, type_str)
+    for select_type in SELECT_TYPES:
+        match = re.match(
+            SELECT_PATTERN.format(select_type=select_type), type_str
+        )
         if match:
             (type_, list_name) = match.groups()
             out['type'] = type_

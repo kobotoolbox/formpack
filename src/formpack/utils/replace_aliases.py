@@ -66,25 +66,35 @@ types = aliases_to_ordered_dict({
     'geopoint': ['gps'],
 })
 
-selects = aliases_to_ordered_dict({
-    'select_multiple': [
-        'select all that apply',
-        'select multiple',
-        'select many',
-        'select_many',
-        'select all that apply from',
-        'add select multiple prompt using',
-    ],
-    'select_one_external': [
-        'select one external',
-    ],
-    'select_one': [
-        'select one',
-        'select one from',
-        'add select one prompt using',
-        'select1',
-    ],
-})
+# keys used in `_expand_type_to_dict()` to handle choices argument
+selects = aliases_to_ordered_dict(
+    {
+        'select_multiple': [
+            'select all that apply',
+            'select multiple',
+            'select many',
+            'select_many',
+            'select all that apply from',
+            'add select multiple prompt using',
+        ],
+        'select_multiple_from_file': [
+            'select multiple from file',
+        ],
+        'select_one_external': [
+            'select one external',
+        ],
+        'select_one': [
+            'select one',
+            'select one from',
+            'add select one prompt using',
+            'select1',
+        ],
+        'select_one_from_file': [
+            'select one from file',
+        ],
+        'rank': [],
+    }
+)
 # Python3: Cast to a list because it's merged into other dicts
 # (i.e `SELECT_SCHEMA` in validators.py)
 SELECT_TYPES = list(selects.keys())
@@ -96,12 +106,15 @@ META_TYPES = [
     'deviceid',
     'phone_number',
     'simserial',
+    'audit',
     # meta values
     'username',
     # reconsider:
     'phonenumber',
     'imei',
     'subscriberid',
+    # geo
+    'start-geopoint',
 ]
 
 LABEL_OPTIONAL_TYPES = [
@@ -128,17 +141,23 @@ MAIN_TYPES = [
     'video',
     'image',
     'audio',
+    'file',
+    'background-audio',
     # enter time values
     'date',
     'datetime',
     'time',
-
     # prompt to collect geo data
     'location',
-
     # no response
     'acknowledge',
     'note',
+    # external data source
+    'xml-external',
+    'csv-external',
+    # other
+    'range',
+    'hidden',
 ] + GEO_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
