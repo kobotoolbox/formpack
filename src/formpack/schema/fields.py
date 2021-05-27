@@ -171,6 +171,10 @@ class FormField(FormDataDef):
             # date and time
             'date': DateField,
             'today': DateField,
+            'datetime': TextField,
+            'time': TextField,
+            'start': TextField,
+            'end': TextField,
 
             # general
             'text': TextField,
