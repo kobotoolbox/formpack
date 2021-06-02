@@ -415,6 +415,63 @@ class TestFormPackExport(unittest.TestCase):
                             ])
         )
 
+    def test_select_one_from_previous_answers(self):
+        title, schemas, submissions = build_fixture(
+            'select_one_from_previous_answers'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Household survey with select_one from previous answers',
+                    {
+                        'fields': [
+                            'Q1',
+                            'Q4',
+                            'Q5',
+                            '_index',
+                        ],
+                        'data': [
+                            [
+                                '2',
+                                'Julius Caesar',
+                                'Gaius Octavius',
+                                1,
+                            ]
+                        ],
+                    },
+                ),
+                (
+                    'FM',
+                    {
+                        'fields': [
+                            'Q2',
+                            'Q3',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [
+                                'Julius Caesar',
+                                '53',
+                                'Household survey with select_one from previous answers',
+                                1,
+                            ],
+                            [
+                                'Gaius Octavius',
+                                '17',
+                                'Household survey with select_one from previous answers',
+                                1,
+                            ],
+                        ],
+                    },
+                ),
+            ]
+        )
+        self.assertEqual(export, expected_dict)
+
     def test_nested_repeats_with_copy_fields(self):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
