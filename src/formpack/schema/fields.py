@@ -157,7 +157,11 @@ class FormField(FormDataDef):
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
-            choice = field_choices[choice_id]
+            # pyxform#472 introduced dynamic list_names for select_one with the
+            # format of `select_one ${question_name}`. The choices are
+            # therefore not within a separate choice list
+            if not choice_id.startswith('$'):
+                choice = field_choices[choice_id]
 
         data_type_classes = {
             # selects
