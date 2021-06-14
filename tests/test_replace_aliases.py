@@ -5,7 +5,11 @@ from __future__ import (unicode_literals, print_function,
 import pytest
 
 from formpack.utils.iterator import get_first_occurrence
-from formpack.utils.replace_aliases import replace_aliases, dealias_type
+from formpack.utils.replace_aliases import (
+    replace_aliases,
+    dealias_type,
+    kobo_specific_sub,
+)
 
 
 def test_replace_select_one():
@@ -154,3 +158,11 @@ def test_survey_header_replaced():
     _assert_column_converted_to('required', 'required')
     _assert_column_converted_to('bind::required', 'required')
     _assert_column_converted_to('bind::relevant', 'relevant')
+
+def test_kobo_specific_names_handle_n_and_m_dash():
+    # n-dash
+    assert kobo_specific_sub('kobo–something') == 'kobo--something'
+    # m-dash
+    assert kobo_specific_sub('kobo—something') == 'kobo--something'
+    # normal
+    assert kobo_specific_sub('kobo--something') == 'kobo--something'

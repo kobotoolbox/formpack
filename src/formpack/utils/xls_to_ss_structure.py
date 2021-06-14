@@ -9,6 +9,7 @@ import xlrd
 from .future import OrderedDict, unichr
 from .string import unicode, str_types
 
+from .replace_aliases import kobo_specific_sub
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
@@ -80,7 +81,7 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
     workbook = xlrd.open_workbook(file_contents=xls_file_object.read())
     ss_structure = OrderedDict()
     for sheet in workbook.sheets():
-        sheet_name = sheet.name
+        sheet_name = kobo_specific_sub(sheet.name)
         sheet_contents = _sheet_to_lists(sheet)
         ss_structure[sheet_name] = sheet_contents
     return ss_structure
