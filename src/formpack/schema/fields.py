@@ -160,23 +160,47 @@ class FormField(FormDataDef):
             choice = field_choices[choice_id]
 
         data_type_classes = {
-            "select_one": FormChoiceField,
-            "select_multiple": FormChoiceFieldWithMultipleSelect,
-            "geopoint": FormGPSField,
-            "date": DateField,
-            "text": TextField,
-            "barcode": TextField,
+            # selects
+            'select_one': FormChoiceField,
+            'select_one_from_file': FormChoiceField,
+            'select_multiple': FormChoiceFieldWithMultipleSelect,
+            # TODO: Get this to work with FormChoiceFieldWithMultipleSelect
+            'select_multiple_from_file': TextField,
+            'rank': TextField,
 
-            # calculate is usually not text but for our purpose it's good
-            # enough
-            "calculate": TextField,
-            "acknowledge": TextField,
-            "integer": NumField,
+            # date and time
+            'date': DateField,
+            'today': DateField,
+            'datetime': TextField,
+            'time': TextField,
+            'start': TextField,
+            'end': TextField,
+
+            # general
+            'text': TextField,
+            'barcode': TextField,
+            'acknowledge': TextField,
+
+            # geo
+            'geopoint': FormGPSField,
+            'start-geopoint': FormGPSField,
+
+            # media
+            'video': TextField,
+            'image': TextField,
+            'audio': TextField,
+            'file': TextField,
+            'background-audio': TextField,
+
+            # numeric
+            'calculate': TextField,
+            'integer': NumField,
             'decimal': NumField,
+            'range': NumField,
 
             # legacy type, treat them as text
-            "select_one_external": partial(TextField, data_type=data_type),
-            "cascading_select": partial(TextField, data_type=data_type),
+            'select_one_external': partial(TextField, data_type=data_type),
+            'cascading_select': partial(TextField, data_type=data_type),
         }
 
         args = {
