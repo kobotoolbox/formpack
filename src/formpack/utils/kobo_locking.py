@@ -53,9 +53,11 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
         return
 
     locks = survey_dict[KOBO_LOCK_SHEET]
-    # Get a unique list of profile names if they have at least one value set to
-    # 'locked' from the matrix of values
-    profiles = set(itertools.chain(*[lock.keys() for lock in locks]))
+
+    # Get a unique list of profile names
+    profiles = set()
+    for lock in locks:
+        profiles.update(lock.keys())
 
     # So some basic validation of locking profiles
     profiles = _validate_locking_profiles(profiles)
@@ -78,7 +80,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
 
     return list(locking_profiles.values())
 
-def revert_kobo_lock_structre(content: dict) -> None:
+def revert_kobo_lock_structure(content: dict) -> None:
     """
     Revert the structure of the locks to one that is ready to be exported into
     an XLSForm again -- the reverse of `get_kobo_locking_profiles`

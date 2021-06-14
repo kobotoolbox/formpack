@@ -12,6 +12,7 @@ from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
 from .future import iteritems, OrderedDict
 from .string import str_types
+from ..constants import KOBO_LOCK_ALL
 
 # This file is a mishmash of things which culminate in the
 # "replace_aliases" method which iterates through a survey and
@@ -301,10 +302,13 @@ def replace_aliases_in_place(content, allowed_types=None):
                          ' first been parsed through "expand_content".')
 
     if settings:
-        content['settings'] = dict([
-            (
-                kobo_specific_sub(settings_header_columns.get(key, key)),
-                pyxform_aliases.yes_no.get(val, val),
+        _settings = {}
+        for key, val in settings.items():
+            _key = kobo_specific_sub(settings_header_columns.get(key, key))
+            _val = (
+                pyxform_aliases.yes_no.get(val, val)
+                if _key == KOBO_LOCK_ALL
+                else val
             )
-            for key, val in settings.items()
-        ])
+            _settings[_key] = _val
+        content['settings'] = _settings

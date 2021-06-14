@@ -9,7 +9,7 @@ import xlwt
 from formpack.constants import KOBO_LOCK_SHEET
 from formpack.utils.kobo_locking import (
     get_kobo_locking_profiles,
-    revert_kobo_lock_structre,
+    revert_kobo_lock_structure,
     strip_kobo_locking_profile,
 )
 from formpack.utils.exceptions import FormPackLibraryLockingError
@@ -126,7 +126,7 @@ class TestKoboLocking(TestCase):
             ][0]
             assert expected_restrictions == actual_restrictions
 
-    def test_revert_kobo_lock_structre(self):
+    def test_revert_kobo_lock_structure(self):
         expected_reverted_locking_profiles = [
             {'restriction': 'choice_add', 'core': 'locked', 'flex': 'locked'},
             {'restriction': 'choice_delete', 'delete': 'locked'},
@@ -210,7 +210,7 @@ class TestKoboLocking(TestCase):
         actual_reverted_locks = {
             KOBO_LOCK_SHEET: get_kobo_locking_profiles(xls)
         }
-        revert_kobo_lock_structre(actual_reverted_locks)
+        revert_kobo_lock_structure(actual_reverted_locks)
 
         def _get_sorted_restrictions(restrictions):
             return sorted(restrictions, key=lambda k: k['restriction'])
