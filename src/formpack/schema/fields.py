@@ -160,7 +160,10 @@ class FormField(FormDataDef):
             # pyxform#472 introduced dynamic list_names for select_one with the
             # format of `select_one ${question_name}`. The choices are
             # therefore not within a separate choice list
-            if not choice_id.startswith('$'):
+            if choice_id.startswith('${') and choice_id.endswith('}'):
+                # ${dynamic_choice}, so question will be treated as a TextField
+                choice = None
+            else:
                 choice = field_choices[choice_id]
 
         data_type_classes = {
