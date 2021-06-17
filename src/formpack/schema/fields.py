@@ -150,7 +150,6 @@ class FormField(FormDataDef):
 
         # normalize spaces
         data_type = definition['type']
-        choice = None
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
@@ -165,6 +164,8 @@ class FormField(FormDataDef):
                 choice = None
             else:
                 choice = field_choices[choice_id]
+        else:
+            choice = None
 
         data_type_classes = {
             # selects
