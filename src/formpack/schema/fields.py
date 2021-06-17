@@ -150,14 +150,22 @@ class FormField(FormDataDef):
 
         # normalize spaces
         data_type = definition['type']
-        choice = None
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
-            choice = field_choices[choice_id]
+            # pyxform#472 introduced dynamic list_names for select_one with the
+            # format of `select_one ${question_name}`. The choices are
+            # therefore not within a separate choice list
+            if choice_id.startswith('${') and choice_id.endswith('}'):
+                # ${dynamic_choice}, so question will be treated as a TextField
+                choice = None
+            else:
+                choice = field_choices[choice_id]
+        else:
+            choice = None
 
         data_type_classes = {
             # selects
