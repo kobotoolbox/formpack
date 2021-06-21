@@ -148,14 +148,15 @@ class FormField(FormDataDef):
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
 
+        selects = ('select_one', 'select_multiple')
+        selects_legacy = ('select one')
+        selects_valid = selects + selects_legacy
+
         # normalize spaces
         data_type = definition['type']
         choice = None
 
-        if ' ' in data_type:
-            raise ValueError('invalid data_type: %s' % data_type)
-
-        if data_type in ('select_one', 'select_multiple'):
+        if data_type in selects_valid:
             choice_id = definition['select_from_list_name']
             choice = field_choices[choice_id]
 

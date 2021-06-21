@@ -236,6 +236,7 @@ def kobo_specific_sub(key: str) -> str:
     """
     return re.sub(KOBO_SPECIFIC_SUB_PATTERN, KOBO_SPECIFIC_PREFERRED, key)
 
+
 def dealias_type(type_str, strict=False, allowed_types=None):
     if allowed_types is None:
         allowed_types = {}
@@ -244,11 +245,11 @@ def dealias_type(type_str, strict=False, allowed_types=None):
         return types[type_str]
     if type_str in allowed_types.keys():
         return allowed_types[type_str]
-    if type_str in KNOWN_TYPES:
-        return type_str
     for key in SELECT_TYPES:
         if type_str.startswith(key):
             return type_str.replace(key, selects[key])
+    if type_str in KNOWN_TYPES:
+        return type_str
     if strict:
         raise ValueError('unknown type {}'.format([type_str]))
 
