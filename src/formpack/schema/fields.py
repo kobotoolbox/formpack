@@ -148,8 +148,8 @@ class FormField(FormDataDef):
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
 
-        selects = ('select_one', 'select_multiple')
-        selects_legacy = ('select one')
+        selects = ['select_one', 'select_multiple']
+        selects_legacy = ['select one']
         selects_valid = selects + selects_legacy
 
         # normalize spaces
