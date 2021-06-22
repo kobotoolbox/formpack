@@ -415,6 +415,39 @@ class TestFormPackExport(unittest.TestCase):
                             ])
         )
 
+    def test_select_one_legacy(self):
+        title, schemas, submissions = build_fixture(
+            'select_one_legacy'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        print(str(export), flush=True)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Your favourite Roman emperors',
+                    {
+                        'fields': [
+                            'fav_emperor',
+                        ],
+                        'data': [
+                            [
+                                'julius',
+                            ],
+                            [
+                                'augustus',
+                            ],
+                            [
+                                'tiberius',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
+        self.assertEqual(export, expected_dict)
+
     def test_select_one_from_previous_answers(self):
         title, schemas, submissions = build_fixture(
             'select_one_from_previous_answers'
