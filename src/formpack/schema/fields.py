@@ -202,6 +202,8 @@ class FormField(FormDataDef):
             # legacy type, treat them as text
             'select_one_external': partial(TextField, data_type=data_type),
             'cascading_select': partial(TextField, data_type=data_type),
+            # handle legacy `select one`
+            'select one': FormChoiceField,
         }
 
         args = {
