@@ -3,3 +3,7 @@
 
 class FormPackGeoJsonError(Exception):
     pass
+
+
+class FormPackLibraryLockingError(Exception):
+    pass

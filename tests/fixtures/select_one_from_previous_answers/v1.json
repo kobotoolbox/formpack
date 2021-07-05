@@ -1,0 +1,76 @@
+{
+    "version": "romev1",
+    "content": {
+	  "survey": [
+		{
+		  "name": "Q1",
+		  "type": "integer",
+		  "label": [
+			"How many members live in your family?"
+		  ]
+		},
+		{
+		  "name": "FM",
+		  "type": "begin_repeat",
+		  "label": [
+			"Family Members"
+		  ],
+		  "repeat_count": "${Q1}"
+		},
+		{
+		  "name": "Q2",
+		  "type": "text",
+		  "label": [
+			"Name?"
+		  ]
+		},
+		{
+		  "name": "Q3",
+		  "type": "integer",
+		  "label": [
+			"${Q2}'s age?"
+		  ]
+		},
+		{
+		  "type": "end_repeat"
+		},
+		{
+		  "name": "Q4",
+		  "type": "select_one",
+		  "label": [
+			"Select the head of the household."
+		  ],
+		  "select_from_list_name": "${Q2}"
+		},
+		{
+		  "name": "Q5",
+		  "type": "select_one",
+		  "label": [
+			"Select the youngest child (<18 years) who is currently available in the family."
+		  ],
+		  "choice_filter": "${Q3} < 18",
+		  "select_from_list_name": "${Q2}"
+		}
+	  ]
+    },
+	"submissions": [
+		{
+		  "FM": [
+			{
+			  "FM/Q2": "Julius Caesar",
+			  "FM/Q3": "53"
+			},
+			{
+			  "FM/Q2": "Gaius Octavius",
+			  "FM/Q3": "17"
+			}
+		  ],
+		  "FM_count": "2",
+		  "Q1": "2",
+		  "Q4": "Julius Caesar",
+		  "Q5": "Gaius Octavius",
+          "meta/versionID": "romev1",
+		  "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b5"
+		}
+	]
+}

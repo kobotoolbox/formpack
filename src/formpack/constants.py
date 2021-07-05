@@ -115,3 +115,35 @@ VALID_BOOLEANS = [
     TRUE,
 ]
 
+# Kobo locking constants
+KOBO_LOCK_ALL = 'kobo--lock_all'
+KOBO_LOCK_COLUMN = 'kobo--locking-profile'
+KOBO_LOCK_KEY = 'locked'
+KOBO_LOCK_SHEET = 'kobo--locking-profiles'
+KOBO_LOCKING_RESTRICTIONS = [
+    'choice_add',
+    'choice_delete',
+    'choice_label_edit',
+    'choice_value_edit',
+    'choice_order_edit',
+    'question_delete',
+    'question_label_edit',
+    'question_settings_edit',
+    'question_skip_logic_edit',
+    'question_validation_edit',
+    'group_delete',
+    'group_label_edit',
+    'group_question_add',
+    'group_question_delete',
+    'group_question_order_edit',
+    'group_settings_edit',
+    'group_skip_logic_edit',
+    'group_split',
+    'form_replace',
+    'group_add',
+    'question_add',
+    'question_order_edit',
+    'language_edit',
+    'form_appearance',
+    'form_meta_edit',
+]

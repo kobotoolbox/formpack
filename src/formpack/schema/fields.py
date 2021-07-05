@@ -152,42 +152,65 @@ class FormField(FormDataDef):
 
         # normalize spaces
         data_type = definition['type']
-        choice = None
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
-            choice = field_choices[choice_id]
+            # pyxform#472 introduced dynamic list_names for select_one with the
+            # format of `select_one ${question_name}`. The choices are
+            # therefore not within a separate choice list
+            if choice_id.startswith('${') and choice_id.endswith('}'):
+                # ${dynamic_choice}, so question will be treated as a TextField
+                choice = None
+            else:
+                choice = field_choices[choice_id]
+        else:
+            choice = None
 
         data_type_classes = {
-            "select_one": FormChoiceField,
-            "select_one_from_file": TextField, # temporary
-            "select_multiple": FormChoiceFieldWithMultipleSelect,
-            "select_multiple_from_file": TextField, # temporary
-            "geopoint": FormGPSField,
-            "start-geopoint": FormGPSField,
-            "text": TextField,
-            "barcode": TextField,
-            "rank": TextField,
+            # selects
+            'select_one': FormChoiceField,
+            'select_one_from_file': FormChoiceField,
+            'select_multiple': FormChoiceFieldWithMultipleSelect,
+            # TODO: Get this to work with FormChoiceFieldWithMultipleSelect
+            'select_multiple_from_file': TextField,
+            'rank': TextField,
 
             # date and time
-            "date": DateField,
-            "today": DateField,
-            "datetime": DateTimeField,
-            "start": DateTimeField,
-            "end": DateTimeField,
+            'date': DateField,
+            'today': DateField,
+            'time': TextField,
+            'datetime': DateTimeField,
+            'start': DateTimeField,
+            'end': DateTimeField,
 
-            "calculate": CalculateField,
-            "acknowledge": TextField,
-            "integer": NumField,
+            # general
+            'text': TextField,
+            'barcode': TextField,
+            'acknowledge': TextField,
+
+            # geo
+            'geopoint': FormGPSField,
+            'start-geopoint': FormGPSField,
+
+            # media
+            'video': TextField,
+            'image': TextField,
+            'audio': TextField,
+            'file': TextField,
+            'background-audio': TextField,
+
+            # numeric
+            'calculate': CalculateField,
+            'integer': NumField,
             'decimal': NumField,
-            "range": NumField,
+            'range': NumField,
 
             # legacy type, treat them as text
-            "select_one_external": partial(TextField, data_type=data_type),
-            "cascading_select": partial(TextField, data_type=data_type),
+            'select_one_external': partial(TextField, data_type=data_type),
+            'cascading_select': partial(TextField, data_type=data_type),
         }
 
         args = {
