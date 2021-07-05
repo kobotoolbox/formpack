@@ -71,34 +71,33 @@ types = aliases_to_ordered_dict({
 })
 
 # keys used in `_expand_type_to_dict()` to handle choices argument
-selects = aliases_to_ordered_dict(
-    {
-        'select_multiple': [
-            'select all that apply',
-            'select multiple',
-            'select many',
-            'select_many',
-            'select all that apply from',
-            'add select multiple prompt using',
-        ],
-        'select_multiple_from_file': [
-            'select multiple from file',
-        ],
-        'select_one_external': [
-            'select one external',
-        ],
-        'select_one': [
-            'select one',
-            'select one from',
-            'add select one prompt using',
-            'select1',
-        ],
-        'select_one_from_file': [
-            'select one from file',
-        ],
-        'rank': [],
-    }
-)
+selects_dict = {
+    'select_multiple': [
+        'select all that apply',
+        'select multiple',
+        'select many',
+        'select_many',
+        'select all that apply from',
+        'add select multiple prompt using',
+    ],
+    'select_multiple_from_file': [
+        'select multiple from file',
+    ],
+    'select_one_external': [
+        'select one external',
+    ],
+    'select_one': [
+        'select one',
+        'select one from',
+        'add select one prompt using',
+        'select1',
+    ],
+    'select_one_from_file': [
+        'select one from file',
+    ],
+    'rank': [],
+}
+selects = aliases_to_ordered_dict(selects_dict)
 # Python3: Cast to a list because it's merged into other dicts
 # (i.e `SELECT_SCHEMA` in validators.py)
 SELECT_TYPES = list(selects.keys())

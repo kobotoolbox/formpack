@@ -148,30 +148,22 @@ class FormField(FormDataDef):
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
 
-        selects = ['select_one', 'select_multiple']
-        selects_legacy = ['select one']
-        selects_valid = selects + selects_legacy
-
         # normalize spaces
         data_type = definition['type']
 
-        if data_type in selects_valid:
-            # now that we're handling legacy `select one`, there's a chance it
-            # doesn't contain 'select_from_list_name'
-            try:
-                choice_id = definition['select_from_list_name']
-            except KeyError:
-                choice_id = None
+        if ' ' in data_type:
+            raise ValueError('invalid data_type: %s' % data_type)
 
+        if data_type in ('select_one', 'select_multiple'):
+            choice_id = definition['select_from_list_name']
             # pyxform#472 introduced dynamic list_names for select_one with the
             # format of `select_one ${question_name}`. The choices are
             # therefore not within a separate choice list
-            if choice_id is not None:
-                if choice_id.startswith('${') and choice_id.endswith('}'):
-                    # ${dynamic_choice}, so question will be treated as a TextField
-                    choice = None
-                else:
-                    choice = field_choices[choice_id]
+            if choice_id.startswith('${') and choice_id.endswith('}'):
+                # ${dynamic_choice}, so question will be treated as a TextField
+                choice = None
+            else:
+                choice = field_choices[choice_id]
         else:
             choice = None
 
@@ -217,8 +209,6 @@ class FormField(FormDataDef):
             # legacy type, treat them as text
             'select_one_external': partial(TextField, data_type=data_type),
             'cascading_select': partial(TextField, data_type=data_type),
-            # handle legacy `select one`
-            'select one': FormChoiceField,
         }
 
         args = {

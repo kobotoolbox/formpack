@@ -422,7 +422,6 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'romev1'}
         export = fp.export(**options).to_dict(submissions)
-        print(str(export), flush=True)
         expected_dict = OrderedDict(
             [
                 (
