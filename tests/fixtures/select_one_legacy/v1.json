@@ -3,10 +3,9 @@
   "content": {
     "survey": [
       {
-        "type": "select one",
+        "type": "select one emperors",
         "name": "fav_emperor",
-        "label": "Who is your favourite emperor",
-        "select_from_list_name": "emperors"
+        "label": "Who is your favourite emperor"
       }
     ],
     "choices": [

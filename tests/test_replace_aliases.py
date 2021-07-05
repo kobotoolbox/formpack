@@ -24,12 +24,6 @@ def test_select_one_aliases_replaced():
     assert dealias_type('select_one dogs') == 'select_one dogs'
 
 
-def test_select_one_aliases_replaced_without_list_name():
-    assert dealias_type('select1') == 'select_one'
-    assert dealias_type('select one') == 'select_one'
-    assert dealias_type('select_one') == 'select_one'
-
-
 def test_replace_select_one_from_file():
     s1 = {'survey': [{'type': 'select one from file dogs.csv'}]}
     replace_aliases(s1, in_place=True)
@@ -56,15 +50,6 @@ def test_select_multiple_aliases_replaced():
     assert dealias_type('select multiple dogs') == 'select_multiple dogs'
     assert dealias_type('select_many dogs') == 'select_multiple dogs'
     assert dealias_type('select_multiple dogs') == 'select_multiple dogs'
-
-
-def test_select_multiple_aliases_replaced_without_list_name():
-    assert dealias_type('select all that apply from') == 'select_multiple'
-    assert dealias_type('select all that apply') == 'select_multiple'
-    assert dealias_type('select many') == 'select_multiple'
-    assert dealias_type('select multiple') == 'select_multiple'
-    assert dealias_type('select_many') == 'select_multiple'
-    assert dealias_type('select_multiple') == 'select_multiple'
 
 
 def test_replace_select_multiple_from_file():
