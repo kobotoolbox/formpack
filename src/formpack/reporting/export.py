@@ -373,7 +373,7 @@ class Export(object):
                         val=val,
                         lang=_lang,
                         multiple_select=self.multiple_select,
-                        xls_types=True,
+                        xls_types=False,
                     )
 
                     # save fields value if they match parent mapping fields.
@@ -723,6 +723,7 @@ class Export(object):
             {
                 'constant_memory': True,
                 'default_date_format': 'yyyy-mm-dd',
+                'remove_timezone': True,
             },
         )
         workbook.use_zip64()

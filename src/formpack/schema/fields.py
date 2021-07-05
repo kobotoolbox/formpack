@@ -236,18 +236,17 @@ class FormField(FormDataDef):
         return {self.name: val}
 
     def try_get_number(self, val):
-        _val = val
         try:
-            _val = int(_val)
+            val = int(val)
         except ValueError:
             pass
-        if isinstance(_val, int):
-            return _val
+        if isinstance(val, int):
+            return val
         try:
-            _val = float(_val)
+            val = float(val)
         except ValueError:
             pass
-        return _val
+        return val
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -469,6 +468,9 @@ class DateField(ExtendedFormField):
         return stats
 
     def format(self, val, xls_types=False, *args, **kwargs):
+        if val is None:
+            val = ''
+
         if not xls_types:
             return {self.name: val}
 
@@ -485,6 +487,9 @@ class DateField(ExtendedFormField):
 class DateTimeField(DateField):
 
     def format(self, val, xls_types=False, *args, **kwargs):
+        if val is None:
+            val = ''
+
         if not xls_types:
             return {self.name: val}
 
@@ -493,19 +498,18 @@ class DateTimeField(DateField):
             _date = parse(val)
         except ValueError:
             pass
-        if isinstance(_date, datetime) and _date.tzinfo is not None:
-            _date = _date.strftime('%Y-%m-%d %H:%M:%S%z')
         return {self.name: _date}
 
 
 class CalculateField(TextField):
 
     def format(self, val, xls_types=False, *args, **kwargs):
+        if val is None:
+            val = ''
+
         if not xls_types:
             return {self.name: val}
 
-        if val is None:
-            val = ''
         return {self.name: self.try_get_number(val)}
 
 
@@ -600,11 +604,12 @@ class NumField(FormField):
             yield float(raw_values)
 
     def format(self, val, xls_types=False, *args, **kwargs):
+        if val is None:
+            val = ''
+
         if not xls_types:
             return {self.name: val}
 
-        if val is None:
-            val = ''
         return {self.name: self.try_get_number(val)}
 
 
@@ -634,7 +639,10 @@ class IdCopyField(CopyField):
             section=section,
             *args, **kwargs)
 
-    def format(self, val, *args, **kwargs):
+    def format(self, val, xls_types=False, *args, **kwargs):
+        if not xls_types:
+            return {self.name: val}
+
         return {self.name: int(val)}
 
 
@@ -648,7 +656,10 @@ class SubmissionTimeCopyField(CopyField):
             section=section,
             *args, **kwargs)
 
-    def format(self, val, *args, **kwargs):
+    def format(self, val, xls_types=False, *args, **kwargs):
+        if not xls_types:
+            return {self.name: val}
+
         _date = val
         try:
             _date = parse(val)
@@ -824,15 +835,21 @@ class FormChoiceField(ExtendedFormField):
         else:
             return translation
 
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both", xls_types=False):
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        multiple_select="both",
+        xls_types=False,
+    ):
         if val is None:
             val = ''
         val = self.get_translation(val, lang)
 
-        if xls_types:
-            val = self.try_get_number(val)
+        if not xls_types:
+            return {self.name: val}
 
-        return {self.name: val}
+        return {self.name: self.try_get_number(val)}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -944,7 +961,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     # maybe try to cache those
     def format(self, val, lang=UNSPECIFIED_TRANSLATION,
                group_sep="/", hierarchy_in_labels=False,
-               multiple_select="both"):
+               multiple_select="both", xls_types=False):
         """ Same than other format(), with an option for multiple_select layout
 
                 multiple_select:
@@ -952,6 +969,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 "summary": only the summary column
                 "details": only the details column
         """
+        _zero, _one = (0, 1) if xls_types else ('0', '1')
         if val is None:
             # If the value is missing, do not imply that any response was
             # received: fill with empty strings instead of zeros
@@ -960,7 +978,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             )
 
         cells = dict.fromkeys(
-            self.get_value_names(multiple_select=multiple_select), "0"
+            self.get_value_names(multiple_select=multiple_select), _zero
         )
         if multiple_select in ("both", "summary"):
             res = []
@@ -974,15 +992,15 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 else:
                     res.append(v)
 
-            if len(res) == 1:
-                res_ = self.try_get_number(res[0])
+            if len(res) == 1 and xls_types:
+                _res = self.try_get_number(res[0])
             else:
-                res_ = " ".join(res)
-            cells[self.name] = res_
+                _res = " ".join(res)
+            cells[self.name] = _res
 
         if multiple_select in ("both", "details"):
             for choice in val.split():
-                cells[self.name + "/" + choice] = "1"
+                cells[self.name + "/" + choice] = _one
 
         return cells
 
