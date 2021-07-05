@@ -242,7 +242,7 @@ class Export(object):
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
-                for copy_field in self.copy_fields_names:
+                for copy_field in self.copy_field_names:
                     auto_field_names.append("_submission_{}".format(copy_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
@@ -403,7 +403,7 @@ class Export(object):
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
                 extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
                 if extra_mapping_values:
-                    for extra_mapping_field in self.copy_fields_names:
+                    for extra_mapping_field in self.copy_field_names:
                         row[
                             '_submission_{}'.format(extra_mapping_field)
                         ] = extra_mapping_values.get(extra_mapping_field, '')

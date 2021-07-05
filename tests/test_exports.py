@@ -480,199 +480,212 @@ class TestFormPackExport(unittest.TestCase):
             versions='bird_nests_v1',
             copy_fields=('_id', '_uuid', ValidationStatusCopyField)
         ).to_dict(submissions)
-        expected_dict = OrderedDict([
-            ('Bird nest survey with nested repeatable groups', {
-                'fields': [
-                    'start',
-                    'end',
-                    '_id',
-                    '_uuid',
-                    '_validation_status',
-                    '_index'
-                ],
-                'data': [
-                    [
-                        '2017-12-27T15:53:26.000-05:00',
-                        '2017-12-27T15:58:20.000-05:00',
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        'validation_status_approved',
-                        1
-                    ],
-                    [
-                        '2017-12-27T15:58:20.000-05:00',
-                        '2017-12-27T15:58:50.000-05:00',
-                        124,
-                        '790af158-7b24-4651-b584-27bf65b9e397',
-                        'validation_status_not_approved',
-                        2
-                    ]
-                ]
-            }),
-            ('group_tree', {
-                'fields': [
-                    'What_kind_of_tree_is_this',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index',
-                    '_submission__id',
-                    '_submission__uuid',
-                    '_submission__validation_status'
-                ],
-                'data': [
-                    [
-                        'pine',
-                        1,
-                        'Bird nest survey with nested repeatable groups',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'spruce',
-                        2,
-                        'Bird nest survey with nested repeatable groups',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'maple',
-                        3,
-                        'Bird nest survey with nested repeatable groups',
-                        2,
-                        124,
-                        '790af158-7b24-4651-b584-27bf65b9e397',
-                        ''
-                    ]
-                ]
-            }),
-            ('group_nest', {
-                'fields': [
-                    'How_high_above_the_ground_is_the_nest',
-                    'How_many_eggs_are_in_the_nest',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index',
-                    '_submission__id',
-                    '_submission__uuid',
-                    '_submission__validation_status'
-                ],
-                'data': [
-                    [
-                        '13',
-                        '3',
-                        1,
-                        'group_tree',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        '15',
-                        '1',
-                        2,
-                        'group_tree',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        '10',
-                        '2',
-                        3,
-                        'group_tree',
-                        2,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        '23',
-                        '1',
-                        4,
-                        'group_tree',
-                        3,
-                        124,
-                        '790af158-7b24-4651-b584-27bf65b9e397',
-                        ''
-                    ]
-                ]
-            }),
-            ('group_egg', {
-                'fields': [
-                    'Describe_the_egg',
-                    '_parent_table_name',
-                    '_parent_index',
-                    '_submission__id',
-                    '_submission__uuid',
-                    '_submission__validation_status'
-                ],
-                'data': [
-                    [
-                        'brown and speckled; medium',
-                        'group_nest',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'brown and speckled; large; cracked',
-                        'group_nest',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'light tan; small',
-                        'group_nest',
-                        1,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'cream-colored',
-                        'group_nest',
-                        2,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'reddish-brown; medium',
-                        'group_nest',
-                        3,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'reddish-brown; small',
-                        'group_nest',
-                        3,
-                        123,
-                        'f16d9a3f-0892-413e-81d4-758ab188ea0b',
-                        ''
-                    ],
-                    [
-                        'grey and speckled',
-                        'group_nest',
-                        4,
-                        124,
-                        '790af158-7b24-4651-b584-27bf65b9e397',
-                        ''
-                    ]
-                ]
-            })
-        ])
-
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Bird nest survey with nested repeatable groups',
+                    {
+                        'fields': [
+                            'start',
+                            'end',
+                            '_id',
+                            '_uuid',
+                            '_validation_status',
+                            '_index',
+                        ],
+                        'data': [
+                            [
+                                '2017-12-27T15:53:26.000-05:00',
+                                '2017-12-27T15:58:20.000-05:00',
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                                1,
+                            ],
+                            [
+                                '2017-12-27T15:58:20.000-05:00',
+                                '2017-12-27T15:58:50.000-05:00',
+                                124,
+                                '790af158-7b24-4651-b584-27bf65b9e397',
+                                'validation_status_not_approved',
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_tree',
+                    {
+                        'fields': [
+                            'What_kind_of_tree_is_this',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                            '_submission__id',
+                            '_submission__uuid',
+                            '_submission__validation_status',
+                        ],
+                        'data': [
+                            [
+                                'pine',
+                                1,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'spruce',
+                                2,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'maple',
+                                3,
+                                'Bird nest survey with nested repeatable groups',
+                                2,
+                                124,
+                                '790af158-7b24-4651-b584-27bf65b9e397',
+                                'validation_status_not_approved',
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_nest',
+                    {
+                        'fields': [
+                            'How_high_above_the_ground_is_the_nest',
+                            'How_many_eggs_are_in_the_nest',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                            '_submission__id',
+                            '_submission__uuid',
+                            '_submission__validation_status',
+                        ],
+                        'data': [
+                            [
+                                '13',
+                                '3',
+                                1,
+                                'group_tree',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                '15',
+                                '1',
+                                2,
+                                'group_tree',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                '10',
+                                '2',
+                                3,
+                                'group_tree',
+                                2,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                '23',
+                                '1',
+                                4,
+                                'group_tree',
+                                3,
+                                124,
+                                '790af158-7b24-4651-b584-27bf65b9e397',
+                                'validation_status_not_approved',
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_egg',
+                    {
+                        'fields': [
+                            'Describe_the_egg',
+                            '_parent_table_name',
+                            '_parent_index',
+                            '_submission__id',
+                            '_submission__uuid',
+                            '_submission__validation_status',
+                        ],
+                        'data': [
+                            [
+                                'brown and speckled; medium',
+                                'group_nest',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'brown and speckled; large; cracked',
+                                'group_nest',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'light tan; small',
+                                'group_nest',
+                                1,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'cream-colored',
+                                'group_nest',
+                                2,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'reddish-brown; medium',
+                                'group_nest',
+                                3,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'reddish-brown; small',
+                                'group_nest',
+                                3,
+                                123,
+                                'f16d9a3f-0892-413e-81d4-758ab188ea0b',
+                                'validation_status_approved',
+                            ],
+                            [
+                                'grey and speckled',
+                                'group_nest',
+                                4,
+                                124,
+                                '790af158-7b24-4651-b584-27bf65b9e397',
+                                'validation_status_not_approved',
+                            ],
+                        ],
+                    },
+                ),
+            ]
+        )
         self.assertEqual(export_dict, expected_dict)
 
     def test_nested_repeats(self):
