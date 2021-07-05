@@ -642,6 +642,9 @@ class IdCopyField(CopyField):
         )
 
     def format(self, val, xls_types=False, *args, **kwargs):
+        if val is None:
+            val = ''
+
         if not xls_types:
             return {self.name: val}
 
@@ -661,6 +664,9 @@ class SubmissionTimeCopyField(CopyField):
         )
 
     def format(self, val, xls_types=False, *args, **kwargs):
+        if val is None:
+            val = ''
+
         if not xls_types:
             return {self.name: val}
 
