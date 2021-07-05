@@ -83,6 +83,13 @@ class Export(object):
                         dumb_field = CopyField(copy_field, section=first_section)
                     first_section.fields[dumb_field.name] = dumb_field
 
+        # Some copy fields are classes, some strings -- collect their field
+        # names for later use
+        self.copy_field_names = [
+            getattr(copy_field, 'FIELD_NAME', copy_field)
+            for copy_field in self.copy_fields
+        ]
+
         # this deals with merging all form versions headers and labels
         res = self.get_fields_labels_tags_for_all_versions(
             lang,
@@ -235,13 +242,8 @@ class Export(object):
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
-                for copy_field in self.copy_fields:
-                    if isclass(copy_field):
-                        auto_field_names.append(
-                            "_submission_{}".format(copy_field.FIELD_NAME))
-                    else:
-                        auto_field_names.append(
-                            "_submission_{}".format(copy_field))
+                for copy_field in self.copy_fields_names:
+                    auto_field_names.append("_submission_{}".format(copy_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -373,12 +375,12 @@ class Export(object):
                         val=val,
                         lang=_lang,
                         multiple_select=self.multiple_select,
-                        xls_types=False,
+                        xls_types=self.xls_types,
                     )
 
                     # save fields value if they match parent mapping fields.
                     # Useful to map children to their parent when flattening groups.
-                    if field.path in self.copy_fields:
+                    if field.path in self.copy_field_names:
                         if _section_name not in self.__r_groups_submission_mapping_values:
                             self.__r_groups_submission_mapping_values[_section_name] = {}
                         self.__r_groups_submission_mapping_values[_section_name].update(cells)
@@ -401,15 +403,10 @@ class Export(object):
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
                 extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
                 if extra_mapping_values:
-                    for extra_mapping_field in self.copy_fields:
-                        if isclass(extra_mapping_field):
-                            row[
-                                '_submission_{}'.format(extra_mapping_field.FIELD_NAME)
-                            ] = extra_mapping_values.get(extra_mapping_field, "")
-                        else:
-                            row[
-                                '_submission_{}'.format(extra_mapping_field)
-                            ] = extra_mapping_values.get(extra_mapping_field, "")
+                    for extra_mapping_field in self.copy_fields_names:
+                        row[
+                            '_submission_{}'.format(extra_mapping_field)
+                        ] = extra_mapping_values.get(extra_mapping_field, '')
 
             rows.append(list(row.values()))
 
