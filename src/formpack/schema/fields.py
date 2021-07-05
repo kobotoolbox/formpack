@@ -631,13 +631,15 @@ class CopyField(FormField):
 
 class IdCopyField(CopyField):
 
-    FIELD_NAME = "_id"
+    FIELD_NAME = '_id'
 
     def __init__(self, section=None, *args, **kwargs):
         super(IdCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
-            *args, **kwargs)
+            *args,
+            **kwargs,
+        )
 
     def format(self, val, xls_types=False, *args, **kwargs):
         if not xls_types:
@@ -648,13 +650,15 @@ class IdCopyField(CopyField):
 
 class SubmissionTimeCopyField(CopyField):
 
-    FIELD_NAME = "_submission_time"
+    FIELD_NAME = '_submission_time'
 
     def __init__(self, section=None, *args, **kwargs):
         super(SubmissionTimeCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
-            *args, **kwargs)
+            *args,
+            **kwargs,
+        )
 
     def format(self, val, xls_types=False, *args, **kwargs):
         if not xls_types:
@@ -670,13 +674,15 @@ class SubmissionTimeCopyField(CopyField):
 
 class NotesCopyField(CopyField):
 
-    FIELD_NAME = "_notes"
+    FIELD_NAME = '_notes'
 
     def __init__(self, section=None, *args, **kwargs):
         super(NotesCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
-            *args, **kwargs)
+            *args,
+            **kwargs,
+        )
 
     def format(self, val, *args, **kwargs):
         if not val:
@@ -686,13 +692,15 @@ class NotesCopyField(CopyField):
 
 class TagsCopyField(CopyField):
 
-    FIELD_NAME = "_tags"
+    FIELD_NAME = '_tags'
 
     def __init__(self, section=None, *args, **kwargs):
         super(TagsCopyField, self).__init__(
             self.FIELD_NAME,
             section=section,
-            *args, **kwargs)
+            *args,
+            **kwargs,
+        )
 
     def format(self, val, *args, **kwargs):
         if val and isinstance(val, list):
