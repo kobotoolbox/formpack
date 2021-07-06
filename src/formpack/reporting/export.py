@@ -29,14 +29,23 @@ from ..utils.string import unicode, unique_name_for_xls
 
 class Export(object):
 
-    def __init__(self, formpack, form_versions, lang=UNSPECIFIED_TRANSLATION,
-                 group_sep="/", hierarchy_in_labels=False,
-                 version_id_keys=[],
-                 multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=None, filter_fields=(),
-                 xls_types=False):
+    def __init__(
+        self,
+        formpack,
+        form_versions,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep="/",
+        hierarchy_in_labels=False,
+        version_id_keys=[],
+        multiple_select="both",
+        copy_fields=(),
+        force_index=False,
+        title="submissions",
+        tag_cols_for_header=None,
+        filter_fields=(),
+        xls_types=False,
+    ):
         """
-
         :param formpack: FormPack
         :param form_versions: OrderedDict
         :param lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
@@ -51,6 +60,8 @@ class Export(object):
         :param force_index: bool.
         :param title: string
         :param tag_cols_for_header: list
+        :param filter_fields: list
+        :param xls_types: bool
         """
 
         self.formpack = formpack

@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import json
 import unittest
-from dateutil.parser import parse
+from dateutil import parser
 from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
@@ -906,13 +906,13 @@ class TestFormPackExport(unittest.TestCase):
                 ],
                 'data': [
                     [
-                        parse('2017-12-27T15:53:26.000-05:00'),
-                        parse('2017-12-27T15:58:20.000-05:00'),
+                        parser.parse('2017-12-27T15:53:26.000-05:00'),
+                        parser.parse('2017-12-27T15:58:20.000-05:00'),
                         1
                     ],
                     [
-                        parse('2017-12-27T15:58:20.000-05:00'),
-                        parse('2017-12-27T15:58:50.000-05:00'),
+                        parser.parse('2017-12-27T15:58:20.000-05:00'),
+                        parser.parse('2017-12-27T15:58:50.000-05:00'),
                         2
                     ]
                 ]

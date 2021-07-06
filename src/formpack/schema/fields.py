@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function, absolute_import,
 
 from collections import defaultdict
 from datetime import datetime
-from dateutil.parser import parse
+from dateutil import parser
 from functools import partial
 from operator import itemgetter
 
@@ -476,7 +476,7 @@ class DateField(ExtendedFormField):
 
         _date = val
         try:
-            _date = parse(val)
+            _date = parser.parse(val)
         except ValueError:
             pass
         if isinstance(_date, datetime):
@@ -495,7 +495,7 @@ class DateTimeField(DateField):
 
         _date = val
         try:
-            _date = parse(val)
+            _date = parser.parse(val)
         except ValueError:
             pass
         return {self.name: _date}
@@ -660,7 +660,7 @@ class SubmissionTimeCopyField(CopyField):
 
         _date = val
         try:
-            _date = parse(val)
+            _date = parser.parse(val)
         except ValueError:
             pass
         return {self.name: _date}
@@ -779,7 +779,14 @@ class FormGPSField(FormField):
 
         return names
 
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION, xls_types=False, *args, **kwargs):
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        xls_types=False,
+        *args,
+        **kwargs
+    ):
         """Same than other format(), but dealing with 2 to 4 values
 
         The GPS value can contain 2, 3 or 4 numerical separated by a
@@ -961,28 +968,35 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         return "<FormChoiceFieldWithMultipleSelect name='%s' type='%s'>" % data
 
     # maybe try to cache those
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION,
-               group_sep="/", hierarchy_in_labels=False,
-               multiple_select="both", xls_types=False):
-        """ Same than other format(), with an option for multiple_select layout
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep="/",
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        xls_types=False,
+    ):
+        """
+        Same than other format(), with an option for multiple_select layout
 
-                multiple_select:
-                "both": add the summary column and a colum for each value
-                "summary": only the summary column
-                "details": only the details column
+        multiple_select:
+            'both': add the summary column and a colum for each value
+            'summary': only the summary column
+            'details': only the details column
         """
         _zero, _one = (0, 1) if xls_types else ('0', '1')
         if val is None:
             # If the value is missing, do not imply that any response was
             # received: fill with empty strings instead of zeros
             return dict.fromkeys(
-                self.get_value_names(multiple_select=multiple_select), ""
+                self.get_value_names(multiple_select=multiple_select), ''
             )
 
         cells = dict.fromkeys(
             self.get_value_names(multiple_select=multiple_select), _zero
         )
-        if multiple_select in ("both", "summary"):
+        if multiple_select in ('both', 'summary'):
             res = []
             for v in val.split():
                 try:
@@ -997,12 +1011,12 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             if len(res) == 1 and xls_types:
                 _res = self.try_get_number(res[0])
             else:
-                _res = " ".join(res)
+                _res = ' '.join(res)
             cells[self.name] = _res
 
-        if multiple_select in ("both", "details"):
+        if multiple_select in ('both', 'details'):
             for choice in val.split():
-                cells[self.name + "/" + choice] = _one
+                cells[self.name + '/' + choice] = _one
 
         return cells
 
