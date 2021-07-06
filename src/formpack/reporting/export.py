@@ -5,7 +5,6 @@ from __future__ import (unicode_literals, print_function, absolute_import,
 import json
 import zipfile
 from collections import defaultdict
-from dateutil.parser import parse
 from inspect import isclass
 from typing import Iterator, Generator, Optional
 

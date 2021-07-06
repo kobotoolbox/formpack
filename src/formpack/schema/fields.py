@@ -233,20 +233,8 @@ class FormField(FormDataDef):
     ):
         if val is None:
             val = ''
-        return {self.name: val}
 
-    def try_get_number(self, val):
-        try:
-            val = int(val)
-        except ValueError:
-            pass
-        if isinstance(val, int):
-            return val
-        try:
-            val = float(val)
-        except ValueError:
-            pass
-        return val
+        return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -278,6 +266,20 @@ class FormField(FormDataDef):
 
     def parse_values(self, raw_values):
         yield raw_values
+
+    @staticmethod
+    def try_get_number(val):
+        try:
+            val = int(val)
+        except ValueError:
+            pass
+        if isinstance(val, int):
+            return val
+        try:
+            val = float(val)
+        except ValueError:
+            pass
+        return val
 
 
 class ExtendedFormField(FormField):
@@ -481,6 +483,7 @@ class DateField(ExtendedFormField):
             pass
         if isinstance(_date, datetime):
             _date = _date.date()
+
         return {self.name: _date}
 
 
@@ -498,6 +501,7 @@ class DateTimeField(DateField):
             _date = parser.parse(val)
         except ValueError:
             pass
+
         return {self.name: _date}
 
 
@@ -663,6 +667,7 @@ class SubmissionTimeCopyField(CopyField):
             _date = parser.parse(val)
         except ValueError:
             pass
+
         return {self.name: _date}
 
 
@@ -681,6 +686,7 @@ class NotesCopyField(CopyField):
     def format(self, val, *args, **kwargs):
         if not val:
             val = ''
+
         return {self.name: str(val)}
 
 
@@ -701,6 +707,7 @@ class TagsCopyField(CopyField):
             val_ = ', '.join(val)
         else:
             val_ = ''
+
         return {self.name: val_}
 
 
