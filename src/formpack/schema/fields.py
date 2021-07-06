@@ -190,6 +190,7 @@ class FormField(FormDataDef):
             'text': TextField,
             'barcode': TextField,
             'acknowledge': TextField,
+            'calculate': TextField,
 
             # geo
             'geopoint': FormGPSField,
@@ -203,7 +204,6 @@ class FormField(FormDataDef):
             'background-audio': TextField,
 
             # numeric
-            'calculate': CalculateField,
             'integer': NumField,
             'decimal': NumField,
             'range': NumField,
@@ -499,18 +499,6 @@ class DateTimeField(DateField):
         except ValueError:
             pass
         return {self.name: _date}
-
-
-class CalculateField(TextField):
-
-    def format(self, val, xls_types=False, *args, **kwargs):
-        if val is None:
-            val = ''
-
-        if not xls_types:
-            return {self.name: val}
-
-        return {self.name: self.try_get_number(val)}
 
 
 class NumField(FormField):
