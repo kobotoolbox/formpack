@@ -3,8 +3,8 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 import re
-from copy import deepcopy
 
+from .fast_deepcopy import fast_deepcopy
 from ..constants import TAG_COLUMNS_AND_SEPARATORS
 from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
                               _flatten_tags,
@@ -50,7 +50,8 @@ def flatten_to_spreadsheet_content(content,
     if remove_sheets is None:
         remove_sheets = []
     if not in_place:
-        content = deepcopy(content)
+        # This is safe, because `content` is JSON-compatible
+        content = fast_deepcopy(content)
 
     translations = content.pop('translations', [])
     translated_cols = content.pop('translated', [])

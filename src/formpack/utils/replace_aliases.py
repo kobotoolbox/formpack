@@ -3,13 +3,13 @@ from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
 from collections import defaultdict
-from copy import deepcopy
 import json
 import re
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
+from .fast_deepcopy import fast_deepcopy
 from .future import iteritems, OrderedDict
 from .string import str_types
 from ..constants import KOBO_LOCK_ALL
@@ -258,7 +258,8 @@ def replace_aliases(content, in_place=False, allowed_types=None):
         replace_aliases_in_place(content, allowed_types=allowed_types)
         return None
     else:
-        _content = deepcopy(content)
+        # This is safe, because `content` is JSON-compatible
+        _content = fast_deepcopy(content)
         replace_aliases_in_place(_content, allowed_types=allowed_types)
         return _content
 

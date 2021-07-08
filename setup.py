@@ -15,6 +15,7 @@ if sys.version_info[0] == 2:
         'cyordereddict',
         'jsonschema',
         'lxml',
+        'msgpack<1',  # 1.0 drops to a python backup on Python 2
         'path.py<12',  # Pinned for Python 2 compatibility
         'pyquery',
         'pyxform',
@@ -38,6 +39,7 @@ else:
         'begins',
         'jsonschema',
         'lxml',
+        'msgpack',
         'path.py',
         'pyquery',
         'pyxform',
