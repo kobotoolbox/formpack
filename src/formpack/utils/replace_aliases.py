@@ -5,12 +5,14 @@ from __future__ import (unicode_literals, print_function,
 from collections import defaultdict
 from copy import deepcopy
 import json
+import re
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
 from .future import iteritems, OrderedDict
 from .string import str_types
+from ..constants import KOBO_LOCK_ALL
 
 # This file is a mishmash of things which culminate in the
 # "replace_aliases" method which iterates through a survey and
@@ -22,6 +24,8 @@ TF_COLUMNS = [
     'required',
 ]
 
+KOBO_SPECIFIC_SUB_PATTERN = r'^kobo(–|—)'
+KOBO_SPECIFIC_PREFERRED = 'kobo--'
 
 def aliases_to_ordered_dict(_d):
     """
@@ -66,25 +70,35 @@ types = aliases_to_ordered_dict({
     'geopoint': ['gps'],
 })
 
-selects = aliases_to_ordered_dict({
-    'select_multiple': [
-        'select all that apply',
-        'select multiple',
-        'select many',
-        'select_many',
-        'select all that apply from',
-        'add select multiple prompt using',
-    ],
-    'select_one_external': [
-        'select one external',
-    ],
-    'select_one': [
-        'select one',
-        'select one from',
-        'add select one prompt using',
-        'select1',
-    ],
-})
+# keys used in `_expand_type_to_dict()` to handle choices argument
+selects = aliases_to_ordered_dict(
+    {
+        'select_multiple': [
+            'select all that apply',
+            'select multiple',
+            'select many',
+            'select_many',
+            'select all that apply from',
+            'add select multiple prompt using',
+        ],
+        'select_multiple_from_file': [
+            'select multiple from file',
+        ],
+        'select_one_external': [
+            'select one external',
+        ],
+        'select_one': [
+            'select one',
+            'select one from',
+            'add select one prompt using',
+            'select1',
+        ],
+        'select_one_from_file': [
+            'select one from file',
+        ],
+        'rank': [],
+    }
+)
 # Python3: Cast to a list because it's merged into other dicts
 # (i.e `SELECT_SCHEMA` in validators.py)
 SELECT_TYPES = list(selects.keys())
@@ -96,12 +110,15 @@ META_TYPES = [
     'deviceid',
     'phone_number',
     'simserial',
+    'audit',
     # meta values
     'username',
     # reconsider:
     'phonenumber',
     'imei',
     'subscriberid',
+    # geo
+    'start-geopoint',
 ]
 
 LABEL_OPTIONAL_TYPES = [
@@ -128,17 +145,23 @@ MAIN_TYPES = [
     'video',
     'image',
     'audio',
+    'file',
+    'background-audio',
     # enter time values
     'date',
     'datetime',
     'time',
-
     # prompt to collect geo data
     'location',
-
     # no response
     'acknowledge',
     'note',
+    # external data source
+    'xml-external',
+    'csv-external',
+    # other
+    'range',
+    'hidden',
 ] + GEO_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
@@ -202,6 +225,17 @@ survey_header_columns = _unpack_headers(pyxform_aliases.survey_header,
                                         formpack_preferred_survey_headers)
 
 
+def kobo_specific_sub(key: str) -> str:
+    """
+    Ensure that kobo-specific names (kobo--*) that happen to start with n-dash
+    or m-dash characters are substituted with two single dashes for
+    consistency. This accommodates for some software that will automatically
+    substitute two dashes for a single n-dash or m-dash character. For example:
+        `kobo–something` -> `kobo--something`,
+        `kobo—something` -> `kobo--soemthing`
+    """
+    return re.sub(KOBO_SPECIFIC_SUB_PATTERN, KOBO_SPECIFIC_PREFERRED, key)
+
 def dealias_type(type_str, strict=False, allowed_types=None):
     if allowed_types is None:
         allowed_types = {}
@@ -247,6 +281,12 @@ def replace_aliases_in_place(content, allowed_types=None):
                 row[val] = row[key]
                 del row[key]
 
+        for key, val in row.copy().items():
+            if re.search(KOBO_SPECIFIC_SUB_PATTERN, key) is not None:
+                new_key = kobo_specific_sub(key)
+                row[new_key] = val
+                del row[key]
+
     for row in content.get('choices', []):
         if 'list name' in row:
             row['list_name'] = row.pop('list name')
@@ -262,7 +302,13 @@ def replace_aliases_in_place(content, allowed_types=None):
                          ' first been parsed through "expand_content".')
 
     if settings:
-        content['settings'] = dict([
-            (settings_header_columns.get(key, key), val)
-            for key, val in settings.items()
-        ])
+        _settings = {}
+        for key, val in settings.items():
+            _key = kobo_specific_sub(settings_header_columns.get(key, key))
+            _val = (
+                pyxform_aliases.yes_no.get(val, val)
+                if _key == KOBO_LOCK_ALL
+                else val
+            )
+            _settings[_key] = _val
+        content['settings'] = _settings

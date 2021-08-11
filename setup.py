@@ -52,7 +52,7 @@ else:
 
 
 setup(name='formpack',
-      version='2.0.1',
+      version='2.1.0',
       description='Manipulation tools for KoBo forms',
       author='the formpack contributors (https://github.com/kobotoolbox/formpack/graphs/contributors)',
       url='https://github.com/kobotoolbox/formpack/',

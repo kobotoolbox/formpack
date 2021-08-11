@@ -10,6 +10,7 @@ import statistics
 
 from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
+from ..utils import singlemode
 from ..utils.future import range, OrderedDict
 from ..utils.ordered_collection import OrderedDefaultdict
 
@@ -37,8 +38,6 @@ class FormField(FormDataDef):
         else:
             self.has_stats = data_type != "note"
 
-        self.empty_result = self.format('', lang=UNSPECIFIED_TRANSLATION)
-
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
@@ -52,6 +51,9 @@ class FormField(FormDataDef):
         """
         args = lang, group_sep, hierarchy_in_labels, multiple_select
         return [self._get_label(*args)]
+
+    def get_value_names(self, multiple_select="both"):
+        return super().get_value_names()
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
         """
@@ -148,33 +150,65 @@ class FormField(FormDataDef):
 
         # normalize spaces
         data_type = definition['type']
-        choice = None
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
-            choice = field_choices[choice_id]
+            # pyxform#472 introduced dynamic list_names for select_one with the
+            # format of `select_one ${question_name}`. The choices are
+            # therefore not within a separate choice list
+            if choice_id.startswith('${') and choice_id.endswith('}'):
+                # ${dynamic_choice}, so question will be treated as a TextField
+                choice = None
+            else:
+                choice = field_choices[choice_id]
+        else:
+            choice = None
 
         data_type_classes = {
-            "select_one": FormChoiceField,
-            "select_multiple": FormChoiceFieldWithMultipleSelect,
-            "geopoint": FormGPSField,
-            "date": DateField,
-            "text": TextField,
-            "barcode": TextField,
+            # selects
+            'select_one': FormChoiceField,
+            'select_one_from_file': FormChoiceField,
+            'select_multiple': FormChoiceFieldWithMultipleSelect,
+            # TODO: Get this to work with FormChoiceFieldWithMultipleSelect
+            'select_multiple_from_file': TextField,
+            'rank': TextField,
 
-            # calculate is usually not text but for our purpose it's good
-            # enough
-            "calculate": TextField,
-            "acknowledge": TextField,
-            "integer": NumField,
+            # date and time
+            'date': DateField,
+            'today': DateField,
+            'datetime': TextField,
+            'time': TextField,
+            'start': TextField,
+            'end': TextField,
+
+            # general
+            'text': TextField,
+            'barcode': TextField,
+            'acknowledge': TextField,
+
+            # geo
+            'geopoint': FormGPSField,
+            'start-geopoint': FormGPSField,
+
+            # media
+            'video': TextField,
+            'image': TextField,
+            'audio': TextField,
+            'file': TextField,
+            'background-audio': TextField,
+
+            # numeric
+            'calculate': TextField,
+            'integer': NumField,
             'decimal': NumField,
+            'range': NumField,
 
             # legacy type, treat them as text
-            "select_one_external": partial(TextField, data_type=data_type),
-            "cascading_select": partial(TextField, data_type=data_type),
+            'select_one_external': partial(TextField, data_type=data_type),
+            'cascading_select': partial(TextField, data_type=data_type),
         }
 
         args = {
@@ -192,7 +226,11 @@ class FormField(FormDataDef):
 
         return data_type_classes.get(data_type, cls)(**args)
 
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
+    def format(
+        self, val, lang=UNSPECIFIED_TRANSLATION, context=None, *args, **kwargs
+    ):
+        if val is None:
+            val = ''
         return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -447,7 +485,7 @@ class NumField(FormField):
             stats['stdev'] = statistics.stdev(self.flatten_dataset(metrics),
                                               xbar=stats['mean'])
             # requires a non empty dataset and a unique mode
-            stats['mode'] = statistics.mode(self.flatten_dataset(metrics))
+            stats['mode'] = singlemode(self.flatten_dataset(metrics))
         except statistics.StatisticsError:
             pass
 
@@ -489,7 +527,7 @@ class NumField(FormField):
                 val_stats['stdev'] = statistics.stdev(values,
                                                       xbar=val_stats['mean'])
                 # requires a non empty dataset and a unique mode
-                val_stats['mode'] = statistics.mode(values)
+                val_stats['mode'] = singlemode(values)
             except statistics.StatisticsError:
                 pass
 
@@ -534,7 +572,9 @@ class ValidationStatusCopyField(CopyField):
             section=section,
             *args, **kwargs)
 
-    def format(self, val, lang=UNSPECIFIED_TRANSLATION, context=None):
+    def format(
+        self, val, lang=UNSPECIFIED_TRANSLATION, context=None, *args, **kwargs
+    ):
 
         if isinstance(val, dict):
             if lang == UNSPECIFIED_TRANSLATION:
@@ -619,11 +659,14 @@ class FormGPSField(FormField):
 
         """
 
+        if val is None:
+            val = ''
+
         values = [val, "", "", "", ""]
         for i, value in enumerate(val.split(), 1):
             values[i] = value
 
-        return dict(zip(self.value_names, values))
+        return dict(zip(self.get_value_names(), values))
 
 
 class FormChoiceField(ExtendedFormField):
@@ -648,6 +691,8 @@ class FormChoiceField(ExtendedFormField):
             return translation
 
     def format(self, val, lang=UNSPECIFIED_TRANSLATION, multiple_select="both"):
+        if val is None:
+            val = ''
         val = self.get_translation(val, lang)
         return {self.name: val}
 
@@ -706,26 +751,9 @@ class FormChoiceField(ExtendedFormField):
         combined_options.update(self.choice.options)
         self.choice.options = combined_options
 
-        self._empty_result()
-        self.value_names = self.get_value_names()
-
-    def _empty_result(self):
-        """
-        Nothing to do here
-        """
-        pass
-
 
 class FormChoiceFieldWithMultipleSelect(FormChoiceField):
     """  Same as FormChoiceField, but you can select several answer """
-
-    def __init__(self, *args, **kwargs):
-        super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
-        self._empty_result()
-
-    def _empty_result(self):
-        # reset empty result so it doesn't contain '0'
-        self.empty_result = dict.fromkeys(self.empty_result, '')
 
     def _get_option_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                           hierarchy_in_labels=False, option=None):
@@ -785,11 +813,23 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 "summary": only the summary column
                 "details": only the details column
         """
-        cells = dict.fromkeys(self.value_names, "0")
+        if val is None:
+            # If the value is missing, do not imply that any response was
+            # received: fill with empty strings instead of zeros
+            return dict.fromkeys(
+                self.get_value_names(multiple_select=multiple_select), ""
+            )
+
+        cells = dict.fromkeys(
+            self.get_value_names(multiple_select=multiple_select), "0"
+        )
         if multiple_select in ("both", "summary"):
             res = []
             for v in val.split():
-                label = self.choice.options[v]['labels'].get(lang)
+                try:
+                    label = self.choice.options[v]['labels'][lang]
+                except KeyError:
+                    label = None
                 if label:
                     res.append(label)
                 else:
@@ -866,6 +906,8 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
         return self.parameter_value_names + word_value_names
 
     def format(self, val, *args, **kwargs):
+        if val is None:
+            val = ''
         all_values = val.split()
         prepended_cells = dict(zip(self.parameter_value_names, all_values))
         word_values = all_values[len(self.PREPENDED_PARAMETERS):]

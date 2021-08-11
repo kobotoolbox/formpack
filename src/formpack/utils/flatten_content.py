@@ -10,6 +10,7 @@ from functools import reduce
 from .array_to_xpath import array_to_xpath
 from .future import range
 from .string import str_types
+from .replace_aliases import SELECT_TYPES
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
 
@@ -72,11 +73,10 @@ def _stringify_type__depr(json_qtype):
     {'select_one': 'xyz'} -> 'select_one xyz'
     {'select_multiple': 'xyz'} -> 'select_mutliple xyz'
     """
-    _type_keys = ['select_one', 'select_multiple']
     if len(json_qtype.keys()) != 1:
         raise ValueError('Type object must have exactly one key: %s' %
-                         ', '.join(_type_keys))
-    for try_key in _type_keys:
+                         ', '.join(SELECT_TYPES))
+    for try_key in SELECT_TYPES:
         if try_key in json_qtype:
             return '{} {}'.format(try_key, json_qtype[try_key])
     if 'select_one_or_other' in json_qtype:
@@ -149,7 +149,7 @@ def translated_col_list(columns, translations, translated):
 
 def _flatten_translated_fields(row, translations, translated_cols,
                                col_order=False,
-                               strip_null_vals_from_named_translations=True,
+                               strip_empty_vals_from_named_translations=True,
                                ):
     if len(translations) == 0:
         translations = [UNTRANSLATED]
@@ -198,8 +198,13 @@ def _flatten_translated_fields(row, translations, translated_cols,
                 _place_col_in_order(key)
             else:
                 _built_colname = '{}::{}'.format(key, _t)
-                if (value is None) and strip_null_vals_from_named_translations:
-                    value = ''
+                if strip_empty_vals_from_named_translations and (
+                    value is None or value == ''
+                ):
+                    # is there a case where we'd want to change None to an
+                    # empty string instead of skipping it entirely? see commit
+                    # 42e8766
+                    continue
                 row[_built_colname] = value
                 _place_col_in_order(_built_colname, key)
     _placed_cols.update(row.keys())

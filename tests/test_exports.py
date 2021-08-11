@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 import xlrd
 from backports import csv
-from path import tempdir
+from path import TempDir
 
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
@@ -414,6 +414,63 @@ class TestFormPackExport(unittest.TestCase):
                                 })
                             ])
         )
+
+    def test_select_one_from_previous_answers(self):
+        title, schemas, submissions = build_fixture(
+            'select_one_from_previous_answers'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Household survey with select_one from previous answers',
+                    {
+                        'fields': [
+                            'Q1',
+                            'Q4',
+                            'Q5',
+                            '_index',
+                        ],
+                        'data': [
+                            [
+                                '2',
+                                'Julius Caesar',
+                                'Gaius Octavius',
+                                1,
+                            ]
+                        ],
+                    },
+                ),
+                (
+                    'FM',
+                    {
+                        'fields': [
+                            'Q2',
+                            'Q3',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [
+                                'Julius Caesar',
+                                '53',
+                                'Household survey with select_one from previous answers',
+                                1,
+                            ],
+                            [
+                                'Gaius Octavius',
+                                '17',
+                                'Household survey with select_one from previous answers',
+                                1,
+                            ],
+                        ],
+                    },
+                ),
+            ]
+        )
+        self.assertEqual(export, expected_dict)
 
     def test_nested_repeats_with_copy_fields(self):
         title, schemas, submissions = build_fixture(
@@ -1148,6 +1205,25 @@ class TestFormPackExport(unittest.TestCase):
         rows = list(fp.export(**options).to_csv(submissions))
         assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";"";""')
 
+    def test_csv_with_tag_headers_select_multiple_summary_or_details(self):
+        """
+        The tag header row needs to change in accordance with the
+        `multiple_select` export option
+        """
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'dietv1', 'tag_cols_for_header': ['hxl']}
+
+        rows = list(
+            fp.export(multiple_select='summary', **options).to_csv(submissions)
+        )
+        assert rows[1] == ('"#loc+name";"#indicator+diet"')
+
+        rows = list(
+            fp.export(multiple_select='details', **options).to_csv(submissions)
+        )
+        assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";""')
+
     # disabled for now
     # @raises(RuntimeError)
     # def test_csv_on_repeatable_groups(self):
@@ -1295,11 +1371,10 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'rgv1'}
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-
 
     def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
@@ -1307,7 +1382,7 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
                                '_over_the_lazy_dog_v1'}
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1323,7 +1398,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('hxl_grouped_repeatable')
         fp = FormPack(schemas, title)
         options = {'versions': 'hxl_rgv1', 'tag_cols_for_header': ['hxl']}
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1441,7 +1516,7 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(exported, expected)
 
-        with tempdir() as d:
+        with TempDir() as d:
             xls = d / 'test.xlsx'
             fp.export().to_xlsx(xls, submissions)
             assert xls.isfile()
@@ -1795,6 +1870,83 @@ class TestFormPackExport(unittest.TestCase):
         zipped.close()
         raw_zip.close()
 
+    def test_select_multiple_summary(self):
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        export = fp.export(
+            multiple_select='summary', versions=fp.versions.keys()
+        ).to_dict(submissions)
+        expected = OrderedDict([(
+            'Dietary needs',
+            {
+                'fields': ['restaurant_name', 'dietary_accommodations'],
+                'data': [
+                    ["Melba's", 'gluten_free'],
+                    ['Land of Kush', 'vegan vegetarian'],
+                    ['Sweet 27', 'gluten_free vegan vegetarian lactose_free'],
+                ],
+            },
+        )])
+        assert export == expected
+
+    def test_select_multiple_details(self):
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        export = fp.export(
+            multiple_select='details', versions=fp.versions.keys()
+        ).to_dict(submissions)
+        expected = OrderedDict([(
+            'Dietary needs',
+            {
+                'fields': [
+                    'restaurant_name',
+                    'dietary_accommodations/gluten_free',
+                    'dietary_accommodations/vegan',
+                    'dietary_accommodations/vegetarian',
+                    'dietary_accommodations/lactose_free',
+                ],
+                'data': [
+                    ["Melba's", '1', '0', '0', '0'],
+                    ['Land of Kush', '0', '1', '1', '0'],
+                    ['Sweet 27', '1', '1', '1', '1'],
+                ],
+            },
+        )])
+        assert export == expected
+
+    def test_select_multiple_both(self):
+        title, schemas, submissions = build_fixture('dietary_needs')
+        fp = FormPack(schemas, title)
+        export = fp.export(
+            multiple_select='both', versions=fp.versions.keys()
+        ).to_dict(submissions)
+        expected = OrderedDict([(
+            'Dietary needs',
+            {
+                'fields': [
+                    'restaurant_name',
+                    'dietary_accommodations',
+                    'dietary_accommodations/gluten_free',
+                    'dietary_accommodations/vegan',
+                    'dietary_accommodations/vegetarian',
+                    'dietary_accommodations/lactose_free',
+                ],
+                'data': [
+                    ["Melba's", 'gluten_free', '1', '0', '0', '0'],
+                    ['Land of Kush', 'vegan vegetarian', '0', '1', '1', '0'],
+                    [
+                        'Sweet 27',
+                        'gluten_free vegan vegetarian lactose_free',
+                        '1',
+                        '1',
+                        '1',
+                        '1',
+                    ],
+                ],
+            },
+        )])
+        assert export == expected
+
     def test_select_multiple_with_different_options_in_multiple_versions(self):
         title, schemas, submissions = build_fixture('favorite_coffee')
         fp = FormPack(schemas, title)
@@ -1826,174 +1978,165 @@ class TestFormPackExport(unittest.TestCase):
             'Keurig'
         ])
 
-    def assert_geojson_feature_properties_match_csv(self, geojson_str,
-                                                    export_obj, submissions):
-        geojson_obj = json.loads(geojson_str)
-        feature_props = [f['properties'] for f in geojson_obj['features']]
-        csv_reader = csv.DictReader(
-            export_obj.to_csv(submissions), delimiter=';')
-        for index, csv_dict in enumerate(csv_reader):
-            self.assertDictEqual(feature_props[index], csv_dict)
-
-
     def test_geojson_point(self):
         title, schemas, submissions = build_fixture('all_geo_types')
         fp = FormPack(schemas, title)
-        self.assertEqual(len(fp.versions), 2)
+        assert len(fp.versions) == 2
 
         export = fp.export(versions=fp.versions.keys())
         geojson_gen = export.to_geojson(submissions, geo_question_name='Point')
         geojson_str = ''.join(geojson_gen)
-
-        # Check the `properties` of each `feature` against the CSV export
-        self.assert_geojson_feature_properties_match_csv(
-            geojson_str, export, submissions)
-
-        # Remove the `properties` we've already checked, and compare the rest
         geojson_obj = json.loads(geojson_str)
-        for feature in geojson_obj['features']:
-            del feature['properties']
-        self.assertDictEqual(
-            geojson_obj,
-            {
-                'features': [
-                    {
-                        'geometry': {
-                            'coordinates': [
-                                -76.60869,
-                                39.306938,
-                                11.0,
-                            ],
-                            'type': 'Point',
-                        },
-                        'type': 'Feature',
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'I have points, traces, and shapes!',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
                     },
-                    {
-                        'geometry': {
-                            'coordinates': [
-                                -58.442238,
-                                -34.631098,
-                                0.0,
-                            ],
-                            'type': 'Point',
-                        },
-                        'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:42:37.313-04:00',
+                        'end': '2019-07-19T18:47:10.516-04:00',
+                        'Just_a_regular_text_question': 'Greenmount',
                     },
-                ],
-                'name': 'I have points, traces, and shapes!',
-                'type': 'FeatureCollection',
-            }
-        )
+                },
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -58.442238,
+                            -34.631098,
+                            0.0,
+                        ],
+                    },
+                    'properties': {
+                        'start': '2019-07-19T18:49:05.982-04:00',
+                        'end': '2019-07-19T19:03:07.602-04:00',
+                        'Just_a_regular_text_question': 'Chacabuco',
+                    },
+                },
+            ],
+        }
+
 
     def test_geojson_trace(self):
         title, schemas, submissions = build_fixture('all_geo_types')
         fp = FormPack(schemas, title)
-        self.assertEqual(len(fp.versions), 2)
+        assert len(fp.versions) == 2
 
         export = fp.export(versions=fp.versions.keys())
         geojson_gen = export.to_geojson(submissions, geo_question_name='Trace')
         geojson_str = ''.join(geojson_gen)
-
-        # Check the `properties` of each `feature` against the CSV export
-        self.assert_geojson_feature_properties_match_csv(
-            geojson_str, export, submissions)
-
-        # Remove the `properties` we've already checked, and compare the rest
         geojson_obj = json.loads(geojson_str)
-        for feature in geojson_obj['features']:
-            del feature['properties']
-        self.assertDictEqual(
-            geojson_obj,
-            {
-                'type': 'FeatureCollection',
-                'name': 'I have points, traces, and shapes!',
-                'features': [
-                    {
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': [
-                                [-76.608323, 39.306032, 1.0],
-                                [-76.608953, 39.308701, 2.0],
-                                [-76.60938, 39.311313, 3.0],
-                                [-76.604223, 39.3116, 4.0],
-                                [-76.603804, 39.306077, 5.0],
-                            ],
-                        },
-                        'type': 'Feature',
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'I have points, traces, and shapes!',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': [
+                            [-76.608323, 39.306032, 1.0],
+                            [-76.608953, 39.308701, 2.0],
+                            [-76.60938, 39.311313, 3.0],
+                            [-76.604223, 39.3116, 4.0],
+                            [-76.603804, 39.306077, 5.0],
+                        ],
                     },
-                    {
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': [
-                                [-58.44218, -34.631089, 0.0],
-                                [-58.439112, -34.635079, 0.0],
-                                [-58.445635, -34.636562, 0.0],
-                                [-58.44713, -34.634929, 0.0],
-                            ],
-                        },
-                        'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:42:37.313-04:00',
+                        'end': '2019-07-19T18:47:10.516-04:00',
+                        'Just_a_regular_text_question': 'Greenmount',
                     },
-                ],
-            }
-        )
+                },
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': [
+                            [-58.44218, -34.631089, 0.0],
+                            [-58.439112, -34.635079, 0.0],
+                            [-58.445635, -34.636562, 0.0],
+                            [-58.44713, -34.634929, 0.0],
+                        ],
+                    },
+                    'properties': {
+                        'start': '2019-07-19T18:49:05.982-04:00',
+                        'end': '2019-07-19T19:03:07.602-04:00',
+                        'Just_a_regular_text_question': 'Chacabuco',
+                    },
+                },
+            ],
+        }
 
     def test_geojson_shape(self):
         title, schemas, submissions = build_fixture('all_geo_types')
         fp = FormPack(schemas, title)
-        self.assertEqual(len(fp.versions), 2)
+        assert len(fp.versions) == 2
 
         export = fp.export(versions=fp.versions.keys())
         geojson_gen = export.to_geojson(submissions, geo_question_name='Shape')
         geojson_str = ''.join(geojson_gen)
-
-        # Check the `properties` of each `feature` against the CSV export
-        self.assert_geojson_feature_properties_match_csv(
-            geojson_str, export, submissions)
-
-        # Remove the `properties` we've already checked, and compare the rest
         geojson_obj = json.loads(geojson_str)
-        for feature in geojson_obj['features']:
-            del feature['properties']
-        self.assertDictEqual(
-            geojson_obj,
-            {
-                'type': 'FeatureCollection',
-                'name': 'I have points, traces, and shapes!',
-                'features': [
-                    {
-                        'geometry': {
-                            'type': 'Polygon',
-                            'coordinates': [
-                                [
-                                    [-76.608294, 39.305938, 0.0],
-                                    [-76.603656, 39.306138, 0.0],
-                                    [-76.604171, 39.31155, 0.0],
-                                    [-76.609332, 39.311288, 0.0],
-                                    [-76.609211, 39.309365, 0.0],
-                                    [-76.608294, 39.305938, 0.0],
-                                ]
-                            ],
-                        },
-                        'type': 'Feature',
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'I have points, traces, and shapes!',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [
+                            [
+                                [-76.608294, 39.305938, 0],
+                                [-76.603656, 39.306138, 0],
+                                [-76.604171, 39.31155, 0],
+                                [-76.609332, 39.311288, 0],
+                                [-76.609211, 39.309365, 0],
+                                [-76.608294, 39.305938, 0],
+                            ]
+                        ],
                     },
-                    {
-                        'geometry': {
-                            'type': 'Polygon',
-                            'coordinates': [
-                                [
-                                    [-58.447229, -34.6347, 0.0],
-                                    [-58.445613, -34.636607, 0.0],
-                                    [-58.438946, -34.635194, 0.0],
-                                    [-58.442056, -34.631063, 0.0],
-                                    [-58.447229, -34.6347, 0.0],
-                                ]
-                            ],
-                        },
-                        'type': 'Feature',
+                    'properties': {
+                        'start': '2019-07-19T18:42:37.313-04:00',
+                        'end': '2019-07-19T18:47:10.516-04:00',
+                        'Just_a_regular_text_question': 'Greenmount',
                     },
-                ],
-            }
-        )
+                },
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [
+                            [
+                                [-58.447229, -34.6347, 0],
+                                [-58.445613, -34.636607, 0],
+                                [-58.438946, -34.635194, 0],
+                                [-58.442056, -34.631063, 0],
+                                [-58.447229, -34.6347, 0],
+                            ]
+                        ],
+                    },
+                    'properties': {
+                        'start': '2019-07-19T18:49:05.982-04:00',
+                        'end': '2019-07-19T19:03:07.602-04:00',
+                        'Just_a_regular_text_question': 'Chacabuco',
+                    },
+                },
+            ],
+        }
 
     def test_geojson_invalid(self):
         title, schemas, _ = build_fixture('all_geo_types')
@@ -2015,32 +2158,169 @@ class TestFormPackExport(unittest.TestCase):
             s[fp.default_version_id_key] = get_first_occurrence(fp.versions)
         export = fp.export(versions=fp.versions.keys())
         geojson_obj = json.loads(''.join(
-            export.to_geojson(submissions, geo_question_name='Trace')
+            export.to_geojson(submissions, flatten=True)
         ))
-        self.assertEqual(len(geojson_obj['features']), 1)
-        self.assertDictEqual(
-            geojson_obj['features'][0]['geometry'],
-            {
-                "coordinates": [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
-                "type": "LineString"
-            }
-        )
-        geojson_obj = json.loads(''.join(
-            export.to_geojson(submissions, geo_question_name='Shape')
-        ))
-        self.assertEqual(len(geojson_obj['features']), 1)
-        self.assertDictEqual(
-            geojson_obj['features'][0]['geometry'],
-            {
-                "coordinates": [[
+        assert len(geojson_obj['features']) == 2
+        assert geojson_obj['features'][0]['geometry'] == {
+            "coordinates": [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
+            "type": "LineString",
+        }
+        assert geojson_obj['features'][1]['geometry'] == {
+            "coordinates": [
+                [
                     [2.0, 1.0, 3.0],
                     [10.0, 9.0, 11.0],
                     [6.0, 5.0, 7.0],
                     [2.0, 1.0, 3.0],
-                ]],
-                "type": "Polygon"
-            }
-        )
+                ]
+            ],
+            "type": "Polygon",
+        }
+
+    def test_geojson_unflattened(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        assert len(fp.versions) == 2
+
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, flatten=False)
+        geojson_str = ''.join(geojson_gen)
+
+        geojson_obj = json.loads(geojson_str)
+        assert len(geojson_obj) == 2
+        assert len(geojson_obj[0]['features']) == 3
+        geojson_obj_f_types = [
+            ft['geometry']['type'] for ft in geojson_obj[0]['features']
+        ]
+        for f_type in ('Point', 'LineString', 'Polygon'):
+            assert f_type in geojson_obj_f_types
+
+        assert geojson_obj == [
+            {
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-76.60869, 39.306938, 11.0],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:42:37.313-04:00',
+                            'end': '2019-07-19T18:47:10.516-04:00',
+                            'Just_a_regular_text_question': 'Greenmount',
+                        },
+                    },
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-76.608323, 39.306032, 1.0],
+                                [-76.608953, 39.308701, 2.0],
+                                [-76.60938, 39.311313, 3.0],
+                                [-76.604223, 39.3116, 4.0],
+                                [-76.603804, 39.306077, 5.0],
+                            ],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:42:37.313-04:00',
+                            'end': '2019-07-19T18:47:10.516-04:00',
+                            'Just_a_regular_text_question': 'Greenmount',
+                        },
+                    },
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
+                                [
+                                    [-76.608294, 39.305938, 0.0],
+                                    [-76.603656, 39.306138, 0.0],
+                                    [-76.604171, 39.31155, 0.0],
+                                    [-76.609332, 39.311288, 0.0],
+                                    [-76.609211, 39.309365, 0.0],
+                                    [-76.608294, 39.305938, 0.0],
+                                ]
+                            ],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:42:37.313-04:00',
+                            'end': '2019-07-19T18:47:10.516-04:00',
+                            'Just_a_regular_text_question': 'Greenmount',
+                        },
+                    },
+                ],
+            },
+            {
+                'type': 'FeatureCollection',
+                'name': 'I have points, traces, and shapes!',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-58.442238, -34.631098, 0.0],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
+                        },
+                    },
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [-58.44218, -34.631089, 0.0],
+                                [-58.439112, -34.635079, 0.0],
+                                [-58.445635, -34.636562, 0.0],
+                                [-58.44713, -34.634929, 0.0],
+                            ],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
+                        },
+                    },
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': [
+                                [
+                                    [-58.447229, -34.6347, 0.0],
+                                    [-58.445613, -34.636607, 0.0],
+                                    [-58.438946, -34.635194, 0.0],
+                                    [-58.442056, -34.631063, 0.0],
+                                    [-58.447229, -34.6347, 0.0],
+                                ]
+                            ],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
+                        },
+                    },
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-58.355287, -34.619206, 0.0],
+                        },
+                        'properties': {
+                            'start': '2019-07-19T18:49:05.982-04:00',
+                            'end': '2019-07-19T19:03:07.602-04:00',
+                            'Just_a_regular_text_question': 'Chacabuco',
+                        },
+                    },
+                ],
+            },
+        ]
 
     #https://github.com/kobotoolbox/formpack/pull/215
     def test_header_label_list_label(self):

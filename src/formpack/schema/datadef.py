@@ -13,7 +13,6 @@ class FormDataDef(object):
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
         self.labels = labels or {}
-        self.value_names = self.get_value_names()
         self.has_stats = has_stats
 
     def __repr__(self):

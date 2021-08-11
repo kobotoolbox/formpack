@@ -48,15 +48,13 @@ def field_and_response_to_geometry(field, response):
         if not 2 <= len(point_components) <= 4:
             raise FormPackGeoJsonError('Cannot parse coordinates')
         try:
-            coordinates = list(map(float, point_components[:3]))
+            coordinates = list(map(float, point_components))
         except ValueError:
             raise FormPackGeoJsonError('Non-numeric data for a coordinate')
 
         # Swap the coordinates because that's what GeoJSON wants 🙄
-        latitude, longitude = coordinates[:2]
-        coordinates[0] = longitude
-        coordinates[1] = latitude
-        return coordinates
+        latitude, longitude, altitude, accuracy = coordinates
+        return longitude, latitude, altitude
 
     geometry = {}
 

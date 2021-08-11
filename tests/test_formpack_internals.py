@@ -5,6 +5,10 @@ from __future__ import (unicode_literals, print_function,
 import json
 from copy import deepcopy
 
+import pytest
+from nose.tools import raises
+
+import pyxform
 from formpack import FormPack, constants
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture
@@ -40,8 +44,8 @@ def test_to_xml():
     # TODO: test output matches what is expected
 
 
-def test_to_xml_fails_when_null_labels():
-    # currently, this form will trigger a confusing error from pyxform:
+def test_to_xml_fails_when_question_has_null_label():
+    # previously, this form would trigger a confusing error from pyxform:
     #  - Exception: (<type 'NoneType'>, None)
 
     # it occurs when a named translation has a <NoneType> value
@@ -56,7 +60,141 @@ def test_to_xml_fails_when_null_labels():
                    'translations': ['NamedTranslation'],
                    'translated': ['label'],
                    }}, id_string='sdf')
-    fp[0].to_xml()
+
+    with pytest.raises(
+        pyxform.errors.PyXFormError,
+        match="^The survey element named 'n1' has no label or hint.$",
+    ):
+        fp[0].to_xml()
+
+
+def test_to_xml_omits_empty_group_labels():
+    fp = FormPack(
+        {
+            'content': {
+                'survey': [
+                    {'type': 'begin_group', 'name': 'group1'},
+                    {'type': 'note', 'name': 'n1', 'label': ['n1 in group1']},
+                    {'type': 'end_group'},  # group1
+                    {'type': 'begin_group', 'name': 'group2', 'label': ['']},
+                    {'type': 'begin_group', 'name': 'group3', 'label': [None]},
+                    {'type': 'note', 'name': 'n2',
+                        'label': ['n2 in group2/group3']},
+                    {'type': 'end_group'},  # group3
+                    {'type': 'end_group'},  # group2
+                ],
+                'translations': ['NamedTranslation'],
+                'translated': ['label'],
+            }
+        },
+        id_string='unlabeled_groups',
+    )
+    xml = fp[0].to_xml()
+    assert '''<label ref="jr:itext('/data/group1:label')"/>''' not in xml
+    assert '''<label ref="jr:itext('/data/group2:label')"/>''' not in xml
+    assert '''<label ref="jr:itext('/data/group2/group3:label')"/>''' not in xml
+
+
+from formpack.schema.datadef import FormGroup
+
+def test_groups_disabled():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'text','name': 'n1', 'label': ['aa']},
+                              {'type': 'begin_group', 'name': 'nada'},
+                              {'type': 'note', 'name': 'n2', 'label': ['ab']},
+                              {'type': 'end_group'},
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+
+    (ga, gz) = [scontent['content']['survey'][nn] for nn in [1, 3]]
+    # verify that "ga" and "gz" variables point to group begin/end
+    assert ga['type'] == 'begin_group'
+    assert gz['type'] == 'end_group'
+    assert ga.get('disabled') == gz.get('disabled') == None
+
+    # verify values before setting "disabled=TRUE"
+    fp = FormPack(scontent, id_string='xx')
+    section = next(iter(fp[0].sections.values()))
+    # only(?) way to access groups is in the hierarchy of a child question
+    n2_parent = section.fields['n2'].hierarchy[-2]
+    assert isinstance(n2_parent, FormGroup)
+    assert n2_parent.name == 'nada'
+    assert 'nada' in fp[0].to_xml()
+
+    ga['disabled'] = gz['disabled'] = 'TRUE'
+    fp = FormPack(scontent, id_string='xx')
+    section = next(iter(fp[0].sections.values()))
+    n2_parent = section.fields['n2'].hierarchy[-2]
+    # n2_parent is a "<FormSection name='submissions'>"
+    # test opposite of what's tested above--
+    assert not isinstance(n2_parent, FormGroup)
+    assert n2_parent.name != 'nada'
+    assert 'nada' not in fp[0].to_xml()
+
+
+def test_disabled_questions_ignored():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'note', 'name': 'n1', 'label': ['aa']},
+                              {'type': 'text','name': 'q2', 'label': ['bb'],
+                               }
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    qq = scontent['content']['survey'][1]
+
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' in s1_fields
+
+    qq['disabled'] = True
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' not in s1_fields
+
+    qq['disabled'] = 'true'
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' not in s1_fields
+
+    qq['disabled'] = 'FALSE'
+    fp = FormPack(scontent, id_string='xx')
+    s1_fields = [ss for ss in fp[0].sections.values()][0].fields
+    assert 'q2' in s1_fields
+
+
+@raises(KeyError)
+def test_missing_choice_list_breaks():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'select_one dogs', 'name': 'q1',
+                               'label': ['aa']},
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    fp = FormPack(scontent, id_string='xx')
+
+
+def test_commented_out_missing_choice_list_does_not_break():
+    scontent = {'content': {
+                   'survey': [
+                              {'type': 'select_one dogs', 'name': 'q1',
+                               'disabled': 'TRUE',
+                               'label': ['aa']},
+                              ],
+                   'translations': ['en'],
+                   'translated': ['label'],
+                  }
+                }
+    fp = FormPack(scontent, id_string='xx')
 
 
 def test_null_untranslated_labels():

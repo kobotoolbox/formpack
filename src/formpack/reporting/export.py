@@ -6,10 +6,16 @@ import json
 import zipfile
 from collections import defaultdict
 from inspect import isclass
+from typing import Iterator, Generator, Optional
 
 import xlsxwriter
 
-from ..constants import UNSPECIFIED_TRANSLATION, TAG_COLUMNS_AND_SEPARATORS
+from ..constants import (
+    GEO_QUESTION_TYPES,
+    TAG_COLUMNS_AND_SEPARATORS,
+    UNSPECIFIED_TRANSLATION,
+    UNSPECIFIED_HEADER_LANG,
+)
 from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
@@ -27,7 +33,8 @@ class Export(object):
                  group_sep="/", hierarchy_in_labels=False,
                  version_id_keys=[],
                  multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=None, header_lang=-1):
+                 title="submissions", tag_cols_for_header=None, 
+                 header_lang=UNSPECIFIED_HEADER_LANG, filter_fields=()):
         """
 
         :param formpack: FormPack
@@ -50,14 +57,16 @@ class Export(object):
 
         self.formpack = formpack
         self.lang = lang
-        self.header_lang = self.lang if header_lang == -1 else header_lang
+        self.header_lang = self.lang if header_lang == UNSPECIFIED_HEADER_LANG else header_lang
         self.group_sep = group_sep
         self.title = title
         self.versions = form_versions
+        self.multiple_select = multiple_select
         self.copy_fields = copy_fields
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
+        self.filter_fields = filter_fields
         self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -77,11 +86,13 @@ class Export(object):
                     first_section.fields[dumb_field.name] = dumb_field
 
         # this deals with merging all form versions headers and labels
-        params = (
-            lang, group_sep, hierarchy_in_labels, multiple_select,
-            tag_cols_for_header, self.header_lang,
+        res = self.get_fields_labels_tags_for_all_versions(
+            lang,
+            group_sep,
+            hierarchy_in_labels,
+            self.header_lang,
+            tag_cols_for_header,
         )
-        res = self.get_fields_labels_tags_for_all_versions(*params)
         self.sections, self.labels, self.tags = res
 
         self.reset()
@@ -159,9 +170,8 @@ class Export(object):
                                                 lang=UNSPECIFIED_TRANSLATION,
                                                 group_sep="/",
                                                 hierarchy_in_labels=False,
-                                                multiple_select="both",
-                                                tag_cols_for_header=None,
-                                                header_lang=UNSPECIFIED_TRANSLATION):
+                                                header_lang=UNSPECIFIED_TRANSLATION,
+                                                tag_cols_for_header=None):
         """ Return 3 mappings containing field, labels, and tags by section
 
             This is needed because when making an export for several
@@ -194,6 +204,16 @@ class Export(object):
         section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
+
+        # Ensure that fields are filtered if they've been specified, otherwise
+        # carry on as usual
+        if self.filter_fields:
+            all_fields = [
+                field
+                for field in all_fields
+                if field.path in self.filter_fields
+            ]
+
         all_sections = {}
 
         # List of fields we generate ourselves to add at the very end
@@ -205,7 +225,7 @@ class Export(object):
             section_labels.setdefault(field.section.name, []).append(
                 field.get_labels(header_lang, group_sep,
                                  hierarchy_in_labels,
-                                 multiple_select)
+                                 self.multiple_select)
             )
             all_sections[field.section.name] = field.section
 
@@ -237,14 +257,17 @@ class Export(object):
             name_lists = []
             tags = []
             for field in fields:
-                name_lists.append(field.value_names)
+                value_names = field.get_value_names(
+                    multiple_select=self.multiple_select
+                )
+                name_lists.append(value_names)
 
                 # Add the tags for this field. If the field has multiple
                 # labels, add the tag for the first label *only*. Insert blanks
                 # for the subsequent fields. See
                 # https://github.com/kobotoolbox/formpack/issues/208
                 tags.extend([flatten_tag_list(field.tags, tag_cols_and_seps)])
-                tags.extend([{}] * (len(field.value_names) - 1))
+                tags.extend([{}] * (len(value_names) - 1))
 
             names = [name for name_list in name_lists for name in name_list]
 
@@ -307,6 +330,15 @@ class Export(object):
         row = self._row_cache[_section_name]
         _fields = tuple(current_section.fields.values())
 
+        # Ensure that fields are filtered if they've been specified, otherwise
+        # carry on as usual
+        if self.filter_fields:
+            _fields = tuple(
+                field
+                for field in current_section.fields.values()
+                if field.path in self.filter_fields
+            )
+
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section
         # with a row of size one.
@@ -338,21 +370,19 @@ class Export(object):
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
 
-                    try:
-                        # get submission value for this field
-                        val = entry[field.path]
-                        # get a mapping of {"col_name": "val", ...}
-                        cells = field.format(val, _lang)
+                    # get submission value for this field
+                    val = entry.get(field.path)
+                    # get a mapping of {"col_name": "val", ...}
+                    cells = field.format(
+                        val, _lang, multiple_select=self.multiple_select
+                    )
 
-                        # save fields value if they match parent mapping fields.
-                        # Useful to map children to their parent when flattening groups.
-                        if field.path in self.copy_fields:
-                            if _section_name not in self.__r_groups_submission_mapping_values:
-                                self.__r_groups_submission_mapping_values[_section_name] = {}
-                            self.__r_groups_submission_mapping_values[_section_name].update(cells)
-
-                    except KeyError:
-                        cells = field.empty_result
+                    # save fields value if they match parent mapping fields.
+                    # Useful to map children to their parent when flattening groups.
+                    if field.path in self.copy_fields:
+                        if _section_name not in self.__r_groups_submission_mapping_values:
+                            self.__r_groups_submission_mapping_values[_section_name] = {}
+                        self.__r_groups_submission_mapping_values[_section_name].update(cells)
 
                     # fill in the canvas
                     row.update(cells)
@@ -366,6 +396,15 @@ class Export(object):
             # TODO: remove that for HTML export
             if '_index' in row:
                 row['_index'] = _indexes[_section_name]
+
+            # If the submission has been tagged, join those tags together into
+            # a comma-separated string
+            for tags_col in ('_tags', '_submission__tags'):
+                if tags_col in row:
+                    tags = row[tags_col]
+                    row[tags_col] = (
+                        ', '.join(tags) if isinstance(tags, list) else tags
+                    )
 
             if '_parent_table_name' in row:
                 row['_parent_table_name'] = current_section.parent.name
@@ -484,41 +523,61 @@ class Export(object):
                     for row in rows:
                         yield format_line(row, sep, quote)
 
-    def to_geojson(self, submissions, geo_question_name=None):
+    def to_geojson(
+        self,
+        submissions: Iterator,
+        flatten: bool = True,
+        geo_question_name: Optional[str] = None,
+    ) -> Generator:
         """
-        Returns a GeoJSON `FeatureCollection` as a string, where each
+        Returns a GeoJSON `FeatureCollection` as a generator object, where each
         submission is a `Feature` with `geometry` taken from the response to
-        the question identified by `geo_question_name`. All question/response
-        pairs are included in the `properties` of each `Feature`. As with
-        `to_csv()`, repeating groups are not included.
+        the question. All question/response pairs are included in the
+        `properties` of each `Feature` if they are not a geo question
+        themselves or are not empty. As with `to_csv()`, repeating groups are
+        not included. There are two modes that the method can run in:
+        `flatten=True` and `flatten=False`. If `True`, all geo responses will
+        be a `Feature` within a single `FeatureCollection` — regardless of
+        whether there are multiple geo questions within a single survey
+        response. If `False`, each survey response will have its own
+        `FeatureCollection` and all geo responses within that survey will be
+        `Feature`s within that.
 
         Example:
+
+        If `flatten=True`:
             {
-              "name": "[name of the first section]",
-              "type": "FeatureCollection"
-              "features": [
-                {
-                  "geometry": {
-                    "coordinates": [longitude, latitude, accuracy],
-                    "type": "Point"
-                  },
-                  "properties": {
-                    "question_name": "response value",
-                    …
-                  },
-                  "type": "Feature"
-                },
-                …
-              ],
+                "type": "FeatureCollection",
+                "name": "name of the first section",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                longitude,
+                                latitude,
+                                altitude
+                            ]
+                        },
+                        "properties": {
+                            ...
+                        },
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
             }
         """
 
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
+        sections = self.sections[first_section_name]
 
-        # Manually write the beginning and end of the GeoJSON file so that we
-        # can yield one GeoJSON `Feature` object at a time
+        # Set up some convenient properties when `yield`ing
         feature_array_preamble = '\n'.join([
             '{',
             '"type": "FeatureCollection",',
@@ -526,12 +585,27 @@ class Export(object):
             '"features": [',
         ])
         feature_array_epilogue = '\n]\n}'
-        yield feature_array_preamble
+        array_preamble = '[\n'
+        array_epilogue = '\n]'
+        comma_newline = ',\n'
+        newline = '\n'
 
-        self.reset() # since we're not using `parse_submissions()`
+        if flatten:
+            yield feature_array_preamble
+        else:
+            yield array_preamble
+
+        self.reset()  # since we're not using `parse_submissions()`
 
         first = True
         for submission in submissions:
+            if not flatten:
+                if first:
+                    yield feature_array_preamble
+                    first = False
+                else:
+                    yield comma_newline + feature_array_preamble
+
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
             version = self.get_version_for_submission(submission)
@@ -539,49 +613,106 @@ class Export(object):
             if not formatted_chunks:
                 continue
 
-            # Find the requested field
             all_fields = version.sections[first_section_name].fields.values()
-            geo_fields = [f for f in all_fields if f.name == geo_question_name]
-            try:
-                geo_field = geo_fields[0]
-            except IndexError:
-                # Requested field doesn't exist in the form version used by
-                # this submission; skip it
-                continue
+            all_geo_fields = [
+                f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
+            ]
+            all_geo_field_names = [f.name for f in all_geo_fields]
 
-            rows = formatted_chunks[first_section_name]
-            for row in rows:
-                try:
-                    geo_response = submission[geo_field.path]
-                except KeyError:
-                    # Discard submissions with missing geo data
+            # Iterate through all geo questions and format only those that have
+            # been answered
+            first_geo = True
+            for geo_field in all_geo_fields:
+                # Handle the API query param of geo_question_name if present by
+                # skipping all geo fields that don't match the specified
+                # question rather than filtering outside of the loop
+                if (
+                    geo_question_name is not None
+                    and geo_question_name != geo_field.name
+                ):
                     continue
-                try:
-                    feature_geometry = field_and_response_to_geometry(
-                        geo_field, geo_response)
-                except FormPackGeoJsonError:
-                    # Discard submissions with invalid geo data
-                    continue
-                except RuntimeError:
-                    # If we're here, the field has an non-geo type. Continue in
-                    # the hope that other submissions belong to better versions
-                    # of the form
-                    continue
-                feature_properties = OrderedDict(zip(labels, row))
-                feature = {
-                    "type": "Feature",
-                    "geometry": feature_geometry,
-                    "properties": feature_properties,
-                }
 
-                if first:
-                    separator = '\n'
-                    first = False
-                else:
-                    separator = ',\n'
-                yield separator + json.dumps(feature, sort_keys=True)
+                rows = formatted_chunks[first_section_name]
+                for row in rows:
+                    try:
+                        geo_response = submission[geo_field.path]
+                    except KeyError:
+                        # Discard submissions with missing geo data
+                        continue
+                    try:
+                        feature_geometry = field_and_response_to_geometry(
+                            geo_field, geo_response
+                        )
+                    except FormPackGeoJsonError:
+                        # Discard submissions with invalid geo data
+                        continue
+                    except RuntimeError:
+                        # If we're here, the field has an non-geo type. Continue in
+                        # the hope that other submissions belong to better versions
+                        # of the form
+                        continue
 
-        yield feature_array_epilogue
+                    feature_properties = OrderedDict()
+                    for name, label, row_value in zip(sections, labels, row):
+                        # Grab the `Field` object since it holds precious info
+                        # that we need to format the response correctly
+                        filtered_fields = [
+                            f for f in all_fields if f.name == name
+                        ]
+                        if not filtered_fields:
+                            continue
+                        field = filtered_fields[0]
+
+                        # Skip all geo fields, including the current one, as
+                        # it's unnecessary to repeat in the Feature's
+                        # properties. Also skip over fields that are blank
+                        if label in all_geo_field_names or not row_value:
+                            continue
+
+                        # Grab the translated label for choice questions if it's
+                        # available.
+                        if hasattr(field, 'choice'):
+                            value_or_none = field.choice.options[row_value][
+                                'labels'
+                            ].get(self.lang)
+                            if value_or_none is None:
+                                value = list(
+                                    field.choice.options[row_value][
+                                        'labels'
+                                    ].values()
+                                )[0]
+                        else:
+                            value = row_value
+
+                        feature_properties.update({label: value})
+
+                    feature = {
+                        "type": "Feature",
+                        "geometry": feature_geometry,
+                        "properties": feature_properties,
+                    }
+
+                    if flatten:
+                        if first:
+                            separator = newline
+                            first = False
+                        else:
+                            separator = comma_newline
+                    else:
+                        if first_geo:
+                            separator = newline
+                            first_geo = False
+                        else:
+                            separator = comma_newline
+                    yield separator + json.dumps(feature)
+
+            if not flatten:
+                yield feature_array_epilogue
+
+        if flatten:
+            yield feature_array_epilogue
+        else:
+            yield array_epilogue
 
     def to_table(self, submissions):
 
@@ -607,13 +738,17 @@ class Export(object):
         sheet_row_positions = defaultdict(lambda: 0)
 
         def _append_row_to_sheet(sheet_, data):
+            # Ensure all list objects are coerced to strings otherwise
+            # xlswriter will fail to export
+            data_ = [str(d) if isinstance(d, list) else d for d in data]
+
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
             sheet_.write_row(
                 row=row_index,
                 col=0,
-                data=data
+                data=data_
             )
             row_index += 1
             sheet_row_positions[sheet_] = row_index
