@@ -371,11 +371,12 @@ class Export(object):
                         val, _lang, multiple_select=self.multiple_select
                     )
 
+                    # get the other value entered if `or_other` is True
                     or_other = getattr(field, 'or_other', False)
                     val_other = (
-                        entry.get(f'{field.path}_other') if or_other else None
+                        entry.get(f'{field.path}_other') if or_other else ''
                     )
-                    if val_other:
+                    if or_other:
                         cells[field.name + '_other'] = val_other
 
                     # save fields value if they match parent mapping fields.

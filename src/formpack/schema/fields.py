@@ -682,6 +682,20 @@ class FormChoiceField(ExtendedFormField):
                                               hierarchy, section,
                                               *args, **kwargs)
 
+    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
+                   hierarchy_in_labels=False, multiple_select="both"):
+        label = self._get_label(lang, group_sep, hierarchy_in_labels)
+        labels = [label]
+        if self.or_other:
+            labels.append(label + '_other')
+        return labels
+
+    def get_value_names(self, multiple_select='both'):
+        names = [self.name]
+        if self.or_other:
+            names.append(self.name + '_other')
+        return names
+
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
         try:
             translation = self.choice.options[val]['labels'][lang]
