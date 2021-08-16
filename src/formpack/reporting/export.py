@@ -365,10 +365,18 @@ class Export(object):
 
                     # get submission value for this field
                     val = entry.get(field.path)
+
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
                         val, _lang, multiple_select=self.multiple_select
                     )
+
+                    or_other = getattr(field, 'or_other', False)
+                    val_other = (
+                        entry.get(f'{field.path}_other') if or_other else None
+                    )
+                    if val_other:
+                        cells[field.name + '_other'] = val_other
 
                     # save fields value if they match parent mapping fields.
                     # Useful to map children to their parent when flattening groups.

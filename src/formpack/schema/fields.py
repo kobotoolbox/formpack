@@ -147,6 +147,7 @@ class FormField(FormDataDef):
         tags = definition.get('tags', [])
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
+        or_other = definition.get('_or_other', False)
 
         # normalize spaces
         data_type = definition['type']
@@ -218,7 +219,8 @@ class FormField(FormDataDef):
             'data_type': data_type,
             'hierarchy': hierarchy,
             'section': section,
-            'choice': choice
+            'choice': choice,
+            'or_other': or_other,
         }
 
         if data_type == 'select_multiple' and appearance == 'literacy':
@@ -673,8 +675,9 @@ class FormChoiceField(ExtendedFormField):
     """  Same as FormField, but link the data to a FormChoice """
 
     def __init__(self, name, labels, data_type, hierarchy=None,
-                 section=None, choice=None, *args, **kwargs):
+                 section=None, choice=None, or_other=False, *args, **kwargs):
         self.choice = choice or FormChoice(name)
+        self.or_other = or_other
         super(FormChoiceField, self).__init__(name, labels, data_type,
                                               hierarchy, section,
                                               *args, **kwargs)
@@ -777,13 +780,19 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             value.
         """
         labels = []
+        label = self._get_label(lang, group_sep, hierarchy_in_labels)
         if multiple_select in ("both", "summary"):
-            labels.append(self._get_label(lang, group_sep, hierarchy_in_labels))
+            labels.append(label)
 
         if multiple_select in ("both", "details"):
             for option in self.choice.options.values():
                 args = (lang, group_sep, hierarchy_in_labels, option)
                 labels.append(self._get_option_label(*args))
+            if self.or_other:
+                labels.append(label + '/other')
+
+        if self.or_other:
+            labels.append(label + '_other')
 
         return labels
 
@@ -796,6 +805,12 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ("both", "details"):
             for option_name in self.choice.options.keys():
                 names.append(self.name + '/' + option_name)
+            if self.or_other:
+                names.append(self.name + '/other')
+
+        if self.or_other:
+            names.append(self.name + '_other')
+
         return names
 
     def __repr__(self):
@@ -839,6 +854,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ("both", "details"):
             for choice in val.split():
                 cells[self.name + "/" + choice] = "1"
+
         return cells
 
     def parse_values(self, raw_values):
