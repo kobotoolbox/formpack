@@ -35,6 +35,11 @@ def test_expand_select_one():
     assert s1['survey'][0]['type'] == 'select_one'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
+def test_expand_select_one_legacy():
+    s1 = {'survey': [{'type': 'select one dogs'}]}
+    expand_content(s1, in_place=True)
+    assert s1['survey'][0]['type'] == 'select_one'
+    assert s1['survey'][0]['select_from_list_name'] == 'dogs'
 
 def test_expand_select_multiple_or_other():
     s1 = {'survey': [{'type': 'select_multiple dogs or_other'}]}
