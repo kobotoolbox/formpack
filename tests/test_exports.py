@@ -472,6 +472,49 @@ class TestFormPackExport(unittest.TestCase):
         )
         self.assertEqual(export, expected_dict)
 
+    def test_select_one_legacy(self):
+        # from 390eda1
+        title, schemas, submissions = build_fixture('select_one_legacy')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Your favourite Roman emperors',
+                    {
+                        'fields': [
+                            'fav_emperor',
+                        ],
+                        'data': [
+                            [
+                                'julius',
+                            ],
+                            [
+                                'augustus',
+                            ],
+                            [
+                                'tiberius',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
+        self.assertEqual(export, expected_dict)
+
+
+    def test_select_one_legacy_choice_list_linked(self):
+        # from
+        # http://github.com/kobotoolbox/formpack/pull/251#issuecomment-885275117
+        title, schemas, submissions = build_fixture('select_one_legacy')
+        fp = FormPack(schemas, title)
+        section = fp[0].sections['Your favourite Roman emperors']
+        choice_list = section.fields['fav_emperor'].choice.options
+        opt1_label = choice_list['julius']['labels'][None]
+        # if this passes, then the choice list is associated
+        assert opt1_label == 'Julius Caesar'
+
     def test_nested_repeats_with_copy_fields(self):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
@@ -2321,4 +2364,3 @@ class TestFormPackExport(unittest.TestCase):
                 ],
             },
         ]
-
