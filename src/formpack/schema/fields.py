@@ -687,13 +687,13 @@ class FormChoiceField(ExtendedFormField):
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
         labels = [label]
         if self.or_other:
-            labels.append(label + '_other')
+            labels.append(f'{label}_other')
         return labels
 
     def get_value_names(self, multiple_select='both'):
         names = [self.name]
         if self.or_other:
-            names.append(self.name + '_other')
+            names.append(f'{self.name }_other')
         return names
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
@@ -803,10 +803,10 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 args = (lang, group_sep, hierarchy_in_labels, option)
                 labels.append(self._get_option_label(*args))
             if self.or_other:
-                labels.append(label + '/other')
+                labels.append(f'{label}/other')
 
         if self.or_other:
-            labels.append(label + '_other')
+            labels.append(f'{label}_other')
 
         return labels
 
@@ -820,10 +820,10 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             for option_name in self.choice.options.keys():
                 names.append(self.name + '/' + option_name)
             if self.or_other:
-                names.append(self.name + '/other')
+                names.append(f'{self.name}/other')
 
         if self.or_other:
-            names.append(self.name + '_other')
+            names.append(f'{self.name}_other')
 
         return names
 
@@ -868,7 +868,6 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ("both", "details"):
             for choice in val.split():
                 cells[self.name + "/" + choice] = "1"
-
         return cells
 
     def parse_values(self, raw_values):
