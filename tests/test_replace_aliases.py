@@ -17,6 +17,17 @@ def test_replace_select_one():
     replace_aliases(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_one dogs'
 
+# "unexpanded" type: "select one dogs"
+def test_replace_select_one_legacy_unexpanded_string():
+    s1 = {'survey': [{'type': 'select one dogs'}]}
+    replace_aliases(s1, in_place=True)
+    assert s1['survey'][0]['type'] == 'select_one dogs'
+
+# "expanded" type: "select one" (where list name has already been pulled out)
+def test_replace_select_one_legacy():
+    s1 = {'survey': [{'type': 'select one'}]}
+    replace_aliases(s1, in_place=True)
+    assert s1['survey'][0]['type'] == 'select_one'
 
 def test_select_one_aliases_replaced():
     assert dealias_type('select1 dogs') == 'select_one dogs'
