@@ -693,7 +693,7 @@ class FormChoiceField(ExtendedFormField):
     def get_value_names(self, multiple_select='both'):
         names = [self.name]
         if self.or_other:
-            names.append(f'{self.name }_other')
+            names.append(f'{self.name}_other')
         return names
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):

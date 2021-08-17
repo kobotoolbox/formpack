@@ -375,7 +375,7 @@ class Export(object):
                     or_other = getattr(field, 'or_other', False)
                     if or_other:
                         cells[f'{field.name}_other'] = entry.get(
-                            f'{field.path}_other'
+                            f'{field.path}_other', ''
                         )
 
                     # save fields value if they match parent mapping fields.
