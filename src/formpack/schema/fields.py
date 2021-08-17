@@ -402,6 +402,15 @@ class TextField(ExtendedFormField):
         return stats
 
 
+class OrOtherTextField(TextField):
+
+    def __init__(self, name, path, *args, **kwargs):
+        super(OrOtherTextField, self).__init__(
+            name=f'{name}_other', data_type='text', labels=[], *args, **kwargs
+        )
+        self.path = f'{path}_other'
+
+
 class DateField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
