@@ -8,7 +8,6 @@ from collections import defaultdict
 from ..constants import UNSPECIFIED_TRANSLATION
 from ..submission import FormSubmission
 from ..utils.ordered_collection import OrderedCounter
-from ..schema import OrOtherTextField
 
 
 class AutoReportStats(object):
@@ -51,14 +50,6 @@ class AutoReport(object):
         return version_id
 
     def _calculate_stats(self, submissions, fields, versions, lang):
-
-        _fields = []
-        for field in fields:
-            _fields.append(field)
-            if getattr(field, 'or_other', False):
-                _fields.append(OrOtherTextField(name=field.name, path=field.path))
-
-        fields = _fields
 
         metrics = {field.name: OrderedCounter() for field in fields}
 

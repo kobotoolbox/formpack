@@ -402,15 +402,6 @@ class TextField(ExtendedFormField):
         return stats
 
 
-class OrOtherTextField(TextField):
-
-    def __init__(self, name, path, *args, **kwargs):
-        super(OrOtherTextField, self).__init__(
-            name=f'{name}_other', data_type='text', labels=[], *args, **kwargs
-        )
-        self.path = f'{path}_other'
-
-
 class DateField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -691,20 +682,6 @@ class FormChoiceField(ExtendedFormField):
                                               hierarchy, section,
                                               *args, **kwargs)
 
-    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
-                   hierarchy_in_labels=False, multiple_select="both"):
-        label = self._get_label(lang, group_sep, hierarchy_in_labels)
-        labels = [label]
-        if self.or_other:
-            labels.append(f'{label}_other')
-        return labels
-
-    def get_value_names(self, multiple_select='both'):
-        names = [self.name]
-        if self.or_other:
-            names.append(f'{self.name}_other')
-        return names
-
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
         try:
             translation = self.choice.options[val]['labels'][lang]
@@ -814,9 +791,6 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             if self.or_other:
                 labels.append(f'{label}/other')
 
-        if self.or_other:
-            labels.append(f'{label}_other')
-
         return labels
 
     def get_value_names(self, multiple_select="both"):
@@ -830,9 +804,6 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 names.append(self.name + '/' + option_name)
             if self.or_other:
                 names.append(f'{self.name}/other')
-
-        if self.or_other:
-            names.append(f'{self.name}_other')
 
         return names
 

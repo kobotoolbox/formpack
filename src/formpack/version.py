@@ -92,6 +92,9 @@ class FormVersion(object):
 
         # TODO: put those parts in a separate method and unit test it
         survey = content.get('survey', [])
+
+        survey = self._append_pseudo_questions(survey)
+
         fields_by_name = dict([(row.get('name'), row) for row in survey])
 
         # Analyze the survey schema and extract the informations we need
@@ -208,6 +211,21 @@ class FormVersion(object):
     #
     # def __repr__(self):
     #    return '<FormVersion %s>' % self._stats()
+
+    @staticmethod
+    def _append_pseudo_questions(survey):
+        _survey = []
+        for item in survey:
+            _survey.append(item)
+            if item.get('_or_other', False):
+                _survey.append(
+                    {
+                        'type': 'text',
+                        'name': f'{item["name"]}_other',
+                        'label': [None],
+                    }
+                )
+        return _survey
 
     def _stats(self):
         _stats = OrderedDict()
