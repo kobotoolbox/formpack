@@ -365,7 +365,6 @@ class Export(object):
 
                     # get submission value for this field
                     val = entry.get(field.path)
-
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
                         val, _lang, multiple_select=self.multiple_select
