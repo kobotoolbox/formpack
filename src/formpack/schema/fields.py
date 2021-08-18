@@ -3,7 +3,6 @@ from __future__ import (unicode_literals, print_function, absolute_import,
                         division)
 
 from collections import defaultdict
-from datetime import datetime
 from dateutil import parser
 from functools import partial
 from operator import itemgetter
@@ -273,7 +272,7 @@ class FormField(FormDataDef):
             val = int(val)
         except ValueError:
             pass
-        if isinstance(val, int):
+        else:
             return val
         try:
             val = float(val)
@@ -481,7 +480,7 @@ class DateField(ExtendedFormField):
             _date = parser.parse(val)
         except ValueError:
             pass
-        if isinstance(_date, datetime):
+        else:
             _date = _date.date()
 
         return {self.name: _date}
