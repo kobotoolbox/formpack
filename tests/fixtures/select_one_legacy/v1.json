@@ -1,0 +1,51 @@
+{
+  "version": "romev1",
+  "content": {
+    "survey": [
+      {
+        "type": "select one emperors",
+        "name": "fav_emperor",
+        "label": "Who is your favourite emperor"
+      }
+    ],
+    "choices": [
+      {
+        "list_name": "emperors",
+        "name": "julius",
+        "label": "Julius Caesar"
+      },
+      {
+        "list_name": "emperors",
+        "name": "augustus",
+        "label": "Augustus"
+      },
+      {
+        "list_name": "emperors",
+        "name": "tiberius",
+        "label": "Tiberius"
+      },
+      {
+        "list_name": "emperors",
+        "name": "caligula",
+        "label": "Caligula"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "fav_emperor": "julius",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b5"
+    },
+    {
+      "fav_emperor": "augustus",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b6"
+    },
+    {
+      "fav_emperor": "tiberius",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b7"
+    }
+  ]
+}

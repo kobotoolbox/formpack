@@ -21,7 +21,6 @@ def test_replace_select_one():
 def test_select_one_aliases_replaced():
     assert dealias_type('select1 dogs') == 'select_one dogs'
     assert dealias_type('select one dogs') == 'select_one dogs'
-    assert dealias_type('select1 dogs') == 'select_one dogs'
     assert dealias_type('select_one dogs') == 'select_one dogs'
 
 
