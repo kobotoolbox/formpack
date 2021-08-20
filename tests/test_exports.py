@@ -536,6 +536,70 @@ class TestFormPackExport(unittest.TestCase):
         )
         self.assertEqual(export, expected_dict)
 
+    def test_select_or_other(self):
+        title, schemas, submissions = build_fixture(
+            'or_other'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Your favourite Roman emperors or other',
+                    {
+                        'fields': [
+                            'fav_emperor',
+                            'fav_emperor_other',
+                            'fav_emperors',
+                            'fav_emperors/julius',
+                            'fav_emperors/augustus',
+                            'fav_emperors/tiberius',
+                            'fav_emperors/caligula',
+                            'fav_emperors/other',
+                            'fav_emperors_other',
+                        ],
+                        'data': [
+                            [
+                                'other',
+                                'Nero',
+                                'caligula other',
+                                '0',
+                                '0',
+                                '0',
+                                '1',
+                                '1',
+                                'Commodus',
+                            ],
+                            [
+                                'augustus',
+                                '',
+                                'julius tiberius',
+                                '1',
+                                '0',
+                                '1',
+                                '0',
+                                '0',
+                                '',
+                            ],
+                            [
+                                'other',
+                                'Marcus Aurelius',
+                                'julius augustus',
+                                '1',
+                                '1',
+                                '0',
+                                '0',
+                                '0',
+                                '',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
+        self.assertEqual(export, expected_dict)
+
     def test_nested_repeats_with_copy_fields(self):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')

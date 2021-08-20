@@ -1,0 +1,62 @@
+{
+  "version": "romev1",
+  "content": {
+    "survey": [
+      {
+        "type": "select_one emperors or_other",
+        "name": "fav_emperor",
+        "label": "Who is your favourite emperor?"
+      },
+      {
+        "type": "select_multiple emperors or_other",
+        "name": "fav_emperors",
+        "label": "Who are your favourite emperors?"
+      }
+    ],
+    "choices": [
+      {
+        "list_name": "emperors",
+        "name": "julius",
+        "label": "Julius Caesar"
+      },
+      {
+        "list_name": "emperors",
+        "name": "augustus",
+        "label": "Augustus"
+      },
+      {
+        "list_name": "emperors",
+        "name": "tiberius",
+        "label": "Tiberius"
+      },
+      {
+        "list_name": "emperors",
+        "name": "caligula",
+        "label": "Caligula"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "fav_emperor": "other",
+      "fav_emperor_other": "Nero",
+      "fav_emperors": "caligula other",
+      "fav_emperors_other": "Commodus",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b5"
+    },
+    {
+      "fav_emperor": "augustus",
+      "fav_emperors": "julius tiberius",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b6"
+    },
+    {
+      "fav_emperor": "other",
+      "fav_emperor_other": "Marcus Aurelius",
+      "fav_emperors": "julius augustus",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b7"
+    }
+  ]
+}
