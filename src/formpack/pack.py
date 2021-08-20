@@ -334,22 +334,40 @@ class FormPack(object):
     def to_json(self, **kwargs):
         return json.dumps(self.to_dict(), **kwargs)
 
-    def export(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/', hierarchy_in_labels=False,
-               versions=-1, multiple_select="both",
-               force_index=False, copy_fields=(), title=None,
-               tag_cols_for_header=None, filter_fields=()):
+    def export(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        versions=-1,
+        multiple_select="both",
+        force_index=False,
+        copy_fields=(),
+        title=None,
+        tag_cols_for_header=None,
+        filter_fields=(),
+        xls_types=False,
+    ):
         """
         Create an export for given versions of the form
         """
         versions = self._get_versions(versions)
         title = title or self.title
-        return Export(self, versions, lang=lang, group_sep=group_sep,
-                      hierarchy_in_labels=hierarchy_in_labels,
-                      version_id_keys=self.version_id_keys(versions),
-                      title=title, multiple_select=multiple_select,
-                      force_index=force_index, copy_fields=copy_fields,
-                      tag_cols_for_header=tag_cols_for_header,
-                      filter_fields=filter_fields,)
+        return Export(
+            self,
+            versions,
+            lang=lang,
+            group_sep=group_sep,
+            hierarchy_in_labels=hierarchy_in_labels,
+            version_id_keys=self.version_id_keys(versions),
+            title=title,
+            multiple_select=multiple_select,
+            force_index=force_index,
+            copy_fields=copy_fields,
+            tag_cols_for_header=tag_cols_for_header,
+            filter_fields=filter_fields,
+            xls_types=xls_types,
+        )
 
     def autoreport(self, versions=-1):
         """
