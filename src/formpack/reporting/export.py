@@ -42,7 +42,7 @@ class Export(object):
         title="submissions",
         tag_cols_for_header=None,
         filter_fields=(),
-        xls_types_as_text=False,
+        xls_types_as_text=True,
     ):
         """
         :param formpack: FormPack
