@@ -470,7 +470,7 @@ class DateField(ExtendedFormField):
 
         return stats
 
-    def format(self, val, xls_types_as_text=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=True, *args, **kwargs):
         if val is None:
             val = ''
 
@@ -490,7 +490,7 @@ class DateField(ExtendedFormField):
 
 class DateTimeField(DateField):
 
-    def format(self, val, xls_types_as_text=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=True, *args, **kwargs):
         if val is None:
             val = ''
 
@@ -596,7 +596,7 @@ class NumField(FormField):
         else:
             yield float(raw_values)
 
-    def format(self, val, xls_types_as_text=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=True, *args, **kwargs):
         if val is None:
             val = ''
 
@@ -634,7 +634,7 @@ class IdCopyField(CopyField):
             **kwargs,
         )
 
-    def format(self, val, xls_types_as_text=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=True, *args, **kwargs):
         if val is None:
             val = ''
 
@@ -656,7 +656,7 @@ class SubmissionTimeCopyField(CopyField):
             **kwargs,
         )
 
-    def format(self, val, xls_types_as_text=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=True, *args, **kwargs):
         if val is None:
             val = ''
 
@@ -791,7 +791,7 @@ class FormGPSField(FormField):
         self,
         val,
         lang=UNSPECIFIED_TRANSLATION,
-        xls_types_as_text=False,
+        xls_types_as_text=True,
         *args,
         **kwargs
     ):
@@ -858,7 +858,7 @@ class FormChoiceField(ExtendedFormField):
         val,
         lang=UNSPECIFIED_TRANSLATION,
         multiple_select="both",
-        xls_types_as_text=False,
+        xls_types_as_text=True,
     ):
         if val is None:
             val = ''
@@ -989,7 +989,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         group_sep="/",
         hierarchy_in_labels=False,
         multiple_select="both",
-        xls_types_as_text=False,
+        xls_types_as_text=True,
     ):
         """
         Same than other format(), with an option for multiple_select layout

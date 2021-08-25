@@ -346,7 +346,7 @@ class FormPack(object):
         title=None,
         tag_cols_for_header=None,
         filter_fields=(),
-        xls_types_as_text=False,
+        xls_types_as_text=True,
     ):
         """
         Create an export for given versions of the form
