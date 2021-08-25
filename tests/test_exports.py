@@ -516,7 +516,7 @@ class TestFormPackExport(unittest.TestCase):
             'select_one_from_previous_answers'
         )
         fp = FormPack(schemas, title)
-        options = {'versions': 'romev1', 'xls_types': True}
+        options = {'versions': 'romev1', 'xls_types_as_text': False}
         export = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict(
             [

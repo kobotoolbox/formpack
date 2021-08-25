@@ -42,7 +42,7 @@ class Export(object):
         title="submissions",
         tag_cols_for_header=None,
         filter_fields=(),
-        xls_types=False,
+        xls_types_as_text=False,
     ):
         """
         :param formpack: FormPack
@@ -60,7 +60,7 @@ class Export(object):
         :param title: string
         :param tag_cols_for_header: list
         :param filter_fields: list
-        :param xls_types: bool
+        :param xls_types_as_text: bool
         """
 
         self.formpack = formpack
@@ -74,7 +74,7 @@ class Export(object):
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
         self.filter_fields = filter_fields
-        self.xls_types = xls_types
+        self.xls_types_as_text = xls_types_as_text
         self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -385,7 +385,7 @@ class Export(object):
                         val=val,
                         lang=_lang,
                         multiple_select=self.multiple_select,
-                        xls_types=self.xls_types,
+                        xls_types_as_text=self.xls_types_as_text,
                     )
 
                     # save fields value if they match parent mapping fields.

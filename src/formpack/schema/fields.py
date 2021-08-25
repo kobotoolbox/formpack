@@ -470,11 +470,11 @@ class DateField(ExtendedFormField):
 
         return stats
 
-    def format(self, val, xls_types=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=False, *args, **kwargs):
         if val is None:
             val = ''
 
-        if not xls_types:
+        if xls_types_as_text:
             return {self.name: val}
 
         _date = val
@@ -490,11 +490,11 @@ class DateField(ExtendedFormField):
 
 class DateTimeField(DateField):
 
-    def format(self, val, xls_types=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=False, *args, **kwargs):
         if val is None:
             val = ''
 
-        if not xls_types:
+        if xls_types_as_text:
             return {self.name: val}
 
         _date = val
@@ -596,11 +596,11 @@ class NumField(FormField):
         else:
             yield float(raw_values)
 
-    def format(self, val, xls_types=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=False, *args, **kwargs):
         if val is None:
             val = ''
 
-        if not xls_types:
+        if xls_types_as_text:
             return {self.name: val}
 
         return {self.name: self.try_get_number(val)}
@@ -634,11 +634,11 @@ class IdCopyField(CopyField):
             **kwargs,
         )
 
-    def format(self, val, xls_types=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=False, *args, **kwargs):
         if val is None:
             val = ''
 
-        if not xls_types:
+        if xls_types_as_text:
             return {self.name: val}
 
         return {self.name: int(val)}
@@ -656,11 +656,11 @@ class SubmissionTimeCopyField(CopyField):
             **kwargs,
         )
 
-    def format(self, val, xls_types=False, *args, **kwargs):
+    def format(self, val, xls_types_as_text=False, *args, **kwargs):
         if val is None:
             val = ''
 
-        if not xls_types:
+        if xls_types_as_text:
             return {self.name: val}
 
         _date = val
@@ -791,7 +791,7 @@ class FormGPSField(FormField):
         self,
         val,
         lang=UNSPECIFIED_TRANSLATION,
-        xls_types=False,
+        xls_types_as_text=False,
         *args,
         **kwargs
     ):
@@ -823,7 +823,7 @@ class FormGPSField(FormField):
 
         values = [val, "", "", "", ""]
         for i, value in enumerate(val.split(), 1):
-            if xls_types:
+            if not xls_types_as_text:
                 values[i] = self.try_get_number(value)
             else:
                 values[i] = value
@@ -858,13 +858,13 @@ class FormChoiceField(ExtendedFormField):
         val,
         lang=UNSPECIFIED_TRANSLATION,
         multiple_select="both",
-        xls_types=False,
+        xls_types_as_text=False,
     ):
         if val is None:
             val = ''
         val = self.get_translation(val, lang)
 
-        if not xls_types:
+        if xls_types_as_text:
             return {self.name: val}
 
         return {self.name: self.try_get_number(val)}
@@ -989,7 +989,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         group_sep="/",
         hierarchy_in_labels=False,
         multiple_select="both",
-        xls_types=False,
+        xls_types_as_text=False,
     ):
         """
         Same than other format(), with an option for multiple_select layout
@@ -999,7 +999,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             'summary': only the summary column
             'details': only the details column
         """
-        _zero, _one = (0, 1) if xls_types else ('0', '1')
+        _zero, _one = ('0', '1') if xls_types_as_text else (0, 1)
         if val is None:
             # If the value is missing, do not imply that any response was
             # received: fill with empty strings instead of zeros
@@ -1022,7 +1022,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
                 else:
                     res.append(v)
 
-            if len(res) == 1 and xls_types:
+            if len(res) == 1 and not xls_types_as_text:
                 _res = self.try_get_number(res[0])
             else:
                 _res = ' '.join(res)

@@ -346,7 +346,7 @@ class FormPack(object):
         title=None,
         tag_cols_for_header=None,
         filter_fields=(),
-        xls_types=False,
+        xls_types_as_text=False,
     ):
         """
         Create an export for given versions of the form
@@ -366,7 +366,7 @@ class FormPack(object):
             copy_fields=copy_fields,
             tag_cols_for_header=tag_cols_for_header,
             filter_fields=filter_fields,
-            xls_types=xls_types,
+            xls_types_as_text=xls_types_as_text,
         )
 
     def autoreport(self, versions=-1):
