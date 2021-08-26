@@ -372,7 +372,6 @@ class Export(object):
                 return []
             _val = val.replace(' ', '_')
             return [f for f in attachments if _val in f['filename']]
-            #return list(filter(lambda f: _val in f['filename'], attachments))
 
         for entry in submission:
 

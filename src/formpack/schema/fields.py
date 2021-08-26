@@ -431,11 +431,10 @@ class MediaField(TextField):
     def format(self, val, attachment, *args, **kwargs):
         if val is None:
             val = ''
-        if not attachment:
-            download_url = ''
-        else:
-            download_url = attachment[0].get('download_url', '')
 
+        download_url = (
+            attachment[0].get('download_url', '') if attachment else ''
+        )
         return {
             self.name: val,
             f'{self.name}_URL': download_url,
