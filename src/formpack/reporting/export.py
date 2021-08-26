@@ -297,7 +297,12 @@ class Export(object):
 
         return section_fields, section_labels, section_tags
 
-    def format_one_submission(self, submission, current_section):
+    def format_one_submission(
+        self,
+        submission,
+        current_section,
+        attachments=None,
+    ):
 
         # 'current_section' is the name of what will become sheets in xls.
         # If you don't have repeat groups, there is only one section
@@ -362,6 +367,13 @@ class Export(object):
         # when repeat groups are involved, deeper levels can have an
         # arbitrary number of entries depending of the user input.
 
+        def _get_attachment(val, attachments):
+            if not isinstance(val, str) or not attachments:
+                return []
+            _val = val.replace(' ', '_')
+            return [f for f in attachments if _val in f['filename']]
+            #return list(filter(lambda f: _val in f['filename'], attachments))
+
         for entry in submission:
 
             # Format one entry and add it to the rows for this section
@@ -374,18 +386,22 @@ class Export(object):
             # previous one, but we reset it, to gain some perfs.
             row.update(_empty_row)
 
+            attachments = entry.get('_attachments') or attachments
+
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
 
                     # get submission value for this field
                     val = entry.get(field.path)
+                    attachment = _get_attachment(val, attachments)
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
                         val=val,
                         lang=_lang,
                         multiple_select=self.multiple_select,
                         xls_types_as_text=self.xls_types_as_text,
+                        attachment=attachment,
                     )
 
                     # save fields value if they match parent mapping fields.
@@ -427,8 +443,11 @@ class Export(object):
                 # and adding the results to the list of rows for this section.
                 nested_data = entry.get(child_section.path)
                 if nested_data:
-                    chunk = self.format_one_submission(entry[child_section.path],
-                                                       child_section)
+                    chunk = self.format_one_submission(
+                        entry[child_section.path],
+                        child_section,
+                        attachments,
+                    )
                     for key, value in iteritems(chunk):
                         if key in chunks:
                             chunks[key].extend(value)
