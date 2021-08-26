@@ -882,6 +882,8 @@ class FormChoiceField(ExtendedFormField):
         lang=UNSPECIFIED_TRANSLATION,
         multiple_select="both",
         xls_types_as_text=True,
+        *args,
+        **kwargs,
     ):
         if val is None:
             val = ''
@@ -1013,6 +1015,8 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         hierarchy_in_labels=False,
         multiple_select="both",
         xls_types_as_text=True,
+        *args,
+        **kwargs,
     ):
         """
         Same than other format(), with an option for multiple_select layout
