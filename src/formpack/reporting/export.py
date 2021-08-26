@@ -373,6 +373,10 @@ class Export(object):
             _val = val.replace(' ', '_')
             return [f for f in attachments if _val in f['filename']]
 
+        def _get_value_from_entry(entry, field):
+            suffix = 'meta/' if field.data_type == 'audit' else ''
+            return entry.get(f'{suffix}{field.path}')
+
         for entry in submission:
 
             # Format one entry and add it to the rows for this section
@@ -392,7 +396,8 @@ class Export(object):
                 if field.can_format:
 
                     # get submission value for this field
-                    val = entry.get(field.path)
+                    val = _get_value_from_entry(entry, field)
+                    # get the attachment for this field
                     attachment = _get_attachment(val, attachments)
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
