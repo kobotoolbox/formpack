@@ -352,7 +352,11 @@ class Export(object):
             '''
             # Not all submissions will have attachments and we only want to
             # consider media types
-            if field.data_type not in EXTENDED_MEDIA_TYPES or not attachments:
+            if (
+                field.data_type not in EXTENDED_MEDIA_TYPES
+                or not attachments
+                or val is None
+            ):
                 return []
             # Spaces in the filename are replaced with underscores in storage,
             # so we need to do the same
