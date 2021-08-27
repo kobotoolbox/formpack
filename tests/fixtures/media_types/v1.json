@@ -71,7 +71,7 @@
     {
       "fav_emperor": "augustus",
       "image_of_emperor": "augustus.jpg",
-      "another_image_of_emperor": "another-augustus.jpg",
+      "another_image_of_emperor": "",
       "meta/audit": "audit.csv",
       "meta/versionID": "romev1",
       "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b6",
@@ -79,10 +79,6 @@
           {
             "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg",
             "filename": "/path/to/augustus.jpg"
-          },
-          {
-            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/another-augustus.jpg",
-            "filename": "/path/to/another-augustus.jpg"
           },
           {
             "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/audit.csv",
