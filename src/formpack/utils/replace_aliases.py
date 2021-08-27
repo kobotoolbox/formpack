@@ -133,6 +133,15 @@ GEO_TYPES = [
     'geotrace',
 ]
 
+MEDIA_TYPES = [
+    'video',
+    'image',
+    'audio',
+    'file',
+    'background-audio',
+]
+EXTENDED_MEDIA_TYPES = MEDIA_TYPES + ['audit']
+
 MAIN_TYPES = [
     # basic entry
     'text',
@@ -140,12 +149,6 @@ MAIN_TYPES = [
     'decimal',
     'email',
     'barcode',
-    # collect media
-    'video',
-    'image',
-    'audio',
-    'file',
-    'background-audio',
     # enter time values
     'date',
     'datetime',
@@ -161,7 +164,7 @@ MAIN_TYPES = [
     # other
     'range',
     'hidden',
-] + GEO_TYPES
+] + GEO_TYPES + MEDIA_TYPES
 formpack_preferred_types = set(MAIN_TYPES + LABEL_OPTIONAL_TYPES + SELECT_TYPES)
 
 _pyxform_type_aliases = defaultdict(list)
