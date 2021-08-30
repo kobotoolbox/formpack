@@ -29,14 +29,24 @@ from ..utils.string import unicode, unique_name_for_xls
 
 class Export(object):
 
-    def __init__(self, formpack, form_versions, lang=UNSPECIFIED_TRANSLATION,
-                 group_sep="/", hierarchy_in_labels=False,
-                 version_id_keys=[],
-                 multiple_select="both", copy_fields=(), force_index=False,
-                 title="submissions", tag_cols_for_header=None, 
-                 header_lang=UNSPECIFIED_HEADER_LANG, filter_fields=()):
+    def __init__(
+        self,
+        formpack,
+        form_versions,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep="/",
+        hierarchy_in_labels=False,
+        version_id_keys=[],
+        multiple_select="both",
+        copy_fields=(),
+        force_index=False,
+        title="submissions",
+        tag_cols_for_header=None,
+        header_lang=UNSPECIFIED_HEADER_LANG,
+        filter_fields=(),
+        xls_types=False,
+    ):
         """
-
         :param formpack: FormPack
         :param form_versions: OrderedDict
         :param lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
@@ -51,8 +61,11 @@ class Export(object):
         :param force_index: bool.
         :param title: string
         :param tag_cols_for_header: list
+        lang_header
         :param header_lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
             None (`constants.UNTRANSLATED`), if not set, default value equal lang arg.
+        :param filter_fields: list
+        :param xls_types: bool
         """
 
         self.formpack = formpack
@@ -67,6 +80,7 @@ class Export(object):
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
         self.filter_fields = filter_fields
+        self.xls_types = xls_types
         self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -84,6 +98,13 @@ class Export(object):
                     else:
                         dumb_field = CopyField(copy_field, section=first_section)
                     first_section.fields[dumb_field.name] = dumb_field
+
+        # Some copy fields are classes, some strings -- collect their field
+        # names for later use
+        self.copy_field_names = [
+            getattr(copy_field, 'FIELD_NAME', copy_field)
+            for copy_field in self.copy_fields
+        ]
 
         # this deals with merging all form versions headers and labels
         res = self.get_fields_labels_tags_for_all_versions(
@@ -239,13 +260,8 @@ class Export(object):
                 auto_field_names.append('_parent_table_name')
                 auto_field_names.append('_parent_index')
                 # Add extra fields
-                for copy_field in self.copy_fields:
-                    if isclass(copy_field):
-                        auto_field_names.append(
-                            "_submission_{}".format(copy_field.FIELD_NAME))
-                    else:
-                        auto_field_names.append(
-                            "_submission_{}".format(copy_field))
+                for copy_field in self.copy_field_names:
+                    auto_field_names.append("_submission_{}".format(copy_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -374,12 +390,15 @@ class Export(object):
                     val = entry.get(field.path)
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
-                        val, _lang, multiple_select=self.multiple_select
+                        val=val,
+                        lang=_lang,
+                        multiple_select=self.multiple_select,
+                        xls_types=self.xls_types,
                     )
 
                     # save fields value if they match parent mapping fields.
                     # Useful to map children to their parent when flattening groups.
-                    if field.path in self.copy_fields:
+                    if field.path in self.copy_field_names:
                         if _section_name not in self.__r_groups_submission_mapping_values:
                             self.__r_groups_submission_mapping_values[_section_name] = {}
                         self.__r_groups_submission_mapping_values[_section_name].update(cells)
@@ -397,29 +416,15 @@ class Export(object):
             if '_index' in row:
                 row['_index'] = _indexes[_section_name]
 
-            # If the submission has been tagged, join those tags together into
-            # a comma-separated string
-            for tags_col in ('_tags', '_submission__tags'):
-                if tags_col in row:
-                    tags = row[tags_col]
-                    row[tags_col] = (
-                        ', '.join(tags) if isinstance(tags, list) else tags
-                    )
-
             if '_parent_table_name' in row:
                 row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
                 extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
                 if extra_mapping_values:
-                    for extra_mapping_field in self.copy_fields:
-                        if isclass(extra_mapping_field):
-                            row[
-                                '_submission_{}'.format(extra_mapping_field.FIELD_NAME)
-                            ] = extra_mapping_values.get(extra_mapping_field, "")
-                        else:
-                            row[
-                                '_submission_{}'.format(extra_mapping_field)
-                            ] = extra_mapping_values.get(extra_mapping_field, "")
+                    for extra_mapping_field in self.copy_field_names:
+                        row[
+                            '_submission_{}'.format(extra_mapping_field)
+                        ] = extra_mapping_values.get(extra_mapping_field, '')
 
             rows.append(list(row.values()))
 
@@ -728,7 +733,14 @@ class Export(object):
         return table
 
     def to_xlsx(self, filename, submissions):
-        workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
+        workbook = xlsxwriter.Workbook(
+            filename,
+            {
+                'constant_memory': True,
+                'default_date_format': 'yyyy-mm-dd',
+                'remove_timezone': True,
+            },
+        )
         workbook.use_zip64()
 
         sheets = {}
@@ -738,17 +750,13 @@ class Export(object):
         sheet_row_positions = defaultdict(lambda: 0)
 
         def _append_row_to_sheet(sheet_, data):
-            # Ensure all list objects are coerced to strings otherwise
-            # xlswriter will fail to export
-            data_ = [str(d) if isinstance(d, list) else d for d in data]
-
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
             sheet_.write_row(
                 row=row_index,
                 col=0,
-                data=data_
+                data=data
             )
             row_index += 1
             sheet_row_positions[sheet_] = row_index
