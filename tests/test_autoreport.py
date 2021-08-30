@@ -514,23 +514,23 @@ class TestAutoReport(unittest.TestCase):
                             }
                         ),
                         (
+                            '2002-01-01',
+                            {
+                                'mean': 2,
+                                'median': 2.0,
+                                'mode': 2,
+                                'stdev': 0.0
+                            }
+                        ),
+                        (
                             '2003-01-01',
                             {
-                                'mean': 1.0,
+                                'mean': 1,
                                 'median': 1,
                                 'mode': '*',
                                 'stdev': '*'
                             }
                         ),
-                        (
-                            '2002-01-01',
-                            {
-                                'mean': 2.0,
-                                'median': 2.0,
-                                'mode': 2,
-                                'stdev': 0.0
-                            }
-                        )
                     )
                 }
             )

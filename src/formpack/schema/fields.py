@@ -560,8 +560,9 @@ class NumField(FormField):
         for val, counter in metrics.items():
             if val is None:
                 continue
-            for splitter, count in counter.items():
-                inversed_metrics[splitter].extend([val] * count)
+            for splitter, trans in top_splitters:
+                count = counter.pop(splitter, 0)
+                inversed_metrics[trans].extend([val] * count)
 
         for splitter, values in inversed_metrics.items():
 
