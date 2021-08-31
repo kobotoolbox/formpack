@@ -516,7 +516,7 @@ class TestFormPackExport(unittest.TestCase):
             'select_one_from_previous_answers'
         )
         fp = FormPack(schemas, title)
-        options = {'versions': 'romev1', 'xls_types': True}
+        options = {'versions': 'romev1', 'xls_types_as_text': False}
         export = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict(
             [
@@ -991,7 +991,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
         fp = FormPack(schemas, title)
-        options = {'versions': 'bird_nests_v1', 'xls_types': True}
+        options = {'versions': 'bird_nests_v1', 'xls_types_as_text': False}
         export_dict = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict([
             ('Bird nest survey with nested repeatable groups', {
@@ -1682,7 +1682,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_export_with_split_fields_gps_fields_and_multiple_selects_xls_types(self):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
-        options = {'versions': 'rpV4', 'xls_types': True}
+        options = {'versions': 'rpV4', 'xls_types_as_text': False}
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         expected = {
             'fields': [
