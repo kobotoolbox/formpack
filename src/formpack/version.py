@@ -221,7 +221,7 @@ class FormVersion(object):
                     {
                         'type': 'text',
                         'name': f'{item["name"]}_other',
-                        'label': [None] * len(self.translations)
+                        'label': [None] * len(self.translations),
                     }
                 )
         return _survey
