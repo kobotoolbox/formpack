@@ -83,8 +83,8 @@ class Export:
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            for version in itervalues(form_versions):
-                first_section = next(itervalues(version.sections))
+            for version in iter(form_versions.values()):
+                first_section = next(iter(version.sections.values()))
                 for copy_field in copy_fields:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
