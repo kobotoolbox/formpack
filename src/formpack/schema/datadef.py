@@ -48,7 +48,7 @@ class FormSection(FormDataDef):
         if labels is None:
             labels = {UNTRANSLATED: 'submissions'}
 
-        super(FormSection, self).__init__(name, labels, *args, **kwargs)
+        super().__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
         self.parent = parent
         self.children = list(children)
@@ -73,7 +73,7 @@ class FormSection(FormDataDef):
 
 class FormChoice(FormDataDef):
     def __init__(self, name, *args, **kwargs):
-        super(FormChoice, self).__init__(name, *args, **kwargs)
+        super().__init__(name, *args, **kwargs)
         self.name = name
         self.options = OrderedDict()
 

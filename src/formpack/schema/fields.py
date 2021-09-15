@@ -29,7 +29,7 @@ class FormField(FormDataDef):
         self.hierarchy = hierarchy + [self]
 
         # warning: the order of the super() call matters
-        super(FormField, self).__init__(name, labels, *args, **kwargs)
+        super().__init__(name, labels, *args, **kwargs)
 
         if has_stats is not None:
             self.has_stats = has_stats
@@ -381,7 +381,7 @@ class TextField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        stats = super(TextField, self).get_stats(metrics, lang, limit)
+        stats = super().get_stats(metrics, lang, limit)
 
         top = metrics.most_common(limit)
         total = stats['total_count']
@@ -400,7 +400,7 @@ class TextField(ExtendedFormField):
     def get_disaggregated_stats(self, metrics, top_splitters,
                                 lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        parent = super(TextField, self)
+        parent = super()
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
         substats = self.get_substats(stats, metrics, top_splitters, lang)
@@ -447,7 +447,7 @@ class DateField(ExtendedFormField):
         Dates are sorted from old to new.
         """
 
-        stats = super(DateField, self).get_stats(metrics, lang, limit)
+        stats = super().get_stats(metrics, lang, limit)
 
         if self.data_type != "date":
             return stats
@@ -471,7 +471,7 @@ class DateField(ExtendedFormField):
     def get_disaggregated_stats(self, metrics, top_splitters,
                                 lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        parent = super(DateField, self)
+        parent = super()
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
 
@@ -541,7 +541,7 @@ class NumField(FormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        stats = super(NumField, self).get_stats(metrics, lang, limit)
+        stats = super().get_stats(metrics, lang, limit)
 
         stats.update({
             'median': '*',
@@ -567,7 +567,7 @@ class NumField(FormField):
     def get_disaggregated_stats(self, metrics, top_splitters,
                                 lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        parent = super(NumField, self)
+        parent = super()
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
 
@@ -629,7 +629,7 @@ class NumField(FormField):
 class CopyField(FormField):
     """ Just copy the data over. No translation. No manipulation """
     def __init__(self, name, hierarchy=(None,), section=None, *args, **kwargs):
-        super(CopyField, self).__init__(name, labels=None,
+        super().__init__(name, labels=None,
                                         data_type=name,
                                         hierarchy=(None,),
                                         section=section,
@@ -647,7 +647,7 @@ class IdCopyField(CopyField):
     FIELD_NAME = '_id'
 
     def __init__(self, section=None, *args, **kwargs):
-        super(IdCopyField, self).__init__(
+        super().__init__(
             self.FIELD_NAME,
             section=section,
             *args,
@@ -669,7 +669,7 @@ class SubmissionTimeCopyField(CopyField):
     FIELD_NAME = '_submission_time'
 
     def __init__(self, section=None, *args, **kwargs):
-        super(SubmissionTimeCopyField, self).__init__(
+        super().__init__(
             self.FIELD_NAME,
             section=section,
             *args,
@@ -697,7 +697,7 @@ class NotesCopyField(CopyField):
     FIELD_NAME = '_notes'
 
     def __init__(self, section=None, *args, **kwargs):
-        super(NotesCopyField, self).__init__(
+        super().__init__(
             self.FIELD_NAME,
             section=section,
             *args,
@@ -716,7 +716,7 @@ class TagsCopyField(CopyField):
     FIELD_NAME = '_tags'
 
     def __init__(self, section=None, *args, **kwargs):
-        super(TagsCopyField, self).__init__(
+        super().__init__(
             self.FIELD_NAME,
             section=section,
             *args,
@@ -739,7 +739,7 @@ class ValidationStatusCopyField(CopyField):
     FIELD_NAME = "_validation_status"
 
     def __init__(self, section=None, *args, **kwargs):
-        super(ValidationStatusCopyField, self).__init__(
+        super().__init__(
             self.FIELD_NAME,
             section=section,
             *args, **kwargs)
@@ -754,7 +754,7 @@ class ValidationStatusCopyField(CopyField):
             else:
                 value = {self.name: val.get("label", "")}
         else:
-            value = super(CopyField, self).format(val=val, lang=lang, context=context)
+            value = super().format(val=val, lang=lang, context=context)
 
         return value
 
@@ -763,7 +763,7 @@ class FormGPSField(FormField):
 
     def __init__(self, name, labels, data_type, hierarchy=None,
                  section=None, choice=None, *args, **kwargs):
-        super(FormGPSField, self).__init__(name, labels, data_type,
+        super().__init__(name, labels, data_type,
                                            hierarchy, section, *args, **kwargs)
 
     def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
@@ -858,7 +858,7 @@ class FormChoiceField(ExtendedFormField):
                  section=None, choice=None, or_other=False, *args, **kwargs):
         self.choice = choice or FormChoice(name)
         self.or_other = or_other
-        super(FormChoiceField, self).__init__(name, labels, data_type,
+        super().__init__(name, labels, data_type,
                                               hierarchy, section,
                                               *args, **kwargs)
 
@@ -893,7 +893,7 @@ class FormChoiceField(ExtendedFormField):
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        stats = super(FormChoiceField, self).get_stats(metrics, lang, limit)
+        stats = super().get_stats(metrics, lang, limit)
         total = stats['total_count']
 
         top = metrics.most_common(limit)
@@ -914,7 +914,7 @@ class FormChoiceField(ExtendedFormField):
     def get_disaggregated_stats(self, metrics, top_splitters,
                                 lang=UNSPECIFIED_TRANSLATION, limit=100):
 
-        parent = super(FormChoiceField, self)
+        parent = super()
         stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
                                                limit)
 
@@ -1096,7 +1096,7 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
     def __init__(self, *args, **kwargs):
         self.parameters_in_use = [
             param for param in self.PREPENDED_PARAMETERS if param is not None]
-        super(FormChoiceFieldWithMultipleSelect, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def parameter_value_names(self):
@@ -1113,12 +1113,12 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
             question_label + group_sep + label
                 for name, label in self.parameters_in_use
         ]
-        word_labels = super(FormLiteracyTestField, self).get_labels(
+        word_labels = super().get_labels(
             lang, group_sep, hierarchy_in_labels, multiple_select)
         return parameter_labels + word_labels
 
     def get_value_names(self, *args, **kwargs):
-        word_value_names = super(FormLiteracyTestField, self).get_value_names(
+        word_value_names = super().get_value_names(
             *args, **kwargs)
         return self.parameter_value_names + word_value_names
 
@@ -1128,7 +1128,7 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
         all_values = val.split()
         prepended_cells = dict(zip(self.parameter_value_names, all_values))
         word_values = all_values[len(self.PREPENDED_PARAMETERS):]
-        cells = super(FormLiteracyTestField, self).format(
+        cells = super().format(
             ' '.join(word_values), *args, **kwargs)
         cells.update(prepended_cells)
         return cells

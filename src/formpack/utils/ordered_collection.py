@@ -37,7 +37,7 @@ class OrderedCounter(Counter, OrderedDict):
             list: list of tuples (items, count)
         """
         if ordered is False:
-            return super(OrderedCounter, self).most_common(n)
+            return super().most_common(n)
 
         # We can use `lambda x: (-x[1], x[0])` to sort by:
         # - second element (descendant order)
@@ -63,7 +63,7 @@ class OrderedDefaultdict(OrderedDict):
         if not (default_factory is None
                 or isinstance(default_factory, Callable)):
             raise TypeError('first argument must be callable or None')
-        super(OrderedDefaultdict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default_factory = default_factory  # called by __missing__()
 
     def __missing__(self, key):
