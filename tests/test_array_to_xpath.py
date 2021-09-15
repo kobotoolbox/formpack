@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import pytest
 
 from formpack.utils.array_to_xpath import array_to_xpath, DEFAULT_FNS

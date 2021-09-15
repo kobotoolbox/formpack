@@ -7,7 +7,6 @@ from copy import deepcopy
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
-from .string import str_types
 from ..constants import KOBO_LOCK_ALL
 
 # This file is a mishmash of things which culminate in the
@@ -23,6 +22,7 @@ TF_COLUMNS = [
 KOBO_SPECIFIC_SUB_PATTERN = r'^kobo(–|—)'
 KOBO_SPECIFIC_PREFERRED = 'kobo--'
 
+
 def aliases_to_ordered_dict(_d):
     """
     unpacks a dict-with-lists to an ordered dict with keys sorted by length
@@ -32,7 +32,7 @@ def aliases_to_ordered_dict(_d):
         arr.append((original, original))
         if isinstance(aliases, bool):
             aliases = [original]
-        elif isinstance(aliases, str_types):
+        elif isinstance(aliases, str):
             aliases = [aliases]
         for alias in aliases:
             arr.append((alias, original,))

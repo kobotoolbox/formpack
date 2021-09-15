@@ -10,7 +10,6 @@ from copy import deepcopy
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES, selects
-from .string import str_types
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
 
@@ -46,7 +45,7 @@ def _expand_tags(row, tag_cols_and_seps=None):
     tags = []
     main_tags = row.pop('tags', None)
     if main_tags:
-        if isinstance(main_tags, str_types):
+        if isinstance(main_tags, str):
             tags = tags + main_tags.split()
         elif isinstance(main_tags, list):
             # carry over any tags listed here
@@ -54,7 +53,7 @@ def _expand_tags(row, tag_cols_and_seps=None):
 
     for tag_col in tag_cols_and_seps.keys():
         tags_str = row.pop(tag_col, None)
-        if tags_str and isinstance(tags_str, str_types):
+        if tags_str and isinstance(tags_str, str):
             for tag in re.findall(r'([\#\+][a-zA-Z][a-zA-Z0-9_]*)', tags_str):
                 tags.append('hxl:%s' % tag)
     if len(tags) > 0:
@@ -89,7 +88,7 @@ def expand_content_in_place(content):
             _type = row['type']
             if _type in META_TYPES:
                 _metas.append(row)
-            if isinstance(_type, str_types):
+            if isinstance(_type, str):
                 row.update(_expand_type_to_dict(row['type']))
             elif isinstance(_type, dict):
                 # legacy {'select_one': 'xyz'} format might
@@ -103,7 +102,7 @@ def expand_content_in_place(content):
         _expand_tags(row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
 
         for key in EXPANDABLE_FIELD_TYPES:
-            if key in row and isinstance(row[key], str_types):
+            if key in row and isinstance(row[key], str):
                 row[key] = _expand_xpath_to_list(row[key])
         for key, vals in iter(specials.items()):
             if key in row:

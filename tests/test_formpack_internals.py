@@ -1,10 +1,11 @@
-# coding: utf-8import json
+# coding: utf-8
+import json
 from copy import deepcopy
 
 import pytest
+import pyxform
 from nose.tools import raises
 
-import pyxform
 from formpack import FormPack, constants
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture

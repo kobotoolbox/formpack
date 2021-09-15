@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import reduce
 
-from .string import unicode, str_types
-
-
 SPACE_PADDING = {
     '+': ' + ',
     '-': ' - ',
@@ -86,7 +83,7 @@ def array_to_flattened_array(outer_arr, _fns):
             # recurse
             for item in arr:
                 arr2x(item)
-        elif isinstance(arr, str_types) or isinstance(arr, int) or \
+        elif isinstance(arr, str) or isinstance(arr, int) or \
                 isinstance(arr, float):
             # parameter is string or number and can be added directly
             out.append(arr)
@@ -126,7 +123,7 @@ def flattened_array_to_padded_string(flattened):
         if p in SPACE_PADDING:
             out_string += SPACE_PADDING[p]
         else:
-            out_string += unicode(p)
+            out_string += str(p)
     return out_string
 
 

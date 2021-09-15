@@ -1,4 +1,6 @@
 # coding: utf-8
+from collections import OrderedDict
+
 from pyxform import aliases as pyxform_aliases
 
 from .constants import UNTRANSLATED
@@ -8,7 +10,6 @@ from .schema import (FormField, FormGroup, FormSection, FormChoice)
 from .submission import FormSubmission
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .utils.flatten_content import flatten_content
-from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 from .validators import validate_content
 

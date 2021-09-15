@@ -1,9 +1,7 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import json
 import unittest
+from collections import OrderedDict
 from dateutil import parser
 from io import BytesIO, TextIOWrapper
 from textwrap import dedent
@@ -22,7 +20,6 @@ from formpack.schema.fields import (
     TagsCopyField,
     NotesCopyField,
 )
-from formpack.utils.future import OrderedDict
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture, open_fixture_file
 

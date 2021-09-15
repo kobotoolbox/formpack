@@ -2,7 +2,6 @@
 from collections import OrderedDict
 
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
-from ..utils import str_types
 
 
 class FormDataDef:
@@ -98,7 +97,7 @@ class FormChoice(FormDataDef):
                 _label = choice_definition['label']
             else:
                 _label = choice_definition.get('image')
-            if isinstance(_label, str_types):
+            if isinstance(_label, str):
                 _label = [_label]
             elif _label is None:
                 _label = []

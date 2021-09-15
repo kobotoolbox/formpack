@@ -9,15 +9,6 @@ from ..constants import (
     EXCEL_SHEET_NAME_SIZE_LIMIT, EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
 )
 
-try:
-    unicode = unicode
-    basestring = basestring
-except NameError:  # Python 3
-    basestring = str
-    unicode = str
-
-str_types = (basestring,)
-
 
 def randstr(n):
     return ''.join(random.choice(string.ascii_lowercase + string.digits)

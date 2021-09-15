@@ -21,7 +21,7 @@ from ..utils.geojson import field_and_response_to_geometry
 from ..utils.iterator import get_first_occurrence
 from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES
 from ..utils.spss import spss_labels_from_variables_dict
-from ..utils.string import unicode, unique_name_for_xls
+from ..utils.string import unique_name_for_xls
 
 
 class Export:
@@ -540,7 +540,7 @@ class Export:
             return value.replace(quote, quote * 2)
 
         def format_line(line, sep, quote):
-            line = [escape_quote(unicode(x), quote) for x in line]
+            line = [escape_quote(str(x), quote) for x in line]
             return quote + (quote + sep + quote).join(line) + quote
 
         section, labels = sections[0]
@@ -841,7 +841,7 @@ class Export:
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
-                        row = [unicode(x) for x in row]
+                        row = [str(x) for x in row]
                         yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
 
         yield "</tbody>"

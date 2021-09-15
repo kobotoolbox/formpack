@@ -1,13 +1,14 @@
 # coding: utf-8
 import json
 import re
+from collections import OrderedDict
+from io import StringIO
 
 from lxml import etree
 from pyquery import PyQuery
 
 from .b64_attachment import B64Attachment
 from .utils import parse_xmljson_to_data
-from .utils.future import iteritems, StringIO, OrderedDict
 
 
 class FormSubmission:
