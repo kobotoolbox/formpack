@@ -7,7 +7,7 @@ from ..submission import FormSubmission
 from ..utils.ordered_collection import OrderedCounter
 
 
-class AutoReportStats(object):
+class AutoReportStats:
 
     def __init__(self, autoreport, stats, submissions_count,
                  submission_counts_by_version):
@@ -20,7 +20,7 @@ class AutoReportStats(object):
         return self.stats
 
 
-class AutoReport(object):
+class AutoReport:
 
     def __init__(self, formpack, form_versions):
         self.formpack = formpack

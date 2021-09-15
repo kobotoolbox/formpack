@@ -117,7 +117,7 @@ def orderable_with_none(k):
     >>> [None, '', 'En']
 
     """
-    class OrderableNone(object):
+    class OrderableNone:
         @total_ordering
         class __OrderableNone:
             def __init__(self):

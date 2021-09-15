@@ -4,7 +4,7 @@ from ..utils import str_types
 from ..utils.future import OrderedDict
 
 
-class FormDataDef(object):
+class FormDataDef:
     """ Any object composing a form. It's only used with a subclass. """
 
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):

@@ -13,7 +13,7 @@ from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
 
 
-class FormPack(object):
+class FormPack:
 
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',

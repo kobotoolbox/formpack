@@ -16,7 +16,7 @@ from .validators import validate_content
 YES_NO = pyxform_aliases.yes_no
 
 
-class LabelStruct(object):
+class LabelStruct:
     """
     LabelStruct stores labels + translations assigned to `field.labels`
     """
@@ -36,7 +36,7 @@ class LabelStruct(object):
         return self._vals.get(key, default)
 
 
-class FormVersion(object):
+class FormVersion:
     @classmethod
     def verify_schema_structure(cls, struct):
         if 'content' not in struct:

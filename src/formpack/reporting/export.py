@@ -25,7 +25,7 @@ from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
 
 
-class Export(object):
+class Export:
 
     def __init__(
         self,
