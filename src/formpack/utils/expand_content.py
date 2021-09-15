@@ -3,11 +3,11 @@
 # This module might be more appropriately named "standardize_content"
 # and pass content through to formpack.utils.replace_aliases during
 # the standardization step: expand_content_in_place(...)
-from copy import deepcopy
 import re
+from collections import OrderedDict
+from copy import deepcopy
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
-from .future import iteritems, OrderedDict
 from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES, selects
 from .string import str_types

@@ -1,5 +1,6 @@
 # coding: utf-8
 import re
+from collections import OrderedDict
 from copy import deepcopy
 
 from .flatten_content import (
@@ -8,7 +9,6 @@ from .flatten_content import (
     _flatten_tags,
     translated_col_list,
 )
-from .future import OrderedDict
 from ..constants import TAG_COLUMNS_AND_SEPARATORS
 
 # xlsform specific ordering preferences

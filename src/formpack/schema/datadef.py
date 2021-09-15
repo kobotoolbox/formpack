@@ -1,7 +1,8 @@
 # coding: utf-8
+from collections import OrderedDict
+
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
 from ..utils import str_types
-from ..utils.future import OrderedDict
 
 
 class FormDataDef:

@@ -1,13 +1,12 @@
 # coding: utf-8
-from collections import defaultdict
-from copy import deepcopy
 import json
 import re
+from collections import defaultdict, OrderedDict
+from copy import deepcopy
 
 from pyxform import aliases as pyxform_aliases
 from pyxform.question_type_dictionary import QUESTION_TYPE_DICT
 
-from .future import iteritems, OrderedDict
 from .string import str_types
 from ..constants import KOBO_LOCK_ALL
 

@@ -2,7 +2,7 @@
 import json
 import re
 import zipfile
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from inspect import isclass
 from typing import Iterator, Generator, Optional
 
@@ -17,7 +17,6 @@ from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
-from ..utils.future import iteritems, itervalues, OrderedDict
 from ..utils.geojson import field_and_response_to_geometry
 from ..utils.iterator import get_first_occurrence
 from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES

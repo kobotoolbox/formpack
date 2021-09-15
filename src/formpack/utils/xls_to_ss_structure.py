@@ -2,11 +2,12 @@
 import datetime
 import re
 import xlrd
+from collections import OrderedDict
 
-from .future import OrderedDict, unichr
+
 from .string import unicode, str_types
-
 from .replace_aliases import kobo_specific_sub
+
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
@@ -48,7 +49,7 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
             # ensure unicode and replace nbsp spaces with normal ones
             # to avoid this issue:
             # https://github.com/modilabs/pyxform/issues/83
-            return unicode(value).replace(unichr(160), ' ')
+            return unicode(value).replace(chr(160), ' ')
 
     def _escape_newline_chars(cell):
         return re.sub(r'\r', '\\\\r', re.sub(r'\n', '\\\\n', cell))

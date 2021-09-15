@@ -5,7 +5,6 @@ from copy import deepcopy
 from functools import reduce
 
 from .array_to_xpath import array_to_xpath
-from .future import range
 from .string import str_types
 from .replace_aliases import SELECT_TYPES
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,

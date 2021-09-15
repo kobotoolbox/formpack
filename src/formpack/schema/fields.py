@@ -1,5 +1,5 @@
 # coding: utf-8
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from dateutil import parser
 from functools import partial
 from operator import itemgetter
@@ -9,7 +9,6 @@ import statistics
 from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
 from ..utils import singlemode
-from ..utils.future import range, OrderedDict
 from ..utils.ordered_collection import OrderedDefaultdict
 
 
