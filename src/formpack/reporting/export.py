@@ -467,7 +467,7 @@ class Export:
                         child_section,
                         attachments,
                     )
-                    for key, value in iteritems(chunk):
+                    for key, value in iter(chunk.items()):
                         if key in chunks:
                             chunks[key].extend(value)
                         else:

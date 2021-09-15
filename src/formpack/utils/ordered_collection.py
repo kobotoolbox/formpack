@@ -43,7 +43,7 @@ class OrderedCounter(Counter, OrderedDict):
         # - second element (descendant order)
         # - first element (ascendant order)
         # because elements of `Counter` are tuples (<item>, <count)
-        most_common_ = sorted(iteritems(self),
+        most_common_ = sorted(iter(self.items()),
                               key=lambda x: (-x[1], orderable_with_none(x[0])))
         if n is None:
             return most_common_
@@ -74,8 +74,8 @@ class OrderedDefaultdict(OrderedDict):
 
     def __reduce__(self):  # optional, for pickle support
         args = (self.default_factory,) if self.default_factory else tuple()
-        return self.__class__, args, None, None, iteritems(self)
+        return self.__class__, args, None, None, iter(self.items())
 
     def __repr__(self):  # optional
         return '%s(%r, %r)' % (self.__class__.__name__, self.default_factory,
-                               list(iteritems(self)))
+                               list(iter(self.items())))

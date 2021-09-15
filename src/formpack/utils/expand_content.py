@@ -64,7 +64,7 @@ def _expand_tags(row, tag_cols_and_seps=None):
 
 def _get_translations_from_special_cols(special_cols, translations):
     translated_cols = []
-    for colname, parsedvals in iteritems(special_cols):
+    for colname, parsedvals in iter(special_cols.items()):
         if 'translation' in parsedvals:
             translated_cols.append(parsedvals['column'])
             if parsedvals['translation'] not in translations:
@@ -105,7 +105,7 @@ def expand_content_in_place(content):
         for key in EXPANDABLE_FIELD_TYPES:
             if key in row and isinstance(row[key], str_types):
                 row[key] = _expand_xpath_to_list(row[key])
-        for key, vals in iteritems(specials):
+        for key, vals in iter(specials.items()):
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
 
@@ -122,7 +122,7 @@ def expand_content_in_place(content):
         survey_content.insert(0, row)
 
     for row in content.get('choices', []):
-        for key, vals in iteritems(specials):
+        for key, vals in iter(specials.items()):
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
 

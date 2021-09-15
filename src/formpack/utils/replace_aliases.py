@@ -276,7 +276,7 @@ def replace_aliases_in_place(content, allowed_types=None):
                 if row[col] in pyxform_aliases.yes_no:
                     row[col] = pyxform_aliases.yes_no[row[col]]
 
-        for key, val in iteritems(survey_header_columns):
+        for key, val in iter(survey_header_columns.items()):
             if key in row and key != val:
                 row[val] = row[key]
                 del row[key]

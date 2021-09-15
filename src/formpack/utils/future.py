@@ -1,24 +1,9 @@
 # coding: utf-8
-try:
-    from cyordereddict import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
+from io import StringIO
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
-
-try:
-    range = xrange
-except NameError:
-    range = range
-
-
-try:
-    unichr = unichr
-except NameError:
-    unichr = chr
+#    range = range
+#    unichr = chr
 
 import sys
 
