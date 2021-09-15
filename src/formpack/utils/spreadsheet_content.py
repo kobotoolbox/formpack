@@ -1,15 +1,15 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import re
 from copy import deepcopy
 
-from ..constants import TAG_COLUMNS_AND_SEPARATORS
-from .flatten_content import (_flatten_translated_fields, _flatten_survey_row,
-                              _flatten_tags,
-                              translated_col_list)
+from .flatten_content import (
+    _flatten_translated_fields,
+    _flatten_survey_row,
+    _flatten_tags,
+    translated_col_list,
+)
 from .future import OrderedDict
+from ..constants import TAG_COLUMNS_AND_SEPARATORS
 
 # xlsform specific ordering preferences
 

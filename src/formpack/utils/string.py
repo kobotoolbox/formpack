@@ -1,13 +1,9 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import random
 import re
 import string
 import unicodedata
 from functools import total_ordering
-
 
 from ..constants import (
     EXCEL_SHEET_NAME_SIZE_LIMIT, EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS

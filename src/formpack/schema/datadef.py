@@ -1,7 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
-
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
 from ..utils import str_types
 from ..utils.future import OrderedDict

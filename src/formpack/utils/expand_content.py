@@ -3,8 +3,6 @@
 # This module might be more appropriately named "standardize_content"
 # and pass content through to formpack.utils.replace_aliases during
 # the standardization step: expand_content_in_place(...)
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
 from copy import deepcopy
 import re
 

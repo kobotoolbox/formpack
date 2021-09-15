@@ -1,6 +1,6 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
+from pyxform import aliases as pyxform_aliases
+
 from .constants import UNTRANSLATED
 from .errors import SchemaError
 from .errors import TranslationError
@@ -11,9 +11,10 @@ from .utils.flatten_content import flatten_content
 from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 from .validators import validate_content
-from pyxform import aliases as pyxform_aliases
+
 
 YES_NO = pyxform_aliases.yes_no
+
 
 class LabelStruct(object):
     """

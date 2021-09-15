@@ -1,8 +1,4 @@
-# coding: utf-8
-
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-import json
+# coding: utf-8import json
 from copy import deepcopy
 
 import pytest

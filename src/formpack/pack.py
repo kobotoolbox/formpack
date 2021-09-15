@@ -1,11 +1,9 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import difflib
 import json
 from copy import deepcopy
 
+from formpack.schema.fields import CopyField
 from .version import FormVersion
 from .utils import str_types
 from .reporting import Export, AutoReport
@@ -13,7 +11,6 @@ from .utils.expand_content import expand_content
 from .utils.future import OrderedDict
 from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
-from formpack.schema.fields import CopyField
 
 
 class FormPack(object):
