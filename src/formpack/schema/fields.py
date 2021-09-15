@@ -197,11 +197,12 @@ class FormField(FormDataDef):
             'start-geopoint': FormGPSField,
 
             # media
-            'video': TextField,
-            'image': TextField,
-            'audio': TextField,
-            'file': TextField,
-            'background-audio': TextField,
+            'video': MediaField,
+            'image': MediaField,
+            'audio': MediaField,
+            'file': MediaField,
+            'background-audio': MediaField,
+            'audit': MediaField,
 
             # numeric
             'integer': NumField,
@@ -416,6 +417,28 @@ class TextField(ExtendedFormField):
         stats.update({'values': values[:limit]})
 
         return stats
+
+
+class MediaField(TextField):
+
+    def get_labels(self, *args, **kwargs):
+        label = self._get_label(*args, **kwargs)
+        return [label, f'{label}_URL']
+
+    def get_value_names(self, *args, **kwargs):
+        return [self.name, f'{self.name}_URL']
+
+    def format(self, val, attachment, *args, **kwargs):
+        if val is None:
+            val = ''
+
+        download_url = (
+            attachment[0].get('download_url', '') if attachment else ''
+        )
+        return {
+            self.name: val,
+            f'{self.name}_URL': download_url,
+        }
 
 
 class DateField(ExtendedFormField):
@@ -859,6 +882,8 @@ class FormChoiceField(ExtendedFormField):
         lang=UNSPECIFIED_TRANSLATION,
         multiple_select="both",
         xls_types_as_text=True,
+        *args,
+        **kwargs,
     ):
         if val is None:
             val = ''
@@ -990,6 +1015,8 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         hierarchy_in_labels=False,
         multiple_select="both",
         xls_types_as_text=True,
+        *args,
+        **kwargs,
     ):
         """
         Same than other format(), with an option for multiple_select layout

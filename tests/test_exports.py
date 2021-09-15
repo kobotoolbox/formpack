@@ -454,6 +454,53 @@ class TestFormPackExport(unittest.TestCase):
         )
         self.assertEqual(export, expected_dict)
 
+    def test_media_types(self):
+        title, schemas, submissions = build_fixture(
+            'media_types'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Media of your favourite Roman emperors',
+                    {
+                        'fields': [
+                            'audit',
+                            'audit_URL',
+                            'fav_emperor',
+                            'image_of_emperor',
+                            'image_of_emperor_URL',
+                            'another_image_of_emperor',
+                            'another_image_of_emperor_URL',
+                        ],
+                        'data': [
+                            [
+                                'audit.csv',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'julius',
+                                'julius.jpg',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg',
+                                'another-julius.jpg',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg',
+                            ],
+                            [
+                                'audit.csv',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'augustus',
+                                'augustus.jpg',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg',
+                                '',
+                                '',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
+        assert export == expected_dict
+
     def test_select_one_from_previous_answers(self):
         title, schemas, submissions = build_fixture(
             'select_one_from_previous_answers'
