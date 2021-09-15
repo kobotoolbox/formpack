@@ -1,4 +1,5 @@
 # coding: utf-8
+import csv
 import json
 import unittest
 from collections import OrderedDict
@@ -8,7 +9,6 @@ from textwrap import dedent
 from zipfile import ZipFile
 
 import xlrd
-from backports import csv
 from path import TempDir
 
 from formpack import FormPack
