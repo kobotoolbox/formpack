@@ -346,10 +346,10 @@ class Export(object):
         _fields = tuple(current_section.fields.values())
 
         def _get_attachment(val, field, attachments):
-            '''
+            """
             Filter attachments for filenames that match the submission field's
             value
-            '''
+            """
             # Not all submissions will have attachments and we only want to
             # consider media types
             if (
