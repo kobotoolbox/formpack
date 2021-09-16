@@ -456,7 +456,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_media_types(self):
         """
-        Please uncomment the `…_URL` headers and corresponding data fields
+        Please uncomment the `…_URL` fields and corresponding data values
         after re-enabling `formpack.schema.fields.MediaField`
         """
         title, schemas, submissions = build_fixture(
