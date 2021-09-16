@@ -420,6 +420,20 @@ class TextField(ExtendedFormField):
 
 
 class MediaField(TextField):
+    """
+    Stub to disable extra URL columns for now; see FutureMediaField
+    """
+    pass
+
+
+class FutureMediaField(TextField):
+    """
+    TODO: Remove the empty MediaField class above and rename this
+    FutureMediaField class to MediaField once we have a way to make the extra
+    columns optional.
+    Once that's done please uncomment/modify lines in
+    `tests.test_exports.TestFormPackExport.test_media_types()` as well.
+    """
 
     def get_labels(self, *args, **kwargs):
         label = self._get_label(*args, **kwargs)

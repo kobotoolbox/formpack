@@ -455,6 +455,10 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export, expected_dict)
 
     def test_media_types(self):
+        """
+        Please uncomment the `…_URL` headers and corresponding data fields
+        after re-enabling `formpack.schema.fields.MediaField`
+        """
         title, schemas, submissions = build_fixture(
             'media_types'
         )
@@ -468,31 +472,31 @@ class TestFormPackExport(unittest.TestCase):
                     {
                         'fields': [
                             'audit',
-                            'audit_URL',
+                            # 'audit_URL',
                             'fav_emperor',
                             'image_of_emperor',
-                            'image_of_emperor_URL',
+                            # 'image_of_emperor_URL',
                             'another_image_of_emperor',
-                            'another_image_of_emperor_URL',
+                            # 'another_image_of_emperor_URL',
                         ],
                         'data': [
                             [
                                 'audit.csv',
-                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
                                 'julius',
                                 'julius.jpg',
-                                'https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg',
                                 'another-julius.jpg',
-                                'https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg',
                             ],
                             [
                                 'audit.csv',
-                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
                                 'augustus',
                                 'augustus.jpg',
-                                'https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg',
                                 '',
-                                '',
+                                # '',
                             ],
                         ],
                     },
