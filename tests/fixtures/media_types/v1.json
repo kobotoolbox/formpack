@@ -49,7 +49,7 @@
     {
       "fav_emperor": "julius",
       "image_of_emperor": "julius.jpg",
-      "another_image_of_emperor": "another-julius.jpg",
+      "another_image_of_emperor": "another-julius 1).jpg",
       "meta/audit": "audit.csv",
       "meta/versionID": "romev1",
       "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b5",
@@ -59,8 +59,8 @@
             "filename": "/path/to/julius.jpg"
           },
           {
-            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg",
-            "filename": "/path/to/another-julius.jpg"
+            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/another-julius_1.jpg",
+            "filename": "/path/to/another-julius_1.jpg"
           },
           {
             "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/audit.csv",
