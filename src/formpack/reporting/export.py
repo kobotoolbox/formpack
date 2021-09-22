@@ -26,6 +26,7 @@ from ..utils.iterator import get_first_occurrence
 from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unicode, unique_name_for_xls
+from ..utils.text import get_valid_filename
 
 
 class Export(object):
@@ -45,6 +46,7 @@ class Export(object):
         tag_cols_for_header=None,
         filter_fields=(),
         xls_types_as_text=True,
+        include_media_url=False,
     ):
         """
         :param formpack: FormPack
@@ -77,6 +79,7 @@ class Export(object):
         self.version_id_keys = version_id_keys
         self.filter_fields = filter_fields
         self.xls_types_as_text = xls_types_as_text
+        self.include_media_url = include_media_url
         self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -238,9 +241,13 @@ class Export(object):
         for field in all_fields:
             section_fields.setdefault(field.section.name, []).append(field)
             section_labels.setdefault(field.section.name, []).append(
-                field.get_labels(lang, group_sep,
-                                 hierarchy_in_labels,
-                                 self.multiple_select)
+                field.get_labels(
+                    lang=lang,
+                    group_sep=group_sep,
+                    hierarchy_in_labels=hierarchy_in_labels,
+                    multiple_select=self.multiple_select,
+                    include_media_url=self.include_media_url,
+                )
             )
             all_sections[field.section.name] = field.section
 
@@ -268,7 +275,8 @@ class Export(object):
             tags = []
             for field in fields:
                 value_names = field.get_value_names(
-                    multiple_select=self.multiple_select
+                    multiple_select=self.multiple_select,
+                    include_media_url=self.include_media_url,
                 )
                 name_lists.append(value_names)
 
@@ -358,9 +366,8 @@ class Export(object):
                 or val is None
             ):
                 return []
-            # Spaces in the filename are replaced with underscores in storage,
-            # so we need to do the same
-            _val = val.replace(' ', '_')
+
+            _val = get_valid_filename(val)
             return [
                 f
                 for f in attachments
@@ -424,6 +431,7 @@ class Export(object):
                         multiple_select=self.multiple_select,
                         xls_types_as_text=self.xls_types_as_text,
                         attachment=attachment,
+                        include_media_url=self.include_media_url
                     )
 
                     # save fields value if they match parent mapping fields.
