@@ -707,22 +707,7 @@ class Export(object):
                         if label in all_geo_field_names or not row_value:
                             continue
 
-                        # Grab the translated label for choice questions if it's
-                        # available.
-                        if hasattr(field, 'choice'):
-                            value_or_none = field.choice.options[row_value][
-                                'labels'
-                            ].get(self.lang)
-                            if value_or_none is None:
-                                value = list(
-                                    field.choice.options[row_value][
-                                        'labels'
-                                    ].values()
-                                )[0]
-                        else:
-                            value = row_value
-
-                        feature_properties.update({label: value})
+                        feature_properties.update({label: row_value})
 
                     feature = {
                         "type": "Feature",
