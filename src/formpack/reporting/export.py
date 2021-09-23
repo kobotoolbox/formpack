@@ -655,7 +655,11 @@ class Export(object):
             all_geo_fields = [
                 f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
             ]
-            all_geo_field_names = [f.name for f in all_geo_fields]
+            all_geo_field_names = [f.name for f in all_geo_fields
+
+            all_geo_field_labels = []
+            for field in all_geo_fields:
+                all_geo_field_labels += field.get_labels(lang=self.lang)
 
             # Iterate through all geo questions and format only those that have
             # been answered
@@ -704,7 +708,11 @@ class Export(object):
                         # Skip all geo fields, including the current one, as
                         # it's unnecessary to repeat in the Feature's
                         # properties. Also skip over fields that are blank
-                        if label in all_geo_field_names or not row_value:
+                        if (
+                            label in all_geo_field_names
+                            or label in all_geo_field_labels
+                            or not row_value
+                        ):
                             continue
 
                         feature_properties.update({label: row_value})

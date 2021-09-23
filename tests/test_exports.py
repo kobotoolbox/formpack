@@ -2409,6 +2409,68 @@ class TestFormPackExport(unittest.TestCase):
             'Keurig'
         ])
 
+    def test_geojson_with_select_xml_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {'versions': 'v1', 'lang': '_xml'}
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(submissions, geo_question_name='geo_location')
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'current_location': 'inside',
+                    },
+                },
+            ],
+        }
+
+    def test_geojson_with_select_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {'versions': 'v1', 'lang': UNTRANSLATED}
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(submissions, geo_question_name='geo_location')
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'Where are you?': 'Inside',
+                    },
+                },
+            ],
+        }
+
     def test_geojson_point(self):
         title, schemas, submissions = build_fixture('all_geo_types')
         fp = FormPack(schemas, title)
@@ -2457,7 +2519,6 @@ class TestFormPackExport(unittest.TestCase):
                 },
             ],
         }
-
 
     def test_geojson_trace(self):
         title, schemas, submissions = build_fixture('all_geo_types')

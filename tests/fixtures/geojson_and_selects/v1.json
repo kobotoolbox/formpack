@@ -1,0 +1,39 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+      {
+        "type": "select_one locations",
+        "name": "current_location",
+        "label": ["Where are you?"]
+      },
+      {
+        "type": "geopoint",
+        "name": "geo_location",
+        "label": ["Point out where you are"]
+      }
+    ],
+    "choices": [
+      {
+        "list_name": "locations",
+        "name": "outside",
+        "label": ["Outside"]
+      },
+      {
+        "list_name": "locations",
+        "name": "inside",
+        "label": ["Inside"]
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "current_location": "inside",
+      "geo_location": "39.306938 -76.60869 11 22",
+      "_geolocation": [
+        39.306938,
+        -76.60869
+      ]
+    }
+  ]
+}
