@@ -655,7 +655,7 @@ class Export(object):
             all_geo_fields = [
                 f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
             ]
-            all_geo_field_names = [f.name for f in all_geo_fields
+            all_geo_field_names = [f.name for f in all_geo_fields]
 
             all_geo_field_labels = []
             for field in all_geo_fields:
