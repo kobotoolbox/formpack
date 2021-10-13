@@ -5,35 +5,60 @@
       {
         "type": "select_one emperors or_other",
         "name": "fav_emperor",
-        "label": "Who is your favourite emperor?"
+        "label": [
+            "Who is your favourite emperor?",
+            "Kiu estas via plej ŝatata imperiestro?"
+        ]
       },
       {
         "type": "select_multiple emperors or_other",
         "name": "fav_emperors",
-        "label": "Who are your favourite emperors?"
+        "label": [
+            "Who are your favourite emperors?",
+            "Kiuj estas viaj plej ŝatataj imperiestroj?"
+        ]
       }
     ],
     "choices": [
       {
         "list_name": "emperors",
         "name": "julius",
-        "label": "Julius Caesar"
+        "label": [
+            "Julius Caesar",
+            "Julius Caesar"
+        ]
       },
       {
         "list_name": "emperors",
         "name": "augustus",
-        "label": "Augustus"
+        "label": [
+            "Augustus",
+            "Augustus"
+        ]
       },
       {
         "list_name": "emperors",
         "name": "tiberius",
-        "label": "Tiberius"
+        "label": [
+            "Tiberius",
+            "Tiberius"
+        ]
       },
       {
         "list_name": "emperors",
         "name": "caligula",
-        "label": "Caligula"
+        "label": [
+            "Caligula",
+            "Caligula"
+        ]
       }
+    ],
+    "translated": [
+        "label"
+    ],
+    "translations": [
+        "English (en)",
+        "Esperanto (eo)"
     ]
   },
   "submissions": [

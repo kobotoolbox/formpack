@@ -212,8 +212,7 @@ class FormVersion(object):
     # def __repr__(self):
     #    return '<FormVersion %s>' % self._stats()
 
-    @staticmethod
-    def _append_pseudo_questions(survey):
+    def _append_pseudo_questions(self, survey):
         _survey = []
         for item in survey:
             _survey.append(item)
@@ -222,7 +221,7 @@ class FormVersion(object):
                     {
                         'type': 'text',
                         'name': f'{item["name"]}_other',
-                        'label': [None],
+                        'label': [None] * len(self.translations),
                     }
                 )
         return _survey
