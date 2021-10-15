@@ -1,6 +1,8 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
+from collections import OrderedDict
+
+from pyxform import aliases as pyxform_aliases
+
 from .constants import UNTRANSLATED
 from .errors import SchemaError
 from .errors import TranslationError
@@ -8,14 +10,14 @@ from .schema import (FormField, FormGroup, FormSection, FormChoice)
 from .submission import FormSubmission
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .utils.flatten_content import flatten_content
-from .utils.future import OrderedDict
 from .utils.xform_tools import formversion_pyxform
 from .validators import validate_content
-from pyxform import aliases as pyxform_aliases
+
 
 YES_NO = pyxform_aliases.yes_no
 
-class LabelStruct(object):
+
+class LabelStruct:
     """
     LabelStruct stores labels + translations assigned to `field.labels`
     """
@@ -35,7 +37,7 @@ class LabelStruct(object):
         return self._vals.get(key, default)
 
 
-class FormVersion(object):
+class FormVersion:
     @classmethod
     def verify_schema_structure(cls, struct):
         if 'content' not in struct:

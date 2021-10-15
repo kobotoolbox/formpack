@@ -1,7 +1,4 @@
 # coding: utf-8
-from __future__ import (division, print_function, absolute_import,
-                        unicode_literals)
-
 import logging
 from collections import defaultdict
 
@@ -10,7 +7,7 @@ from ..submission import FormSubmission
 from ..utils.ordered_collection import OrderedCounter
 
 
-class AutoReportStats(object):
+class AutoReportStats:
 
     def __init__(self, autoreport, stats, submissions_count,
                  submission_counts_by_version):
@@ -23,7 +20,7 @@ class AutoReportStats(object):
         return self.stats
 
 
-class AutoReport(object):
+class AutoReport:
 
     def __init__(self, formpack, form_versions):
         self.formpack = formpack
@@ -34,16 +31,21 @@ class AutoReport(object):
         Get the version ID from the provided submission, or `None` if not found.
 
         :param dict submission: An individual data submission.
-        :rtype: `formpack.utils.string.str_types` or NoneType
+        :rtype: str or NoneType
         """
-        version_id_keys = set(self.formpack.version_id_keys()).\
-            intersection(set(submission.keys()))
+        version_id_keys = set(self.formpack.version_id_keys()).intersection(
+            set(submission.keys())
+        )
         if len(version_id_keys) == 0:
             return None
         elif len(version_id_keys) > 1:
-            possible_versions_dict = {v_id_ky: submission[v_id_ky] for v_id_ky in version_id_keys}
-            raise ValueError('Submission version ambiguous. Multiple possible version ID keys: {}.'
-                             .format(possible_versions_dict))
+            possible_versions_dict = {
+                v_id_ky: submission[v_id_ky] for v_id_ky in version_id_keys
+            }
+            raise ValueError(
+                f'Submission version ambiguous. '
+                f'Multiple possible version ID keys: {possible_versions_dict}'
+            )
         version_id_key = version_id_keys.pop()
 
         version_id = submission.get(version_id_key)

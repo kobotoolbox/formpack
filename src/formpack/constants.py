@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
 
 # In the core formpack code, the default `lang` parameter conflicted
 # with the desired representation of the JSON form, where "null" would

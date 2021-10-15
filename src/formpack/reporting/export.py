@@ -1,11 +1,8 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
-
 import json
 import re
 import zipfile
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from inspect import isclass
 from typing import Iterator, Generator, Optional
 
@@ -20,15 +17,14 @@ from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
-from ..utils.future import iteritems, itervalues, OrderedDict
 from ..utils.geojson import field_and_response_to_geometry
 from ..utils.iterator import get_first_occurrence
 from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES
 from ..utils.spss import spss_labels_from_variables_dict
-from ..utils.string import unicode, unique_name_for_xls
+from ..utils.string import unique_name_for_xls
 
 
-class Export(object):
+class Export:
 
     def __init__(
         self,
@@ -86,8 +82,8 @@ class Export(object):
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            for version in itervalues(form_versions):
-                first_section = next(itervalues(version.sections))
+            for version in iter(form_versions.values()):
+                first_section = next(iter(version.sections.values()))
                 for copy_field in copy_fields:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
@@ -470,7 +466,7 @@ class Export(object):
                         child_section,
                         attachments,
                     )
-                    for key, value in iteritems(chunk):
+                    for key, value in iter(chunk.items()):
                         if key in chunks:
                             chunks[key].extend(value)
                         else:
@@ -544,7 +540,7 @@ class Export(object):
             return value.replace(quote, quote * 2)
 
         def format_line(line, sep, quote):
-            line = [escape_quote(unicode(x), quote) for x in line]
+            line = [escape_quote(str(x), quote) for x in line]
             return quote + (quote + sep + quote).join(line) + quote
 
         section, labels = sections[0]
@@ -845,7 +841,7 @@ class Export(object):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
-                        row = [unicode(x) for x in row]
+                        row = [str(x) for x in row]
                         yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
 
         yield "</tbody>"
