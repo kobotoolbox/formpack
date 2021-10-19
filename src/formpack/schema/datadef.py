@@ -1,13 +1,10 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
+from collections import OrderedDict
 
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
-from ..utils import str_types
-from ..utils.future import OrderedDict
 
 
-class FormDataDef(object):
+class FormDataDef:
     """ Any object composing a form. It's only used with a subclass. """
 
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
@@ -51,7 +48,7 @@ class FormSection(FormDataDef):
         if labels is None:
             labels = {UNTRANSLATED: 'submissions'}
 
-        super(FormSection, self).__init__(name, labels, *args, **kwargs)
+        super().__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
         self.parent = parent
         self.children = list(children)
@@ -76,7 +73,7 @@ class FormSection(FormDataDef):
 
 class FormChoice(FormDataDef):
     def __init__(self, name, *args, **kwargs):
-        super(FormChoice, self).__init__(name, *args, **kwargs)
+        super().__init__(name, *args, **kwargs)
         self.name = name
         self.options = OrderedDict()
 
@@ -100,7 +97,7 @@ class FormChoice(FormDataDef):
                 _label = choice_definition['label']
             else:
                 _label = choice_definition.get('image')
-            if isinstance(_label, str_types):
+            if isinstance(_label, str):
                 _label = [_label]
             elif _label is None:
                 _label = []

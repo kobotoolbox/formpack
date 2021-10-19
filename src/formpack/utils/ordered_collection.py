@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-
-from collections import Counter
+from collections import Counter, OrderedDict
 from collections.abc import Callable
 
-from .future import iteritems, OrderedDict
 from .string import orderable_with_none
 
 
@@ -39,13 +36,13 @@ class OrderedCounter(Counter, OrderedDict):
             list: list of tuples (items, count)
         """
         if ordered is False:
-            return super(OrderedCounter, self).most_common(n)
+            return super().most_common(n)
 
         # We can use `lambda x: (-x[1], x[0])` to sort by:
         # - second element (descendant order)
         # - first element (ascendant order)
         # because elements of `Counter` are tuples (<item>, <count)
-        most_common_ = sorted(iteritems(self),
+        most_common_ = sorted(iter(self.items()),
                               key=lambda x: (-x[1], orderable_with_none(x[0])))
         if n is None:
             return most_common_
@@ -65,7 +62,7 @@ class OrderedDefaultdict(OrderedDict):
         if not (default_factory is None
                 or isinstance(default_factory, Callable)):
             raise TypeError('first argument must be callable or None')
-        super(OrderedDefaultdict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default_factory = default_factory  # called by __missing__()
 
     def __missing__(self, key):
@@ -76,8 +73,8 @@ class OrderedDefaultdict(OrderedDict):
 
     def __reduce__(self):  # optional, for pickle support
         args = (self.default_factory,) if self.default_factory else tuple()
-        return self.__class__, args, None, None, iteritems(self)
+        return self.__class__, args, None, None, iter(self.items())
 
     def __repr__(self):  # optional
         return '%s(%r, %r)' % (self.__class__.__name__, self.default_factory,
-                               list(iteritems(self)))
+                               list(iter(self.items())))

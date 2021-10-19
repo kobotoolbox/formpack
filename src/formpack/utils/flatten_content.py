@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import re
 from collections import defaultdict, OrderedDict
 from copy import deepcopy
 from functools import reduce
 
 from .array_to_xpath import array_to_xpath
-from .future import range
-from .string import str_types
 from .replace_aliases import SELECT_TYPES
 from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
                          TAG_COLUMNS_AND_SEPARATORS)
@@ -101,7 +96,7 @@ def _flatten_tags(row, tag_cols_and_seps=None):
         tag_cols_and_seps = {}
 
     for col in ['tags'] + list(tag_cols_and_seps.keys()):
-        if col in row and isinstance(row[col], str_types):
+        if col in row and isinstance(row[col], str):
             return
 
     tag_list = row.pop('tags', [])
