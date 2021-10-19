@@ -1,16 +1,14 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
+import csv
 import json
 import unittest
+from collections import OrderedDict
 from dateutil import parser
 from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
 
 import xlrd
-from backports import csv
 from path import TempDir
 
 from formpack import FormPack
@@ -22,7 +20,6 @@ from formpack.schema.fields import (
     TagsCopyField,
     NotesCopyField,
 )
-from formpack.utils.future import OrderedDict
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture, open_fixture_file
 
@@ -454,6 +451,57 @@ class TestFormPackExport(unittest.TestCase):
         )
         self.assertEqual(export, expected_dict)
 
+    def test_media_types(self):
+        """
+        Please uncomment the `…_URL` fields and corresponding data values
+        after re-enabling `formpack.schema.fields.MediaField`
+        """
+        title, schemas, submissions = build_fixture(
+            'media_types'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1'}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Media of your favourite Roman emperors',
+                    {
+                        'fields': [
+                            'audit',
+                            # 'audit_URL',
+                            'fav_emperor',
+                            'image_of_emperor',
+                            # 'image_of_emperor_URL',
+                            'another_image_of_emperor',
+                            # 'another_image_of_emperor_URL',
+                        ],
+                        'data': [
+                            [
+                                'audit.csv',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'julius',
+                                'julius.jpg',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg',
+                                'another-julius.jpg',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg',
+                            ],
+                            [
+                                'audit.csv',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'augustus',
+                                'augustus.jpg',
+                                # 'https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg',
+                                '',
+                                # '',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
+        assert export == expected_dict
+
     def test_select_one_from_previous_answers(self):
         title, schemas, submissions = build_fixture(
             'select_one_from_previous_answers'
@@ -516,7 +564,7 @@ class TestFormPackExport(unittest.TestCase):
             'select_one_from_previous_answers'
         )
         fp = FormPack(schemas, title)
-        options = {'versions': 'romev1', 'xls_types': True}
+        options = {'versions': 'romev1', 'xls_types_as_text': False}
         export = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict(
             [
@@ -991,7 +1039,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
         fp = FormPack(schemas, title)
-        options = {'versions': 'bird_nests_v1', 'xls_types': True}
+        options = {'versions': 'bird_nests_v1', 'xls_types_as_text': False}
         export_dict = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict([
             ('Bird nest survey with nested repeatable groups', {
@@ -1682,7 +1730,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_export_with_split_fields_gps_fields_and_multiple_selects_xls_types(self):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
-        options = {'versions': 'rpV4', 'xls_types': True}
+        options = {'versions': 'rpV4', 'xls_types_as_text': False}
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
         expected = {
             'fields': [

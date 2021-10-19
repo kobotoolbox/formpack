@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
 
 # In the core formpack code, the default `lang` parameter conflicted
 # with the desired representation of the JSON form, where "null" would
@@ -65,16 +63,20 @@ EXPORT_SETTING_FLATTEN = 'flatten'
 EXPORT_SETTING_GROUP_SEP = 'group_sep'
 EXPORT_SETTING_HIERARCHY_IN_LABELS = 'hierarchy_in_labels'
 EXPORT_SETTING_LANG = 'lang'
-EXPORT_SETTING_NAME = 'name'
 EXPORT_SETTING_MULTIPLE_SELECT = 'multiple_select'
+EXPORT_SETTING_NAME = 'name'
+EXPORT_SETTING_QUERY = 'query'
 EXPORT_SETTING_SOURCE = 'source'
+EXPORT_SETTING_SUBMISSION_IDS = 'submission_ids'
 EXPORT_SETTING_TYPE = 'type'
-EXPORT_SETTING_XLS_TYPES = 'xls_types'
+EXPORT_SETTING_XLS_TYPES_AS_TEXT = 'xls_types_as_text'
 OPTIONAL_EXPORT_SETTINGS = [
     EXPORT_SETTING_FIELDS,
     EXPORT_SETTING_FLATTEN,
     EXPORT_SETTING_NAME,
-    EXPORT_SETTING_XLS_TYPES,
+    EXPORT_SETTING_QUERY,
+    EXPORT_SETTING_SUBMISSION_IDS,
+    EXPORT_SETTING_XLS_TYPES_AS_TEXT,
 ]
 REQUIRED_EXPORT_SETTINGS = [
     EXPORT_SETTING_FIELDS_FROM_ALL_VERSIONS,

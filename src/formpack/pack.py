@@ -1,23 +1,19 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import difflib
 import json
+from collections import OrderedDict
 from copy import deepcopy
 
+from formpack.schema.fields import CopyField
 from .version import FormVersion
-from .utils import str_types
 from .reporting import Export, AutoReport
 from .utils.expand_content import expand_content
-from .utils.future import OrderedDict
 from .utils.replace_aliases import replace_aliases
 from .constants import UNSPECIFIED_TRANSLATION
 from .constants import UNSPECIFIED_HEADER_LANG
-from formpack.schema.fields import CopyField
 
 
-class FormPack(object):
+class FormPack:
 
     def __init__(self, versions=None, title='Submissions', id_string=None,
                  default_version_id_key='__version__',
@@ -227,7 +223,7 @@ class FormPack(object):
         """
         # Cast data_types if it's not already a list
         if data_types is not None:
-            if isinstance(data_types, str_types):
+            if isinstance(data_types, str):
                 data_types = [data_types]
 
         # tmp2 is a 2 dimensions list of `field`.
@@ -348,7 +344,7 @@ class FormPack(object):
         tag_cols_for_header=None,
         header_lang=UNSPECIFIED_HEADER_LANG,
         filter_fields=(),
-        xls_types=False,
+        xls_types_as_text=True,
     ):
         """
         Create an export for given versions of the form
@@ -369,7 +365,7 @@ class FormPack(object):
             tag_cols_for_header=tag_cols_for_header,
             header_lang=header_lang,
             filter_fields=filter_fields,
-            xls_types=xls_types,
+            xls_types_as_text=xls_types_as_text,
         )
 
     def autoreport(self, versions=-1):
@@ -383,7 +379,7 @@ class FormPack(object):
         if versions is None:
             versions = -1
 
-        if isinstance(versions, str_types + (int,)):
+        if isinstance(versions, (str, int,)):
             versions = [versions]
         versions = [self[key] for key in versions]
 

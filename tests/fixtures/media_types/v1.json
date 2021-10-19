@@ -1,0 +1,90 @@
+{
+  "version": "romev1",
+  "content": {
+    "survey": [
+      {
+        "type": "select_one emperors",
+        "name": "fav_emperor",
+        "label": "Who is your favourite emperor"
+      },
+      {
+        "type": "audit",
+        "name": "audit"
+      },
+      {
+        "type": "image",
+        "name": "image_of_emperor",
+        "label": "Upload an image of your favourite emperor"
+      },
+      {
+        "type": "image",
+        "name": "another_image_of_emperor",
+        "label": "Upload another image of your favourite emperor"
+      }
+    ],
+    "choices": [
+      {
+        "list_name": "emperors",
+        "name": "julius",
+        "label": "Julius Caesar"
+      },
+      {
+        "list_name": "emperors",
+        "name": "augustus",
+        "label": "Augustus"
+      },
+      {
+        "list_name": "emperors",
+        "name": "tiberius",
+        "label": "Tiberius"
+      },
+      {
+        "list_name": "emperors",
+        "name": "caligula",
+        "label": "Caligula"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "fav_emperor": "julius",
+      "image_of_emperor": "julius.jpg",
+      "another_image_of_emperor": "another-julius.jpg",
+      "meta/audit": "audit.csv",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b5",
+      "_attachments": [
+          {
+            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg",
+            "filename": "/path/to/julius.jpg"
+          },
+          {
+            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg",
+            "filename": "/path/to/another-julius.jpg"
+          },
+          {
+            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/audit.csv",
+            "filename": "/path/to/audit.csv"
+          }
+      ]
+    },
+    {
+      "fav_emperor": "augustus",
+      "image_of_emperor": "augustus.jpg",
+      "another_image_of_emperor": "",
+      "meta/audit": "audit.csv",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b6",
+      "_attachments": [
+          {
+            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg",
+            "filename": "/path/to/augustus.jpg"
+          },
+          {
+            "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/audit.csv",
+            "filename": "/path/to/audit.csv"
+          }
+      ]
+    }
+  ]
+}

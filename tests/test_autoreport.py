@@ -1,12 +1,9 @@
 # coding: utf-8
-from __future__ import (division, print_function, unicode_literals)
-
 import json
 import unittest
 
 from formpack import FormPack
 from .fixtures import build_fixture
-from formpack.utils.string import unicode
 
 
 class TestAutoReport(unittest.TestCase):
@@ -77,7 +74,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 4
 
-        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(str(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
             (
@@ -266,7 +263,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 6
 
-        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(str(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
             (
@@ -347,7 +344,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 3
 
-        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(str(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
             (
@@ -425,7 +422,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 6
 
-        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(str(repr(f)), n, d) for f, n, d in stats]
 
         expected = [
             (
@@ -549,7 +546,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == 22
 
-        stats = [(unicode(repr(field)), field_name, stats_dict) for field, field_name, stats_dict in stats]
+        stats = [(str(repr(field)), field_name, stats_dict) for field, field_name, stats_dict in stats]
 
         for stat in stats:
             stats_dict = dict(stat[2])
@@ -591,7 +588,7 @@ class TestAutoReport(unittest.TestCase):
 
         assert stats.submissions_count == len(submissions)
 
-        stats = [(unicode(repr(f)), n, d) for f, n, d in stats]
+        stats = [(str(repr(f)), n, d) for f, n, d in stats]
         expected = [(
             "<NumField name='the_number' type='integer'>", 'the_number',
             {

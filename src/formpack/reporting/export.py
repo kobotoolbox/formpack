@@ -1,10 +1,8 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
-
 import json
+import re
 import zipfile
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from inspect import isclass
 from typing import Iterator, Generator, Optional
 
@@ -20,14 +18,14 @@ from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
-from ..utils.future import iteritems, itervalues, OrderedDict
 from ..utils.geojson import field_and_response_to_geometry
 from ..utils.iterator import get_first_occurrence
+from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES
 from ..utils.spss import spss_labels_from_variables_dict
-from ..utils.string import unicode, unique_name_for_xls
+from ..utils.string import unique_name_for_xls
 
 
-class Export(object):
+class Export:
 
     def __init__(
         self,
@@ -44,7 +42,7 @@ class Export(object):
         tag_cols_for_header=None,
         header_lang=UNSPECIFIED_HEADER_LANG,
         filter_fields=(),
-        xls_types=False,
+        xls_types_as_text=True,
     ):
         """
         :param formpack: FormPack
@@ -65,7 +63,7 @@ class Export(object):
         :param header_lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
             None (`constants.UNTRANSLATED`), if not set, default value equal lang arg.
         :param filter_fields: list
-        :param xls_types: bool
+        :param xls_types_as_text: bool
         """
 
         self.formpack = formpack
@@ -80,7 +78,7 @@ class Export(object):
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
         self.filter_fields = filter_fields
-        self.xls_types = xls_types
+        self.xls_types_as_text = xls_types_as_text
         self.__r_groups_submission_mapping_values = {}
 
         if tag_cols_for_header is None:
@@ -90,8 +88,8 @@ class Export(object):
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
-            for version in itervalues(form_versions):
-                first_section = next(itervalues(version.sections))
+            for version in iter(form_versions.values()):
+                first_section = next(iter(version.sections.values()))
                 for copy_field in copy_fields:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
@@ -305,7 +303,12 @@ class Export(object):
 
         return section_fields, section_labels, section_tags
 
-    def format_one_submission(self, submission, current_section):
+    def format_one_submission(
+        self,
+        submission,
+        current_section,
+        attachments=None,
+    ):
 
         # 'current_section' is the name of what will become sheets in xls.
         # If you don't have repeat groups, there is only one section
@@ -346,6 +349,32 @@ class Export(object):
         row = self._row_cache[_section_name]
         _fields = tuple(current_section.fields.values())
 
+        def _get_attachment(val, field, attachments):
+            """
+            Filter attachments for filenames that match the submission field's
+            value
+            """
+            # Not all submissions will have attachments and we only want to
+            # consider media types
+            if (
+                field.data_type not in EXTENDED_MEDIA_TYPES
+                or not attachments
+                or val is None
+            ):
+                return []
+            # Spaces in the filename are replaced with underscores in storage,
+            # so we need to do the same
+            _val = val.replace(' ', '_')
+            return [
+                f
+                for f in attachments
+                if re.match(fr'^.*/{_val}$', f['filename']) is not None
+            ]
+
+        def _get_value_from_entry(entry, field):
+            suffix = 'meta/' if field.data_type == 'audit' else ''
+            return entry.get(f'{suffix}{field.path}')
+
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
         if self.filter_fields:
@@ -382,18 +411,23 @@ class Export(object):
             # previous one, but we reset it, to gain some perfs.
             row.update(_empty_row)
 
+            attachments = entry.get('_attachments') or attachments
+
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
 
                     # get submission value for this field
-                    val = entry.get(field.path)
+                    val = _get_value_from_entry(entry, field)
+                    # get the attachment for this field
+                    attachment = _get_attachment(val, field, attachments)
                     # get a mapping of {"col_name": "val", ...}
                     cells = field.format(
                         val=val,
                         lang=_lang,
                         multiple_select=self.multiple_select,
-                        xls_types=self.xls_types,
+                        xls_types_as_text=self.xls_types_as_text,
+                        attachment=attachment,
                     )
 
                     # save fields value if they match parent mapping fields.
@@ -435,9 +469,12 @@ class Export(object):
                 # and adding the results to the list of rows for this section.
                 nested_data = entry.get(child_section.path)
                 if nested_data:
-                    chunk = self.format_one_submission(entry[child_section.path],
-                                                       child_section)
-                    for key, value in iteritems(chunk):
+                    chunk = self.format_one_submission(
+                        entry[child_section.path],
+                        child_section,
+                        attachments,
+                    )
+                    for key, value in iter(chunk.items()):
                         if key in chunks:
                             chunks[key].extend(value)
                         else:
@@ -511,7 +548,7 @@ class Export(object):
             return value.replace(quote, quote * 2)
 
         def format_line(line, sep, quote):
-            line = [escape_quote(unicode(x), quote) for x in line]
+            line = [escape_quote(str(x), quote) for x in line]
             return quote + (quote + sep + quote).join(line) + quote
 
         section, labels = sections[0]
@@ -812,7 +849,7 @@ class Export(object):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
-                        row = [unicode(x) for x in row]
+                        row = [str(x) for x in row]
                         yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
 
         yield "</tbody>"
