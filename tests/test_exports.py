@@ -452,6 +452,8 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export, expected_dict)
 
     def test_media_types_include_media_url(self):
+        # need to make sure that filenames such as "another-julius 1).jpg"
+        # don't break the export
         title, schemas, submissions = build_fixture(
             'media_types'
         )
