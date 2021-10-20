@@ -38,8 +38,15 @@ class FormField(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
-    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep="/",
-                   hierarchy_in_labels=False, multiple_select="both"):
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep="/",
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        *args,
+        **kwargs
+    ):
         """ Return a list of labels for this field.
 
             Most fields have only one label, so the list contains only one item,
@@ -49,7 +56,7 @@ class FormField(FormDataDef):
         args = lang, group_sep, hierarchy_in_labels, multiple_select
         return [self._get_label(*args)]
 
-    def get_value_names(self, multiple_select="both"):
+    def get_value_names(self, multiple_select="both", *args, **kwargs):
         return super().get_value_names()
 
     def get_translation(self, val, lang=UNSPECIFIED_TRANSLATION):
@@ -76,7 +83,7 @@ class FormField(FormDataDef):
     # TODO: remove multiple_select ?
     def _get_label(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
                    hierarchy_in_labels=False, multiple_select="both",
-                   _hierarchy_end=None):
+                   _hierarchy_end=None, *args, **kwargs):
         """
         Return the label for this field
 
@@ -416,31 +423,31 @@ class TextField(ExtendedFormField):
 
 
 class MediaField(TextField):
-    """
-    Stub to disable extra URL columns for now; see FutureMediaField
-    """
-    pass
 
-
-class FutureMediaField(TextField):
-    """
-    TODO: Remove the empty MediaField class above and rename this
-    FutureMediaField class to MediaField once we have a way to make the extra
-    columns optional.
-    Once that's done please uncomment/modify lines in
-    `tests.test_exports.TestFormPackExport.test_media_types()` as well.
-    """
-
-    def get_labels(self, *args, **kwargs):
+    def get_labels(self, include_media_url=False, *args, **kwargs):
         label = self._get_label(*args, **kwargs)
-        return [label, f'{label}_URL']
+        if include_media_url:
+            return [label, f'{label}_URL']
+        return [label]
 
-    def get_value_names(self, *args, **kwargs):
-        return [self.name, f'{self.name}_URL']
+    def get_value_names(self, include_media_url=False, *args, **kwargs):
+        if include_media_url:
+            return [self.name, f'{self.name}_URL']
+        return [self.name]
 
-    def format(self, val, attachment, *args, **kwargs):
+    def format(
+        self,
+        val,
+        attachment=[],
+        include_media_url=False,
+        *args,
+        **kwargs,
+    ):
         if val is None:
             val = ''
+
+        if not include_media_url:
+            return {self.name: val}
 
         download_url = (
             attachment[0].get('download_url', '') if attachment else ''
@@ -779,8 +786,15 @@ class FormGPSField(FormField):
         super().__init__(name, labels, data_type,
                                            hierarchy, section, *args, **kwargs)
 
-    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
-                   hierarchy_in_labels=False, multiple_select="both"):
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        *args,
+        **kwargs
+    ):
         """Return a list of labels for this field.
 
         Most fields have only one label, so the list contains only one item,
@@ -810,7 +824,7 @@ class FormGPSField(FormField):
 
         return labels
 
-    def get_value_names(self, multiple_select="both"):
+    def get_value_names(self, multiple_select="both", *args, **kwargs):
         """ Return the list of field identifiers used by this field"""
         names = []
         names.append(self.name)
@@ -976,8 +990,15 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
         return "{}{}{}".format(label, group_sep, option_label)
 
-    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
-                   hierarchy_in_labels=False, multiple_select="both"):
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        *args,
+        **kwargs
+    ):
         """ Return a list of labels for this field.
 
             Most fields have only one label, so the list contains only one item,
@@ -998,7 +1019,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
         return labels
 
-    def get_value_names(self, multiple_select="both"):
+    def get_value_names(self, multiple_select="both", *args, **kwargs):
         """ Return the list of field identifiers used by this field"""
         names = []
         if multiple_select in ("both", "summary"):
@@ -1119,8 +1140,15 @@ class FormLiteracyTestField(FormChoiceFieldWithMultipleSelect):
                 for name, label in self.parameters_in_use
         ]
 
-    def get_labels(self, lang=UNSPECIFIED_TRANSLATION, group_sep='/',
-                   hierarchy_in_labels=False, multiple_select="both"):
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        *args,
+        **kwargs
+    ):
         question_label = self._get_label(lang, group_sep, hierarchy_in_labels)
         parameter_labels = [
             question_label + group_sep + label
