@@ -1,4 +1,5 @@
 # coding: utf-8
+import math
 from collections import defaultdict, OrderedDict
 from dateutil import parser
 from functools import partial
@@ -274,16 +275,31 @@ class FormField(FormDataDef):
 
     @staticmethod
     def try_get_number(val):
+        """
+        Attempt to convert string values to integers or floats. If the value is
+        `inf` or `nan` or not a valid integer or float then return the string
+        value instead.
+        """
+
+        str_val = val
+
         try:
             val = int(val)
         except ValueError:
             pass
         else:
             return val
+
         try:
             val = float(val)
         except ValueError:
             pass
+
+        # The floats `+/-inf` and `nan` cause XLS exports to fail, therefore
+        # return the string value instead.
+        if isinstance(val, float) and not math.isfinite(val):
+            return str_val
+
         return val
 
 
