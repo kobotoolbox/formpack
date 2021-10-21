@@ -29,6 +29,13 @@
                 "label": [
                     "Spruce"
                 ]
+            },
+            {
+                "list_name": "tree_type",
+                "name": "nan",
+                "label": [
+                    "Not a tree"
+                ]
             }
         ],
         "survey": [
@@ -199,7 +206,7 @@
                 "group_tree/group_nest/group_egg_count": "1"
               }
             ],
-            "group_tree/What_kind_of_tree_is_this": "maple"
+            "group_tree/What_kind_of_tree_is_this": "nan"
           }
         ],
         "__version__": "bird_nests_v1",
