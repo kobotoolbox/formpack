@@ -8,27 +8,27 @@ from pyxform.xls2json import workbook_to_json
 from .flatten_content import flatten_content
 
 DATA_TYPE_ALIASES = (
-    ("add select one prompt using", 'select_one'),
-    ("select one from", 'select_one'),
-    ("select1", 'select_one'),
-    ("select one", 'select_one'),
+    ('add select one prompt using', 'select_one'),
+    ('select one from', 'select_one'),
+    ('select1', 'select_one'),
+    ('select one', 'select_one'),
     ('select one from file', 'select_one_from_file'),
-    ("add select multiple prompt using", 'select_multiple'),
-    ("select all that apply from", 'select_multiple'),
-    ("select multiple", 'select_multiple'),
-    ("select all that apply", 'select_multiple'),
+    ('add select multiple prompt using', 'select_multiple'),
+    ('select all that apply from', 'select_multiple'),
+    ('select multiple', 'select_multiple'),
+    ('select all that apply', 'select_multiple'),
     ('select multiple from file', 'select_multiple_from_file'),
-    ("select_one_external", "select one external"),
+    ('select_one_external', 'select one external'),
     ('cascading select', 'cascading_select'),
     ('location', 'geopoint'),
-    ("begin lgroup", 'begin_repeat'),
-    ("end lgroup", 'end_repeat'),
-    ("begin group", 'begin_group'),
-    ("end group", 'end_group'),
-    ("begin repeat", 'begin_repeat'),
-    ("end repeat", 'end_repeat'),
-    ("begin looped group", 'begin_repeat'),
-    ("end looped group", 'end_repeat'),
+    ('begin lgroup', 'begin_repeat'),
+    ('end lgroup', 'end_repeat'),
+    ('begin group', 'begin_group'),
+    ('end group', 'end_group'),
+    ('begin repeat', 'begin_repeat'),
+    ('end repeat', 'end_repeat'),
+    ('begin looped group', 'begin_repeat'),
+    ('end looped group', 'end_repeat'),
 )
 
 
@@ -67,7 +67,7 @@ def parse_xmljson_to_data(data, parent_tags=[], output=[]):
     else:
         key = '/' + '/'.join(parent_tags) + '/' + tag
         val = data.get('text')
-        output.append((key, val,))
+        output.append((key, val))
     return output
 
 
@@ -77,7 +77,9 @@ def parse_xml_to_data(xml_str):
 
 
 def normalize_data_type(data_type):
-    """ Normalize spaces and aliases for field data types """
+    """
+    Normalize spaces and aliases for field data types
+    """
 
     # normalize spaces
     data_type = ' '.join(data_type.split())
