@@ -42,8 +42,9 @@ class OrderedCounter(Counter, OrderedDict):
         # - second element (descendant order)
         # - first element (ascendant order)
         # because elements of `Counter` are tuples (<item>, <count)
-        most_common_ = sorted(iter(self.items()),
-                              key=lambda x: (-x[1], orderable_with_none(x[0])))
+        most_common_ = sorted(
+            iter(self.items()), key=lambda x: (-x[1], orderable_with_none(x[0]))
+        )
         if n is None:
             return most_common_
 
@@ -55,19 +56,19 @@ class OrderedDefaultdict(OrderedDict):
     defaultdict that keeps insertion order compatible with Python 2.7+
 
     Source: https://stackoverflow.com/a/4127426
-
     """
 
     def __init__(self, default_factory=None, *args, **kwargs):
-        if not (default_factory is None
-                or isinstance(default_factory, Callable)):
+        if not (
+            default_factory is None or isinstance(default_factory, Callable)
+        ):
             raise TypeError('first argument must be callable or None')
         super().__init__(*args, **kwargs)
         self.default_factory = default_factory  # called by __missing__()
 
     def __missing__(self, key):
         if self.default_factory is None:
-            raise KeyError(key, )
+            raise KeyError(key)
         self[key] = value = self.default_factory()
         return value
 
@@ -76,5 +77,8 @@ class OrderedDefaultdict(OrderedDict):
         return self.__class__, args, None, None, iter(self.items())
 
     def __repr__(self):  # optional
-        return '%s(%r, %r)' % (self.__class__.__name__, self.default_factory,
-                               list(iter(self.items())))
+        return '%s(%r, %r)' % (
+            self.__class__.__name__,
+            self.default_factory,
+            list(iter(self.items())),
+        )

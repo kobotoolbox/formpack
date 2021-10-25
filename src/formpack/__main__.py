@@ -30,11 +30,11 @@ def print_xls(filename, expand=False, flatten=False, xml=False):
             if xml:
                 print(FormPack({'content': content}, **settings)[0].to_xml())
             else:
-                print(json.dumps(content,
-                                 indent=2))
+                print(json.dumps(content, indent=2))
     except EnvironmentError as e:
-        sys.exit('error trying to read input as xls file? {}: {}'.format(
-                 filename, e))
+        sys.exit(
+            'error trying to read input as xls file? {}: {}'.format(filename, e)
+        )
 
 
 @begin.subcommand

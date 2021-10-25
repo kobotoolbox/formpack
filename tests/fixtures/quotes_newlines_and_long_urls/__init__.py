@@ -1,5 +1,5 @@
 # coding: utf-8
-'''
+"""
 Quotes, newlines, and long URLs: oh, my!
 
 Double quotation marks need to be escaped (by doubling them!) in CSV exports,
@@ -9,7 +9,7 @@ Excel does not tolerate hyperlinks with URLs longer than 255 characters. Not
 that we ever explicitly create Excel hyperlinks, but
 https://github.com/jmcnamara/XlsxWriter tries to be helpful and add them
 automatically. Excessively long URLs should just be written as strings.
-'''
+"""
 
 DATA = {
     'title': 'Quotes, newlines, and long URLs',
@@ -51,7 +51,7 @@ DATA = {
             },
             'submissions': [
                 {
-                    "Enter_some_long_text_and_linebreaks_here":
+                    "Enter_some_long_text_and_linebreaks_here": (
                         "Check out this URL I found:\n"
                         "https://now.read.this/?Never%20forget%20that%20you%20"
                         "are%20one%20of%20a%20kind.%20Never%20forget%20that%20"
@@ -65,30 +65,27 @@ DATA = {
                         "world.%20In%20fact%2C%20it%20is%20always%20because%20"
                         "of%20one%20person%20that%20all%20the%20changes%20that"
                         "%20matter%20in%20the%20world%20come%20about.%20So%20"
-                        "be%20that%20one%20person.",
+                        "be%20that%20one%20person."
+                    ),
                     "Some_other_question": "yes",
                 },
                 # Thanks to @tinok for the whimisical sample data below
                 {
-                    "Enter_some_long_text_and_linebreaks_here":
-                        "Hi, my name is Roger.\"\n\nI like to enter quotes "
-                        "randomly and follow them with new lines.",
+                    "Enter_some_long_text_and_linebreaks_here": "Hi, my name is Roger.\"\n\nI like to enter quotes "
+                    "randomly and follow them with new lines.",
                     "Some_other_question": "yes",
                 },
                 {
-                    "Enter_some_long_text_and_linebreaks_here":
-                        "This one has no linebreaks",
+                    "Enter_some_long_text_and_linebreaks_here": "This one has no linebreaks",
                     "Some_other_question": "no",
                 },
                 {
-                    "Enter_some_long_text_and_linebreaks_here":
-                        "This\nis\nnot\na Haiku",
+                    "Enter_some_long_text_and_linebreaks_here": "This\nis\nnot\na Haiku",
                     "Some_other_question": "yes",
                 },
                 {
-                    "Enter_some_long_text_and_linebreaks_here":
-                        "\"Hands up!\" He yelled.\nWhy?\"\nShe couldn't "
-                        "understand anything.",
+                    "Enter_some_long_text_and_linebreaks_here": "\"Hands up!\" He yelled.\nWhy?\"\nShe couldn't "
+                    "understand anything.",
                     "Some_other_question": "yes",
                 },
             ],

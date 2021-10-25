@@ -1,7 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import unittest
 from formpack.b64_attachment import B64Attachment
 
@@ -31,6 +28,9 @@ class TestB64Attachment(unittest.TestCase):
     def test_write_to_file(self):
         img_example = load_fixture_json('restaurant_photo/images')[0]
         attachment = B64Attachment(img_example)
-        (filename, filepath,) = B64Attachment.write_to_tempfile(attachment)
+        (
+            filename,
+            filepath,
+        ) = B64Attachment.write_to_tempfile(attachment)
         self.assertTrue(len(filename) > 1)
         self.assertTrue(len(filepath) > 1)

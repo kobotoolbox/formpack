@@ -47,16 +47,22 @@ def test_to_xml_fails_when_question_has_null_label():
 
     # it occurs when a named translation has a <NoneType> value
     # (empty strings are OK)
-    fp = FormPack({'content': {
-                   'survey': [
-                              {'type': 'note',
-                               'name': 'n1',
-                               'label': [None],
-                               },
-                              ],
-                   'translations': ['NamedTranslation'],
-                   'translated': ['label'],
-                   }}, id_string='sdf')
+    fp = FormPack(
+        {
+            'content': {
+                'survey': [
+                    {
+                        'type': 'note',
+                        'name': 'n1',
+                        'label': [None],
+                    },
+                ],
+                'translations': ['NamedTranslation'],
+                'translated': ['label'],
+            }
+        },
+        id_string='sdf',
+    )
 
     with pytest.raises(
         pyxform.errors.PyXFormError,
@@ -75,8 +81,11 @@ def test_to_xml_omits_empty_group_labels():
                     {'type': 'end_group'},  # group1
                     {'type': 'begin_group', 'name': 'group2', 'label': ['']},
                     {'type': 'begin_group', 'name': 'group3', 'label': [None]},
-                    {'type': 'note', 'name': 'n2',
-                        'label': ['n2 in group2/group3']},
+                    {
+                        'type': 'note',
+                        'name': 'n2',
+                        'label': ['n2 in group2/group3'],
+                    },
                     {'type': 'end_group'},  # group3
                     {'type': 'end_group'},  # group2
                 ],
@@ -94,18 +103,20 @@ def test_to_xml_omits_empty_group_labels():
 
 from formpack.schema.datadef import FormGroup
 
+
 def test_groups_disabled():
-    scontent = {'content': {
-                   'survey': [
-                              {'type': 'text','name': 'n1', 'label': ['aa']},
-                              {'type': 'begin_group', 'name': 'nada'},
-                              {'type': 'note', 'name': 'n2', 'label': ['ab']},
-                              {'type': 'end_group'},
-                              ],
-                   'translations': ['en'],
-                   'translated': ['label'],
-                  }
-                }
+    scontent = {
+        'content': {
+            'survey': [
+                {'type': 'text', 'name': 'n1', 'label': ['aa']},
+                {'type': 'begin_group', 'name': 'nada'},
+                {'type': 'note', 'name': 'n2', 'label': ['ab']},
+                {'type': 'end_group'},
+            ],
+            'translations': ['en'],
+            'translated': ['label'],
+        }
+    }
 
     (ga, gz) = [scontent['content']['survey'][nn] for nn in [1, 3]]
     # verify that "ga" and "gz" variables point to group begin/end
@@ -134,16 +145,20 @@ def test_groups_disabled():
 
 
 def test_disabled_questions_ignored():
-    scontent = {'content': {
-                   'survey': [
-                              {'type': 'note', 'name': 'n1', 'label': ['aa']},
-                              {'type': 'text','name': 'q2', 'label': ['bb'],
-                               }
-                              ],
-                   'translations': ['en'],
-                   'translated': ['label'],
-                  }
-                }
+    scontent = {
+        'content': {
+            'survey': [
+                {'type': 'note', 'name': 'n1', 'label': ['aa']},
+                {
+                    'type': 'text',
+                    'name': 'q2',
+                    'label': ['bb'],
+                },
+            ],
+            'translations': ['en'],
+            'translated': ['label'],
+        }
+    }
     qq = scontent['content']['survey'][1]
 
     fp = FormPack(scontent, id_string='xx')
@@ -168,34 +183,39 @@ def test_disabled_questions_ignored():
 
 @raises(KeyError)
 def test_missing_choice_list_breaks():
-    scontent = {'content': {
-                   'survey': [
-                              {'type': 'select_one dogs', 'name': 'q1',
-                               'label': ['aa']},
-                              ],
-                   'translations': ['en'],
-                   'translated': ['label'],
-                  }
-                }
+    scontent = {
+        'content': {
+            'survey': [
+                {'type': 'select_one dogs', 'name': 'q1', 'label': ['aa']},
+            ],
+            'translations': ['en'],
+            'translated': ['label'],
+        }
+    }
     fp = FormPack(scontent, id_string='xx')
 
 
 def test_commented_out_missing_choice_list_does_not_break():
-    scontent = {'content': {
-                   'survey': [
-                              {'type': 'select_one dogs', 'name': 'q1',
-                               'disabled': 'TRUE',
-                               'label': ['aa']},
-                              ],
-                   'translations': ['en'],
-                   'translated': ['label'],
-                  }
-                }
+    scontent = {
+        'content': {
+            'survey': [
+                {
+                    'type': 'select_one dogs',
+                    'name': 'q1',
+                    'disabled': 'TRUE',
+                    'label': ['aa'],
+                },
+            ],
+            'translations': ['en'],
+            'translated': ['label'],
+        }
+    }
     fp = FormPack(scontent, id_string='xx')
 
 
 def test_null_untranslated_labels():
-    content = json.loads('''
+    content = json.loads(
+        '''
         {
           "translations": [
             "arabic",
@@ -260,7 +280,8 @@ def test_null_untranslated_labels():
             "label"
           ]
         }
-    ''')
+    '''
+    )
     fp = FormPack({'content': content}, id_string='arabic_and_null')
     fields = fp.get_fields_for_versions()
     field = fields[0]
@@ -286,15 +307,35 @@ def test_get_fields_for_versions_returns_unique_fields():
     fields multiple times. This is was a failing test to reproduce that issue
     """
     fp = FormPack(
-        [{'content': {'survey': [{'name': 'hey', 'type': 'image'},
-                                  {'name': 'two', 'type': 'image'}]},
-          'version': 'vRR7hH6SxTupvtvCqu7n5d'},
-         {'content': {'survey': [{'name': 'one', 'type': 'image'},
-                                  {'name': 'two', 'type': 'image'}]},
-          'version': 'vA8xs9JVi8aiSfypLgyYW2'},
-         {'content': {'survey': [{'name': 'one', 'type': 'image'},
-                                  {'name': 'two', 'type': 'image'}]},
-          'version': 'vNqgh8fJqyjFk6jgiCk4rn'}]
+        [
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'hey', 'type': 'image'},
+                        {'name': 'two', 'type': 'image'},
+                    ]
+                },
+                'version': 'vRR7hH6SxTupvtvCqu7n5d',
+            },
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'one', 'type': 'image'},
+                        {'name': 'two', 'type': 'image'},
+                    ]
+                },
+                'version': 'vA8xs9JVi8aiSfypLgyYW2',
+            },
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'one', 'type': 'image'},
+                        {'name': 'two', 'type': 'image'},
+                    ]
+                },
+                'version': 'vNqgh8fJqyjFk6jgiCk4rn',
+            },
+        ]
     )
     fields = fp.get_fields_for_versions(fp.versions)
     field_names = [field.name for field in fields]
@@ -311,7 +352,7 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
                         'name': 'constant_question_name',
                         'type': 'select_one choice',
                         'label': 'first version question label',
-                        'hxl': '#first_version_hxl'
+                        'hxl': '#first_version_hxl',
                     },
                 ],
                 'choices': [
@@ -321,7 +362,7 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
                         'label': 'first version choice label',
                     },
                 ],
-            }
+            },
         },
         {
             'version': 'v2',
@@ -331,7 +372,7 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
                         'name': 'constant_question_name',
                         'type': 'select_one choice',
                         'label': 'second version question label',
-                        'hxl': '#second_version_hxl'
+                        'hxl': '#second_version_hxl',
                     },
                 ],
                 'choices': [
@@ -341,8 +382,8 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
                         'label': 'second version choice label',
                     }
                 ],
-            }
-        }
+            },
+        },
     ]
     fp = FormPack(schemas)
     fields = fp.get_fields_for_versions(fp.versions)
@@ -371,7 +412,7 @@ def test_get_fields_for_versions_returns_all_choices():
                         'label': 'first version choice label',
                     },
                 ],
-            }
+            },
         },
         {
             'version': 'v2',
@@ -390,8 +431,8 @@ def test_get_fields_for_versions_returns_all_choices():
                         'label': 'second version choice label',
                     }
                 ],
-            }
-        }
+            },
+        },
     ]
     fp = FormPack(schemas)
     fields = fp.get_fields_for_versions(fp.versions)
@@ -402,7 +443,8 @@ def test_get_fields_for_versions_returns_all_choices():
 
 def test_field_position_with_multiple_versions():
     title, schemas, submissions = build_fixture(
-        'field_position_with_multiple_versions')
+        'field_position_with_multiple_versions'
+    )
     fp = FormPack(schemas, title)
 
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
@@ -421,7 +463,8 @@ def test_field_position_with_multiple_versions():
 
 def test_fields_for_versions_list_index_out_of_range():
     title, schemas, submissions = build_fixture(
-        'fields_for_versions_list_index_out_of_range')
+        'fields_for_versions_list_index_out_of_range'
+    )
     fp = FormPack(schemas, title)
     all_fields = fp.get_fields_for_versions(fp.versions.keys())
     expected = [
