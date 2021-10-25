@@ -25,8 +25,6 @@ class FormPack:
         submissions_xml=None,
     ):
         """
-
-
         :param versions: list. Versions of the asset. It must be sorted in ascending order. From oldest to newest.
         :param title: string. The human readable name of the form.
         :param id_string: The human readable id of the form.
@@ -364,7 +362,9 @@ class FormPack:
         xls_types_as_text=True,
         include_media_url=False,
     ):
-        """Create an export for given versions of the form."""
+        """
+        Create an export for given versions of the form.
+        """
         versions = self._get_versions(versions)
         title = title or self.title
         return Export(
@@ -385,7 +385,9 @@ class FormPack:
         )
 
     def autoreport(self, versions=-1):
-        """Create an automatic report for given versions of the form."""
+        """
+        Create an automatic report for given versions of the form.
+        """
         return AutoReport(self, self._get_versions(versions))
 
     def _get_versions(self, versions):
