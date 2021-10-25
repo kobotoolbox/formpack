@@ -30,17 +30,18 @@ ORDERS_BY_SHEET = {
     'settings': [
         '^id_string$',
         '^form_title$',
-    ]
+    ],
 }
 
 
-def flatten_to_spreadsheet_content(content,
-                                   in_place=False,
-                                   prioritized_columns=None,
-                                   deprioritized_columns=None,
-                                   remove_columns=None,
-                                   remove_sheets=None,
-                                   ):
+def flatten_to_spreadsheet_content(
+    content,
+    in_place=False,
+    prioritized_columns=None,
+    deprioritized_columns=None,
+    remove_columns=None,
+    remove_sheets=None,
+):
     if prioritized_columns is None:
         prioritized_columns = {}
     if deprioritized_columns is None:
@@ -56,14 +57,18 @@ def flatten_to_spreadsheet_content(content,
     translated_cols = content.pop('translated', [])
     if 'settings' in content and isinstance(content['settings'], dict):
         content['settings'] = [content['settings']]
-    sheet_names = _order_sheet_names([x for x in content.keys()
-                                      if x not in remove_sheets])
+    sheet_names = _order_sheet_names(
+        [x for x in content.keys() if x not in remove_sheets]
+    )
 
     def _row_to_ordered_dict(row, dest):
         dest_keys = list(dest.keys())
-        _flatten_translated_fields(row, translations, translated_cols,
-                                   col_order=dest_keys,
-                                   )
+        _flatten_translated_fields(
+            row,
+            translations,
+            translated_cols,
+            col_order=dest_keys,
+        )
         _flatten_survey_row(row)
         for key in dest_keys:
             dest[key] = row.get(key, None)
@@ -85,9 +90,12 @@ def flatten_to_spreadsheet_content(content,
         _not_mids = firsts + lasts + removed
         mids = [x for x in _all_cols if x not in _not_mids]
 
-        ordered_cols = translated_col_list((firsts + mids + lasts), translations, translated_cols)
+        ordered_cols = translated_col_list(
+            (firsts + mids + lasts), translations, translated_cols
+        )
         return [
-            _row_to_ordered_dict(row, OrderedDict.fromkeys(ordered_cols)) for row in rows
+            _row_to_ordered_dict(row, OrderedDict.fromkeys(ordered_cols))
+            for row in rows
         ]
 
     if in_place:
@@ -101,8 +109,7 @@ def flatten_to_spreadsheet_content(content,
         rows = content.pop(sheet_name)
         for row in rows:
             if 'tags' in row:
-                _flatten_tags(
-                    row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
+                _flatten_tags(row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
         if sheet_name in all_sheets:
             all_sheets.remove(sheet_name)
         _od[sheet_name] = _sheet_to_ordered_dicts(sheet_name, rows)
