@@ -1,7 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import pytest
 
 from formpack.utils.iterator import get_first_occurrence
@@ -32,12 +29,23 @@ def test_replace_select_one_from_file():
 
 def test_true_false_value_replaced():
     # only replaced on columns with TF_COLUMNS
-    s1 = {'survey': [
-        {'type': 'text', 'required': val} for val in [
-            True, 'True', 'yes', 'true()', 'TRUE',
-            False, 'NO', 'no', 'false()', 'FALSE'
+    s1 = {
+        'survey': [
+            {'type': 'text', 'required': val}
+            for val in [
+                True,
+                'True',
+                'yes',
+                'true()',
+                'TRUE',
+                False,
+                'NO',
+                'no',
+                'false()',
+                'FALSE',
+            ]
         ]
-    ]}
+    }
     replace_aliases(s1, in_place=True)
     tfs = [row['required'] for row in s1['survey']]
     assert tfs == [True] * 5 + [False] * 5
@@ -105,25 +113,33 @@ def test_settings_get_replaced():
 
 
 def test_custom_allowed_types():
-    ex1 = replace_aliases({'survey': [{'type': 'x_y_z_a_b_c'}]}, allowed_types={
-            'xyzabc': 'x_y_z_a_b_c'
-        })
+    ex1 = replace_aliases(
+        {'survey': [{'type': 'x_y_z_a_b_c'}]},
+        allowed_types={'xyzabc': 'x_y_z_a_b_c'},
+    )
     assert ex1['survey'][0]['type'] == 'xyzabc'
 
-    ex2 = replace_aliases({'survey': [{'type': 'xyzabc'}]}, allowed_types={
+    ex2 = replace_aliases(
+        {'survey': [{'type': 'xyzabc'}]},
+        allowed_types={
             'xyzabc': ['x_y_z_a_b_c'],
-        })
+        },
+    )
     assert ex2['survey'][0]['type'] == 'xyzabc'
 
-    ex3 = replace_aliases({'survey': [{'type': 'xyzabc'}]}, allowed_types={
+    ex3 = replace_aliases(
+        {'survey': [{'type': 'xyzabc'}]},
+        allowed_types={
             'xyzabc': True,
-        })
+        },
+    )
     assert ex3['survey'][0]['type'] == 'xyzabc'
 
 
 def test_list_name_renamed():
     ex1 = replace_aliases({'choices': [{'list name': 'mylist'}]})
     assert list(ex1['choices'][0]) == ['list_name']
+
 
 # when formpack exports support choice['value'] as the identifier for the choice, then we
 # will use choice['value']; until then, we will do the opposite; since both are accepted
@@ -136,8 +152,12 @@ def test_list_name_renamed():
 
 
 def test_choice_value_becomes_name__temp():
-    'in the meantime, we ensure that "value" alias is changed to "name"'
-    ex1 = replace_aliases({'choices': [{'list_name': 'mylist', 'value': 'myvalue'}]})
+    """
+    In the meantime, we ensure that "value" alias is changed to "name"
+    """
+    ex1 = replace_aliases(
+        {'choices': [{'list_name': 'mylist', 'value': 'myvalue'}]}
+    )
     c1 = ex1['choices'][0]
     assert 'name' in c1
     assert c1['name'] == 'myvalue'
@@ -157,6 +177,7 @@ def test_survey_header_replaced():
     _assert_column_converted_to('required', 'required')
     _assert_column_converted_to('bind::required', 'required')
     _assert_column_converted_to('bind::relevant', 'relevant')
+
 
 def test_kobo_specific_names_handle_n_and_m_dash():
     # n-dash
