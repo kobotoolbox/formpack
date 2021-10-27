@@ -395,13 +395,7 @@ class FormPack:
         if versions is None:
             versions = -1
 
-        if isinstance(
-            versions,
-            (
-                str,
-                int,
-            ),
-        ):
+        if isinstance(versions, (str, int)):
             versions = [versions]
         versions = [self[key] for key in versions]
 
