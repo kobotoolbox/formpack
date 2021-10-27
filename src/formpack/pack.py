@@ -236,11 +236,11 @@ class FormPack:
         #
         # Index 0 of tmp2d will be `[field1, field2]`
         tmp2d = []
-        # This dict is used to remember final position of each field.
-        # Its keys are field_names and values are tuples of coordinates in tmp2d
-        # Keeping example above:
-        #       `positions[field1.name]` would be `(0, 0)`
-        #       `positions[field2.name]` would be `(0, 1)`
+        # This dict is used to remember final position of each field.  Its keys
+        # are the combination of field and section names and the values are
+        # tuples of coordinates in tmp2d Keeping example above:
+        #       `positions[f'{field1.name}_{section.name}']` would be `(0, 0)`
+        #       `positions[f'{field2.name}_{section.name}']` would be `(0, 1)`
         positions = {}
 
         # Create the initial field mappings from the first form version
@@ -251,10 +251,11 @@ class FormPack:
         index = 0
         for section in versions_desc[0].sections.values():
             for field_name, field_object in section.fields.items():
+                field_section_name = f'{field_name}_{section.name}'
                 if isinstance(field_object, CopyField):
                     copy_fields.append(field_object)
                 else:
-                    positions[field_name] = (index, 0)
+                    positions[field_section_name] = (index, 0)
                     tmp2d.append([field_object])
                     index += 1
 
@@ -262,9 +263,10 @@ class FormPack:
             index = 0
             for section_name, section in version.sections.items():
                 for field_name, field_object in section.fields.items():
+                    field_section_name = f'{field_name}_{section_name}'
                     if not isinstance(field_object, CopyField):
-                        if field_name in positions:
-                            position = positions[field_name]
+                        if field_section_name in positions:
+                            position = positions[field_section_name]
                             latest_field_object = tmp2d[position[0]][position[1]]
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
@@ -283,7 +285,7 @@ class FormPack:
                                 # it can happen when current version has more items than newest one.
                                 index = len(tmp2d) - 1
 
-                            positions[field_name] = (index, len(tmp2d[index]) - 1)
+                            positions[field_section_name] = (index, len(tmp2d[index]) - 1)
 
                         index += 1
 
