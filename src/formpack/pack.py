@@ -262,11 +262,11 @@ class FormPack:
         index = 0
         for section in versions_desc[0].sections.values():
             for field_name, field_object in section.fields.items():
-                field_section_name = f'{field_name}_{section.name}'
+                section_field_name = f'{section.name}_{field_name}'
                 if isinstance(field_object, CopyField):
                     copy_fields.append(field_object)
                 else:
-                    positions[field_section_name] = (index, 0)
+                    positions[section_field_name] = (index, 0)
                     tmp2d.append([field_object])
                     index += 1
 
@@ -274,10 +274,10 @@ class FormPack:
             index = 0
             for section_name, section in version.sections.items():
                 for field_name, field_object in section.fields.items():
-                    field_section_name = f'{field_name}_{section_name}'
+                    section_field_name = f'{section_name}_{field_name}'
                     if not isinstance(field_object, CopyField):
-                        if field_section_name in positions:
-                            position = positions[field_section_name]
+                        if section_field_name in positions:
+                            position = positions[section_field_name]
                             latest_field_object = tmp2d[position[0]][
                                 position[1]
                             ]
@@ -299,7 +299,7 @@ class FormPack:
                                 # it can happen when current version has more items than newest one.
                                 index = len(tmp2d) - 1
 
-                            positions[field_name] = (
+                            positions[section_field_name] = (
                                 index,
                                 len(tmp2d[index]) - 1,
                             )
