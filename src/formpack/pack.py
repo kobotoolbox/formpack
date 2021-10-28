@@ -247,9 +247,10 @@ class FormPack:
         #
         # Index 0 of tmp2d will be `[field1, field2]`
         tmp2d = []
-        # This dict is used to remember final position of each field.  Its keys
+        # This dict is used to remember final position of each field. Its keys
         # are the combination of field and section names and the values are
-        # tuples of coordinates in tmp2d Keeping example above:
+        # tuples of coordinates in tmp2d.
+        # Keeping example above:
         #       `positions[f'{section.name}_{field1.name}']` would be `(0, 0)`
         #       `positions[f'{section.name}_{field2.name}']` would be `(0, 1)`
         positions = {}
