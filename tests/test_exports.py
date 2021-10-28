@@ -789,7 +789,7 @@ class TestFormPackExport(unittest.TestCase):
                                 'validation_status_approved',
                             ],
                             [
-                                'nan',
+                                'maple',
                                 3,
                                 'Bird nest survey with nested repeatable groups',
                                 2,
@@ -978,7 +978,7 @@ class TestFormPackExport(unittest.TestCase):
                         1
                     ],
                     [
-                        'nan',
+                        'maple',
                         3,
                         'Bird nest survey with nested repeatable groups',
                         2
@@ -1075,7 +1075,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
         fp = FormPack(schemas, title)
-        options = {'versions': 'bird_nests_v1', 'xls_types_as_text': False}
+        options = {'versions': 'bird_nests_v2', 'xls_types_as_text': False}
         export_dict = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict([
             ('Bird nest survey with nested repeatable groups', {
@@ -1843,7 +1843,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_xlsx_with_types(self):
         title, schemas, submissions = build_fixture('nested_grouped_repeatable')
         fp = FormPack(schemas, title)
-        options = {'versions': 'bird_nests_v1', 'xls_types_as_text': False}
+        options = {'versions': 'bird_nests_v2', 'xls_types_as_text': False}
 
         with TempDir() as d:
             xls = d / 'foo.xlsx'
