@@ -301,6 +301,50 @@ def test_get_fields_for_versions_returns_unique_fields():
     assert sorted(field_names) == ['hey', 'one', 'two']
 
 
+def test_get_fields_for_versions_returns_all_fields_with_repeat_groups():
+    """
+    Test for #275 to ensure that all repeat groups across versions are included
+    especially if the question names remain the same and only the group name
+    changes
+    """
+    fp = FormPack(
+        [
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'old_name', 'type': 'begin_repeat'},
+                        {'name': 'one', 'type': 'image'},
+                        {'name': 'two', 'type': 'image'},
+                        {'type': 'end_repeat'},
+                    ]
+                },
+                'version': 'vRR7hH6SxTupvtvCqu7n5d',
+            },
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'new_name', 'type': 'begin_repeat'},
+                        {'name': 'one', 'type': 'image'},
+                        {'name': 'two', 'type': 'image'},
+                        {'type': 'end_repeat'},
+                    ]
+                },
+                'version': 'vA8xs9JVi8aiSfypLgyYW2',
+            },
+        ]
+    )
+    fields = fp.get_fields_for_versions(fp.versions)
+    field_and_section_names = [
+        (field.name, field.section.name) for field in fields
+    ]
+    assert field_and_section_names == [
+        ('one', 'new_name'),
+        ('two', 'new_name'),
+        ('one', 'old_name'),
+        ('two', 'old_name'),
+    ]
+
+
 def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     schemas = [
         {
