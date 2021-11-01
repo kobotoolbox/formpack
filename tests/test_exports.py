@@ -9,7 +9,7 @@ from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
 
-import xlrd
+import excelrd as xlrd
 from backports import csv
 from path import TempDir
 

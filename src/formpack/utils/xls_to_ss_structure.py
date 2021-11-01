@@ -4,7 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import datetime
 import re
-import xlrd
+import excelrd as xlrd
 
 from .future import OrderedDict, unichr
 from .string import unicode, str_types
