@@ -397,8 +397,6 @@ class Export:
                 if field.path in self.filter_fields
             )
 
-
-
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section
         # with a row of size one.

@@ -111,7 +111,9 @@ class TestFormPackFixtures(unittest.TestCase):
         assert 4 == len(fixture)
 
         title, schemas, submissions, analysis_form = fixture
-        fp = FormPack(schemas, title, analysis_form=analysis_form)
+        fp = FormPack(schemas, title)
+        fp.extend_survey(analysis_form)
+
         assert 2 == len(fp.versions)
         assert 'Simple Clerk Interaction' == title
 
@@ -121,8 +123,7 @@ class TestFormPackFixtures(unittest.TestCase):
         actual_analysis_questions = sorted(
             [
                 f.name
-                for f in fp.get_fields_for_versions(fp.versions)
-                if f.analysis_question
+                for f in fp.analysis_form.fields
             ]
         )
         assert expected_analysis_questions == actual_analysis_questions
