@@ -1,0 +1,96 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+        {
+            "type": "audio",
+            "name": "record_a_note",
+            "label": [
+                "Record a clerk saying something",
+                "Registri oficiston dirantan ion"
+            ]
+        },
+        {
+            "type": "select_multiple goods",
+            "name": "goods_sold",
+            "label": [
+                "What are some goods sold at the store?",
+                "Kio estas iuj varoj venditaj en la vendejo?"
+            ]
+        }
+    ],
+    "choices": [
+        {
+            "list_name": "goods",
+            "name": "chocolate",
+            "label": [
+                "Chocolate",
+                "Ĉokolado"
+            ]
+        },
+        {
+            "list_name": "goods",
+            "name": "fruit",
+            "label": [
+                "Fruit",
+                "Frukto"
+            ]
+        },
+        {
+            "list_name": "goods",
+            "name": "pasta",
+            "label": [
+                "Pasta",
+                "Pasto"
+            ]
+        }
+    ],
+    "settings": {
+        "version": "v1"
+    },
+    "translated": [
+        "label"
+    ],
+    "translations": [
+        "English (en)",
+        "Esperanto (es)"
+    ]
+  },
+  "submissions": [
+    {
+      "record_a_note": "clerk_interaction_1.mp3",
+      "goods_sold": "chocolate",
+      "_attachments": [
+        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_1.mp3"}
+      ],
+      "_supplementalDetails": {
+        "record_a_note_transcription_acme_1_speech2text": "Hello how may I help you?",
+        "record_a_note_tone_of_voice": "excited confused",
+        "goods_sold_comment": "Not much diversity",
+        "goods_sold_rating": "3"
+      }
+    },
+    {
+      "record_a_note": "clerk_interaction_2.mp3",
+      "goods_sold": "chocolate fruit pasta",
+      "_attachments": [
+        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_2.mp3"}
+      ],
+      "_supplementalDetails": {
+        "record_a_note_transcription_acme_1_speech2text": "Thank you for your business",
+        "record_a_note_tone_of_voice": "anxious excited",
+        "goods_sold_rating": "2"
+      }
+    },
+    {
+      "record_a_note": "clerk_interaction_3.mp3",
+      "goods_sold": "pasta",
+      "_attachments": [
+        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_3.mp3"}
+      ],
+      "_supplementalDetails": {
+          "goods_sold_rating": "3"
+      }
+    }
+  ]
+}
