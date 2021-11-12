@@ -2,11 +2,13 @@
 from formpack import FormPack
 from .fixtures import build_fixture
 
-def tests_additional_field_exports():
+def tests_additional_field_exports_xxx():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
-    pack = FormPack(schemas, title=title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
 
-    options = {'include_analysis_fields': True, 'versions': 'v1'}
+    #options = {'include_analysis_fields': True, 'versions': 'v1'}
+    options = {'versions': 'v1'}
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']

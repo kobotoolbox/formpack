@@ -24,6 +24,12 @@ class FormField(FormDataDef):
         self.section = section
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
+        self.analysis_question = False
+
+        source = kwargs.get('source')
+        if source is not None:
+            self.source = source
+            self.analysis_question = True
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -34,7 +40,7 @@ class FormField(FormDataDef):
         if has_stats is not None:
             self.has_stats = has_stats
         else:
-            self.has_stats = data_type != "note"
+            self.has_stats = data_type != "note" and not self.analysis_question
 
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
@@ -120,7 +126,7 @@ class FormField(FormDataDef):
         # even if `lang` can be None, we don't want the `label` to be None.
         label = self.labels.get(lang, self.name)
         # If `label` is None, no matches are found, so return `field` name.
-        return self.name if label is None else label
+        return label or self.name
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
@@ -153,6 +159,7 @@ class FormField(FormDataDef):
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
         or_other = definition.get('_or_other', False)
+        source = definition.get('source')
 
         # normalize spaces
         data_type = definition['type']
@@ -227,6 +234,7 @@ class FormField(FormDataDef):
             'section': section,
             'choice': choice,
             'or_other': or_other,
+            'source': source,
         }
 
         if data_type == 'select_multiple' and appearance == 'literacy':

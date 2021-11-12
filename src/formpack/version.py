@@ -317,3 +317,41 @@ class FormVersion:
         })
 
         return survey._to_pretty_xml() #.encode('utf-8')
+
+
+class AnalysisForm:
+
+    def __init__(self, form_pack, schema):
+
+        self.schema = schema
+        self.form_pack = form_pack
+
+        survey = self.schema.get('additional_fields', [])
+        section = FormSection(name=form_pack.title)
+
+        self.fields = [
+            FormField.from_json_definition(dd, translations=[None], section=section)
+            for dd in survey
+        ]
+
+        self.fields_by_source = self._get_fields_by_source()
+
+    def __repr__(self):
+        return f"<AnalysisForm parent='{self.form_pack.title}'>"
+
+    def _get_fields_by_source(self):
+        fields_by_source = {}
+        for field in self.fields:
+            if field.source not in fields_by_source:
+                fields_by_source[field.source] = [field]
+            else:
+                fields_by_source[field.source].append(field)
+        return fields_by_source
+
+    def insert_analysis_fields(self, fields):
+        _fields = []
+        for field in fields:
+            _fields.append(field)
+            if field.name in self.fields_by_source:
+                _fields += self.fields_by_source[field.name]
+        return _fields

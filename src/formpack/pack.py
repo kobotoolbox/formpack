@@ -5,7 +5,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from formpack.schema.fields import CopyField
-from .version import FormVersion
+from .version import FormVersion, AnalysisForm
 from .reporting import Export, AutoReport
 from .utils.expand_content import expand_content
 from .utils.replace_aliases import replace_aliases
@@ -48,6 +48,8 @@ class FormPack:
         self.strict_schema = strict_schema
 
         self.asset_type = asset_type
+
+        self.analysis_form = None
 
         self.load_all_versions(versions)
 
@@ -163,6 +165,10 @@ class FormPack:
             self.title = form_version.version_title
 
         self.versions[form_version.id] = form_version
+
+    def extend_survey(self, analysis_form):
+        af = AnalysisForm(self, analysis_form)
+        self.analysis_form = af
 
     def version_diff(self, vn1, vn2):
         v1 = self.versions[vn1]
@@ -312,6 +318,9 @@ class FormPack:
                         all_fields.append(field)
                 else:
                     all_fields.append(field)
+
+        if self.analysis_form:
+            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
 
         # Finally, add copy fields at the end
         all_fields += copy_fields
