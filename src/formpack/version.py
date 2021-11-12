@@ -329,12 +329,28 @@ class AnalysisForm:
         survey = self.schema.get('additional_fields', [])
         section = FormSection(name=form_pack.title)
 
+        self.translations = [
+            t if t is not None else UNTRANSLATED
+            for t in schema.get('translations', [None])
+        ]
+
+        choices_definition = schema.get('additional_choices', ())
+        field_choices = FormChoice.all_from_json_definition(
+            choices_definition, self.translations
+        )
+
         self.fields = [
-            FormField.from_json_definition(dd, translations=[None], section=section)
+            FormField.from_json_definition(
+                dd,
+                translations=self.translations,
+                section=section,
+                field_choices=field_choices,
+            )
             for dd in survey
         ]
 
         self.fields_by_source = self._get_fields_by_source()
+
 
     def __repr__(self):
         return f"<AnalysisForm parent='{self.form_pack.title}'>"

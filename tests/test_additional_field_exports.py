@@ -7,8 +7,7 @@ def tests_additional_field_exports_xxx():
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
-    #options = {'include_analysis_fields': True, 'versions': 'v1'}
-    options = {'versions': 'v1'}
+    options = {'include_analysis_fields': True, 'versions': 'v1'}
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
@@ -34,7 +33,8 @@ def tests_additional_field_exports_advanced():
     title, schemas, submissions, analysis_form = build_fixture(
         'analysis_form_advanced'
     )
-    pack = FormPack(schemas, title=title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
 
     options = {
         'include_analysis_fields': True,
@@ -203,7 +203,8 @@ def tests_additional_field_exports_advanced():
 
 def tests_additional_field_exports_v2():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
-    pack = FormPack(schemas, title=title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
 
     options = {'include_analysis_fields': True, 'versions': 'v2'}
     export = pack.export(**options)
@@ -229,7 +230,8 @@ def tests_additional_field_exports_v2():
 
 def tests_additional_field_exports_all_versions():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
-    pack = FormPack(schemas, title=title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
 
     options = {'include_analysis_fields': True, 'versions': pack.versions}
     export = pack.export(**options)
@@ -269,7 +271,8 @@ def tests_additional_field_exports_all_versions():
 
 def tests_additional_field_exports_all_versions_exclude_fields():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
-    pack = FormPack(schemas, title=title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
 
     options = {'versions': pack.versions}
     export = pack.export(**options)
@@ -297,7 +300,8 @@ def tests_additional_field_exports_all_versions_exclude_fields():
 
 def tests_additional_field_exports_all_versions_langs():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
-    pack = FormPack(schemas, title=title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
 
     options = {
         'include_analysis_fields': True,
@@ -351,9 +355,10 @@ def tests_additional_field_exports_all_versions_langs():
 def test_simple_report_with_analysis_form():
 
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
-    fp = FormPack(schemas, title, analysis_form=analysis_form)
+    pack = FormPack(schemas, title)
+    pack.extend_survey(analysis_form)
 
-    report = fp.autoreport(versions=fp.versions.keys())
+    report = pack.autoreport(versions=pack.versions.keys())
     stats = report.get_stats(submissions, lang='English (en)')
 
     assert stats.submissions_count == 6

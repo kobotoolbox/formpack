@@ -9,8 +9,7 @@
             "type": "text",
             "name": "record_a_note_transcription_acme_1_speech2text",
             "label": [
-                ": ACME Transcription",
-                ""
+                ": ACME Transcription"
             ],
             "source": "record_a_note",
             "engine": "engines/acme_1_speech2text"
@@ -19,8 +18,7 @@
             "type": "datetime",
             "name": "record_a_note_acme_timestamp",
             "label": [
-                "Transcription Timestamp",
-                ""
+                "Transcription Timestamp"
             ],
             "source": "record_a_note"
         },
@@ -28,8 +26,7 @@
             "type": "text",
             "name": "name_of_clerk_comment",
             "label": [
-                "Comment on the name of the clerk",
-                ""
+                "Comment on the name of the clerk"
             ],
             "source": "name_of_clerk"
         },
@@ -37,10 +34,12 @@
             "type": "text",
             "name": "name_of_shop_comment",
             "label": [
-                "Comment on the name of the shop",
-                ""
+                "Comment on the name of the shop"
             ],
             "source": "name_of_shop"
         }
+    ],
+    "translations": [
+        "English (en)"
     ]
 }

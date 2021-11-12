@@ -319,9 +319,6 @@ class FormPack:
                 else:
                     all_fields.append(field)
 
-        if self.analysis_form:
-            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
-
         # Finally, add copy fields at the end
         all_fields += copy_fields
 
@@ -356,6 +353,7 @@ class FormPack:
         filter_fields=(),
         xls_types_as_text=True,
         include_media_url=False,
+        include_analysis_fields=False,
     ):
         """
         Create an export for given versions of the form
@@ -376,7 +374,8 @@ class FormPack:
             tag_cols_for_header=tag_cols_for_header,
             filter_fields=filter_fields,
             xls_types_as_text=xls_types_as_text,
-            include_media_url=include_media_url
+            include_media_url=include_media_url,
+            include_analysis_fields=include_analysis_fields,
         )
 
     def autoreport(self, versions=-1):
