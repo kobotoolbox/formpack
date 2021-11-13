@@ -320,7 +320,6 @@ class FormVersion:
 
 
 class AnalysisForm:
-
     def __init__(self, form_pack, schema):
 
         self.schema = schema
@@ -341,16 +340,15 @@ class AnalysisForm:
 
         self.fields = [
             FormField.from_json_definition(
-                dd,
-                translations=self.translations,
-                section=section,
+                definition=data_def,
                 field_choices=field_choices,
+                section=section,
+                translations=self.translations,
             )
-            for dd in survey
+            for data_def in survey
         ]
 
         self.fields_by_source = self._get_fields_by_source()
-
 
     def __repr__(self):
         return f"<AnalysisForm parent='{self.form_pack.title}'>"

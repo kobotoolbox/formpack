@@ -8,7 +8,11 @@ from operator import itemgetter
 import statistics
 
 from .datadef import FormDataDef, FormChoice
-from ..constants import UNSPECIFIED_TRANSLATION
+from ..constants import (
+    ANALYSIS_TYPES,
+    ANALYSIS_TYPE_CODING,
+    UNSPECIFIED_TRANSLATION,
+)
 from ..utils import singlemode
 from ..utils.ordered_collection import OrderedDefaultdict
 
@@ -30,6 +34,8 @@ class FormField(FormDataDef):
         if source is not None:
             self.source = source
             self.analysis_question = True
+            self.analysis_type = kwargs.get('analysis_type')
+            self.settings = kwargs.get('settings')
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -160,12 +166,17 @@ class FormField(FormDataDef):
         appearance = definition.get('appearance')
         or_other = definition.get('_or_other', False)
         source = definition.get('source')
+        analysis_type = definition.get('analysis_type', ANALYSIS_TYPE_CODING)
+        settings = definition.get('settings', {})
 
         # normalize spaces
         data_type = definition['type']
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
+
+        if analysis_type not in ANALYSIS_TYPES:
+            raise ValueError(f'Invalid analysis data type: {analysis_type}')
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
@@ -235,6 +246,8 @@ class FormField(FormDataDef):
             'choice': choice,
             'or_other': or_other,
             'source': source,
+            'analysis_type': analysis_type,
+            'settings': settings,
         }
 
         if data_type == 'select_multiple' and appearance == 'literacy':

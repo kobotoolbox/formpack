@@ -12,7 +12,11 @@
                 ": ACME Transcription"
             ],
             "source": "record_a_note",
-            "engine": "engines/acme_1_speech2text"
+            "analysis_type": "transcription",
+            "settings": {
+                "mode": "auto",
+                "engine": "engines/acme_1_speech2text"
+            }
         },
         {
             "type": "datetime",
