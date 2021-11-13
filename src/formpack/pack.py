@@ -167,8 +167,7 @@ class FormPack:
         self.versions[form_version.id] = form_version
 
     def extend_survey(self, analysis_form):
-        af = AnalysisForm(self, analysis_form)
-        self.analysis_form = af
+        self.analysis_form = AnalysisForm(self, analysis_form)
 
     def version_diff(self, vn1, vn2):
         v1 = self.versions[vn1]
