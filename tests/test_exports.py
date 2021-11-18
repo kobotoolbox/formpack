@@ -451,11 +451,56 @@ class TestFormPackExport(unittest.TestCase):
         )
         self.assertEqual(export, expected_dict)
 
-    def test_media_types(self):
-        """
-        Please uncomment the `…_URL` fields and corresponding data values
-        after re-enabling `formpack.schema.fields.MediaField`
-        """
+    def test_media_types_include_media_url(self):
+        # need to make sure that filenames such as "another-julius 1).jpg"
+        # don't break the export
+        title, schemas, submissions = build_fixture(
+            'media_types'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': 'romev1', 'include_media_url': True}
+        export = fp.export(**options).to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Media of your favourite Roman emperors',
+                    {
+                        'fields': [
+                            'audit',
+                            'audit_URL',
+                            'fav_emperor',
+                            'image_of_emperor',
+                            'image_of_emperor_URL',
+                            'another_image_of_emperor',
+                            'another_image_of_emperor_URL',
+                        ],
+                        'data': [
+                            [
+                                'audit.csv',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'julius',
+                                'julius.jpg',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg',
+                                'another-julius 1).jpg',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/another-julius_1.jpg',
+                            ],
+                            [
+                                'audit.csv',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'augustus',
+                                'augustus.jpg',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg',
+                                '',
+                                '',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
+        assert export == expected_dict
+
+    def test_media_types_exclude_media_url(self):
         title, schemas, submissions = build_fixture(
             'media_types'
         )
@@ -469,31 +514,22 @@ class TestFormPackExport(unittest.TestCase):
                     {
                         'fields': [
                             'audit',
-                            # 'audit_URL',
                             'fav_emperor',
                             'image_of_emperor',
-                            # 'image_of_emperor_URL',
                             'another_image_of_emperor',
-                            # 'another_image_of_emperor_URL',
                         ],
                         'data': [
                             [
                                 'audit.csv',
-                                # 'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
                                 'julius',
                                 'julius.jpg',
-                                # 'https://kc.kobo.org/media/original?media_file=/path/to/julius.jpg',
-                                'another-julius.jpg',
-                                # 'https://kc.kobo.org/media/original?media_file=/path/to/another-julius.jpg',
+                                'another-julius 1).jpg',
                             ],
                             [
                                 'audit.csv',
-                                # 'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
                                 'augustus',
                                 'augustus.jpg',
-                                # 'https://kc.kobo.org/media/original?media_file=/path/to/augustus.jpg',
                                 '',
-                                # '',
                             ],
                         ],
                     },
@@ -1039,7 +1075,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture(
             'nested_grouped_repeatable')
         fp = FormPack(schemas, title)
-        options = {'versions': 'bird_nests_v1', 'xls_types_as_text': False}
+        options = {'versions': 'bird_nests_v2', 'xls_types_as_text': False}
         export_dict = fp.export(**options).to_dict(submissions)
         expected_dict = OrderedDict([
             ('Bird nest survey with nested repeatable groups', {
@@ -1082,7 +1118,7 @@ class TestFormPackExport(unittest.TestCase):
                         1
                     ],
                     [
-                        'maple',
+                        'nan',
                         3,
                         'Bird nest survey with nested repeatable groups',
                         2
@@ -1798,6 +1834,16 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_repeatable')
         fp = FormPack(schemas, title)
         options = {'versions': 'rgv1'}
+
+        with TempDir() as d:
+            xls = d / 'foo.xlsx'
+            fp.export(**options).to_xlsx(xls, submissions)
+            assert xls.isfile()
+
+    def test_xlsx_with_types(self):
+        title, schemas, submissions = build_fixture('nested_grouped_repeatable')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'bird_nests_v2', 'xls_types_as_text': False}
 
         with TempDir() as d:
             xls = d / 'foo.xlsx'

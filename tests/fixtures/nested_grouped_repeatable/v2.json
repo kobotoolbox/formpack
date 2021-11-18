@@ -1,0 +1,216 @@
+{
+    "version": "bird_nests_v2",
+    "content": {
+        "choices": [
+            {
+                "list_name": "tree_type",
+                "name": "pine",
+                "label": [
+                    "Pine"
+                ]
+            },
+            {
+                "list_name": "tree_type",
+                "name": "oak",
+                "label": [
+                    "Oak"
+                ]
+            },
+            {
+                "list_name": "tree_type",
+                "name": "maple",
+                "label": [
+                    "Maple"
+                ]
+            },
+            {
+                "list_name": "tree_type",
+                "name": "spruce",
+                "label": [
+                    "Spruce"
+                ]
+            },
+            {
+                "list_name": "tree_type",
+                "name": "nan",
+                "label": [
+                    "Not a tree"
+                ]
+            }
+        ],
+        "survey": [
+            {
+                "type": "start",
+                "name": "start"
+            },
+            {
+                "type": "end",
+                "name": "end"
+            },
+            {
+                "type": "begin_repeat",
+                "name": "group_tree",
+                "label": [
+                    "For each tree"
+                ]
+            },
+            {
+                "select_from_list_name": "tree_type",
+                "name": "What_kind_of_tree_is_this",
+                "label": [
+                    "What kind of tree is this?"
+                ],
+                "type": "select_one"
+            },
+            {
+                "type": "begin_repeat",
+                "name": "group_nest",
+                "label": [
+                    "For each nest"
+                ]
+            },
+            {
+                "type": "integer",
+                "name": "How_high_above_the_ground_is_the_nest",
+                "label": [
+                    "How high above the ground is the nest?"
+                ]
+            },
+            {
+                "type": "integer",
+                "name": "How_many_eggs_are_in_the_nest",
+                "label": [
+                    "How many eggs are in the nest?"
+                ]
+            },
+            {
+                "name": "group_egg",
+                "label": [
+                    "For each egg"
+                ],
+                "repeat_count": "${How_many_eggs_are_in_the_nest}",
+                "type": "begin_repeat"
+            },
+            {
+                "type": "text",
+                "name": "Describe_the_egg",
+                "label": [
+                    "Describe the egg"
+                ]
+            },
+            {
+                "type": "end_repeat"
+            },
+            {
+                "type": "end_repeat"
+            },
+            {
+                "type": "end_repeat"
+            }
+        ]
+    },
+    "submissions": [
+      {
+        "_validation_status": {
+          "by_whom": "user1",
+          "timestamp": 1531158682,
+          "uid": "validation_status_approved",
+          "color": "#00ff00",
+          "label":"Approved"
+        },
+        "meta/instanceID": "uuid:f16d9a3f-0892-413e-81d4-758ab188ea0b",
+        "end": "2017-12-27T15:58:20.000-05:00",
+        "_submission_time": "2017-12-27T20:58:25",
+        "_id": 123,
+        "_uuid": "f16d9a3f-0892-413e-81d4-758ab188ea0b",
+        "start": "2017-12-27T15:53:26.000-05:00",
+        "group_tree": [
+          {
+            "group_tree/group_nest": [
+              {
+                "group_tree/group_nest/How_high_above_the_ground_is_the_nest": "13",
+                "group_tree/group_nest/group_egg": [
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "brown and speckled; medium"
+                  },
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "brown and speckled; large; cracked"
+                  },
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "light tan; small"
+                  }
+                ],
+                "group_tree/group_nest/How_many_eggs_are_in_the_nest": "3",
+                "group_tree/group_nest/group_egg_count": "3"
+              },
+              {
+                "group_tree/group_nest/How_high_above_the_ground_is_the_nest": "15",
+                "group_tree/group_nest/group_egg": [
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "cream-colored"
+                  }
+                ],
+                "group_tree/group_nest/How_many_eggs_are_in_the_nest": "1",
+                "group_tree/group_nest/group_egg_count": "1"
+              }
+            ],
+            "group_tree/What_kind_of_tree_is_this": "pine"
+          },
+          {
+            "group_tree/group_nest": [
+              {
+                "group_tree/group_nest/How_high_above_the_ground_is_the_nest": "10",
+                "group_tree/group_nest/group_egg": [
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "reddish-brown; medium"
+                  },
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "reddish-brown; small"
+                  }
+                ],
+                "group_tree/group_nest/How_many_eggs_are_in_the_nest": "2",
+                "group_tree/group_nest/group_egg_count": "2"
+              }
+            ],
+            "group_tree/What_kind_of_tree_is_this": "spruce"
+          }
+        ],
+        "__version__": "bird_nests_v1",
+        "formhub/uuid": "ddd2f25ff0f5464a9f91ad65130f1460"
+      },
+      {
+        "_validation_status": {
+          "by_whom": "user1",
+          "timestamp": 1531158682,
+          "uid": "validation_status_not_approved",
+          "color": "#00ff00",
+          "label":"Not approved"
+        },
+        "meta/instanceID": "uuid:790af158-7b24-4651-b584-27bf65b9e397",
+        "end": "2017-12-27T15:58:50.000-05:00",
+        "_submission_time": "2017-12-27T20:58:55",
+        "_id": 124,
+        "_uuid": "790af158-7b24-4651-b584-27bf65b9e397",
+        "start": "2017-12-27T15:58:20.000-05:00",
+        "group_tree": [
+          {
+            "group_tree/group_nest": [
+              {
+                "group_tree/group_nest/How_high_above_the_ground_is_the_nest": "23",
+                "group_tree/group_nest/group_egg": [
+                  {
+                    "group_tree/group_nest/group_egg/Describe_the_egg": "grey and speckled"
+                  }
+                ],
+                "group_tree/group_nest/How_many_eggs_are_in_the_nest": "1",
+                "group_tree/group_nest/group_egg_count": "1"
+              }
+            ],
+            "group_tree/What_kind_of_tree_is_this": "nan"
+          }
+        ],
+        "__version__": "bird_nests_v1",
+        "formhub/uuid": "ddd2f25ff0f5464a9f91ad65130f1460"
+      }
+    ]
+}
