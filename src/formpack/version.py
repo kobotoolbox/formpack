@@ -362,10 +362,17 @@ class AnalysisForm:
                 fields_by_source[field.source].append(field)
         return fields_by_source
 
+    def _map_sections_to_analysis_fields(self, survey_field):
+        _fields = []
+        for analysis_field in self.fields_by_source[survey_field.name]:
+            analysis_field.section = survey_field.section
+            _fields.append(analysis_field)
+        return _fields
+
     def insert_analysis_fields(self, fields):
         _fields = []
         for field in fields:
             _fields.append(field)
             if field.name in self.fields_by_source:
-                _fields += self.fields_by_source[field.name]
+                _fields += self._map_sections_to_analysis_fields(field)
         return _fields

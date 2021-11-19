@@ -29,6 +29,76 @@ def tests_additional_field_exports():
         'Sounds like an interesting person',
     ]
 
+def tests_additional_field_exports_repeat_groups():
+    title, schemas, submissions, analysis_form = build_fixture(
+        'analysis_form_repeat_groups'
+    )
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
+
+    options = {
+        'include_analysis_fields': True,
+        'versions': 'v1',
+    }
+    export = pack.export(**options)
+    values = export.to_dict(submissions)
+    assert [
+        'Clerk Interaction Repeat Groups',
+        'stores',
+        'record_interactions',
+        'record_ambient_noises',
+    ] == list(values.keys())
+
+    main_export_sheet = values['Clerk Interaction Repeat Groups']
+    assert ['enumerator_name', '_index'] == main_export_sheet['fields']
+    main_response0 = main_export_sheet['data'][0]
+    assert 'John Doe' == main_response0[0]
+
+    repeat_sheet_0 = values['stores']
+    assert 'Costco' == repeat_sheet_0['data'][0][0]
+
+    repeat_sheet_1 = values['record_interactions']
+    assert [
+        'record_a_note',
+        'record_a_note_transcription_acme_1_speech2text',
+    ] == repeat_sheet_1['fields'][:2]
+    assert 3 == len(repeat_sheet_1['data'])
+    repeat_data_response_1 = [res[:2] for res in repeat_sheet_1['data']]
+    repeat_data_expected_1 = [
+        [
+            'clerk_interaction_1.mp3',
+            'Hello how may I help you?',
+        ],
+        [
+            'clerk_interaction_2.mp3',
+            '',
+        ],
+        [
+            'clerk_interaction_3.mp3',
+            'Thank you for your business',
+        ],
+    ]
+    assert repeat_data_expected_1 == repeat_data_response_1
+
+    repeat_sheet_2 = values['record_ambient_noises']
+    assert [
+        'record_a_noise',
+        'record_a_noise_comment_on_noise_level',
+    ] == repeat_sheet_2['fields'][:2]
+    assert 2 == len(repeat_sheet_2['data'])
+    repeat_data_response_2 = [res[:2] for res in repeat_sheet_2['data']]
+    repeat_data_expected_2 = [
+        [
+            'noise_1.mp3',
+            "Lot's of noise",
+        ],
+        [
+            'noise_2.mp3',
+            'Quiet',
+        ],
+    ]
+    assert repeat_data_expected_2 == repeat_data_response_2
+
 def tests_additional_field_exports_advanced():
     title, schemas, submissions, analysis_form = build_fixture(
         'analysis_form_advanced'

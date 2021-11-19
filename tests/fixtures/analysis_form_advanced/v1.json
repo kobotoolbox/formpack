@@ -3,6 +3,14 @@
   "content": {
     "survey": [
         {
+            "type": "begin_group",
+            "name": "clerk_interactions",
+            "label": [
+                "Clerk interactions",
+                "Komizo-interagoj"
+            ]
+        },
+        {
             "type": "audio",
             "name": "record_a_note",
             "label": [
@@ -17,6 +25,9 @@
                 "What are some goods sold at the store?",
                 "Kio estas iuj varoj venditaj en la vendejo?"
             ]
+        },
+        {
+            "type": "end_group"
         }
     ],
     "choices": [
@@ -58,8 +69,8 @@
   },
   "submissions": [
     {
-      "record_a_note": "clerk_interaction_1.mp3",
-      "goods_sold": "chocolate",
+      "clerk_interactions/record_a_note": "clerk_interaction_1.mp3",
+      "clerk_interactions/goods_sold": "chocolate",
       "_attachments": [
         {"mimetype": "audio/mpeg", "filename": "clerk_interaction_1.mp3"}
       ],
@@ -71,8 +82,8 @@
       }
     },
     {
-      "record_a_note": "clerk_interaction_2.mp3",
-      "goods_sold": "chocolate fruit pasta",
+      "clerk_interactions/record_a_note": "clerk_interaction_2.mp3",
+      "clerk_interactions/goods_sold": "chocolate fruit pasta",
       "_attachments": [
         {"mimetype": "audio/mpeg", "filename": "clerk_interaction_2.mp3"}
       ],
@@ -83,8 +94,8 @@
       }
     },
     {
-      "record_a_note": "clerk_interaction_3.mp3",
-      "goods_sold": "pasta",
+      "clerk_interactions/record_a_note": "clerk_interaction_3.mp3",
+      "clerk_interactions/goods_sold": "pasta",
       "_attachments": [
         {"mimetype": "audio/mpeg", "filename": "clerk_interaction_3.mp3"}
       ],

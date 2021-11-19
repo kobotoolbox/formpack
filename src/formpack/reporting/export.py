@@ -316,6 +316,8 @@ class Export:
         submission,
         current_section,
         attachments=None,
+        supplemental_details=None,
+        repeat_index=0,
     ):
 
         # 'current_section' is the name of what will become sheets in xls.
@@ -381,9 +383,14 @@ class Export:
                 if re.match(fr'^.*/{_val}$', f['filename']) is not None
             ]
 
-        def _get_value_from_entry(entry, field):
-            if field.analysis_question and '_supplementalDetails' in entry:
-                return entry['_supplementalDetails'].get(field.name)
+        def _get_value_from_entry(entry, field, supplemental_details):
+            if field.analysis_question and supplemental_details:
+                sd = supplemental_details.get(field.name)
+                if isinstance(sd, str):
+                    return sd
+                if isinstance(sd, list):
+                    _v = [v['value'] for v in sd if v['_index'] == repeat_index]
+                    return _v[0] if _v else ''
 
             suffix = 'meta/' if field.data_type == 'audit' else ''
             return entry.get(f'{suffix}{field.path}')
@@ -425,13 +432,15 @@ class Export:
             row.update(_empty_row)
 
             attachments = entry.get('_attachments') or attachments
+            supplemental_details = (
+                entry.get('_supplementalDetails') or supplemental_details
+            )
 
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
-
                     # get submission value for this field
-                    val = _get_value_from_entry(entry, field)
+                    val = _get_value_from_entry(entry, field, supplemental_details)
                     # get the attachment for this field
                     attachment = _get_attachment(val, field, attachments)
                     # get a mapping of {"col_name": "val", ...}
@@ -486,7 +495,9 @@ class Export:
                     chunk = self.format_one_submission(
                         entry[child_section.path],
                         child_section,
-                        attachments,
+                        attachemnts=attachments,
+                        supplemental_details=supplemental_details,
+                        repeat_index=repeat_index,
                     )
                     for key, value in iter(chunk.items()):
                         if key in chunks:
@@ -494,7 +505,12 @@ class Export:
                         else:
                             chunks[key] = value
 
+                # Reset the repeat index once we're done with this current
+                # repeat group
+                repeat_index = 0
+
             _indexes[_section_name] += 1
+            repeat_index += 1
 
         return chunks
 
