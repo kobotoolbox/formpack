@@ -495,7 +495,7 @@ class Export:
                     chunk = self.format_one_submission(
                         entry[child_section.path],
                         child_section,
-                        attachemnts=attachments,
+                        attachments=attachments,
                         supplemental_details=supplemental_details,
                         repeat_index=repeat_index,
                     )
