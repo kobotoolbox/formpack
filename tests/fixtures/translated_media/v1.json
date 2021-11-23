@@ -1,0 +1,24 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+      {
+        "type": "text",
+        "name": "fav_emperor",
+        "label::English (en)": "Who is your favourite emperor?",
+        "label::Esperanto (es)": "Kiu estas via plej ŝatata imperiestro?"
+      },
+      {
+        "type": "note",
+        "name": "emperors",
+        "image::English (en)": "caesar_en.png",
+        "image::Esperanto (es)": "caesar_es.png"
+      }
+    ]
+  },
+  "submissions": [
+    {
+      "fav_emperor": "caesar"
+    }
+  ]
+}

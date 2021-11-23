@@ -451,6 +451,18 @@ class TestFormPackExport(unittest.TestCase):
         )
         self.assertEqual(export, expected_dict)
 
+    def test_translated_media(self):
+        title, schemas, submissions = build_fixture('translated_media')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'v1'}
+        export = fp.export(**options)
+        expected_dict = export.to_dict(submissions)
+
+        with TempDir() as d:
+            xls = d / 'foo.xlsx'
+            export.to_xlsx(xls, submissions)
+            assert xls.isfile()
+
     def test_media_types_include_media_url(self):
         # need to make sure that filenames such as "another-julius 1).jpg"
         # don't break the export

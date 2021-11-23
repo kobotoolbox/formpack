@@ -186,19 +186,29 @@ def _get_special_survey_cols(content):
             continue
         if column_name.startswith('body:'):
             continue
-        mtch = re.match(r'^media\s*::?\s*([^:]+)\s*::?\s*([^:]+)$', column_name)
+        mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)\s*::?\s*([^:]+)$', column_name)
         if mtch:
             matched = mtch.groups()
-            media_type = matched[0]
+            if len(matched) == 3:
+                media_type = matched[1]
+                trans = matched[2]
+            else:
+                media_type = matched[0]
+                trans = matched[1]
+
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
                           coltype='media',
                           media=media_type,
-                          translation=matched[1])
+                          translation=trans)
             continue
-        mtch = re.match(r'^media\s*::?\s*([^:]+)$', column_name)
+        mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)$', column_name)
         if mtch:
-            media_type = mtch.groups()[0]
+            matched = mtch.groups()
+            if len(matched) == 2:
+                media_type = matched[1]
+            else:
+                media_type = matched[0]
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
                           coltype='media',
