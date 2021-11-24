@@ -143,6 +143,26 @@ def expand_content(content, in_place=False):
         return content_copy
 
 
+def _get_known_translated_cols(translated_cols):
+    """
+    This is necessary to handle a legacy issue where media attributes such as
+    `image`, `audio` and `video` were transformed to `media::x`, but their
+    value in the `translated` list was still `x` therefore not being recognized
+    as a "known translated" column. This resulted in a mismatch in labels and
+    translations and broke the exports and autoreport.
+    """
+    if not translated_cols:
+        return []
+
+    _translated_cols = []
+    for col in translated_cols:
+        if col in ['image', 'audio', 'video']:
+            col = f'media::{col}'
+        _translated_cols.append(col)
+
+    return _translated_cols
+
+
 def _get_special_survey_cols(content):
     """
     This will extract information about columns in an xlsform with ':'s
@@ -158,7 +178,9 @@ def _get_special_survey_cols(content):
     uniq_cols = OrderedDict()
     special = OrderedDict()
 
-    known_translated_cols = content.get('translated', [])
+    known_translated_cols = _get_known_translated_cols(
+        content.get('translated')
+    )
 
     def _pluck_uniq_cols(sheet_name):
         for row in content.get(sheet_name, []):
