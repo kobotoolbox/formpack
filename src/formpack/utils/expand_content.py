@@ -211,12 +211,8 @@ def _get_special_survey_cols(content):
         mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)\s*::?\s*([^:]+)$', column_name)
         if mtch:
             matched = mtch.groups()
-            if len(matched) == 3:
-                media_type = matched[1]
-                trans = matched[2]
-            else:
-                media_type = matched[0]
-                trans = matched[1]
+            media_type = matched[-2]
+            trans = matched[-1]
 
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
@@ -227,10 +223,7 @@ def _get_special_survey_cols(content):
         mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)$', column_name)
         if mtch:
             matched = mtch.groups()
-            if len(matched) == 2:
-                media_type = matched[1]
-            else:
-                media_type = matched[0]
+            media_type = matched[-1]
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
                           coltype='media',
