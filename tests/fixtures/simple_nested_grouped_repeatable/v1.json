@@ -1,0 +1,60 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+      {
+        "type": "begin_repeat",
+        "name": "cities",
+        "label": [
+          "Cities",
+          "Urboj"
+        ]
+      },
+      {
+        "type": "begin_repeat",
+        "name": "respondents",
+        "label": [
+          "Respondents",
+          "Respondantoj"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "respondent_name",
+        "label": [
+          "What is the respondent's name?",
+          "Kio estas la nomo de la respondanto?"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "end_repeat"
+      }
+    ],
+    "translated": [
+      "label"
+    ],
+    "translations": [
+      "English (en)",
+      "Esperanto (eo)"
+    ]
+  },
+  "submissions": [
+    {
+      "cities": [
+        {
+          "cities/respondents": [
+            {
+              "cities/respondents/respondent_name": "Caesar"
+            },
+            {
+              "cities/respondents/respondent_name": "Augustus"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

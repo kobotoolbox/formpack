@@ -1,0 +1,97 @@
+{
+  "version": "v2",
+  "content": {
+    "survey": [
+      {
+        "type": "begin_repeat",
+        "name": "cities",
+        "label": [
+          "Cities",
+          "Urboj"
+        ]
+      },
+      {
+        "type": "begin_repeat",
+        "name": "respondents",
+        "label": [
+          "Respondents",
+          "Respondantoj"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "respondent_name",
+        "label": [
+          "What is the respondent's name?",
+          "Kio estas la nomo de la respondanto?"
+        ]
+      },
+      {
+        "type": "integer",
+        "name": "respondent_age",
+        "label": [
+          "What is the respondent's age?",
+          "Kio estas la aĝo de la respondanto?"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "begin_repeat",
+        "name": "items",
+        "label": [
+          "Items",
+          "Eroj"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "item",
+        "label": [
+          "What is the item?",
+          "Kio estas la objekto?"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "end_repeat"
+      }
+    ],
+    "translated": [
+      "label"
+    ],
+    "translations": [
+      "English (en)",
+      "Esperanto (eo)"
+    ]
+  },
+  "submissions": [
+    {
+      "cities": [
+        {
+          "cities/respondents": [
+            {
+              "cities/respondents/respondent_name": "Caesar",
+              "cities/respondents/respondent_age": "55"
+            },
+            {
+              "cities/respondents/respondent_name": "Augustus",
+              "cities/respondents/respondent_age": "75"
+            }
+          ],
+          "cities/items": [
+            {
+              "cities/items/item": "Sword"
+            },
+            {
+              "cities/items/item": "Thrown"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
