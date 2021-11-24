@@ -212,13 +212,12 @@ def _get_special_survey_cols(content):
         if mtch:
             matched = mtch.groups()
             media_type = matched[-2]
-            trans = matched[-1]
-
+            translation = matched[-1]
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
                           coltype='media',
                           media=media_type,
-                          translation=trans)
+                          translation=translation)
             continue
         mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)$', column_name)
         if mtch:
