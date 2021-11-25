@@ -202,7 +202,7 @@ def _get_special_survey_cols(content):
             _mark_special(column_name=column_name,
                           column=column_name,
                           translation=UNTRANSLATED)
-        if ':' not in column_name:
+        if ':' not in column_name and column_name not in ['image','audio','video']:
             continue
         if column_name.startswith('bind:'):
             continue
