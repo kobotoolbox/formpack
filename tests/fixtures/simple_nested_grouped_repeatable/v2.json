@@ -34,7 +34,7 @@
         "name": "items",
         "label": [
           "Items",
-          "Items"
+          "Eroj"
         ]
       },
       {
@@ -42,7 +42,7 @@
         "name": "item",
         "label": [
           "What is the item?",
-          "What is the item?"
+          "Kio estas la objekto?"
         ]
       },
       {
