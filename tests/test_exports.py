@@ -288,12 +288,20 @@ class TestFormPackExport(unittest.TestCase):
                                             'respondent2\'s r3',
                                             'respondent2\'s r4']])
 
-    def test_simple_nested_repeat(self):
-        title, schemas, submissions = build_fixture('simple_grouped_repeatable')
+    def test_simple_nested_grouped_repeatable(self):
+        title, schemas, submissions = build_fixture(
+            'simple_nested_grouped_repeatable'
+        )
         fp = FormPack(schemas, title)
-        options = {'versions': fp.versions, 'force_index': True}
+        options = {'versions': fp.versions}
         export = fp.export(**options)
         actual_dict = export.to_dict(submissions)
+        assert 4 == len(actual_dict)
+
+        with TempDir() as d:
+            xls = d / 'foo.xlsx'
+            export.to_xlsx(xls, submissions)
+            assert xls.isfile()
 
     def test_repeats(self):
         title, schemas, submissions = build_fixture('grouped_repeatable')
