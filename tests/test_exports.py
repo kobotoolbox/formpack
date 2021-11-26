@@ -296,7 +296,62 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': fp.versions}
         export = fp.export(**options)
         actual_dict = export.to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Simple nested grouped repeatable',
+                    {'data': [[1], [2]], 'fields': ['_index']},
+                ),
+                (
+                    'cities',
+                    {
+                        'data': [
+                            [1, 'Simple nested grouped repeatable', 1],
+                            [2, 'Simple nested grouped repeatable', 2],
+                        ],
+                        'fields': [
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                    },
+                ),
+                (
+                    'respondents',
+                    {
+                        'data': [
+                            ['Caesar', '', 'cities', 1],
+                            ['Augustus', '', 'cities', 1],
+                            ['Caesar', '55', 'cities', 2],
+                            ['Augustus', '75', 'cities', 2],
+                        ],
+                        'fields': [
+                            'respondent_name',
+                            'respondent_age',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                    },
+                ),
+                (
+                    'items',
+                    {
+                        'data': [
+                            ['Sword', 'cities', 2],
+                            ['Thrown', 'cities', 2],
+                        ],
+                        'fields': [
+                            'item',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                    },
+                ),
+            ]
+        )
+
         assert 4 == len(actual_dict)
+        assert expected_dict == actual_dict
 
         with TempDir() as d:
             xls = d / 'foo.xlsx'

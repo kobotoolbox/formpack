@@ -27,6 +27,14 @@
         ]
       },
       {
+        "type": "integer",
+        "name": "respondent_age",
+        "label": [
+          "What is the respondent's age?",
+          "Kio estas la aĝo de la respondanto?"
+        ]
+      },
+      {
         "type": "end_repeat"
       },
       {
@@ -66,14 +74,14 @@
         {
           "cities/respondents": [
             {
-              "cities/respondents/respondent_name": "Caesar"
+              "cities/respondents/respondent_name": "Caesar",
+              "cities/respondents/respondent_age": "55"
             },
             {
-              "cities/respondents/respondent_name": "Augustus"
+              "cities/respondents/respondent_name": "Augustus",
+              "cities/respondents/respondent_age": "75"
             }
-          ]
-        },
-        {
+          ],
           "cities/items": [
             {
               "cities/items/item": "Sword"
