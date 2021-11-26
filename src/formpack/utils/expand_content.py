@@ -10,8 +10,12 @@ from copy import deepcopy
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES, selects
-from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
-                         TAG_COLUMNS_AND_SEPARATORS)
+from ..constants import (
+    MEDIA_TYPES,
+    OR_OTHER_COLUMN,
+    TAG_COLUMNS_AND_SEPARATORS,
+    UNTRANSLATED,
+)
 
 REMOVE_EMPTY_STRINGS = True
 # this will be used to check which version of formpack was used to compile the
@@ -156,7 +160,7 @@ def _get_known_translated_cols(translated_cols):
 
     _translated_cols = []
     for col in translated_cols:
-        if col in ['image', 'audio', 'video']:
+        if col in MEDIA_TYPES:
             col = f'media::{col}'
         _translated_cols.append(col)
 
@@ -175,6 +179,8 @@ def _get_special_survey_cols(content):
         'hint::English',
     For more examples, see tests.
     """
+    RE_MEDIA_TYPES = '|'.join(MEDIA_TYPES)
+
     uniq_cols = OrderedDict()
     special = OrderedDict()
 
@@ -202,13 +208,13 @@ def _get_special_survey_cols(content):
             _mark_special(column_name=column_name,
                           column=column_name,
                           translation=UNTRANSLATED)
-        if ':' not in column_name and column_name not in ['image','audio','video']:
+        if ':' not in column_name and column_name not in MEDIA_TYPES:
             continue
         if column_name.startswith('bind:'):
             continue
         if column_name.startswith('body:'):
             continue
-        mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)\s*::?\s*([^:]+)$', column_name)
+        mtch = re.match(rf'^(media\s*::?\s*)?({RE_MEDIA_TYPES})\s*::?\s*([^:]+)$', column_name)
         if mtch:
             matched = mtch.groups()
             media_type = matched[-2]
@@ -219,7 +225,7 @@ def _get_special_survey_cols(content):
                           media=media_type,
                           translation=translation)
             continue
-        mtch = re.match(r'^(media\s*::?\s*)?(image|video|audio)$', column_name)
+        mtch = re.match(rf'^(media\s*::?\s*)?({RE_MEDIA_TYPES})$', column_name)
         if mtch:
             matched = mtch.groups()
             media_type = matched[-1]
