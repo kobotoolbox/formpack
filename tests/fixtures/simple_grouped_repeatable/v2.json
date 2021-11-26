@@ -1,0 +1,89 @@
+{
+  "version": "v2",
+  "content": {
+    "survey": [
+      {
+        "type": "begin_repeat",
+        "name": "cities",
+        "label": [
+          "Cities",
+          "Urboj"
+        ]
+      },
+      {
+        "type": "begin_repeat",
+        "name": "responents",
+        "label": [
+          "Respondents",
+          "Respondantoj"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "respondent_name",
+        "label": [
+          "What is the respondent's name?",
+          "Kio estas la nomo de la respondanto?"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "begin_repeat",
+        "name": "items",
+        "label": [
+          "Items",
+          "Items"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "item",
+        "label": [
+          "What is the item?",
+          "What is the item?"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "end_repeat"
+      }
+    ],
+    "translated": [
+      "label"
+    ],
+    "translations": [
+      "English (en)",
+      "Esperanto (eo)"
+    ]
+  },
+  "submissions": [
+    {
+      "cities": [
+        {
+          "cities/respondents": [
+            {
+              "cities/respondents/respondent_name": "Caesar"
+            },
+            {
+              "cities/respondents/respondent_name": "Augustus"
+            }
+          ]
+        },
+        {
+          "cities/items": [
+            {
+              "cities/items/item": "Sword"
+            },
+            {
+              "cities/items/item": "Thrown"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

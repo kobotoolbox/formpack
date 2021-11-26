@@ -10,5 +10,6 @@ DATA = {
     'id_string': 'simple_grouped_repeatable',
     'versions': [
         load_fixture_json('simple_grouped_repeatable/v1'),
+        load_fixture_json('simple_grouped_repeatable/v2'),
     ],
 }

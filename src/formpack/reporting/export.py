@@ -13,7 +13,7 @@ from ..constants import (
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
-from ..schema import CopyField, FormSection
+from ..schema import CopyField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
@@ -226,12 +226,8 @@ class Export:
 
         # Collect all the sections regardless if they contain any fields
         all_sections = {}
-        for field in all_fields:
-            for item in field.hierarchy:
-                if not isinstance(item, FormSection):
-                    continue
-                if item.name not in all_sections:
-                    all_sections[item.name] = item
+        for version in self.versions.values():
+            all_sections.update(version.sections)
 
         # {section: [field_object, field_object, …], …}
         # {section: [field_label, field_label, …], …}

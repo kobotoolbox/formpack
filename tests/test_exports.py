@@ -291,7 +291,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_simple_nested_repeat(self):
         title, schemas, submissions = build_fixture('simple_grouped_repeatable')
         fp = FormPack(schemas, title)
-        options = {'versions': 'v1', 'force_index': True}
+        options = {'versions': fp.versions, 'force_index': True}
         export = fp.export(**options)
         actual_dict = export.to_dict(submissions)
 
