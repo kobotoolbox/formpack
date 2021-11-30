@@ -385,11 +385,14 @@ class Export:
 
         def _get_value_from_entry(entry, field, supplemental_details):
             if field.analysis_question and supplemental_details:
-                sd = supplemental_details.get(field.name)
-                if isinstance(sd, str):
-                    return sd
-                if isinstance(sd, list):
-                    _v = [v['value'] for v in sd if v['_index'] == repeat_index]
+                sd = supplemental_details.get(field.source, {})
+                if not sd:
+                    return
+                val = sd.get(field.analysis_path[-1], '')
+                if isinstance(val, str):
+                    return val
+                if isinstance(val, list):
+                    _v = [v['value'] for v in val if v['_index'] == repeat_index]
                     return _v[0] if _v else ''
 
             suffix = 'meta/' if field.data_type == 'audit' else ''

@@ -35,6 +35,7 @@ class FormField(FormDataDef):
             self.source = source
             self.analysis_question = True
             self.analysis_type = kwargs.get('analysis_type')
+            self.analysis_path = kwargs.get('analysis_path')
             self.settings = kwargs.get('settings')
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
@@ -168,6 +169,7 @@ class FormField(FormDataDef):
         source = definition.get('source')
         analysis_type = definition.get('analysis_type', ANALYSIS_TYPE_CODING)
         settings = definition.get('settings', {})
+        analysis_path = definition.get('path')
 
         # normalize spaces
         data_type = definition['type']
@@ -248,6 +250,7 @@ class FormField(FormDataDef):
             'source': source,
             'analysis_type': analysis_type,
             'settings': settings,
+            'analysis_path': analysis_path,
         }
 
         if data_type == 'select_multiple' and appearance == 'literacy':
