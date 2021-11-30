@@ -2,7 +2,7 @@
 from formpack import FormPack
 from .fixtures import build_fixture
 
-def tests_additional_field_exports():
+def tests_additional_field_exports_x():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
@@ -15,10 +15,10 @@ def tests_additional_field_exports():
     assert 3 == len(main_export_sheet['data'])
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_acme_timestamp',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/acme_timestamp',
         'name_of_clerk',
-        'name_of_clerk_comment',
+        'name_of_clerk/comment',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -60,7 +60,7 @@ def tests_additional_field_exports_repeat_groups():
     repeat_sheet_1 = values['record_interactions']
     assert [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
+        'record_a_note/transcript_acme_1_speech2text',
     ] == repeat_sheet_1['fields'][:2]
     assert 3 == len(repeat_sheet_1['data'])
     repeat_data_response_1 = [res[:2] for res in repeat_sheet_1['data']]
@@ -83,7 +83,7 @@ def tests_additional_field_exports_repeat_groups():
     repeat_sheet_2 = values['record_ambient_noises']
     assert [
         'record_a_noise',
-        'record_a_noise_comment_on_noise_level',
+        'record_a_noise/comment_on_noise_level',
     ] == repeat_sheet_2['fields'][:2]
     assert 2 == len(repeat_sheet_2['data'])
     repeat_data_response_2 = [res[:2] for res in repeat_sheet_2['data']]
@@ -118,17 +118,17 @@ def tests_additional_field_exports_advanced():
     assert 3 == len(main_export_sheet['data'])
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_tone_of_voice',
-        'record_a_note_tone_of_voice/anxious',
-        'record_a_note_tone_of_voice/excited',
-        'record_a_note_tone_of_voice/confused',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/tone_of_voice',
+        'record_a_note/tone_of_voice/anxious',
+        'record_a_note/tone_of_voice/excited',
+        'record_a_note/tone_of_voice/confused',
         'goods_sold',
         'goods_sold/chocolate',
         'goods_sold/fruit',
         'goods_sold/pasta',
-        'goods_sold_comment',
-        'goods_sold_rating',
+        'goods_sold/comment',
+        'goods_sold/rating',
     ]
     assert main_export_sheet['data'] == [
         [
@@ -182,15 +182,15 @@ def tests_additional_field_exports_advanced():
 
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_tone_of_voice/anxious',
-        'record_a_note_tone_of_voice/excited',
-        'record_a_note_tone_of_voice/confused',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/tone_of_voice/anxious',
+        'record_a_note/tone_of_voice/excited',
+        'record_a_note/tone_of_voice/confused',
         'goods_sold/chocolate',
         'goods_sold/fruit',
         'goods_sold/pasta',
-        'goods_sold_comment',
-        'goods_sold_rating',
+        'goods_sold/comment',
+        'goods_sold/rating',
     ]
     assert main_export_sheet['data'] == [
         [
@@ -238,11 +238,11 @@ def tests_additional_field_exports_advanced():
 
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_tone_of_voice',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/tone_of_voice',
         'goods_sold',
-        'goods_sold_comment',
-        'goods_sold_rating',
+        'goods_sold/comment',
+        'goods_sold/rating',
     ]
     assert main_export_sheet['data'] == [
         [
@@ -284,10 +284,10 @@ def tests_additional_field_exports_v2():
     assert 3 == len(main_export_sheet['data'])
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_acme_timestamp',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop_comment',
+        'name_of_shop/comment',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -311,12 +311,12 @@ def tests_additional_field_exports_all_versions():
     assert 6 == len(main_export_sheet['data'])
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_acme_timestamp',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop_comment',
+        'name_of_shop/comment',
         'name_of_clerk',
-        'name_of_clerk_comment',
+        'name_of_clerk/comment',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -399,12 +399,12 @@ def tests_additional_field_exports_all_versions_langs():
 
     assert main_export_sheet['fields'] == [
         'Registri oficiston dirantan ion',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_acme_timestamp',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/acme_timestamp',
         'Kio estas la nomo de la butiko?',
-        'name_of_shop_comment',
+        'name_of_shop/comment',
         'name_of_clerk',
-        'name_of_clerk_comment',
+        'name_of_clerk/comment',
     ]
 
     options['lang'] = None
@@ -414,12 +414,12 @@ def tests_additional_field_exports_all_versions_langs():
 
     assert main_export_sheet['fields'] == [
         'record_a_note',
-        'record_a_note_transcription_acme_1_speech2text',
-        'record_a_note_acme_timestamp',
+        'record_a_note/transcript_acme_1_speech2text',
+        'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop_comment',
+        'name_of_shop/comment',
         'name_of_clerk',
-        'name_of_clerk_comment',
+        'name_of_clerk/comment',
     ]
 
 def test_simple_report_with_analysis_form():
