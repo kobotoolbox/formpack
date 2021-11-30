@@ -1,5 +1,5 @@
 # coding: utf-8
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from pyxform import aliases as pyxform_aliases
 
@@ -354,12 +354,9 @@ class AnalysisForm:
         return f"<AnalysisForm parent='{self.form_pack.title}'>"
 
     def _get_fields_by_source(self):
-        fields_by_source = {}
+        fields_by_source = defaultdict(list)
         for field in self.fields:
-            if field.source not in fields_by_source:
-                fields_by_source[field.source] = [field]
-            else:
-                fields_by_source[field.source].append(field)
+            fields_by_source[field.source].append(field)
         return fields_by_source
 
     def _map_sections_to_analysis_fields(self, survey_field):
