@@ -383,17 +383,27 @@ class Export:
                 if re.match(fr'^.*/{_val}$', f['filename']) is not None
             ]
 
+        def _get_value_from_supplemental_details(field, supplemental_details):
+            source, name = field.analysis_path
+            _sup_details = supplemental_details.get(source, {})
+
+            if not _sup_details:
+                return
+
+            val = _sup_details.get(name, '')
+            if isinstance(val, str):
+                return val
+
+            # TODO: improve MVP handling of repeat groups for future
+            if isinstance(val, list):
+                _v = [v['value'] for v in val if v['_index'] == repeat_index]
+                return _v[0] if _v else ''
+
         def _get_value_from_entry(entry, field, supplemental_details):
             if field.analysis_question and supplemental_details:
-                sd = supplemental_details.get(field.source, {})
-                if not sd:
-                    return
-                val = sd.get(field.analysis_path[-1], '')
-                if isinstance(val, str):
-                    return val
-                if isinstance(val, list):
-                    _v = [v['value'] for v in val if v['_index'] == repeat_index]
-                    return _v[0] if _v else ''
+                return _get_value_from_supplemental_details(
+                    field, supplemental_details
+                )
 
             suffix = 'meta/' if field.data_type == 'audit' else ''
             return entry.get(f'{suffix}{field.path}')
