@@ -12,7 +12,9 @@
         "record_a_note",
         "transcript_acme_1_speech2text"
       ],
-      "label": ": ACME Transcription",
+      "label": [
+        ": ACME Transcription"
+      ],
       "source": "record_a_note",
       "analysis_type": "transcript",
       "settings": {
@@ -27,7 +29,9 @@
         "record_a_note",
         "acme_timestamp"
       ],
-      "label": "Transcription Timestamp",
+      "label": [
+        "Transcription Timestamp"
+      ],
       "source": "record_a_note"
     },
     {
@@ -37,7 +41,9 @@
         "name_of_clerk",
         "comment"
       ],
-      "label": "Comment on the name of the clerk",
+      "label": [
+        "Comment on the name of the clerk"
+      ],
       "source": "name_of_clerk"
     },
     {
@@ -47,7 +53,9 @@
         "name_of_shop",
         "comment"
       ],
-      "label": "Comment on the name of the shop",
+      "label": [
+        "Comment on the name of the shop"
+      ],
       "source": "name_of_shop"
     }
   ]

@@ -2,7 +2,7 @@
 from formpack import FormPack
 from .fixtures import build_fixture
 
-def tests_additional_field_exports_x():
+def tests_additional_field_exports():
     title, schemas, submissions, analysis_form = build_fixture('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
