@@ -326,6 +326,7 @@ class AnalysisForm:
         self.form_pack = form_pack
 
         survey = self.schema.get('additional_fields', [])
+        fields_by_name = {row['name']:row for row in survey}
         section = FormSection(name=form_pack.title)
 
         self.translations = [
@@ -338,16 +339,26 @@ class AnalysisForm:
             choices_definition, self.translations
         )
 
-        self.fields = [
-            FormField.from_json_definition(
+        for data_def in survey:
+            field = FormField.from_json_definition(
                 definition=data_def,
                 field_choices=field_choices,
                 section=section,
                 translations=self.translations,
             )
-            for data_def in survey
-        ]
 
+            _f = fields_by_name[field.name]
+            _labels = LabelStruct()
+            if 'label' in _f:
+                if not isinstance(_f['label'], list):
+                    _f['label'] = [_f['label']]
+                _labels = LabelStruct(
+                    labels=_f['label'], translations=self.translations
+                )
+            field.labels = _labels
+            section.fields[field.name] = field
+
+        self.fields = list(section.fields.values())
         self.fields_by_source = self._get_fields_by_source()
 
     def __repr__(self):
