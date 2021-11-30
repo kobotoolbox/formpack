@@ -2,43 +2,43 @@
   "version": "v1",
   "content": {
     "survey": [
-        {
-            "type": "audio",
-            "name": "record_a_note",
-            "label": [
-                "Record a clerk saying something",
-                "Registri oficiston dirantan ion"
-            ]
-        },
-        {
-            "type": "begin_group",
-            "name": "clerk_details",
-            "label": [
-                "Some details of the clerk",
-                "Kelkaj detaloj de la oficisto"
-            ]
-        },
-        {
-            "type": "text",
-            "name": "name_of_clerk",
-            "label": [
-                "What is the clerk's name?",
-                ""
-            ]
-        },
-        {
-            "type": "end_group"
-        }
+      {
+        "type": "audio",
+        "name": "record_a_note",
+        "label": [
+          "Record a clerk saying something",
+          "Registri oficiston dirantan ion"
+        ]
+      },
+      {
+        "type": "begin_group",
+        "name": "clerk_details",
+        "label": [
+          "Some details of the clerk",
+          "Kelkaj detaloj de la oficisto"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "name_of_clerk",
+        "label": [
+          "What is the clerk's name?",
+          ""
+        ]
+      },
+      {
+        "type": "end_group"
+      }
     ],
     "settings": {
-        "version": "v1"
+      "version": "v1"
     },
     "translated": [
-        "label"
+      "label"
     ],
     "translations": [
-        "English (en)",
-        "Esperanto (es)"
+      "English (en)",
+      "Esperanto (es)"
     ]
   },
   "submissions": [
@@ -46,29 +46,44 @@
       "record_a_note": "clerk_interaction_1.mp3",
       "clerk_details/name_of_clerk": "John",
       "_attachments": [
-        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_1.mp3"}
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_1.mp3"
+        }
       ],
       "_supplementalDetails": {
-        "record_a_note_transcription_acme_1_speech2text": "Hello how may I help you?",
-        "record_a_note_acme_timestamp": "2021-11-01Z",
-        "name_of_clerk_comment": "Sounds like an interesting person"
+        "record_a_note": {
+          "transcript_acme_1_speech2text": "Hello how may I help you?",
+          "acme_timestamp": "2021-11-01Z"
+        },
+        "name_of_clerk": {
+          "comment": "Sounds like an interesting person"
+        }
       }
     },
     {
       "record_a_note": "clerk_interaction_2.mp3",
       "clerk_details/name_of_clerk": "Alex",
       "_attachments": [
-        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_2.mp3"}
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_2.mp3"
+        }
       ],
       "_supplementalDetails": {
-        "record_a_note_transcription_acme_1_speech2text": "Thank you for your business"
+        "record_a_note": {
+          "transcript_acme_1_speech2text": "Thank you for your business"
+        }
       }
     },
     {
       "record_a_note": "clerk_interaction_3.mp3",
       "clerk_details/name_of_clerk": "Olivier",
       "_attachments": [
-        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_3.mp3"}
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_3.mp3"
+        }
       ],
       "_supplementalDetails": {}
     }

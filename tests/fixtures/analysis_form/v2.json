@@ -2,43 +2,43 @@
   "version": "v2",
   "content": {
     "survey": [
-        {
-            "type": "audio",
-            "name": "record_a_note",
-            "label": [
-                "Record a clerk saying something",
-                "Registri oficiston dirantan ion"
-            ]
-        },
-        {
-            "type": "begin_group",
-            "name": "clerk_details",
-            "label": [
-                "Some details of the clerk",
-                "Kelkaj detaloj de la oficisto"
-            ]
-        },
-        {
-            "type": "text",
-            "name": "name_of_shop",
-            "label": [
-                "What is the shop's name?",
-                "Kio estas la nomo de la butiko?"
-            ]
-        },
-        {
-            "type": "end_group"
-        }
+      {
+        "type": "audio",
+        "name": "record_a_note",
+        "label": [
+          "Record a clerk saying something",
+          "Registri oficiston dirantan ion"
+        ]
+      },
+      {
+        "type": "begin_group",
+        "name": "clerk_details",
+        "label": [
+          "Some details of the clerk",
+          "Kelkaj detaloj de la oficisto"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "name_of_shop",
+        "label": [
+          "What is the shop's name?",
+          "Kio estas la nomo de la butiko?"
+        ]
+      },
+      {
+        "type": "end_group"
+      }
     ],
     "settings": {
-        "version": "v2"
+      "version": "v2"
     },
     "translated": [
-        "label"
+      "label"
     ],
     "translations": [
-        "English (en)",
-        "Esperanto (es)"
+      "English (en)",
+      "Esperanto (es)"
     ]
   },
   "submissions": [
@@ -46,29 +46,44 @@
       "record_a_note": "clerk_interaction_4.mp3",
       "clerk_details/name_of_shop": "Save On",
       "_attachments": [
-        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_4.mp3"}
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_4.mp3"
+        }
       ],
       "_supplementalDetails": {
-        "record_a_note_transcription_acme_1_speech2text": "Hello how may I help you?",
-        "record_a_note_acme_timestamp": "2021-11-01Z",
-        "name_of_shop_comment": "Pretty cliche"
+        "record_a_note": {
+          "transcript_acme_1_speech2text": "Hello how may I help you?",
+          "acme_timestamp": "2021-11-01Z"
+        },
+        "name_of_shop": {
+          "comment": "Pretty cliche"
+        }
       }
     },
     {
       "record_a_note": "clerk_interaction_5.mp3",
       "clerk_details/name_of_shop": "Walmart",
       "_attachments": [
-        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_5.mp3"}
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_5.mp3"
+        }
       ],
       "_supplementalDetails": {
-        "record_a_note_transcription_acme_1_speech2text": "Thank you for your business"
+        "record_a_note": {
+          "transcript_acme_1_speech2text": "Thank you for your business"
+        }
       }
     },
     {
       "record_a_note": "clerk_interaction_6.mp3",
       "clerk_details/name_of_shop": "Costco",
       "_attachments": [
-        {"mimetype": "audio/mpeg", "filename": "clerk_interaction_6.mp3"}
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_6.mp3"
+        }
       ],
       "_supplementalDetails": {}
     }

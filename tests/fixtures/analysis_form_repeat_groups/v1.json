@@ -27,12 +27,12 @@
         ]
       },
       {
-          "type": "begin_group",
-          "name": "recordings",
-          "label": [
-              "Recordings",
-              "Registradoj"
-          ]
+        "type": "begin_group",
+        "name": "recordings",
+        "label": [
+          "Recordings",
+          "Registradoj"
+        ]
       },
       {
         "type": "begin_repeat",
@@ -140,26 +140,30 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note_transcription_acme_1_speech2text": [
-          {
-            "_index": 0,
-            "value": "Hello how may I help you?"
-          },
-          {
-            "_index": 2,
-            "value": "Thank you for your business"
-          }
-        ],
-        "record_a_noise_comment_on_noise_level": [
-          {
-            "_index": 0,
-            "value": "Lot's of noise"
-          },
-          {
-            "_index": 1,
-            "value": "Quiet"
-          }
-        ]
+        "record_a_note": {
+          "transcript_acme_1_speech2text": [
+            {
+              "_index": 0,
+              "value": "Hello how may I help you?"
+            },
+            {
+              "_index": 2,
+              "value": "Thank you for your business"
+            }
+          ]
+        },
+        "record_a_noise": {
+          "comment_on_noise_level": [
+            {
+              "_index": 0,
+              "value": "Lot's of noise"
+            },
+            {
+              "_index": 1,
+              "value": "Quiet"
+            }
+          ]
+        }
       }
     }
   ]

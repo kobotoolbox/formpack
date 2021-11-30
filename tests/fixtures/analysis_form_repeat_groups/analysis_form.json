@@ -1,37 +1,39 @@
 {
-    "engines": {
-        "acme_1_speech2text": {
-            "details": "an external service provided by ACME, Inc."
-        }
+  "engines": {
+    "acme_1_speech2text": {
+      "details": "an external service provided by ACME, Inc."
+    }
+  },
+  "additional_fields": [
+    {
+      "type": "text",
+      "name": "record_a_note/transcript_acme_1_speech2text",
+      "path": ["record_a_note", "transcript_acme_1_speech2text"],
+      "label": [
+        ": ACME Transcription",
+        ""
+      ],
+      "source": "record_a_note",
+      "analysis_type": "transcript",
+      "settings": {
+        "mode": "auto",
+        "engine": "engines/acme_1_speech2text"
+      }
     },
-    "additional_fields": [
-        {
-            "type": "text",
-            "name": "record_a_note_transcription_acme_1_speech2text",
-            "label": [
-                ": ACME Transcription",
-                ""
-            ],
-            "source": "record_a_note",
-            "analysis_type": "transcription",
-            "settings": {
-                "mode": "auto",
-                "engine": "engines/acme_1_speech2text"
-            }
-        },
-        {
-            "type": "text",
-            "name": "record_a_noise_comment_on_noise_level",
-            "label": [
-                "Comment on noise level",
-                "Komentu pri brunivelo"
-            ],
-            "source": "record_a_noise",
-            "analysis_type": "coding"
-        }
-    ],
-    "translations": [
-        "English (en)",
-        "Esperanto (es)"
-    ]
+    {
+      "type": "text",
+      "name": "record_a_noise/comment_on_noise_level",
+      "path": ["record_a_noise", "comment_on_noise_level"],
+      "label": [
+        "Comment on noise level",
+        "Komentu pri brunivelo"
+      ],
+      "source": "record_a_noise",
+      "analysis_type": "coding"
+    }
+  ],
+  "translations": [
+    "English (en)",
+    "Esperanto (es)"
+  ]
 }
