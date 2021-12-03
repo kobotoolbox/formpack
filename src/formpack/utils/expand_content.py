@@ -10,6 +10,7 @@ from typing import (
     Any,
     Dict,
     List,
+    Optional,
     Set,
     Tuple,
     Union,
@@ -35,7 +36,7 @@ def _expand_translatable_content(
     content: Dict[str, List[Any]],
     row: Dict[str, Union[str, List[Any]]],
     col_shortname: str,
-    special_column_details: Dict[str, Union[str, None]],
+    special_column_details: Dict[str, Optional[str]],
 ) -> None:
     _scd = special_column_details
     if 'translation' in _scd:
@@ -57,7 +58,7 @@ def _expand_translatable_content(
 
 def _expand_tags(
     row: Dict[str, Union[str, List[Any]]],
-    tag_cols_and_seps: Union[None, Dict[str, str]] = None,
+    tag_cols_and_seps: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Union[str, List[Any]]]:
     if tag_cols_and_seps is None:
         tag_cols_and_seps = {}
@@ -163,7 +164,7 @@ def expand_content_in_place(content: Dict[str, List[Any]]) -> None:
 def expand_content(
     content: Dict[str, List[Any]],
     in_place: bool = False,
-) -> Union[None, Dict[str, List[Any]]]:
+) -> Optional[Dict[str, List[Any]]]:
     if in_place:
         expand_content_in_place(content)
         return None
