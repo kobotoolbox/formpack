@@ -6,6 +6,7 @@
 import re
 from collections import OrderedDict
 from copy import deepcopy
+from typing import List
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .iterator import get_first_occurrence
@@ -147,7 +148,7 @@ def expand_content(content, in_place=False):
         return content_copy
 
 
-def _get_known_translated_cols(translated_cols):
+def _get_known_translated_cols(translated_cols: List[str]) -> List[str]:
     """
     This is necessary to handle a legacy issue where media attributes such as
     `image`, `audio` and `video` were transformed to `media::x`, but their
@@ -217,8 +218,8 @@ def _get_special_survey_cols(content):
         mtch = re.match(rf'^(media\s*::?\s*)?({RE_MEDIA_TYPES})\s*::?\s*([^:]+)$', column_name)
         if mtch:
             matched = mtch.groups()
-            media_type = matched[-2]
-            translation = matched[-1]
+            media_type = matched[1]
+            translation = matched[2]
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
                           coltype='media',
@@ -228,7 +229,7 @@ def _get_special_survey_cols(content):
         mtch = re.match(rf'^(media\s*::?\s*)?({RE_MEDIA_TYPES})$', column_name)
         if mtch:
             matched = mtch.groups()
-            media_type = matched[-1]
+            media_type = matched[1]
             _mark_special(column_name=column_name,
                           column='media::{}'.format(media_type),
                           coltype='media',
