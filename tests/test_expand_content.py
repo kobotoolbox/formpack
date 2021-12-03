@@ -186,6 +186,46 @@ def test_expand_translated_media():
       }
 
 
+def test_expand_translated_media_mangled_format():
+    """
+    An unfortunate bug seen in formpack#115 has resulted in needing to account
+    for this behaviour if surveys used image::lang rather than
+    media::image::lang
+    """
+    s1 = {
+        'survey': [
+            {
+                'type': 'note',
+                'media::image': ['eng.jpg'],
+            },
+        ],
+        'translated': ['image'], # Bug 🐛: not coming through as media::image
+        'schema': SCHEMA_VERSION,
+        'translations': ['English (en)']
+    }
+    expand_content(s1, in_place=True)
+    assert s1 == {
+        'survey': [
+            {
+                'type': 'note',
+                'media::image': ['eng.jpg'],
+            },
+        ],
+        'translated': ['media::image'],
+        'schema': SCHEMA_VERSION,
+        'translations': ['English (en)'],
+    }
+    flatten_content(s1, in_place=True)
+    assert s1 == {
+        'survey': [
+            {
+                'type': 'note',
+                'media::image::English (en)': 'eng.jpg',
+            },
+        ],
+    }
+
+
 def test_expand_translated_media_with_no_translated():
     s1 = {'survey': [{'type': 'note',
                       'media::image': 'nolang.jpg',
