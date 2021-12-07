@@ -443,4 +443,4 @@ def test_simple_report_with_analysis_form():
         [f._get_label(lang=lang) for f in pack.analysis_form.fields]
     )
     # Ensure analysis fields aren't making it into the report
-    assert stats - analysis_fields == stats
+    assert not stats.intersection(analysis_fields)
