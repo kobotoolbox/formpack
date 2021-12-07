@@ -1,9 +1,11 @@
 # coding: utf-8
 from formpack import FormPack
 from .fixtures import build_fixture
+from .fixtures.load_fixture_json import load_analysis_form_json
 
 def tests_additional_field_exports():
-    title, schemas, submissions, analysis_form = build_fixture('analysis_form')
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -30,9 +32,8 @@ def tests_additional_field_exports():
     ]
 
 def tests_additional_field_exports_repeat_groups():
-    title, schemas, submissions, analysis_form = build_fixture(
-        'analysis_form_repeat_groups'
-    )
+    title, schemas, submissions = build_fixture('analysis_form_repeat_groups')
+    analysis_form = load_analysis_form_json('analysis_form_repeat_groups')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -100,9 +101,8 @@ def tests_additional_field_exports_repeat_groups():
     assert repeat_data_expected_2 == repeat_data_response_2
 
 def tests_additional_field_exports_advanced():
-    title, schemas, submissions, analysis_form = build_fixture(
-        'analysis_form_advanced'
-    )
+    title, schemas, submissions = build_fixture('analysis_form_advanced')
+    analysis_form = load_analysis_form_json('analysis_form_advanced')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -272,7 +272,8 @@ def tests_additional_field_exports_advanced():
     ]
 
 def tests_additional_field_exports_v2():
-    title, schemas, submissions, analysis_form = build_fixture('analysis_form')
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -299,7 +300,8 @@ def tests_additional_field_exports_v2():
     ]
 
 def tests_additional_field_exports_all_versions():
-    title, schemas, submissions, analysis_form = build_fixture('analysis_form')
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -340,7 +342,8 @@ def tests_additional_field_exports_all_versions():
     ]
 
 def tests_additional_field_exports_all_versions_exclude_fields():
-    title, schemas, submissions, analysis_form = build_fixture('analysis_form')
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -369,7 +372,8 @@ def tests_additional_field_exports_all_versions_exclude_fields():
     ]
 
 def tests_additional_field_exports_all_versions_langs():
-    title, schemas, submissions, analysis_form = build_fixture('analysis_form')
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
@@ -423,86 +427,20 @@ def tests_additional_field_exports_all_versions_langs():
     ]
 
 def test_simple_report_with_analysis_form():
-
-    title, schemas, submissions, analysis_form = build_fixture('analysis_form')
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title)
     pack.extend_survey(analysis_form)
 
+    lang = 'English (en)'
     report = pack.autoreport(versions=pack.versions.keys())
-    stats = report.get_stats(submissions, lang='English (en)')
+    stats = report.get_stats(submissions, lang=lang)
 
     assert stats.submissions_count == 6
 
-    stats = [(str(repr(f)), n, d) for f, n, d in stats]
-
-    expected = [
-        (
-            "<MediaField name='record_a_note' type='audio'>",
-            'record_a_note',
-            {
-                'total_count': 6,
-                'not_provided': 0,
-                'provided': 6,
-                'show_graph': False,
-                'frequency': [
-                    ('clerk_interaction_1.mp3', 1),
-                    ('clerk_interaction_2.mp3', 1),
-                    ('clerk_interaction_3.mp3', 1),
-                    ('clerk_interaction_4.mp3', 1),
-                    ('clerk_interaction_5.mp3', 1),
-                    ('clerk_interaction_6.mp3', 1),
-                ],
-                'percentage': [
-                    ('clerk_interaction_1.mp3', 16.67),
-                    ('clerk_interaction_2.mp3', 16.67),
-                    ('clerk_interaction_3.mp3', 16.67),
-                    ('clerk_interaction_4.mp3', 16.67),
-                    ('clerk_interaction_5.mp3', 16.67),
-                    ('clerk_interaction_6.mp3', 16.67),
-                ],
-            },
-        ),
-        (
-            "<TextField name='name_of_shop' type='text'>",
-            "What is the shop's name?",
-            {
-                'total_count': 6,
-                'not_provided': 3,
-                'provided': 3,
-                'show_graph': False,
-                'frequency': [
-                    ('Save On', 1),
-                    ('Walmart', 1),
-                    ('Costco', 1),
-                ],
-                'percentage': [
-                    ('Save On', 16.67),
-                    ('Walmart', 16.67),
-                    ('Costco', 16.67),
-                ],
-            },
-        ),
-        (
-            "<TextField name='name_of_clerk' type='text'>",
-            "What is the clerk's name?",
-            {
-                'total_count': 6,
-                'not_provided': 3,
-                'provided': 3,
-                'show_graph': False,
-                'frequency': [
-                    ('John', 1),
-                    ('Alex', 1),
-                    ('Olivier', 1),
-                ],
-                'percentage': [
-                    ('John', 16.67),
-                    ('Alex', 16.67),
-                    ('Olivier', 16.67),
-                ],
-            },
-        ),
-    ]
-
-    for i, stat in enumerate(stats):
-        assert stat == expected[i]
+    stats = set([n for f, n, d in stats])
+    analysis_fields = set(
+        [f._get_label(lang=lang) for f in pack.analysis_form.fields]
+    )
+    # Ensure analysis fields aren't making it into the report
+    assert stats - analysis_fields == stats

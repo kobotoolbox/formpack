@@ -16,7 +16,6 @@ def build_fixture(modulename, data_variable_name="DATA"):
         return fixtures
 
     title = fixtures.get('title')
-    analysis_form = fixtures.get('analysis_form')
 
     # separate the submissions from the schema
     schemas = [dict(v) for v in fixtures['versions']]
@@ -28,8 +27,6 @@ def build_fixture(modulename, data_variable_name="DATA"):
             submission.update({version_id_key: version})
             submissions.append(submission)
 
-    if analysis_form is not None:
-        return title, schemas, submissions, analysis_form
     return title, schemas, submissions
 
 

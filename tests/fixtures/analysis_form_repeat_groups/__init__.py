@@ -3,7 +3,7 @@
 analysis_form_repeat_groups
 '''
 
-from ..load_fixture_json import load_fixture_json, load_analysis_form_json
+from ..load_fixture_json import load_fixture_json
 
 DATA = {
     'title': 'Clerk Interaction Repeat Groups',
@@ -11,5 +11,4 @@ DATA = {
     'versions': [
         load_fixture_json('analysis_form_repeat_groups/v1'),
     ],
-    'analysis_form': load_analysis_form_json('analysis_form_repeat_groups')
 }

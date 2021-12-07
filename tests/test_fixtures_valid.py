@@ -6,6 +6,7 @@ import unittest
 
 from formpack import FormPack
 from .fixtures import build_fixture
+from .fixtures.load_fixture_json import load_analysis_form_json
 from formpack.constants import ANALYSIS_TYPES
 
 
@@ -109,9 +110,10 @@ class TestFormPackFixtures(unittest.TestCase):
 
     def test_analysis_form(self):
         fixture = build_fixture('analysis_form')
-        assert 4 == len(fixture)
+        assert 3 == len(fixture)
 
-        title, schemas, submissions, analysis_form = fixture
+        title, schemas, submissions = fixture
+        analysis_form = load_analysis_form_json('analysis_form')
         fp = FormPack(schemas, title)
         fp.extend_survey(analysis_form)
 

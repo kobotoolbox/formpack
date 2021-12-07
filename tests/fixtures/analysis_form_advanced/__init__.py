@@ -3,7 +3,7 @@
 analysis_form_advanced
 '''
 
-from ..load_fixture_json import load_fixture_json, load_analysis_form_json
+from ..load_fixture_json import load_fixture_json
 
 DATA = {
     'title': 'Advanced Clerk Interaction',
@@ -11,5 +11,4 @@ DATA = {
     'versions': [
         load_fixture_json('analysis_form_advanced/v1'),
     ],
-    'analysis_form': load_analysis_form_json('analysis_form_advanced')
 }
