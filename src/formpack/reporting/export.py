@@ -4,7 +4,12 @@ import re
 import zipfile
 from collections import defaultdict, OrderedDict
 from inspect import isclass
-from typing import Iterator, Generator, Optional
+from typing import (
+    Dict,
+    Generator,
+    Iterator,
+    Optional,
+)
 
 import xlsxwriter
 
@@ -383,7 +388,9 @@ class Export:
                 if re.match(fr'^.*/{_val}$', f['filename']) is not None
             ]
 
-        def _get_value_from_supplemental_details(field, supplemental_details):
+        def _get_value_from_supplemental_details(
+            field, supplemental_details: Dict
+        ) -> Optional[str]:
             source, name = field.analysis_path
             _sup_details = supplemental_details.get(source, {})
 
@@ -399,7 +406,9 @@ class Export:
                 _v = [v['value'] for v in val if v['_index'] == repeat_index]
                 return _v[0] if _v else ''
 
-        def _get_value_from_entry(entry, field, supplemental_details):
+        def _get_value_from_entry(
+            entry: Dict, field: FormField, supplemental_details: Dict
+        ) -> Optional[str]:
             if field.analysis_question and supplemental_details:
                 return _get_value_from_supplemental_details(
                     field, supplemental_details
