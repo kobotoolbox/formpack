@@ -18,7 +18,7 @@ from ..constants import (
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
-from ..schema import CopyField
+from ..schema import CopyField, FormField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
