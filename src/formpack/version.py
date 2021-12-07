@@ -1,7 +1,6 @@
 # coding: utf-8
 from collections import OrderedDict, defaultdict
 from typing import (
-    Any,
     Dict,
     List,
     Union,
@@ -45,7 +44,7 @@ class LabelStruct:
 
 class BaseForm:
     @staticmethod
-    def _get_translations(content: Dict[str, List[Any]]) -> List[str]:
+    def _get_translations(content: Dict[str, List]) -> List[str]:
         return [
             t if t is not None else UNTRANSLATED
             for t in content.get('translations', [None])
@@ -53,8 +52,8 @@ class BaseForm:
 
     @staticmethod
     def _get_fields_by_name(
-        survey: Dict[str, Union[str, List[Any]]]
-    ) -> Dict[str, Dict[str, Union[str, List[Any]]]]:
+        survey: Dict[str, Union[str, List]]
+    ) -> Dict[str, Dict[str, Union[str, List]]]:
         return {row['name']: row for row in survey if 'name' in row}
 
     @staticmethod
@@ -346,7 +345,7 @@ class AnalysisForm(BaseForm):
     def __init__(
         self,
         formpack: 'FormPack',
-        schema: Dict[str, Union[str, List[Any]]],
+        schema: Dict[str, Union[str, List]],
     ) -> None:
 
         self.schema = schema
