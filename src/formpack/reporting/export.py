@@ -213,10 +213,6 @@ class Export:
             raise RuntimeError(
                 '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
 
-        section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
-        section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
-        section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
-
         all_fields = self.formpack.get_fields_for_versions(self.versions)
 
         # Ensure that fields are filtered if they've been specified, otherwise
@@ -228,7 +224,17 @@ class Export:
                 if field.path in self.filter_fields
             ]
 
+        # Collect all the sections regardless if they contain any fields
         all_sections = {}
+        for version in self.versions.values():
+            all_sections.update(version.sections)
+
+        # {section: [field_object, field_object, …], …}
+        # {section: [field_label, field_label, …], …}
+        # {section: [{column_name: tag_string, …}, …]}
+        section_fields = OrderedDict((s, []) for s in all_sections)
+        section_labels = OrderedDict((s, []) for s in all_sections)
+        section_tags = OrderedDict((s, []) for s in all_sections)
 
         # List of fields we generate ourselves to add at the very end
         # of the field list
@@ -245,7 +251,6 @@ class Export:
                     include_media_url=self.include_media_url,
                 )
             )
-            all_sections[field.section.name] = field.section
 
         for section_name, section in all_sections.items():
             # Append optional additional fields
