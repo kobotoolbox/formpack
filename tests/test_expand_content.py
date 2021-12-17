@@ -212,9 +212,9 @@ def test_expand_translated_media_mangled_format():
                 'media::image': ['eng.jpg'],
             },
         ],
-        'translated': ['image'], # Bug 🐛: not coming through as media::image
+        'translated': ['image'],  # Bug 🐛: not coming through as media::image
         'schema': SCHEMA_VERSION,
-        'translations': ['English (en)']
+        'translations': ['English (en)'],
     }
     expand_content(s1, in_place=True)
     assert s1 == {
