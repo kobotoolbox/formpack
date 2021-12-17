@@ -18,6 +18,6 @@ DATA = {
         load_fixture_json('restaurant_profile/v1'),
         load_fixture_json('restaurant_profile/v2'),
         load_fixture_json('restaurant_profile/v3'),
-        load_fixture_json('restaurant_profile/v4')
+        load_fixture_json('restaurant_profile/v4'),
     ],
 }

@@ -11,10 +11,12 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
     The goal: Convert an XLS file object to a python object.
 
-    This draws on code from `pyxform.xls2json_backends` and `convert_file_to_csv_string`, however
-    this works as it is expected (does not add extra sheets or perform misc conversions which are
-    a part of `pyxform.xls2json_backends.xls_to_dict`.)
+    This draws on code from `pyxform.xls2json_backends` and
+    `convert_file_to_csv_string`, however this works as it is expected (does
+    not add extra sheets or perform misc conversions which are a part of
+    `pyxform.xls2json_backends.xls_to_dict`.)
     """
+
     def _iswhitespace(string):
         return isinstance(string, str) and len(string.strip()) == 0
 
@@ -38,7 +40,8 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
             # raise Exception(
             #   "Cannot handle excel formatted date at " + error_location)
             datetime_or_time_only = xlrd.xldate_as_tuple(
-                value, workbook.datemode)
+                value, workbook.datemode
+            )
             if datetime_or_time_only[:3] == (0, 0, 0):
                 # must be time only
                 return str(datetime.time(*datetime_or_time_only[3:]))
@@ -64,10 +67,12 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
                 if isinstance(value, str):
                     value = _escape_newline_chars(value.strip())
                 if (value is not None) and (not _iswhitespace(value)):
-                    value = xls_value_to_unicode(value, sheet.cell_type(row, col))
-                if value != "":
+                    value = xls_value_to_unicode(
+                        value, sheet.cell_type(row, col)
+                    )
+                if value != '':
                     row_empty = False
-                if value == "":
+                if value == '':
                     value = None
                 row_results.append(value)
             if not strip_empty_rows or not row_empty:

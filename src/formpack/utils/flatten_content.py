@@ -6,14 +6,18 @@ from functools import reduce
 
 from .array_to_xpath import array_to_xpath
 from .replace_aliases import SELECT_TYPES
-from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
-                         TAG_COLUMNS_AND_SEPARATORS)
+from ..constants import (
+    UNTRANSLATED,
+    OR_OTHER_COLUMN,
+    TAG_COLUMNS_AND_SEPARATORS,
+)
 
 
-def flatten_content_in_place(survey_content,
-                             remove_columns=None,
-                             remove_sheets=None,
-                             ):
+def flatten_content_in_place(
+    survey_content,
+    remove_columns=None,
+    remove_sheets=None,
+):
     """
     if asset.content contains nested objects, then
     this is where we "flatten" them so that they
@@ -25,7 +29,9 @@ def flatten_content_in_place(survey_content,
         remove_columns = {}
     if remove_sheets is None:
         remove_sheets = []
-    remove_sheets = set(remove_sheets + ['translated', 'translations', 'schema'])
+    remove_sheets = set(
+        remove_sheets + ['translated', 'translations', 'schema']
+    )
     popped_sheets = {}
     for sheet_name in remove_sheets:
         popped_sheets[sheet_name] = survey_content.pop(sheet_name, [])
@@ -34,13 +40,15 @@ def flatten_content_in_place(survey_content,
         _removed = remove_columns.get(sheet_name, [])
         if sheet_name in survey_content:
             for row in survey_content[sheet_name]:
-                _flatten_translated_fields(row,
-                                           popped_sheets.get('translations'),
-                                           popped_sheets.get('translated'),
-                                           )
+                _flatten_translated_fields(
+                    row,
+                    popped_sheets.get('translations'),
+                    popped_sheets.get('translated'),
+                )
                 _flatten_survey_row(row)
                 for key in _removed:
                     row.pop(key, None)
+
     _iter_through_sheet('survey')
     _iter_through_sheet('choices')
 
@@ -69,8 +77,10 @@ def _stringify_type__depr(json_qtype):
     {'select_multiple': 'xyz'} -> 'select_mutliple xyz'
     """
     if len(json_qtype.keys()) != 1:
-        raise ValueError('Type object must have exactly one key: %s' %
-                         ', '.join(SELECT_TYPES))
+        raise ValueError(
+            'Type object must have exactly one key: %s'
+            % ', '.join(SELECT_TYPES)
+        )
     for try_key in SELECT_TYPES:
         if try_key in json_qtype:
             return '{} {}'.format(try_key, json_qtype[try_key])
@@ -125,12 +135,13 @@ def _flatten_tags(row, tag_cols_and_seps=None):
 
 def translated_col_list(columns, translations, translated):
     if (len(translations) == 0 and len(translated) != 0) or (
-            len(translations) != 0 and len(translated) == 0):
+        len(translations) != 0 and len(translated) == 0
+    ):
         raise ValueError('cannot have translations with no translated')
 
     def _for_each_t(col):
         return lambda arr, _tr: arr + [
-            col if (_tr is None) else "{}::{}".format(col, _tr)
+            col if (_tr is None) else '{}::{}'.format(col, _tr)
         ]
 
     def _expand_translateds(arr, col):
@@ -139,13 +150,17 @@ def translated_col_list(columns, translations, translated):
         else:
             arr.append(col)
         return arr
+
     return reduce(_expand_translateds, columns, [])
 
 
-def _flatten_translated_fields(row, translations, translated_cols,
-                               col_order=False,
-                               strip_empty_vals_from_named_translations=True,
-                               ):
+def _flatten_translated_fields(
+    row,
+    translations,
+    translated_cols,
+    col_order=False,
+    strip_empty_vals_from_named_translations=True,
+):
     if len(translations) == 0:
         translations = [UNTRANSLATED]
 
@@ -172,13 +187,19 @@ def _flatten_translated_fields(row, translations, translated_cols,
     for key in (k for k in translated_cols if k in row):
         items = row[key]
         if not isinstance(items, list):
-            raise ValueError('"{}" column is not translated'.format(
+            raise ValueError(
+                '"{}" column is not translated'.format(
                     key,
-                ), o_row)
+                ),
+                o_row,
+            )
         if len(items) != len(translations):
-            raise ValueError('Incorrect translation count: "{}"'.format(
+            raise ValueError(
+                'Incorrect translation count: "{}"'.format(
                     key,
-                ), o_row)
+                ),
+                o_row,
+            )
         del row[key]
         for i in translations_range:
             _t = translations[i]
@@ -187,7 +208,7 @@ def _flatten_translated_fields(row, translations, translated_cols,
             except IndexError:
                 raise ValueError(
                     'Column "{}" does not have enough translations'.format(key)
-                    )
+                )
             if _t is UNTRANSLATED:
                 row[key] = value
                 _place_col_in_order(key)

@@ -1,4 +1,4 @@
-'''
+"""
 selectone_to_multiple has
 
 * text question
@@ -6,7 +6,7 @@ selectone_to_multiple has
 * select_one
     turns to
 * select_multiple
-'''
+"""
 
 from ..load_fixture_json import load_fixture_json
 
@@ -18,6 +18,7 @@ DATA = {
         load_fixture_json('selectone_to_multiple/v2_selectone'),
         load_fixture_json('selectone_to_multiple/v3_selectmultiple'),
     ],
-    'submissions': load_fixture_json('selectone_to_multiple/submissions'
-                                      ).get('submissions')
+    'submissions': load_fixture_json('selectone_to_multiple/submissions').get(
+        'submissions'
+    ),
 }

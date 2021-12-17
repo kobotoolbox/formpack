@@ -22,7 +22,7 @@ DATA = {
         load_fixture_json('site_inspection/v2'),
         load_fixture_json('site_inspection/v3'),
         load_fixture_json('site_inspection/v4'),
-        load_fixture_json('site_inspection/v5')
+        load_fixture_json('site_inspection/v5'),
     ],
 }
 

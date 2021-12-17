@@ -5,7 +5,9 @@ from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
 
 
 class FormDataDef:
-    """ Any object composing a form. It's only used with a subclass. """
+    """
+    Any object composing a form. It's only used with a subclass.
+    """
 
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
@@ -25,7 +27,9 @@ class FormDataDef:
 
     @classmethod
     def _extract_json_labels(cls, definition, translations):
-        """ Extract translation labels from the JSON data definition """
+        """
+        Extract translation labels from the JSON data definition
+        """
         label = definition.get('label')
         if label:
             labels = OrderedDict(zip(translations, label))
@@ -39,11 +43,21 @@ class FormGroup(FormDataDef):  # useful to get __repr__
 
 
 class FormSection(FormDataDef):
-    """ The tabular representation of a repeatable group of fields """
+    """
+    The tabular representation of a repeatable group of fields
+    """
 
-    def __init__(self, name="submissions", labels=None, fields=None,
-                 parent=None, children=(), hierarchy=(None,),
-                 *args, **kwargs):
+    def __init__(
+        self,
+        name='submissions',
+        labels=None,
+        fields=None,
+        parent=None,
+        children=(),
+        hierarchy=(None,),
+        *args,
+        **kwargs
+    ):
 
         if labels is None:
             labels = {UNTRANSLATED: 'submissions'}
@@ -58,10 +72,13 @@ class FormSection(FormDataDef):
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     @classmethod
-    def from_json_definition(cls, definition, hierarchy=(None,), parent=None,
-                             translations=None):
+    def from_json_definition(
+        cls, definition, hierarchy=(None,), parent=None, translations=None
+    ):
         labels = cls._extract_json_labels(definition, translations)
-        return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
+        return cls(
+            definition['name'], labels, hierarchy=hierarchy, parent=parent
+        )
 
     def get_label(self, lang=UNSPECIFIED_TRANSLATION):
         return [self.labels.get(lang) or self.name]
