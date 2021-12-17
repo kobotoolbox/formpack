@@ -13,18 +13,15 @@ from .constants import UNSPECIFIED_TRANSLATION
 
 
 class FormPack:
-    def __init__(
-        self,
-        versions=None,
-        title='Submissions',
-        id_string=None,
-        default_version_id_key='__version__',
-        strict_schema=False,
-        root_node_name='data',
-        asset_type=None,
-        submissions_xml=None,
-    ):
+
+    def __init__(self, versions=None, title='Submissions', id_string=None,
+                 default_version_id_key='__version__',
+                 strict_schema=False,
+                 root_node_name='data',
+                 asset_type=None, submissions_xml=None):
         """
+
+
         :param versions: list. Versions of the asset. It must be sorted in ascending order. From oldest to newest.
         :param title: string. The human readable name of the form.
         :param id_string: The human readable id of the form.
@@ -57,7 +54,7 @@ class FormPack:
     # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
     # to fix https://github.com/kobotoolbox/formpack/issues/150
     #
-    # def __repr__(self):
+    #def __repr__(self):
     #    return '<FormPack %s>' % self._stats()
 
     def version_id_keys(self, _versions=None):
@@ -104,9 +101,8 @@ class FormPack:
         _stats['versions'] = len(self.versions)
         # _stats['submissions'] = self.submissions_count()
         if self.versions:
-            _stats['row_count'] = len(
-                self[-1].schema.get('content', {}).get('survey', [])
-            )
+            _stats['row_count'] = len(self[-1].schema.get('content', {})
+                                                     .get('survey', []))
         # returns stats in the format [ key="value" ]
         return '\n\t'.join('%s="%s"' % item for item in _stats.items())
 
@@ -115,21 +111,20 @@ class FormPack:
             self.load_version(deepcopy(schema))
 
     def load_version(self, schema):
-        """
-        Load one version and attach it to this Formpack.
+        """ Load one version and attach it to this Formpack
 
-        All the metadata parsing is delegated to the FormVersion class,
-        hence several attributes for FormPack are populated on the fly
-        while getting versions loaded:
+            All the metadata parsing is delegated to the FormVersion class,
+            hence several attributes for FormPack are populated on the fly
+            while getting versions loaded:
 
-            - title : the human readable name of the form. Match the one
-                      from the most recent version.
-            - id_string : the human readable id of the form. The same for
-                          all versions of the same FormPack.
+                - title : the human readable name of the form. Match the one
+                          from the most recent version.
+                - id_string : the human readable id of the form. The same for
+                              all versions of the same FormPack.
 
-        Each version can be distinguish by its version_id, which is
-        unique accross an entire FormPack. It can be None, but only for
-        one version in the FormPack.
+            Each version can be distinguish by its version_id, which is
+            unique accross an entire FormPack. It can be None, but only for
+            one version in the FormPack.
         """
         replace_aliases(schema['content'], in_place=True)
         expand_content(schema['content'], in_place=True)
@@ -145,27 +140,20 @@ class FormPack:
         # Avoid duplicate versions id
         if form_version.id in self.versions:
             if form_version.id is None:
-                raise ValueError(
-                    'cannot have two versions without '
-                    'a "version" id specified'
-                )
+                raise ValueError('cannot have two versions without '
+                                 'a "version" id specified')
 
-            raise ValueError(
-                'cannot have duplicate version id: %s' % form_version.id
-            )
+            raise ValueError('cannot have duplicate version id: %s'
+                             % form_version.id)
 
         # If the form pack doesn't have an id_string, we get it from the
         # first form version. We also avoid heterogenenous id_string in versions
         if form_version.id_string:
             if self.id_string and self.id_string != form_version.id_string:
-                raise ValueError(
-                    'Versions must of the same form must '
-                    'share an id_string: %s != %s'
-                    % (
-                        self.id_string,
-                        form_version.id_string,
-                    )
-                )
+                raise ValueError('Versions must of the same form must '
+                                 'share an id_string: %s != %s' % (
+                                    self.id_string, form_version.id_string,
+                                 ))
 
             self.id_string = form_version.id_string
 
@@ -181,16 +169,16 @@ class FormPack:
         v2 = self.versions[vn2]
 
         def summr(v):
-            return json.dumps(
-                v.schema.get('content'),
-                indent=4,
-                sort_keys=True,
-            ).splitlines(1)
-
+            return json.dumps(v.schema.get('content'),
+                              indent=4,
+                              sort_keys=True,
+                              ).splitlines(1)
         out = []
-        for line in difflib.unified_diff(
-            summr(v1), summr(v2), fromfile=vn1, tofile=vn2, n=1
-        ):
+        for line in difflib.unified_diff(summr(v1),
+                                         summr(v2),
+                                         fromfile=vn1,
+                                         tofile=vn2,
+                                         n=1):
             out.append(line)
         return ''.join(out)
 
@@ -199,7 +187,8 @@ class FormPack:
         """
         Update `new_field.choice` so that it contains everything from
         `old_field.choice`. In the event of a conflict, `new_field.choice`
-        wins. If either field does not have a `choice` attribute, do nothing.
+        wins. If either field does not have a `choice` attribute, do
+        nothing
 
         :param old_field: FormField
         :param new_field: FormField
@@ -217,7 +206,7 @@ class FormPack:
     def get_fields_for_versions(self, versions=-1, data_types=None):
 
         """
-        Return a mapping containing fields.
+            Return a mapping containing fields
 
             This is needed because when making an report for several
             versions of the same form, fields get added, removed, and
@@ -247,11 +236,12 @@ class FormPack:
         #
         # Index 0 of tmp2d will be `[field1, field2]`
         tmp2d = []
-        # This dict is used to remember final position of each field.
-        # Its keys are field_names and values are tuples of coordinates in tmp2d
+        # This dict is used to remember final position of each field. Its keys
+        # are the combination of field and section names and the values are
+        # tuples of coordinates in tmp2d.
         # Keeping example above:
-        #       `positions[field1.name]` would be `(0, 0)`
-        #       `positions[field2.name]` would be `(0, 1)`
+        #       `positions[f'{section.name}_{field1.name}']` would be `(0, 0)`
+        #       `positions[f'{section.name}_{field2.name}']` would be `(0, 1)`
         positions = {}
 
         # Create the initial field mappings from the first form version
@@ -262,10 +252,11 @@ class FormPack:
         index = 0
         for section in versions_desc[0].sections.values():
             for field_name, field_object in section.fields.items():
+                section_field_name = f'{section.name}_{field_name}'
                 if isinstance(field_object, CopyField):
                     copy_fields.append(field_object)
                 else:
-                    positions[field_name] = (index, 0)
+                    positions[section_field_name] = (index, 0)
                     tmp2d.append([field_object])
                     index += 1
 
@@ -273,18 +264,16 @@ class FormPack:
             index = 0
             for section_name, section in version.sections.items():
                 for field_name, field_object in section.fields.items():
+                    section_field_name = f'{section_name}_{field_name}'
                     if not isinstance(field_object, CopyField):
-                        if field_name in positions:
-                            position = positions[field_name]
-                            latest_field_object = tmp2d[position[0]][
-                                position[1]
-                            ]
+                        if section_field_name in positions:
+                            position = positions[section_field_name]
+                            latest_field_object = tmp2d[position[0]][position[1]]
                             # Because versions_desc are ordered from latest to oldest,
                             # we use current field object as the old one and the one already
                             # in position as the latest one.
                             new_object = self._combine_field_choices(
-                                field_object, latest_field_object
-                            )
+                                field_object, latest_field_object)
                             tmp2d[position[0]][position[1]] = new_object
                         else:
                             try:
@@ -297,10 +286,7 @@ class FormPack:
                                 # it can happen when current version has more items than newest one.
                                 index = len(tmp2d) - 1
 
-                            positions[field_name] = (
-                                index,
-                                len(tmp2d[index]) - 1,
-                            )
+                            positions[section_field_name] = (index, len(tmp2d[index]) - 1)
 
                         index += 1
 
@@ -363,7 +349,7 @@ class FormPack:
         include_media_url=False,
     ):
         """
-        Create an export for given versions of the form.
+        Create an export for given versions of the form
         """
         versions = self._get_versions(versions)
         title = title or self.title
@@ -381,12 +367,12 @@ class FormPack:
             tag_cols_for_header=tag_cols_for_header,
             filter_fields=filter_fields,
             xls_types_as_text=xls_types_as_text,
-            include_media_url=include_media_url,
+            include_media_url=include_media_url
         )
 
     def autoreport(self, versions=-1):
         """
-        Create an automatic report for given versions of the form.
+        Create an automatic report for given versions of the form
         """
         return AutoReport(self, self._get_versions(versions))
 
@@ -395,7 +381,7 @@ class FormPack:
         if versions is None:
             versions = -1
 
-        if isinstance(versions, (str, int)):
+        if isinstance(versions, (str, int,)):
             versions = [versions]
         versions = [self[key] for key in versions]
 
