@@ -370,6 +370,12 @@ class TestFormPackExport(unittest.TestCase):
             ],
         )
 
+    def test_translations_labels_mismatch(self):
+        title, schemas, submissions = build_fixture('translations_labels_mismatch')
+        fp = FormPack(schemas, title)
+        options = {'versions': 'v1'}
+        export = fp.export(**options).to_dict(submissions)
+
     def test_simple_nested_grouped_repeatable(self):
         title, schemas, submissions = build_fixture(
             'simple_nested_grouped_repeatable'

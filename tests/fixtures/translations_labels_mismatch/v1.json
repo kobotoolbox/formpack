@@ -1,0 +1,27 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+      {
+        "type": "text",
+        "name": "fav_emperor",
+        "label": [
+            "Who is your favourite emperor?"
+        ],
+        "hint::English (en)": "Before the decline of the Roman Empire"
+      }
+    ],
+    "translated": [
+        "hint",
+        "label"
+    ],
+    "translations": [
+        null
+    ]
+  },
+  "submissions": [
+    {
+      "fav_emperor": "Marcus Aurelius"
+    }
+  ]
+}
