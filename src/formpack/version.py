@@ -28,7 +28,7 @@ class LabelStruct:
                 'Mismatched labels and translations: [{}] [{}] '
                 '{}!={}'.format(
                     ', '.join(labels),
-                    ', '.join(translations),
+                    ', '.join(map(str, translations)),
                     len(labels),
                     len(translations),
                 )
