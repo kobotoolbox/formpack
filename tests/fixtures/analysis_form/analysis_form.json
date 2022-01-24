@@ -20,6 +20,24 @@
       }
     },
     {
+      "type": "text",
+      "name": "record_a_note/translated",
+      "path": [
+        "record_a_note",
+        "translated"
+      ],
+      "source": "record_a_note",
+      "analysis_type": "translation",
+      "settings": {
+        "mode": "auto",
+        "engine": "engines/acme_1_translate",
+        "translations": [
+          "es",
+          "af"
+        ]
+      }
+    },
+    {
       "type": "datetime",
       "name": "record_a_note/acme_timestamp",
       "path": [

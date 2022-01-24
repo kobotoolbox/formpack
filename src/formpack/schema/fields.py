@@ -11,6 +11,7 @@ from .datadef import FormDataDef, FormChoice
 from ..constants import (
     ANALYSIS_TYPES,
     ANALYSIS_TYPE_CODING,
+    ANALYSIS_TYPE_TRANSLATION,
     UNSPECIFIED_TRANSLATION,
 )
 from ..utils import singlemode
@@ -424,6 +425,56 @@ class ExtendedFormField(FormField):
 
 
 class TextField(ExtendedFormField):
+    @property
+    def _is_translation(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
+
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep="/",
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        *args,
+        **kwargs,
+    ):
+        if self._is_translation:
+            return self.get_value_names()
+        args = lang, group_sep, hierarchy_in_labels, multiple_select
+        return [self._get_label(*args)]
+
+    def get_value_names(self, multiple_select="both", *args, **kwargs):
+        if self._is_translation:
+            return [
+                f'{self.name}_{code}' for code in self.settings['translations']
+            ]
+        return super().get_value_names()
+
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep="/",
+        hierarchy_in_labels=False,
+        multiple_select="both",
+        xls_types_as_text=True,
+        *args,
+        **kwargs,
+    ):
+        if val is None:
+            val = ''
+
+        if self._is_translation:
+            cells = dict.fromkeys(self.get_value_names(), '')
+            for code in self.settings['translations']:
+                try:
+                    val = val[code]['value']
+                except (TypeError, KeyError):
+                    val = ''
+                cells[f'{self.name}_{code}'] = val
+            return cells
+
+        return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 
@@ -436,19 +487,23 @@ class TextField(ExtendedFormField):
         for key, val in top:
             percentage.append((key, self._get_percentage(val, total)))
 
-        stats.update({
-            'frequency': top,
-            'percentage': percentage,
-        })
+        stats.update(
+            {
+                'frequency': top,
+                'percentage': percentage,
+            }
+        )
 
         return stats
 
-    def get_disaggregated_stats(self, metrics, top_splitters,
-                                lang=UNSPECIFIED_TRANSLATION, limit=100):
+    def get_disaggregated_stats(
+        self, metrics, top_splitters, lang=UNSPECIFIED_TRANSLATION, limit=100
+    ):
 
         parent = super()
-        stats = parent.get_disaggregated_stats(metrics, top_splitters, lang,
-                                               limit)
+        stats = parent.get_disaggregated_stats(
+            metrics, top_splitters, lang, limit
+        )
         substats = self.get_substats(stats, metrics, top_splitters, lang)
 
         # sort values by total frequency

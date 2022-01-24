@@ -56,6 +56,11 @@
           "transcript": {
             "value": "Hello how may I help you?"
           },
+          "translated": {
+            "es": {
+              "value": "Saluton, kiel mi povas helpi vin?"
+            }
+          },
           "acme_timestamp": "2021-11-01Z"
         },
         "name_of_clerk": {

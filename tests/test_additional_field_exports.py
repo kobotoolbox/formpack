@@ -19,6 +19,8 @@ def tests_additional_field_exports():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note/transcript',
+        'record_a_note/translated_es',
+        'record_a_note/translated_af',
         'record_a_note/acme_timestamp',
         'name_of_clerk',
         'name_of_clerk/comment',
@@ -27,6 +29,8 @@ def tests_additional_field_exports():
     assert response0 == [
         'clerk_interaction_1.mp3',
         'Hello how may I help you?',
+        'Saluton, kiel mi povas helpi vin?',
+        '',
         '2021-11-01Z',
         'John',
         'Sounds like an interesting person',
@@ -288,6 +292,8 @@ def tests_additional_field_exports_v2():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note/transcript',
+        'record_a_note/translated_es',
+        'record_a_note/translated_af',
         'record_a_note/acme_timestamp',
         'name_of_shop',
         'name_of_shop/comment',
@@ -296,6 +302,8 @@ def tests_additional_field_exports_v2():
     assert response0 == [
         'clerk_interaction_4.mp3',
         'Hello how may I help you?',
+        '',
+        '',
         '2021-11-01Z',
         'Save On',
         'Pretty cliche',
@@ -316,6 +324,8 @@ def tests_additional_field_exports_all_versions():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note/transcript',
+        'record_a_note/translated_es',
+        'record_a_note/translated_af',
         'record_a_note/acme_timestamp',
         'name_of_shop',
         'name_of_shop/comment',
@@ -326,6 +336,8 @@ def tests_additional_field_exports_all_versions():
     assert response0 == [
         'clerk_interaction_1.mp3',
         'Hello how may I help you?',
+        'Saluton, kiel mi povas helpi vin?',
+        '',
         '2021-11-01Z',
         '',
         '',
@@ -336,6 +348,8 @@ def tests_additional_field_exports_all_versions():
     assert response3 == [
         'clerk_interaction_4.mp3',
         'Hello how may I help you?',
+        '',
+        '',
         '2021-11-01Z',
         'Save On',
         'Pretty cliche',
@@ -391,6 +405,8 @@ def tests_additional_field_exports_all_versions_langs():
     assert main_export_sheet['fields'] == [
         'Record a clerk saying something',
         'record_a_note/transcript',
+        'record_a_note/translated_es',
+        'record_a_note/translated_af',
         'Transcription Timestamp',
         "What is the shop's name?",
         'Comment on the name of the shop',
@@ -406,6 +422,8 @@ def tests_additional_field_exports_all_versions_langs():
     assert main_export_sheet['fields'] == [
         'Registri oficiston dirantan ion',
         'record_a_note/transcript',
+        'record_a_note/translated_es',
+        'record_a_note/translated_af',
         'record_a_note/acme_timestamp',
         'Kio estas la nomo de la butiko?',
         'name_of_shop/comment',
@@ -421,6 +439,8 @@ def tests_additional_field_exports_all_versions_langs():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note/transcript',
+        'record_a_note/translated_es',
+        'record_a_note/translated_af',
         'record_a_note/acme_timestamp',
         'name_of_shop',
         'name_of_shop/comment',
