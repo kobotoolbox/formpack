@@ -141,7 +141,7 @@
       ],
       "_supplementalDetails": {
         "record_a_note": {
-          "transcript_acme_1_speech2text": [
+          "transcript": [
             {
               "_index": 0,
               "value": "Hello how may I help you?"

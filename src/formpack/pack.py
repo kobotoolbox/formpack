@@ -3,6 +3,7 @@ import difflib
 import json
 from collections import OrderedDict
 from copy import deepcopy
+from typing import Dict
 
 from formpack.schema.fields import CopyField
 from .version import FormVersion, AnalysisForm
@@ -166,7 +167,7 @@ class FormPack:
 
         self.versions[form_version.id] = form_version
 
-    def extend_survey(self, analysis_form: AnalysisForm) -> None:
+    def extend_survey(self, analysis_form: Dict) -> None:
         self.analysis_form = AnalysisForm(self, analysis_form)
 
     def version_diff(self, vn1, vn2):

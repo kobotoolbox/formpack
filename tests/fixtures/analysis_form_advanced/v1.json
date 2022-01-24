@@ -79,7 +79,9 @@
       ],
       "_supplementalDetails": {
         "record_a_note": {
-          "transcript_acme_1_speech2text": "Hello how may I help you?",
+          "transcript": {
+            "value": "Hello how may I help you?"
+          },
           "tone_of_voice": "excited confused"
         },
         "goods_sold": {
@@ -99,7 +101,9 @@
       ],
       "_supplementalDetails": {
         "record_a_note": {
-          "transcript_acme_1_speech2text": "Thank you for your business",
+          "transcript": {
+            "value": "Thank you for your business"
+          },
           "tone_of_voice": "anxious excited"
         },
         "goods_sold": {

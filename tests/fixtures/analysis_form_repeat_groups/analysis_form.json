@@ -1,18 +1,14 @@
 {
   "engines": {
-    "acme_1_speech2text": {
+    "transcript": {
       "details": "an external service provided by ACME, Inc."
     }
   },
   "additional_fields": [
     {
       "type": "text",
-      "name": "record_a_note/transcript_acme_1_speech2text",
-      "path": ["record_a_note", "transcript_acme_1_speech2text"],
-      "label": [
-        ": ACME Transcription",
-        ""
-      ],
+      "name": "record_a_note/transcript",
+      "path": ["record_a_note", "transcript"],
       "source": "record_a_note",
       "analysis_type": "transcript",
       "settings": {

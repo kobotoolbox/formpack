@@ -322,7 +322,6 @@ class Export:
         current_section,
         attachments=None,
         supplemental_details=None,
-        repeat_index=0,
     ):
 
         # 'current_section' is the name of what will become sheets in xls.
@@ -398,13 +397,10 @@ class Export:
                 return
 
             val = _sup_details.get(name, '')
-            if isinstance(val, str):
-                return val
+            if field.analysis_type == 'transcript':
+                return val['value']
 
-            # TODO: improve MVP handling of repeat groups for future
-            if isinstance(val, list):
-                _v = [v['value'] for v in val if v['_index'] == repeat_index]
-                return _v[0] if _v else ''
+            return val
 
         def _get_value_from_entry(
             entry: Dict, field: FormField, supplemental_details: Dict
@@ -519,7 +515,6 @@ class Export:
                         child_section,
                         attachments=attachments,
                         supplemental_details=supplemental_details,
-                        repeat_index=repeat_index,
                     )
                     for key, value in iter(chunk.items()):
                         if key in chunks:
@@ -527,12 +522,7 @@ class Export:
                         else:
                             chunks[key] = value
 
-                # Reset the repeat index once we're done with this current
-                # repeat group
-                repeat_index = 0
-
             _indexes[_section_name] += 1
-            repeat_index += 1
 
         return chunks
 
