@@ -13,6 +13,7 @@ from path import TempDir
 
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
+from formpack.errors import TranslationError
 from formpack.schema.fields import (
     ValidationStatusCopyField,
     IdCopyField,
@@ -369,6 +370,11 @@ class TestFormPackExport(unittest.TestCase):
                 ],
             ],
         )
+
+    def test_translations_labels_mismatch(self):
+        title, schemas, submissions = build_fixture('translations_labels_mismatch')
+        with self.assertRaises(TranslationError) as e:
+            fp = FormPack(schemas, title)
 
     def test_simple_nested_grouped_repeatable(self):
         title, schemas, submissions = build_fixture(
