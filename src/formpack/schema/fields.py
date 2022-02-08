@@ -11,6 +11,7 @@ from .datadef import FormDataDef, FormChoice
 from ..constants import (
     ANALYSIS_TYPES,
     ANALYSIS_TYPE_CODING,
+    ANALYSIS_TYPE_TRANSCRIPT,
     ANALYSIS_TYPE_TRANSLATION,
     UNSPECIFIED_TRANSLATION,
 )
@@ -38,6 +39,10 @@ class FormField(FormDataDef):
             self.analysis_type = kwargs.get('analysis_type')
             self.analysis_path = kwargs.get('analysis_path')
             self.settings = kwargs.get('settings')
+            if self.analysis_type == ANALYSIS_TYPE_TRANSCRIPT:
+                self.languages = kwargs.get('languages')
+            if self.analysis_type == ANALYSIS_TYPE_TRANSLATION:
+                self.language = kwargs.get('language')
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -171,6 +176,8 @@ class FormField(FormDataDef):
         analysis_type = definition.get('analysis_type', ANALYSIS_TYPE_CODING)
         settings = definition.get('settings', {})
         analysis_path = definition.get('path')
+        languages = definition.get('languages')
+        language = definition.get('language')
 
         # normalize spaces
         data_type = definition['type']
@@ -252,6 +259,8 @@ class FormField(FormDataDef):
             'analysis_type': analysis_type,
             'settings': settings,
             'analysis_path': analysis_path,
+            'language': language,
+            'languages': languages,
         }
 
         if data_type == 'select_multiple' and appearance == 'literacy':
@@ -425,56 +434,56 @@ class ExtendedFormField(FormField):
 
 
 class TextField(ExtendedFormField):
-    @property
-    def _is_translation(self):
-        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
+    #@property
+    #def _is_translation(self):
+    #    return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
 
-    def get_labels(
-        self,
-        lang=UNSPECIFIED_TRANSLATION,
-        group_sep="/",
-        hierarchy_in_labels=False,
-        multiple_select="both",
-        *args,
-        **kwargs,
-    ):
-        if self._is_translation:
-            return self.get_value_names()
-        args = lang, group_sep, hierarchy_in_labels, multiple_select
-        return [self._get_label(*args)]
+    #def get_labels(
+    #    self,
+    #    lang=UNSPECIFIED_TRANSLATION,
+    #    group_sep="/",
+    #    hierarchy_in_labels=False,
+    #    multiple_select="both",
+    #    *args,
+    #    **kwargs,
+    #):
+    #    if self._is_translation:
+    #        return self.get_value_names()
+    #    args = lang, group_sep, hierarchy_in_labels, multiple_select
+    #    return [self._get_label(*args)]
 
-    def get_value_names(self, multiple_select="both", *args, **kwargs):
-        if self._is_translation:
-            return [
-                f'{self.name}_{code}' for code in self.settings['translations']
-            ]
-        return super().get_value_names()
+    #def get_value_names(self, multiple_select="both", *args, **kwargs):
+    #    if self._is_translation:
+    #        return [
+    #            f'{self.name}_{code}' for code in self.settings['translations']
+    #        ]
+    #    return super().get_value_names()
 
-    def format(
-        self,
-        val,
-        lang=UNSPECIFIED_TRANSLATION,
-        group_sep="/",
-        hierarchy_in_labels=False,
-        multiple_select="both",
-        xls_types_as_text=True,
-        *args,
-        **kwargs,
-    ):
-        if val is None:
-            val = ''
+    #def format(
+    #    self,
+    #    val,
+    #    lang=UNSPECIFIED_TRANSLATION,
+    #    group_sep="/",
+    #    hierarchy_in_labels=False,
+    #    multiple_select="both",
+    #    xls_types_as_text=True,
+    #    *args,
+    #    **kwargs,
+    #):
+    #    if val is None:
+    #        val = ''
 
-        if self._is_translation:
-            cells = dict.fromkeys(self.get_value_names(), '')
-            for code in self.settings['translations']:
-                try:
-                    val = val[code]['value']
-                except (TypeError, KeyError):
-                    val = ''
-                cells[f'{self.name}_{code}'] = val
-            return cells
+    #    if self._is_translation:
+    #        cells = dict.fromkeys(self.get_value_names(), '')
+    #        for code in self.settings['translations']:
+    #            try:
+    #                val = val[code]['value']
+    #            except (TypeError, KeyError):
+    #                val = ''
+    #            cells[f'{self.name}_{code}'] = val
+    #        return cells
 
-        return {self.name: val}
+    #    return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 

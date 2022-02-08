@@ -15,6 +15,7 @@ import xlsxwriter
 
 from ..constants import (
     ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
     GEO_QUESTION_TYPES,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
@@ -397,12 +398,18 @@ class Export:
             if not _sup_details:
                 return
 
+            if 'translated_' in name:
+                name = 'translated'
+
             val = _sup_details.get(name)
             if val is None:
                 return ''
 
             if field.analysis_type == ANALYSIS_TYPE_TRANSCRIPT:
                 return val['value']
+
+            if field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
+                return val[field.language]['value']
 
             return val
 

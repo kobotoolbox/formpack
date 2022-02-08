@@ -1,40 +1,38 @@
 {
   "engines": {
-    "transcript": {
-      "details": "an external service provided by ACME, Inc."
+    "engines/transcript_manual": {
+      "details": "A human provided transcription"
     }
   },
   "additional_fields": [
     {
-      "type": "text",
+      "type": "transcript",
       "name": "record_a_note/transcript",
+      "label": "record_a_note Transcript",
       "path": [
         "record_a_note",
         "transcript"
       ],
+      "languages": ["en"],
       "source": "record_a_note",
-      "analysis_type": "transcript",
       "settings": {
-        "mode": "auto",
-        "engine": "engines/acme_1_speech2text"
+        "mode": "manual",
+        "engine": "engines/transcript_manual"
       }
     },
     {
-      "type": "text",
-      "name": "record_a_note/translated",
+      "type": "translation",
+      "name": "record_a_note/translated_es",
+      "label": "record_a_note Translated (es)",
+      "language": "es",
       "path": [
         "record_a_note",
-        "translated"
+        "translated_es"
       ],
       "source": "record_a_note",
-      "analysis_type": "translation",
       "settings": {
-        "mode": "auto",
-        "engine": "engines/acme_1_translate",
-        "translations": [
-          "es",
-          "af"
-        ]
+        "mode": "manual",
+        "engine": "engines/translation_manual"
       }
     },
     {

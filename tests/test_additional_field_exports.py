@@ -4,7 +4,7 @@ from formpack import FormPack
 from .fixtures import build_fixture
 from .fixtures.load_fixture_json import load_analysis_form_json
 
-def tests_additional_field_exports():
+def tests_additional_field_exports_xxx():
     title, schemas, submissions = build_fixture('analysis_form')
     analysis_form = load_analysis_form_json('analysis_form')
     pack = FormPack(schemas, title=title)
@@ -20,7 +20,6 @@ def tests_additional_field_exports():
         'record_a_note',
         'record_a_note/transcript',
         'record_a_note/translated_es',
-        'record_a_note/translated_af',
         'record_a_note/acme_timestamp',
         'name_of_clerk',
         'name_of_clerk/comment',
@@ -30,7 +29,6 @@ def tests_additional_field_exports():
         'clerk_interaction_1.mp3',
         'Hello how may I help you?',
         'Saluton, kiel mi povas helpi vin?',
-        '',
         '2021-11-01Z',
         'John',
         'Sounds like an interesting person',

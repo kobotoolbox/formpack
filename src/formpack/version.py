@@ -363,6 +363,15 @@ class AnalysisForm(BaseForm):
         )
 
         for data_def in survey:
+            data_type = data_def['type']
+            if data_type in ['translation', 'transcript']:
+                data_def.update(
+                    {
+                        'type': 'text',
+                        'analysis_type': data_type,
+                    }
+                )
+
             field = FormField.from_json_definition(
                 definition=data_def,
                 field_choices=field_choices,
