@@ -10,7 +10,11 @@ def tests_additional_field_exports_xxx():
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
-    options = {'include_analysis_fields': True, 'versions': 'v1'}
+    options = {
+        'include_analysis_fields': True,
+        'versions': 'v1',
+        'filter_fields': ['record_a_note'],
+    }
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
@@ -19,19 +23,15 @@ def tests_additional_field_exports_xxx():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note/transcript',
-        'record_a_note/translated_es',
+        'record_a_note/translation_es',
         'record_a_note/acme_timestamp',
-        'name_of_clerk',
-        'name_of_clerk/comment',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
         'clerk_interaction_1.mp3',
-        'Hello how may I help you?',
+        '[en] Hello how may I help you?',
         'Saluton, kiel mi povas helpi vin?',
         '2021-11-01Z',
-        'John',
-        'Sounds like an interesting person',
     ]
 
 @unittest.skip('Currently not supporting repeat groups')

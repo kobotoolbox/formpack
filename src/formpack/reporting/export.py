@@ -231,9 +231,6 @@ class Export:
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
 
-        if self.analysis_form and self.include_analysis_fields:
-            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
-
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
         if self.filter_fields:
@@ -242,6 +239,10 @@ class Export:
                 for field in all_fields
                 if field.path in self.filter_fields
             ]
+
+        # TODO: For MVP, just reattach additional fields to their source
+        if self.analysis_form and self.include_analysis_fields:
+            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
 
         all_sections = {}
 
@@ -398,7 +399,7 @@ class Export:
             if not _sup_details:
                 return
 
-            if 'translated_' in name:
+            if 'translation' in name:
                 name = 'translated'
 
             val = _sup_details.get(name)
@@ -406,10 +407,12 @@ class Export:
                 return ''
 
             if field.analysis_type == ANALYSIS_TYPE_TRANSCRIPT:
-                return val['value']
-
-            if field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
-                return val[field.language]['value']
+                val = f'[{val["languageCode"]}] {val["value"]}'
+            elif field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
+                try:
+                    val = val[field.language]['value']
+                except KeyError:
+                    val = ''
 
             return val
 
@@ -432,6 +435,11 @@ class Export:
                 for field in _fields
                 if field.path in self.filter_fields
             )
+
+        # TODO: For MVP, just reattach additional fields to their source
+        if self.analysis_form and self.include_analysis_fields:
+            _fields = self.analysis_form.insert_analysis_fields(_fields)
+
 
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section

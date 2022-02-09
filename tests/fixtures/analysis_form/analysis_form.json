@@ -22,12 +22,12 @@
     },
     {
       "type": "translation",
-      "name": "record_a_note/translated_es",
+      "name": "record_a_note/translation_es",
       "label": "record_a_note Translated (es)",
       "language": "es",
       "path": [
         "record_a_note",
-        "translated_es"
+        "translation_es"
       ],
       "source": "record_a_note",
       "settings": {
