@@ -403,6 +403,7 @@ class AnalysisForm(BaseForm):
         _fields = []
         for analysis_field in self.fields_by_source[survey_field.name]:
             analysis_field.section = survey_field.section
+            analysis_field.source_field = survey_field
             _fields.append(analysis_field)
         return _fields
 

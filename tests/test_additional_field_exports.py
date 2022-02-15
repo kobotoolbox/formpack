@@ -14,17 +14,24 @@ def tests_additional_field_exports_xxx():
         'include_analysis_fields': True,
         'versions': 'v1',
         'filter_fields': ['record_a_note'],
+        'lang': 'English (en)'
     }
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
 
     assert 3 == len(main_export_sheet['data'])
+    #assert main_export_sheet['fields'] == [
+    #    'record_a_note',
+    #    'record_a_note/transcript',
+    #    'record_a_note/translation_es',
+    #    'record_a_note/acme_timestamp',
+    #]
     assert main_export_sheet['fields'] == [
-        'record_a_note',
-        'record_a_note/transcript',
-        'record_a_note/translation_es',
-        'record_a_note/acme_timestamp',
+        'Record a clerk saying something',
+        'Record a clerk saying something - transcript',
+        'Record a clerk saying something - translation (es)',
+        'Transcription Timestamp',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [

@@ -434,23 +434,31 @@ class ExtendedFormField(FormField):
 
 
 class TextField(ExtendedFormField):
-    #@property
-    #def _is_translation(self):
-    #    return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
+    @property
+    def _is_transcript(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSCRIPT
 
-    #def get_labels(
-    #    self,
-    #    lang=UNSPECIFIED_TRANSLATION,
-    #    group_sep="/",
-    #    hierarchy_in_labels=False,
-    #    multiple_select="both",
-    #    *args,
-    #    **kwargs,
-    #):
-    #    if self._is_translation:
-    #        return self.get_value_names()
-    #    args = lang, group_sep, hierarchy_in_labels, multiple_select
-    #    return [self._get_label(*args)]
+    @property
+    def _is_translation(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
+
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        *args,
+        **kwargs,
+    ):
+        args = lang, group_sep, hierarchy_in_labels, multiple_select
+        if hasattr(self, 'source') and lang != UNSPECIFIED_TRANSLATION:
+            source_label = self.source_field._get_label(*args)
+            if self._is_translation:
+                return [f'{source_label} - translation ({self.language})']
+            elif self._is_transcript:
+                return [f'{source_label} - transcript']
+        return [self._get_label(*args)]
 
     #def get_value_names(self, multiple_select="both", *args, **kwargs):
     #    if self._is_translation:
