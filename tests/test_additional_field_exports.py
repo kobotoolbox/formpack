@@ -14,29 +14,29 @@ def tests_additional_field_exports_xxx():
         'include_analysis_fields': True,
         'versions': 'v1',
         'filter_fields': ['record_a_note'],
-        'lang': 'English (en)'
+        #'lang': 'English (en)'
     }
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
 
     assert 3 == len(main_export_sheet['data'])
-    #assert main_export_sheet['fields'] == [
-    #    'record_a_note',
-    #    'record_a_note/transcript_en',
-    #    'record_a_note/transcript_es',
-    #    'record_a_note/translation_en',
-    #    'record_a_note/translation_es',
-    #    'record_a_note/acme_timestamp',
-    #]
     assert main_export_sheet['fields'] == [
-        'Record a clerk saying something',
-        'Record a clerk saying something - transcript (en)',
-        'Record a clerk saying something - transcript (es)',
-        'Record a clerk saying something - translation (en)',
-        'Record a clerk saying something - translation (es)',
-        'Transcription Timestamp',
+        'record_a_note',
+        'record_a_note - transcript (en)',
+        'record_a_note - transcript (es)',
+        'record_a_note - translation (en)',
+        'record_a_note - translation (es)',
+        'record_a_note/acme_timestamp',
     ]
+    #assert main_export_sheet['fields'] == [
+    #    'Record a clerk saying something',
+    #    'Record a clerk saying something - transcript (en)',
+    #    'Record a clerk saying something - transcript (es)',
+    #    'Record a clerk saying something - translation (en)',
+    #    'Record a clerk saying something - translation (es)',
+    #    'Transcription Timestamp',
+    #]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
         'clerk_interaction_1.mp3',

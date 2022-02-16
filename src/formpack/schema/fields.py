@@ -452,21 +452,17 @@ class TextField(ExtendedFormField):
         **kwargs,
     ):
         args = lang, group_sep, hierarchy_in_labels, multiple_select
-        if hasattr(self, 'source') and lang != UNSPECIFIED_TRANSLATION:
+        if hasattr(self, 'source'):
             source_label = self.source_field._get_label(*args)
             if self._is_translation:
                 return [f'{source_label} - translation ({self.language})']
             elif self._is_transcript:
                 return [f'{source_label} - transcript ({code})' for code in self.languages]
-        if self._is_transcript:
-            return self.get_value_names()
         return [self._get_label(*args)]
 
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         if self._is_transcript:
-            return [
-                f'{self.name}_{code}' for code in self.languages
-            ]
+            return [f'{self.source_field.name} - transcript ({code})' for code in self.languages]
         return super().get_value_names()
 
     def format(
@@ -487,7 +483,7 @@ class TextField(ExtendedFormField):
             cells = dict.fromkeys(self.get_value_names(), '')
             # TODO why is this necessary??
             if isinstance(val, dict):
-                cells[f'{self.name}_{val["languageCode"]}'] = val['value']
+                cells[f'{self.source_field.name} - transcript ({val["languageCode"]})'] = val['value']
             return cells
 
         return {self.name: val}
