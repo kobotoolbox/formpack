@@ -407,7 +407,7 @@ class Export:
                 return ''
 
             if field.analysis_type == ANALYSIS_TYPE_TRANSCRIPT:
-                val = f'[{val["languageCode"]}] {val["value"]}'
+                return val
             elif field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
                 try:
                     val = val[field.language]['value']

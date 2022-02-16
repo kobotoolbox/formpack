@@ -457,41 +457,40 @@ class TextField(ExtendedFormField):
             if self._is_translation:
                 return [f'{source_label} - translation ({self.language})']
             elif self._is_transcript:
-                return [f'{source_label} - transcript']
+                return [f'{source_label} - transcript ({code})' for code in self.languages]
+        if self._is_transcript:
+            return self.get_value_names()
         return [self._get_label(*args)]
 
-    #def get_value_names(self, multiple_select="both", *args, **kwargs):
-    #    if self._is_translation:
-    #        return [
-    #            f'{self.name}_{code}' for code in self.settings['translations']
-    #        ]
-    #    return super().get_value_names()
+    def get_value_names(self, multiple_select='both', *args, **kwargs):
+        if self._is_transcript:
+            return [
+                f'{self.name}_{code}' for code in self.languages
+            ]
+        return super().get_value_names()
 
-    #def format(
-    #    self,
-    #    val,
-    #    lang=UNSPECIFIED_TRANSLATION,
-    #    group_sep="/",
-    #    hierarchy_in_labels=False,
-    #    multiple_select="both",
-    #    xls_types_as_text=True,
-    #    *args,
-    #    **kwargs,
-    #):
-    #    if val is None:
-    #        val = ''
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        xls_types_as_text=True,
+        *args,
+        **kwargs,
+    ):
+        if val is None:
+            val = ''
 
-    #    if self._is_translation:
-    #        cells = dict.fromkeys(self.get_value_names(), '')
-    #        for code in self.settings['translations']:
-    #            try:
-    #                val = val[code]['value']
-    #            except (TypeError, KeyError):
-    #                val = ''
-    #            cells[f'{self.name}_{code}'] = val
-    #        return cells
+        if self._is_transcript:
+            cells = dict.fromkeys(self.get_value_names(), '')
+            # TODO why is this necessary??
+            if isinstance(val, dict):
+                cells[f'{self.name}_{val["languageCode"]}'] = val['value']
+            return cells
 
-    #    return {self.name: val}
+        return {self.name: val}
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
 

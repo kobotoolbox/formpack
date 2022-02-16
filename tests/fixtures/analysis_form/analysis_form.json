@@ -13,11 +13,26 @@
         "record_a_note",
         "transcript"
       ],
-      "languages": ["en"],
+      "languages": ["en", "es"],
       "source": "record_a_note",
       "settings": {
         "mode": "manual",
         "engine": "engines/transcript_manual"
+      }
+    },
+    {
+      "type": "translation",
+      "name": "record_a_note/translation_en",
+      "label": "record_a_note Translated (en)",
+      "language": "en",
+      "path": [
+        "record_a_note",
+        "translation_en"
+      ],
+      "source": "record_a_note",
+      "settings": {
+        "mode": "manual",
+        "engine": "engines/translation_manual"
       }
     },
     {

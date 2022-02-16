@@ -54,12 +54,12 @@
       "_supplementalDetails": {
         "record_a_note": {
           "transcript": {
-            "value": "Hello how may I help you?",
-            "languageCode": "en"
+            "value": "Saluton, kiel mi povas helpi vin?",
+            "languageCode": "es"
           },
           "translated": {
-            "es": {
-              "value": "Saluton, kiel mi povas helpi vin?"
+            "en": {
+              "value": "Hello how may I help you?"
             }
           },
           "acme_timestamp": "2021-11-01Z"

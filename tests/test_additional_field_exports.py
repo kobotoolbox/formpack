@@ -23,21 +23,27 @@ def tests_additional_field_exports_xxx():
     assert 3 == len(main_export_sheet['data'])
     #assert main_export_sheet['fields'] == [
     #    'record_a_note',
-    #    'record_a_note/transcript',
+    #    'record_a_note/transcript_en',
+    #    'record_a_note/transcript_es',
+    #    'record_a_note/translation_en',
     #    'record_a_note/translation_es',
     #    'record_a_note/acme_timestamp',
     #]
     assert main_export_sheet['fields'] == [
         'Record a clerk saying something',
-        'Record a clerk saying something - transcript',
+        'Record a clerk saying something - transcript (en)',
+        'Record a clerk saying something - transcript (es)',
+        'Record a clerk saying something - translation (en)',
         'Record a clerk saying something - translation (es)',
         'Transcription Timestamp',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
         'clerk_interaction_1.mp3',
-        '[en] Hello how may I help you?',
+        '',
         'Saluton, kiel mi povas helpi vin?',
+        'Hello how may I help you?',
+        '',
         '2021-11-01Z',
     ]
 
