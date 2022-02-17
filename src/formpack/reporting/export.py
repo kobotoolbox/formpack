@@ -406,9 +406,7 @@ class Export:
             if val is None:
                 return ''
 
-            if field.analysis_type == ANALYSIS_TYPE_TRANSCRIPT:
-                return val
-            elif field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
+            if field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
                 try:
                     val = val[field.language]['value']
                 except KeyError:

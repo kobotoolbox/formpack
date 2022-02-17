@@ -481,9 +481,10 @@ class TextField(ExtendedFormField):
 
         if self._is_transcript:
             cells = dict.fromkeys(self.get_value_names(), '')
-            # TODO why is this necessary??
             if isinstance(val, dict):
-                cells[f'{self.source_field.name} - transcript ({val["languageCode"]})'] = val['value']
+                cells[
+                    f'{self.source_field.name} - transcript ({val["languageCode"]})'
+                ] = val['value']
             return cells
 
         return {self.name: val}
