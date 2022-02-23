@@ -10,17 +10,21 @@ from copy import deepcopy
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES, selects
-from ..constants import (UNTRANSLATED, OR_OTHER_COLUMN,
-                         TAG_COLUMNS_AND_SEPARATORS)
+from ..constants import (
+    UNTRANSLATED,
+    OR_OTHER_COLUMN,
+    TAG_COLUMNS_AND_SEPARATORS,
+)
 
 REMOVE_EMPTY_STRINGS = True
 # this will be used to check which version of formpack was used to compile the
 # asset content
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = '1'
 
 
-def _expand_translatable_content(content, row, col_shortname,
-                                 special_column_details):
+def _expand_translatable_content(
+    content, row, col_shortname, special_column_details
+):
     _scd = special_column_details
     if 'translation' in _scd:
         translations = content['translations']
@@ -94,10 +98,12 @@ def expand_content_in_place(content):
                 # legacy {'select_one': 'xyz'} format might
                 # still be on kobo-prod
                 _type_str = _expand_type_to_dict(
-                    get_first_occurrence(_type.keys()))['type']
+                    get_first_occurrence(_type.keys())
+                )['type']
                 _list_name = get_first_occurrence(_type.values())
-                row.update({'type': _type_str,
-                            'select_from_list_name': _list_name})
+                row.update(
+                    {'type': _type_str, 'select_from_list_name': _list_name}
+                )
 
         _expand_tags(row, tag_cols_and_seps=TAG_COLUMNS_AND_SEPARATORS)
 
@@ -111,7 +117,7 @@ def expand_content_in_place(content):
         if REMOVE_EMPTY_STRINGS:
             row_copy = dict(row)
             for key, val in row_copy.items():
-                if val == "":
+                if val == '':
                     del row[key]
 
     # for now, prepend meta questions to the beginning of the survey
@@ -177,9 +183,11 @@ def _get_special_survey_cols(content):
 
     for column_name in uniq_cols.keys():
         if column_name in ['label', 'hint']:
-            _mark_special(column_name=column_name,
-                          column=column_name,
-                          translation=UNTRANSLATED)
+            _mark_special(
+                column_name=column_name,
+                column=column_name,
+                translation=UNTRANSLATED,
+            )
         if ':' not in column_name:
             continue
         if column_name.startswith('bind:'):
@@ -190,39 +198,47 @@ def _get_special_survey_cols(content):
         if mtch:
             matched = mtch.groups()
             media_type = matched[0]
-            _mark_special(column_name=column_name,
-                          column='media::{}'.format(media_type),
-                          coltype='media',
-                          media=media_type,
-                          translation=matched[1])
+            _mark_special(
+                column_name=column_name,
+                column='media::{}'.format(media_type),
+                coltype='media',
+                media=media_type,
+                translation=matched[1],
+            )
             continue
         mtch = re.match(r'^media\s*::?\s*([^:]+)$', column_name)
         if mtch:
             media_type = mtch.groups()[0]
-            _mark_special(column_name=column_name,
-                          column='media::{}'.format(media_type),
-                          coltype='media',
-                          media=media_type,
-                          translation=UNTRANSLATED)
+            _mark_special(
+                column_name=column_name,
+                column='media::{}'.format(media_type),
+                coltype='media',
+                media=media_type,
+                translation=UNTRANSLATED,
+            )
             continue
         mtch = re.match(r'^([^:]+)\s*::?\s*([^:]+)$', column_name)
         if mtch:
             # example: label::x, constraint_message::x, hint::x
             matched = mtch.groups()
             column_shortname = matched[0]
-            _mark_special(column_name=column_name,
-                          column=column_shortname,
-                          translation=matched[1])
+            _mark_special(
+                column_name=column_name,
+                column=column_shortname,
+                translation=matched[1],
+            )
 
             # also add the empty column if it exists
             if column_shortname in uniq_cols:
-                _mark_special(column_name=column_shortname,
-                              column=column_shortname,
-                              translation=UNTRANSLATED)
+                _mark_special(
+                    column_name=column_shortname,
+                    column=column_shortname,
+                    translation=UNTRANSLATED,
+                )
             continue
-    (translations,
-     translated_cols) = _get_translations_from_special_cols(special,
-                                                            content.get('translations', []))
+    (translations, translated_cols) = _get_translations_from_special_cols(
+        special, content.get('translations', [])
+    )
     translated_cols.update(known_translated_cols)
     return special, translations, sorted(translated_cols)
 

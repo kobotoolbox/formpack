@@ -8,9 +8,9 @@ from ..utils.ordered_collection import OrderedCounter
 
 
 class AutoReportStats:
-
-    def __init__(self, autoreport, stats, submissions_count,
-                 submission_counts_by_version):
+    def __init__(
+        self, autoreport, stats, submissions_count, submission_counts_by_version
+    ):
         self.autoreport = autoreport
         self.stats = stats
         self.submissions_count = submissions_count
@@ -21,7 +21,6 @@ class AutoReportStats:
 
 
 class AutoReport:
-
     def __init__(self, formpack, form_versions):
         self.formpack = formpack
         self.versions = form_versions
@@ -91,14 +90,22 @@ class AutoReport:
 
         def stats_generator():
             for field in fields:
-                yield (field,
-                       field.get_labels(lang)[0],
-                       field.get_stats(metrics[field.name], lang=lang))
+                yield (
+                    field,
+                    field.get_labels(lang)[0],
+                    field.get_stats(metrics[field.name], lang=lang),
+                )
 
-        return AutoReportStats(self, stats_generator(), submissions_count,
-                               submission_counts_by_version)
+        return AutoReportStats(
+            self,
+            stats_generator(),
+            submissions_count,
+            submission_counts_by_version,
+        )
 
-    def _disaggregate_stats(self, submissions, fields, versions, lang, split_by_field):
+    def _disaggregate_stats(
+        self, submissions, fields, versions, lang, split_by_field
+    ):
 
         # We want only the most used values so we build a separate counter
         # for it to filter them
@@ -168,7 +175,7 @@ class AutoReport:
             if splitter is not None:
                 values = split_by_field.parse_values(splitter)
             else:
-                values = (None, )
+                values = (None,)
 
             splitters_rank.update(values)
 
@@ -191,14 +198,25 @@ class AutoReport:
 
         def stats_generator():
             for field in fields:
-                stats = field.get_disaggregated_stats(metrics[field.name], lang=lang,
-                                                      top_splitters=top_splitters)
+                stats = field.get_disaggregated_stats(
+                    metrics[field.name], lang=lang, top_splitters=top_splitters
+                )
                 yield (field, field.get_labels(lang)[0], stats)
 
-        return AutoReportStats(self, stats_generator(), submissions_count,
-                               submission_counts_by_version)
+        return AutoReportStats(
+            self,
+            stats_generator(),
+            submissions_count,
+            submission_counts_by_version,
+        )
 
-    def get_stats(self, submissions, fields=(), lang=UNSPECIFIED_TRANSLATION, split_by=None):
+    def get_stats(
+        self,
+        submissions,
+        fields=(),
+        lang=UNSPECIFIED_TRANSLATION,
+        split_by=None,
+    ):
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
         all_fields = [field for field in all_fields if field.has_stats]
@@ -214,10 +232,12 @@ class AutoReport:
             try:
                 split_by_field = next(f for f in fields if f.name == split_by)
             except StopIteration:
-                raise ValueError('No field matching name "%s" '
-                                 'for split_by' % split_by)
+                raise ValueError(
+                    'No field matching name "%s" ' 'for split_by' % split_by
+                )
 
-            return self._disaggregate_stats(submissions, fields,
-                                            self.versions, lang, split_by_field)
+            return self._disaggregate_stats(
+                submissions, fields, self.versions, lang, split_by_field
+            )
 
         return self._calculate_stats(submissions, fields, self.versions, lang)

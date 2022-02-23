@@ -8,10 +8,10 @@ VARIABLE_LABEL_LIMIT_BYTES = 255
 VALUE_LABEL_LIMIT_BYTES = 120
 SELECT_MULTIPLE_NAME_DELIMITER = '_'
 SELECT_MULTIPLE_LABEL_DELIMITER = ' :: '
-''' SPSS limits variable names to 64 bytes, but we'll create more problems for
-people if we try to change variable names here. Any change to them would
-require altering data exports as well; otherwise, the labels we generate would
-be useless '''
+# SPSS limits variable names to 64 bytes, but we'll create more problems for
+# people if we try to change variable names here. Any change to them would
+# require altering data exports as well; otherwise, the labels we generate
+# would be useless
 VARIABLE_NAME_LIMIT_BYTES = 64
 
 
@@ -23,7 +23,7 @@ def utf8_len(s):
 
 
 def spss_escape(s):
-    return s.replace("'", "''").replace("\n", "\\n")
+    return s.replace("'", "''").replace('\n', '\\n')
 
 
 def utf8_ellipsize(s, max_bytes, ellipsis='…'):
@@ -57,15 +57,14 @@ def spss_labels_from_variables_dict(variables):
     # Create initial version of each section, no wrapping
     variable_section_lines = ['VARIABLE LABELS']
     value_section_lines = ['VALUE LABELS']
-    variable_count = 0 # because the first does not need a leading slash
+    variable_count = 0  # because the first does not need a leading slash
     value_count = 0
 
     for variable_name, variable in variables.items():
         if utf8_len(variable_name) > VARIABLE_NAME_LIMIT_BYTES:
             logging.warning(
                 'SPSS variable name exceeds {} bytes: {}'.format(
-                    VARIABLE_NAME_LIMIT_BYTES,
-                    variable_name
+                    VARIABLE_NAME_LIMIT_BYTES, variable_name
                 )
             )
 
@@ -78,7 +77,7 @@ def spss_labels_from_variables_dict(variables):
                         variable['label'],
                         VARIABLE_LABEL_LIMIT_BYTES,
                     )
-                )
+                ),
             )
         )
         variable_count += 1
@@ -100,7 +99,7 @@ def spss_labels_from_variables_dict(variables):
                 output = label_format_string.format(
                     variable_label=variable['label'],
                     delimiter=SELECT_MULTIPLE_LABEL_DELIMITER,
-                    value_label=value_label
+                    value_label=value_label,
                 )
                 if utf8_len(output) > VARIABLE_LABEL_LIMIT_BYTES:
                     variable_label = utf8_ellipsize(
@@ -108,13 +107,14 @@ def spss_labels_from_variables_dict(variables):
                     )
                     value_label = utf8_ellipsize(
                         value_label,
-                        VARIABLE_LABEL_LIMIT_BYTES - utf8_len(variable_label) -
-                            utf8_len(SELECT_MULTIPLE_LABEL_DELIMITER)
+                        VARIABLE_LABEL_LIMIT_BYTES
+                        - utf8_len(variable_label)
+                        - utf8_len(SELECT_MULTIPLE_LABEL_DELIMITER),
                     )
                     output = label_format_string.format(
                         variable_label=variable_label,
                         delimiter=SELECT_MULTIPLE_LABEL_DELIMITER,
-                        value_label=value_label
+                        value_label=value_label,
                     )
                 assert utf8_len(output) <= VARIABLE_LABEL_LIMIT_BYTES
                 variable_section_lines.append(
@@ -124,7 +124,7 @@ def spss_labels_from_variables_dict(variables):
                         variable_name=variable_name,
                         delimiter=SELECT_MULTIPLE_NAME_DELIMITER,
                         value_name=value_name,
-                        variable_label=spss_escape(output)
+                        variable_label=spss_escape(output),
                     )
                 )
                 variable_count += 1
@@ -132,7 +132,7 @@ def spss_labels_from_variables_dict(variables):
             continue
 
         value_section_lines.append(
-            "{line_leader}{variable_name}".format(
+            '{line_leader}{variable_name}'.format(
                 line_leader=' /' if value_count else ' ',
                 variable_name=variable_name,
             )
@@ -143,7 +143,7 @@ def spss_labels_from_variables_dict(variables):
                     value_name=spss_escape(value_name),
                     value_label=spss_escape(
                         utf8_ellipsize(value_label, VALUE_LABEL_LIMIT_BYTES)
-                    )
+                    ),
                 )
             )
         value_count += 1
@@ -166,14 +166,14 @@ def spss_labels_from_variables_dict(variables):
             in_string = False
             last_split = 0
             last_split_in_string = False
-            line_limit = LINE_LIMIT_BYTES # this will change if in a string
+            line_limit = LINE_LIMIT_BYTES  # this will change if in a string
             byte_count = 0
             while byte_count < line_limit:
                 # good split points: whitespace, or good insides of strings
                 char = chars[char_i]
                 if in_string:
                     # handle `\n` and `''`
-                    bichar = ''.join(chars[char_i:char_i+2])
+                    bichar = ''.join(chars[char_i : char_i + 2])
                     if bichar == '\\n' or bichar == "''":
                         last_split = char_i
                         last_split_in_string = True
@@ -182,14 +182,16 @@ def spss_labels_from_variables_dict(variables):
                         byte_count += 1
                     else:
                         if char == "'":
-                            in_string = False; line_limit += 1
+                            in_string = False
+                            line_limit += 1
                         else:
                             last_split = char_i
                             last_split_in_string = True
                 else:
                     if char == "'":
-                        in_string = True; line_limit -= 1
-                    if char == " ":
+                        in_string = True
+                        line_limit -= 1
+                    if char == ' ':
                         last_split = char_i
                         last_split_in_string = False
                 char_i += 1
@@ -198,13 +200,15 @@ def spss_labels_from_variables_dict(variables):
                 raise Exception("Can't split line {}".format(line_no))
             else:
                 if last_split_in_string:
-                    next_line = (" + '" + line[last_split:])#.rstrip()
+                    next_line = " + '" + line[last_split:]  # .rstrip()
                     line = full_file_lines[line_no] = line[0:last_split] + "'"
                     full_file_lines.insert(line_no + 1, next_line)
                 else:
                     # print "split outside of string." + line
-                    next_line = (" " + line[last_split:])#.rstrip()
-                    line = full_file_lines[line_no] = line[0:last_split]#.rstrip()
+                    next_line = ' ' + line[last_split:]  # .rstrip()
+                    line = full_file_lines[line_no] = line[
+                        0:last_split
+                    ]  # .rstrip()
                     full_file_lines.insert(line_no + 1, next_line)
         line_no += 1
 

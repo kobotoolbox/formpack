@@ -7,76 +7,80 @@ _fns = {}
 
 
 def test_custom_directive():
-    assert 'dlrow olleh' == array_to_xpath({
-        '@string_reverse': 'hello world'
-    }, {
-        '@string_reverse': lambda args: [args[::-1]]
-    })
+    assert 'dlrow olleh' == array_to_xpath(
+        {'@string_reverse': 'hello world'},
+        {'@string_reverse': lambda args: [args[::-1]]},
+    )
 
 
 def test_equiv_1():
     inp = []
-    expected = ""
+    expected = ''
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_2():
     inp = ['a', 'b']
-    expected = "ab"
+    expected = 'ab'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_3():
     inp = ['a', {'something': 'b'}, 'c']
-    expected = "abc"
+    expected = 'abc'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_4():
-    inp = ['a', {'something_b': 'b', 'something_c': 'c'}, 'd', [['e', 'f', {'x': 'g'}]]]
-    expected = "abcdefg"
+    inp = [
+        'a',
+        {'something_b': 'b', 'something_c': 'c'},
+        'd',
+        [['e', 'f', {'x': 'g'}]],
+    ]
+    expected = 'abcdefg'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_5():
     inp = ['a', {'# pound sign starts a comment': 'never added'}, 'b']
-    expected = "ab"
+    expected = 'ab'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_6():
     inp = ['a', ['(', ')']]
-    expected = "a()"
+    expected = 'a()'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_7():
     inp = ['a', ['(', ['1', '2', '3'], ')']]
-    expected = "a(123)"
+    expected = 'a(123)'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_8():
     inp = ['a', ['(', ['x', '+', 'y', ',', 'z'], ')'], 'b']
-    expected = "a(x + y, z)b"
+    expected = 'a(x + y, z)b'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_9():
     inp = ['a', ['(', ['x', '+', 'y', ',', 'z'], ')']]
-    expected = "a(x + y, z)"
+    expected = 'a(x + y, z)'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_10():
     inp = [{'@lookup': 'abc'}]
-    expected = "${abc}"
+    expected = '${abc}'
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_11():
     inp = [{'@lookup': 'abc'}]
-    expected = "${abc}"
+    expected = '${abc}'
     assert expected == array_to_xpath(inp, _fns)
 
 
@@ -87,13 +91,38 @@ def test_equiv_12():
 
 
 def test_equiv_13():
-    inp = [{'@and': [[{'@lookup': 'a'}, '=', "'a'"], [{'@lookup': 'b'}, '=', "'b'"], [{'@lookup': 'c'}, '=', "'c'"]]}, 'and', {'@or': [[{'@lookup': 'x'}, '=', "'x'"], [{'@lookup': 'y'}, '=', "'y'"]]}]
-    expected = "${a} = 'a' and ${b} = 'b' and ${c} = 'c' and ${x} = 'x' or ${y} = 'y'"
+    inp = [
+        {
+            '@and': [
+                [{'@lookup': 'a'}, '=', "'a'"],
+                [{'@lookup': 'b'}, '=', "'b'"],
+                [{'@lookup': 'c'}, '=', "'c'"],
+            ]
+        },
+        'and',
+        {
+            '@or': [
+                [{'@lookup': 'x'}, '=', "'x'"],
+                [{'@lookup': 'y'}, '=', "'y'"],
+            ]
+        },
+    ]
+    expected = (
+        "${a} = 'a' and ${b} = 'b' and ${c} = 'c' and ${x} = 'x' or ${y} = 'y'"
+    )
     assert expected == array_to_xpath(inp, _fns)
 
 
 def test_equiv_14():
-    inp = [{'aa__q1': [{'@lookup': 'question_a'}, '!=', "'a'"]}, 'and', ['${question_b}', '<=', 123], 'and', [{'@not_multiselected': ['question_c', "'option_2'"]}], 'and', [{'@lookup': 'question_d'}, '=', "'option_2'"]]
+    inp = [
+        {'aa__q1': [{'@lookup': 'question_a'}, '!=', "'a'"]},
+        'and',
+        ['${question_b}', '<=', 123],
+        'and',
+        [{'@not_multiselected': ['question_c', "'option_2'"]}],
+        'and',
+        [{'@lookup': 'question_d'}, '=', "'option_2'"],
+    ]
     expected = "${question_a} != 'a' and ${question_b} <= 123 and not(selected(${question_c}, 'option_2')) and ${question_d} = 'option_2'"
     assert expected == array_to_xpath(inp, _fns)
 
@@ -103,8 +132,10 @@ def test_lookup():
 
 
 def test_response_not_equal():
-    assert array_to_xpath([{'@response_not_equal': ['abc', '123']}]
-                          ) == '${abc} != 123'
+    assert (
+        array_to_xpath([{'@response_not_equal': ['abc', '123']}])
+        == '${abc} != 123'
+    )
 
 
 def test_join():
@@ -148,11 +179,17 @@ def test_count_selected():
 
 
 def test_multiselected():
-    assert array_to_xpath([{'@multiselected': ['abc', 'xyz']}]) == 'selected(${abc}, xyz)'
+    assert (
+        array_to_xpath([{'@multiselected': ['abc', 'xyz']}])
+        == 'selected(${abc}, xyz)'
+    )
 
 
 def test_not_multiselected():
-    assert array_to_xpath([{'@not_multiselected': ['abc', 'xyz']}]) == 'not(selected(${abc}, xyz))'
+    assert (
+        array_to_xpath([{'@not_multiselected': ['abc', 'xyz']}])
+        == 'not(selected(${abc}, xyz))'
+    )
 
 
 def test_case_struct():
@@ -161,78 +198,36 @@ def test_case_struct():
     def _case_fn(args):
         return inner_case_fn(args[0]['@case'])
 
-    assert _case_fn([
-        {
-          "@case": [
-            'xxx',
-          ]
-        }
-    ]) == [
-        'xxx'
+    assert _case_fn([{'@case': ['xxx']}]) == ['xxx']
+
+    assert _case_fn([{'@case': [['zzz', "'green'"], '']}]) == [
+        {'@if': ['zzz', "'green'", '']}
     ]
 
-    assert _case_fn([
-        {
-          "@case": [
-            ['zzz', "'green'"],
-            '',
-          ]
-        }
-    ]) == [
-        {
-            '@if': [
-                'zzz',
-                "'green'",
-                ''
-            ]
-        }
+    assert _case_fn(
+        [{'@case': [['zzz', "'green'"], {'@lookup': 'defaultval'}]}]
+    ) == [{'@if': ['zzz', "'green'", {'@lookup': 'defaultval'}]}]
+
+    assert _case_fn([{'@case': [['zzz', "'green'"], 'somedefault']}]) == [
+        {'@if': ['zzz', "'green'", 'somedefault']}
     ]
 
-    assert _case_fn([
-        {
-          "@case": [
-            ['zzz', "'green'"],
-            {'@lookup': 'defaultval'}
-          ]
-        }
-    ]) == [
-        {
-            '@if': [
-                'zzz',
-                "'green'",
-                {
-                    '@lookup': 'defaultval',
-                }
-            ]
-        }
-    ]
+    assert _case_fn(
+        [{'@case': [['s1', "'red'"], ['s2', "'yellow'"], 'green']}]
+    ) == [{'@if': ['s1', "'red'", {'@if': ['s2', "'yellow'", 'green']}]}]
 
-    assert _case_fn([
-        {
-          "@case": [
-            ['zzz', "'green'"],
-            'somedefault'
-          ]
-        }
-    ]) == [
-        {
-            '@if': [
-                'zzz',
-                "'green'",
-                'somedefault',
-            ]
-        }
-    ]
-
-    assert _case_fn([
-        {
-          "@case": [
-            ['s1', "'red'"],
-            ['s2', "'yellow'"],
-            'green'
-          ]
-        }
-    ]) == [
+    assert _case_fn(
+        [
+            {
+                '@case': [
+                    ['s1', "'red'"],
+                    ['s2', "'yellow'"],
+                    ['s3', "'green'"],
+                    'blinkred',
+                ]
+            }
+        ]
+    ) == [
         {
             '@if': [
                 's1',
@@ -241,40 +236,9 @@ def test_case_struct():
                     '@if': [
                         's2',
                         "'yellow'",
-                        'green',
+                        {'@if': ['s3', "'green'", 'blinkred']},
                     ]
-                }
-            ]
-        }
-    ]
-
-    assert _case_fn([
-        {
-          "@case": [
-            ['s1', "'red'"],
-            ['s2', "'yellow'"],
-            ['s3', "'green'"],
-            'blinkred'
-          ]
-        }
-    ]) == [
-        {
-            '@if': [
-                's1',
-                "'red'",
-                {
-                    '@if': [
-                        's2',
-                        "'yellow'",
-                        {
-                            '@if': [
-                                's3',
-                                "'green'",
-                                'blinkred'
-                            ]
-                        }
-                    ]
-                }
+                },
             ]
         }
     ]
@@ -283,27 +247,30 @@ def test_case_struct():
 def test_case_expression():
     inp = [
         {
-          "@case": [
-            ['s1', "'red'"],
-            ['s2', "'yellow'"],
-            ['s3', "'green'"],
-            "'blinkred'",
-          ]
+            '@case': [
+                ['s1', "'red'"],
+                ['s2', "'yellow'"],
+                ['s3', "'green'"],
+                "'blinkred'",
+            ]
         }
     ]
-    assert array_to_xpath(inp) == '''
+    assert (
+        array_to_xpath(inp)
+        == '''
         if(s1, 'red', if(s2, 'yellow', if(s3, 'green', 'blinkred')))
     '''.strip()
+    )
 
 
 def test_case_invalid_params():
-    '''
-    the @case function receives an array
-    '''
+    """
+    The @case function receives an array
+    """
+
     def _case(*items):
-        return array_to_xpath([
-            {'@case': list(items)}
-        ])
+        return array_to_xpath([{'@case': list(items)}])
+
     _case('default')
 
     with pytest.raises(ValueError):
@@ -312,32 +279,22 @@ def test_case_invalid_params():
 
     # array.length must be 2
     with pytest.raises(ValueError):
-        _case(['too', 'many', 'items'],
-              'default')
+        _case(['too', 'many', 'items'], 'default')
 
     with pytest.raises(ValueError):
-        _case(['toofew'],
-              'default')
+        _case(['toofew'], 'default')
 
 
 def test_comma_parens():
-    assert array_to_xpath([
-        {'@comma_parens': [
-            ['a', 'b'],
-        ]}
-    ]) == '(a, b)'
+    assert array_to_xpath([{'@comma_parens': [['a', 'b']]}]) == '(a, b)'
 
 
 def test_if_expr():
-    assert array_to_xpath([
-        {
-            '@if': [
-                'condition',
-                "'val1'",
-                "'val2'",
-            ]
-        }
-    ]) == "if(condition, 'val1', 'val2')"
+    assert (
+        array_to_xpath([{'@if': ['condition', "'val1'", "'val2'"]}])
+        == "if(condition, 'val1', 'val2')"
+    )
+
 
 default_fn_tests = {
     '@lookup': test_lookup,
@@ -361,18 +318,13 @@ default_fn_tests = {
 
 
 def test_all_transformation_fns_covered():
-    '''
-    this ensures that all of the default transformation functions have an
+    """
+    This ensures that all of the default transformation functions have an
     associated test defined.
-    '''
+    """
     assert set(default_fn_tests.keys()) == set(DEFAULT_FNS.keys())
+
 
 def test_invalid_transformation_fn():
     with pytest.raises(ValueError):
-        array_to_xpath([
-            {
-                '@never_defined_transform_fn': [
-                    'abc', 'def',
-                ]
-            }
-        ])
+        array_to_xpath([{'@never_defined_transform_fn': ['abc', 'def']}])
