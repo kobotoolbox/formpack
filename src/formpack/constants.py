@@ -52,6 +52,7 @@ TAG_COLUMNS_AND_SEPARATORS = {
 }
 
 GEO_QUESTION_TYPES = ('geopoint', 'geotrace', 'geoshape')
+MEDIA_TYPES = ('audio', 'image', 'video')
 
 # Export Settings
 EXPORT_SETTING_FIELDS = 'fields'
