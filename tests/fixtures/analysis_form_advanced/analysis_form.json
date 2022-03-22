@@ -6,11 +6,11 @@
   },
   "additional_fields": [
     {
-      "type": "text",
+      "type": "transcript",
       "name": "record_a_note/transcript",
       "path": ["record_a_note", "transcript"],
       "source": "record_a_note",
-      "analysis_type": "transcript",
+      "languages": ["en"],
       "settings": {
         "mode": "auto",
         "engine": "engines/acme_1_speech2text"

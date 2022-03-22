@@ -80,7 +80,8 @@
       "_supplementalDetails": {
         "record_a_note": {
           "transcript": {
-            "value": "Hello how may I help you?"
+            "value": "Hello how may I help you?",
+            "languageCode": "en"
           },
           "tone_of_voice": "excited confused"
         },
@@ -102,7 +103,8 @@
       "_supplementalDetails": {
         "record_a_note": {
           "transcript": {
-            "value": "Thank you for your business"
+            "value": "Thank you for your business",
+            "languageCode": "en"
           },
           "tone_of_voice": "anxious excited"
         },
