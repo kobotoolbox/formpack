@@ -8,7 +8,11 @@ from typing import (
 
 from pyxform import aliases as pyxform_aliases
 
-from .constants import UNTRANSLATED
+from .constants import (
+    ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
+    UNTRANSLATED,
+)
 from .errors import SchemaError
 from .errors import TranslationError
 from .schema import FormField, FormGroup, FormSection, FormChoice
@@ -389,7 +393,10 @@ class AnalysisForm(BaseForm):
 
         for data_def in survey:
             data_type = data_def['type']
-            if data_type in ['translation', 'transcript']:
+            if data_type in [
+                ANALYSIS_TYPE_TRANSCRIPT,
+                ANALYSIS_TYPE_TRANSLATION,
+            ]:
                 data_def.update(
                     {
                         'type': 'text',

@@ -403,7 +403,7 @@ class Export:
             ]
 
         def _get_value_from_supplemental_details(
-            field, supplemental_details: Dict
+            field: FormField, supplemental_details: Dict
         ) -> Optional[str]:
             source, name = field.analysis_path
             _sup_details = supplemental_details.get(source, {})
@@ -411,18 +411,13 @@ class Export:
             if not _sup_details:
                 return
 
-            if 'translation' in name:
+            # TODO: Fix this on KPI side so that names are consistent
+            if ANALYSIS_TYPE_TRANSLATION in name:
                 name = 'translated'
 
             val = _sup_details.get(name)
             if val is None:
                 return ''
-
-            if field.analysis_type == ANALYSIS_TYPE_TRANSLATION:
-                try:
-                    val = val[field.language]['value']
-                except KeyError:
-                    val = ''
 
             return val
 

@@ -50,7 +50,7 @@ def test_additional_field_exports_with_labels():
         'include_analysis_fields': True,
         'versions': 'v1',
         'filter_fields': ['record_a_note'],
-        'lang': 'English (en)'
+        'lang': 'English (en)',
     }
     export = pack.export(**options)
     values = export.to_dict(submissions)

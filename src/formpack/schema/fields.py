@@ -509,7 +509,12 @@ class TextField(ExtendedFormField):
         if val is None:
             val = ''
 
-        if self._is_transcript:
+        if self._is_translation and isinstance(val, dict):
+            try:
+                val = val[self.language]['value']
+            except KeyError:
+                val = ''
+        elif self._is_transcript:
             cells = dict.fromkeys(self.get_value_names(), '')
             if isinstance(val, dict):
                 cells[
