@@ -363,7 +363,7 @@ class FormVersion(BaseForm):
             }
         )
 
-        return survey._to_pretty_xml() #.encode('utf-8')
+        return survey._to_pretty_xml()  # .encode('utf-8')
 
 
 class AnalysisForm(BaseForm):

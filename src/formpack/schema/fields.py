@@ -481,12 +481,18 @@ class TextField(ExtendedFormField):
             if self._is_translation:
                 return [f'{source_label} - translation ({self.language})']
             elif self._is_transcript:
-                return [f'{source_label} - transcript ({code})' for code in self.languages]
+                return [
+                    f'{source_label} - transcript ({code})'
+                    for code in self.languages
+                ]
         return [self._get_label(*args)]
 
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         if self._is_transcript:
-            return [f'{self.source_field.name} - transcript ({code})' for code in self.languages]
+            return [
+                f'{self.source_field.name} - transcript ({code})'
+                for code in self.languages
+            ]
         return super().get_value_names()
 
     def format(

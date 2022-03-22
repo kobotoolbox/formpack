@@ -441,15 +441,12 @@ class Export:
         # carry on as usual
         if self.filter_fields:
             _fields = tuple(
-                field
-                for field in _fields
-                if field.path in self.filter_fields
+                field for field in _fields if field.path in self.filter_fields
             )
 
         # TODO: For MVP, just reattach additional fields to their source
         if self.analysis_form and self.include_analysis_fields:
             _fields = self.analysis_form.insert_analysis_fields(_fields)
-
 
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section
@@ -487,7 +484,9 @@ class Export:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
                     # get submission value for this field
-                    val = _get_value_from_entry(entry, field, supplemental_details)
+                    val = _get_value_from_entry(
+                        entry, field, supplemental_details
+                    )
                     # get the attachment for this field
                     attachment = _get_attachment(val, field, attachments)
                     # get a mapping of {"col_name": "val", ...}

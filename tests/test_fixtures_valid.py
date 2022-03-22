@@ -136,10 +136,7 @@ class TestFormPackFixtures(unittest.TestCase):
             [f['name'] for f in analysis_form['additional_fields']]
         )
         actual_analysis_questions = sorted(
-            [
-                f.name
-                for f in fp.analysis_form.fields
-            ]
+            [f.name for f in fp.analysis_form.fields]
         )
         assert expected_analysis_questions == actual_analysis_questions
 

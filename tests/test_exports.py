@@ -372,7 +372,9 @@ class TestFormPackExport(unittest.TestCase):
         )
 
     def test_translations_labels_mismatch(self):
-        title, schemas, submissions = build_fixture('translations_labels_mismatch')
+        title, schemas, submissions = build_fixture(
+            'translations_labels_mismatch'
+        )
         with self.assertRaises(TranslationError) as e:
             fp = FormPack(schemas, title)
 
@@ -1194,138 +1196,100 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         options = {'versions': 'bird_nests_v2', 'xls_types_as_text': False}
         export_dict = fp.export(**options).to_dict(submissions)
-        expected_dict = OrderedDict([
-            ('Bird nest survey with nested repeatable groups', {
-                'fields': [
-                    'start',
-                    'end',
-                    '_index'
-                ],
-                'data': [
-                    [
-                        parser.parse('2017-12-27T15:53:26.000-05:00'),
-                        parser.parse('2017-12-27T15:58:20.000-05:00'),
-                        1
-                    ],
-                    [
-                        parser.parse('2017-12-27T15:58:20.000-05:00'),
-                        parser.parse('2017-12-27T15:58:50.000-05:00'),
-                        2
-                    ]
-                ]
-            }),
-            ('group_tree', {
-                'fields': [
-                    'What_kind_of_tree_is_this',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        'pine',
-                        1,
-                        'Bird nest survey with nested repeatable groups',
-                        1
-                    ],
-                    [
-                        'spruce',
-                        2,
-                        'Bird nest survey with nested repeatable groups',
-                        1
-                    ],
-                    [
-                        'nan',
-                        3,
-                        'Bird nest survey with nested repeatable groups',
-                        2
-                    ]
-                ]
-            }),
-            ('group_nest', {
-                'fields': [
-                    'How_high_above_the_ground_is_the_nest',
-                    'How_many_eggs_are_in_the_nest',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        13,
-                        3,
-                        1,
-                        'group_tree',
-                        1
-                    ],
-                    [
-                        15,
-                        1,
-                        2,
-                        'group_tree',
-                        1
-                    ],
-                    [
-                        10,
-                        2,
-                        3,
-                        'group_tree',
-                        2
-                    ],
-                    [
-                        23,
-                        1,
-                        4,
-                        'group_tree',
-                        3
-                    ]
-                ]
-            }),
-            ('group_egg', {
-                'fields': [
-                    'Describe_the_egg',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        'brown and speckled; medium',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'brown and speckled; large; cracked',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'light tan; small',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'cream-colored',
-                        'group_nest',
-                        2
-                    ],
-                    [
-                        'reddish-brown; medium',
-                        'group_nest',
-                        3
-                    ],
-                    [
-                        'reddish-brown; small',
-                        'group_nest',
-                        3
-                    ],
-                    [
-                        'grey and speckled',
-                        'group_nest',
-                        4
-                    ]
-                ]
-            })
-        ])
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Bird nest survey with nested repeatable groups',
+                    {
+                        'fields': ['start', 'end', '_index'],
+                        'data': [
+                            [
+                                parser.parse('2017-12-27T15:53:26.000-05:00'),
+                                parser.parse('2017-12-27T15:58:20.000-05:00'),
+                                1,
+                            ],
+                            [
+                                parser.parse('2017-12-27T15:58:20.000-05:00'),
+                                parser.parse('2017-12-27T15:58:50.000-05:00'),
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_tree',
+                    {
+                        'fields': [
+                            'What_kind_of_tree_is_this',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [
+                                'pine',
+                                1,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                            ],
+                            [
+                                'spruce',
+                                2,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                            ],
+                            [
+                                'nan',
+                                3,
+                                'Bird nest survey with nested repeatable groups',
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_nest',
+                    {
+                        'fields': [
+                            'How_high_above_the_ground_is_the_nest',
+                            'How_many_eggs_are_in_the_nest',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [13, 3, 1, 'group_tree', 1],
+                            [15, 1, 2, 'group_tree', 1],
+                            [10, 2, 3, 'group_tree', 2],
+                            [23, 1, 4, 'group_tree', 3],
+                        ],
+                    },
+                ),
+                (
+                    'group_egg',
+                    {
+                        'fields': [
+                            'Describe_the_egg',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            ['brown and speckled; medium', 'group_nest', 1],
+                            [
+                                'brown and speckled; large; cracked',
+                                'group_nest',
+                                1,
+                            ],
+                            ['light tan; small', 'group_nest', 1],
+                            ['cream-colored', 'group_nest', 2],
+                            ['reddish-brown; medium', 'group_nest', 3],
+                            ['reddish-brown; small', 'group_nest', 3],
+                            ['grey and speckled', 'group_nest', 4],
+                        ],
+                    },
+                ),
+            ]
+        )
         self.assertEqual(export_dict, expected_dict)
 
     def test_repeats_alias(self):

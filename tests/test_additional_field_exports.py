@@ -4,6 +4,7 @@ from formpack import FormPack
 from .fixtures import build_fixture
 from .fixtures.load_fixture_json import load_analysis_form_json
 
+
 def tests_additional_field_exports_xxx():
     title, schemas, submissions = build_fixture('analysis_form')
     analysis_form = load_analysis_form_json('analysis_form')
@@ -29,14 +30,14 @@ def tests_additional_field_exports_xxx():
         'record_a_note - translation (es)',
         'record_a_note/acme_timestamp',
     ]
-    #assert main_export_sheet['fields'] == [
+    # assert main_export_sheet['fields'] == [
     #    'Record a clerk saying something',
     #    'Record a clerk saying something - transcript (en)',
     #    'Record a clerk saying something - transcript (es)',
     #    'Record a clerk saying something - translation (en)',
     #    'Record a clerk saying something - translation (es)',
     #    'Transcription Timestamp',
-    #]
+    # ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
         'clerk_interaction_1.mp3',
@@ -46,6 +47,7 @@ def tests_additional_field_exports_xxx():
         '',
         '2021-11-01Z',
     ]
+
 
 @unittest.skip('Currently not supporting repeat groups')
 def tests_additional_field_exports_repeat_groups():
@@ -116,6 +118,7 @@ def tests_additional_field_exports_repeat_groups():
         ],
     ]
     assert repeat_data_expected_2 == repeat_data_response_2
+
 
 def tests_additional_field_exports_advanced():
     title, schemas, submissions = build_fixture('analysis_form_advanced')
@@ -288,6 +291,7 @@ def tests_additional_field_exports_advanced():
         ],
     ]
 
+
 def tests_additional_field_exports_v2():
     title, schemas, submissions = build_fixture('analysis_form')
     analysis_form = load_analysis_form_json('analysis_form')
@@ -319,6 +323,7 @@ def tests_additional_field_exports_v2():
         'Save On',
         'Pretty cliche',
     ]
+
 
 def tests_additional_field_exports_all_versions():
     title, schemas, submissions = build_fixture('analysis_form')
@@ -368,6 +373,7 @@ def tests_additional_field_exports_all_versions():
         '',
     ]
 
+
 def tests_additional_field_exports_all_versions_exclude_fields():
     title, schemas, submissions = build_fixture('analysis_form')
     analysis_form = load_analysis_form_json('analysis_form')
@@ -397,6 +403,7 @@ def tests_additional_field_exports_all_versions_exclude_fields():
         'Save On',
         '',
     ]
+
 
 def tests_additional_field_exports_all_versions_langs():
     title, schemas, submissions = build_fixture('analysis_form')
@@ -458,6 +465,7 @@ def tests_additional_field_exports_all_versions_langs():
         'name_of_clerk',
         'name_of_clerk/comment',
     ]
+
 
 def test_simple_report_with_analysis_form():
     title, schemas, submissions = build_fixture('analysis_form')
