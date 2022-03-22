@@ -1,7 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import unittest
 
 from formpack import FormPack
@@ -25,10 +22,10 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
         v0 = fp[0]
-        self.assertEqual(list(v0.sections['Sanitation report'].fields.keys()),
-                         ['restaurant_name',
-                          'restaurant_rating',
-                          'report_date'])
+        self.assertEqual(
+            list(v0.sections['Sanitation report'].fields.keys()),
+            ['restaurant_name', 'restaurant_rating', 'report_date'],
+        )
 
     def test_grouped_questions(self):
         """
@@ -37,8 +34,10 @@ class TestFormPackFixtures(unittest.TestCase):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 1)
-        self.assertEqual(list(fp[0].sections['Grouped questions'].fields.keys()),
-                         ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'])
+        self.assertEqual(
+            list(fp[0].sections['Grouped questions'].fields.keys()),
+            ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz'],
+        )
 
     def test_customer_satisfaction(self):
         """
@@ -48,10 +47,13 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(schemas, title)
         v0 = fp[0]
         self.assertEqual(len(fp.versions), 1)
-        self.assertEqual(list(v0.sections['Customer Satisfaction'].fields.keys()),
-                         ['restaurant_name', 'customer_enjoyment'])
-        self.assertEqual(sorted(fp.to_dict().keys()),
-                         ['id_string', 'title', 'versions'])
+        self.assertEqual(
+            list(v0.sections['Customer Satisfaction'].fields.keys()),
+            ['restaurant_name', 'customer_enjoyment'],
+        )
+        self.assertEqual(
+            sorted(fp.to_dict().keys()), ['id_string', 'title', 'versions']
+        )
         # TODO: find a way to restore this test (or change fixtures)
         # self.assertEqual(fp.to_dict(), {'title': 'Customer Satisfaction',
         #                                 'id_string': 'customer_satisfaction',
@@ -62,11 +64,15 @@ class TestFormPackFixtures(unittest.TestCase):
         fp = FormPack(schemas, title)
         self.assertEqual(len(fp.versions), 4)
         v0 = fp[0]
-        self.assertEqual(list(v0.sections['Restaurant profile'].fields.keys()),
-                         ['restaurant_name', 'location'])
+        self.assertEqual(
+            list(v0.sections['Restaurant profile'].fields.keys()),
+            ['restaurant_name', 'location'],
+        )
 
-        self.assertEqual(sorted(fp.to_dict().keys()),
-                         sorted(['id_string', 'title', 'versions']))
+        self.assertEqual(
+            sorted(fp.to_dict().keys()),
+            sorted(['id_string', 'title', 'versions']),
+        )
         # TODO: find a way to restore this test (or change fixtures)
         # self.assertEqual(fp.to_dict(), {'title': 'Restaurant profile',
         #                                 'id_string': 'restaurant_profile',
@@ -78,7 +84,8 @@ class TestFormPackFixtures(unittest.TestCase):
         self.assertEqual(len(fp.versions), 5)
         v0 = fp[0]
         self.assertEqual(
-            list(v0.sections['Site inspection'].fields.keys()), [
+            list(v0.sections['Site inspection'].fields.keys()),
+            [
                 'inspector',
                 'did_you_find_the_site',
                 'was_there_damage_to_the_site',
@@ -88,17 +95,22 @@ class TestFormPackFixtures(unittest.TestCase):
                 'is_the_gate_secure',
                 'is_plant_life_encroaching',
                 'please_rate_the_impact_of_any_defects_observed',
-            ]
+            ],
         )
 
-        self.assertEqual(sorted(fp.to_dict().keys()),
-                         sorted(['id_string', 'title', 'versions']))
+        self.assertEqual(
+            sorted(fp.to_dict().keys()),
+            sorted(['id_string', 'title', 'versions']),
+        )
 
-        self.assertEqual(fp.to_dict(), {
-            'title': 'Site inspection',
-            'id_string': 'site_inspection',
-            'versions': [s['content'] for s in schemas]
-        })
+        self.assertEqual(
+            fp.to_dict(),
+            {
+                'title': 'Site inspection',
+                'id_string': 'site_inspection',
+                'versions': [s['content'] for s in schemas],
+            },
+        )
 
     # TODO: update this test, it doesn't test anything anymore.
     def test_xml_instances_loaded(self):
@@ -138,4 +150,3 @@ class TestFormPackFixtures(unittest.TestCase):
             hasattr(f1, 'analysis_type') and f1.analysis_type in ANALYSIS_TYPES
         )
         assert hasattr(f1, 'settings')
-

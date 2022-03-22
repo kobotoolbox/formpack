@@ -7,6 +7,6 @@ DATA = {
     'id_string': 'favorite_coffee',
     'versions': [
         load_fixture_json('favorite_coffee/v1'),
-        load_fixture_json('favorite_coffee/v2')
-    ]
+        load_fixture_json('favorite_coffee/v2'),
+    ],
 }

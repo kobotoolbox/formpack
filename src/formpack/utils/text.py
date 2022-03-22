@@ -1,5 +1,6 @@
 import re
 
+
 def get_valid_filename(name):
     """
     Copied over from django/utils/text.py#L225-L238 to emulate filename

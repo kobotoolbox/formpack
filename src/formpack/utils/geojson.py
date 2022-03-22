@@ -61,8 +61,7 @@ def field_and_response_to_geometry(field, response):
     elif field.data_type == 'geotrace':
         geometry['type'] = 'LineString'
         geometry['coordinates'] = [
-            split_geopoint_str(point)
-            for point in response.split(';')
+            split_geopoint_str(point) for point in response.split(';')
         ]
         if len(geometry['coordinates']) < 2:
             raise FormPackGeoJsonError('Too few points for a line')
@@ -84,7 +83,8 @@ def field_and_response_to_geometry(field, response):
     else:
         raise RuntimeError(
             '{field_name} is a {data_type}, which is not geographic'.format(
-                field_name=field.name, data_type=field.data_type)
+                field_name=field.name, data_type=field.data_type
+            )
         )
 
     return geometry
