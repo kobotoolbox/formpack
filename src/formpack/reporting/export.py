@@ -637,6 +637,8 @@ class Export:
 
         # Force to text otherwise might fail JSON serializing
         self.xls_types_as_text = True
+        # Format as summary for multiple select question types
+        self.multiple_select = 'summary'
 
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
@@ -726,15 +728,6 @@ class Export:
 
                     feature_properties = OrderedDict()
                     for name, label, row_value in zip(sections, labels, row):
-                        # Grab the `Field` object since it holds precious info
-                        # that we need to format the response correctly
-                        filtered_fields = [
-                            f for f in all_fields if f.name == name
-                        ]
-                        if not filtered_fields:
-                            continue
-                        field = filtered_fields[0]
-
                         # Skip all geo fields, including the current one, as
                         # it's unnecessary to repeat in the Feature's
                         # properties. Also skip over fields that are blank
