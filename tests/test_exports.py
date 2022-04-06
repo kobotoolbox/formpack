@@ -2822,7 +2822,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('geojson_and_selects')
         fp = FormPack(schemas, title)
 
-        options = {'versions': 'v1', 'lang': '_xml'}
+        options = {'versions': 'v1', 'lang': '_xml', 'include_media_url': True}
         export = fp.export(**options)
         geojson_gen = export.to_geojson(
             submissions, geo_question_name='geo_location'
@@ -2845,6 +2845,8 @@ class TestFormPackExport(unittest.TestCase):
                         ],
                     },
                     'properties': {
+                        'an_image': 'location.jpeg',
+                        'an_image_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
                         'current_location': 'inside',
                     },
                 },
@@ -2855,7 +2857,11 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture('geojson_and_selects')
         fp = FormPack(schemas, title)
 
-        options = {'versions': 'v1', 'lang': UNTRANSLATED}
+        options = {
+            'versions': 'v1',
+            'lang': UNTRANSLATED,
+            'include_media_url': True,
+        }
         export = fp.export(**options)
         geojson_gen = export.to_geojson(
             submissions, geo_question_name='geo_location'
@@ -2878,6 +2884,8 @@ class TestFormPackExport(unittest.TestCase):
                         ],
                     },
                     'properties': {
+                        'Take a photo of the location': 'location.jpeg',
+                        'Take a photo of the location_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
                         'Where are you?': 'Inside',
                     },
                 },

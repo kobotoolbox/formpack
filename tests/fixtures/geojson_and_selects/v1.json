@@ -5,24 +5,39 @@
       {
         "type": "select_one locations",
         "name": "current_location",
-        "label": ["Where are you?"]
+        "label": [
+          "Where are you?"
+        ]
       },
       {
         "type": "geopoint",
         "name": "geo_location",
-        "label": ["Point out where you are"]
+        "label": [
+          "Point out where you are"
+        ]
+      },
+      {
+        "type": "image",
+        "name": "an_image",
+        "label": [
+          "Take a photo of the location"
+        ]
       }
     ],
     "choices": [
       {
         "list_name": "locations",
         "name": "outside",
-        "label": ["Outside"]
+        "label": [
+          "Outside"
+        ]
       },
       {
         "list_name": "locations",
         "name": "inside",
-        "label": ["Inside"]
+        "label": [
+          "Inside"
+        ]
       }
     ]
   },
@@ -30,9 +45,16 @@
     {
       "current_location": "inside",
       "geo_location": "39.306938 -76.60869 11 22",
+      "an_image": "location.jpeg",
       "_geolocation": [
         39.306938,
         -76.60869
+      ],
+      "_attachments": [
+        {
+          "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg",
+          "filename": "/path/to/location.jpeg"
+        }
       ]
     }
   ]
