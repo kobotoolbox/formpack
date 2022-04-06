@@ -8,7 +8,7 @@ requirements = [
     'lxml',
     'path.py',
     'pyquery',
-    'pyxform<=1.7.0',
+    'pyxform',
     'statistics',
     'XlsxWriter',
     'geojson-rewind',

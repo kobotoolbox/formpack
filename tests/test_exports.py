@@ -8,6 +8,7 @@ from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
 
+import openpyxl
 import xlrd
 from path import TempDir
 
@@ -1914,8 +1915,8 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-            book = xlrd.open_workbook(xls)
-            assert book.sheet_names() == [
+            book = openpyxl.load_workbook(xls)
+            assert book.get_sheet_names() == [
                 'long survey name_ the quick,...',
                 'long_group_name__Victor_jagt...',
                 'long_group_name__Victor_... (1)',
@@ -1929,15 +1930,15 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-            book = xlrd.open_workbook(xls)
+            book = openpyxl.load_workbook(xls, data_only=True)
             # Verify main sheet
-            sheet = book.sheet_by_name('Household survey with HXL an...')
-            row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == ['#date+start', '#date+end', '#loc+name', '']
+            sheet = book.get_sheet_by_name('Household survey with HXL an...')
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == ['#date+start', '#date+end', '#loc+name', None]
             # Verify repeating group
-            sheet = book.sheet_by_name('houshold_member_repeat')
-            row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == ['#beneficiary', '', '']
+            sheet = book.get_sheet_by_name('houshold_member_repeat')
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == ['#beneficiary', None, None]
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
