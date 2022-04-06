@@ -372,7 +372,9 @@ class TestFormPackExport(unittest.TestCase):
         )
 
     def test_translations_labels_mismatch(self):
-        title, schemas, submissions = build_fixture('translations_labels_mismatch')
+        title, schemas, submissions = build_fixture(
+            'translations_labels_mismatch'
+        )
         with self.assertRaises(TranslationError) as e:
             fp = FormPack(schemas, title)
 
@@ -2822,7 +2824,9 @@ class TestFormPackExport(unittest.TestCase):
 
         options = {'versions': 'v1', 'lang': '_xml'}
         export = fp.export(**options)
-        geojson_gen = export.to_geojson(submissions, geo_question_name='geo_location')
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
         geojson_str = ''.join(geojson_gen)
         geojson_obj = json.loads(geojson_str)
 
@@ -2853,7 +2857,9 @@ class TestFormPackExport(unittest.TestCase):
 
         options = {'versions': 'v1', 'lang': UNTRANSLATED}
         export = fp.export(**options)
-        geojson_gen = export.to_geojson(submissions, geo_question_name='geo_location')
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
         geojson_str = ''.join(geojson_gen)
         geojson_obj = json.loads(geojson_str)
 
