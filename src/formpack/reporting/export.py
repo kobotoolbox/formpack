@@ -635,6 +635,9 @@ class Export:
             }
         """
 
+        # Force to text otherwise might fail JSON serializing
+        self.xls_types_as_text = True
+
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
