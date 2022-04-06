@@ -1,16 +1,14 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import json
 import re
+from collections import OrderedDict
+from io import StringIO
 
 from lxml import etree
 from pyquery import PyQuery
 
 from .b64_attachment import B64Attachment
 from .utils import parse_xmljson_to_data
-from .utils.future import iteritems, StringIO, OrderedDict
 
 
 class FormSubmission:
@@ -28,23 +26,24 @@ class FormSubmission:
 
     def to_xml_struct(self, files=False):
         def _item_to_struct(item):
-            (key, val,) = item
+            key, val = item
             if isinstance(val, list):
                 val = list(map(_item_to_struct, val))
             elif isinstance(val, B64Attachment) and files is not False:
-                (fname, fpath) = B64Attachment.write_to_tempfile(
-                                                        val)
+                (fname, fpath) = B64Attachment.write_to_tempfile(val)
                 files.append([fname, fpath])
                 val = fname
             return {'tag': key, 'attributes': {}, 'children': val}
+
         return {
             'tag': self._version._root_node_name or 'data',
             'attributes': {
                 'id_string': self._version.id_string,
                 'version': self._version._version_id,
             },
-            'children': [_item_to_struct(item)
-                         for item in iteritems(self.data)],
+            'children': [
+                _item_to_struct(item) for item in iter(self.data.items())
+            ],
         }
 
     def to_xml(self, files=False):
@@ -70,7 +69,7 @@ class NestedStruct(OrderedDict):
         return json.dumps(self, indent=4)
 
     def to_xml(self):
-        _tag, contents = get_first_occurrence(iteritems(self))
+        _tag, contents = get_first_occurrence(iter(self.items()))
         pqi = PyQuery('<wrap />')
 
         def _append_contents(struct, par):
@@ -82,7 +81,7 @@ class NestedStruct(OrderedDict):
             if 'text' in struct:
                 _node.text(struct['text'])
             elif 'children' in struct:
-                for ugh, child in iteritems(struct['children']):
+                for ugh, child in iter(struct['children'].items()):
                     _append_contents(child, _node)
             par.append(_node)
 
@@ -104,8 +103,10 @@ class NestedStruct(OrderedDict):
                 cur_ptr = cur_ptr.get(_layer)
                 cur_ptr['tag'] = _layer
                 cur_ptr = cur_ptr.get('children')
-            cur_ptr[outer_layer] = {'tag': outer_layer,
-                                    'text': child.get('children')}
+            cur_ptr[outer_layer] = {
+                'tag': outer_layer,
+                'text': child.get('children'),
+            }
         return items_ns
 
 

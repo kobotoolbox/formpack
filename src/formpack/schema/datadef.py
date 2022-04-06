@@ -1,14 +1,13 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
+from collections import OrderedDict
 
 from ..constants import UNSPECIFIED_TRANSLATION, UNTRANSLATED
-from ..utils import str_types
-from ..utils.future import OrderedDict
 
 
-class FormDataDef(object):
-    """ Any object composing a form. It's only used with a subclass. """
+class FormDataDef:
+    """
+    Any object composing a form. It's only used with a subclass.
+    """
 
     def __init__(self, name, labels=None, has_stats=False, *args, **kwargs):
         self.name = name
@@ -28,7 +27,9 @@ class FormDataDef(object):
 
     @classmethod
     def _extract_json_labels(cls, definition, translations):
-        """ Extract translation labels from the JSON data definition """
+        """
+        Extract translation labels from the JSON data definition
+        """
         label = definition.get('label')
         if label:
             labels = OrderedDict(zip(translations, label))
@@ -42,16 +43,26 @@ class FormGroup(FormDataDef):  # useful to get __repr__
 
 
 class FormSection(FormDataDef):
-    """ The tabular representation of a repeatable group of fields """
+    """
+    The tabular representation of a repeatable group of fields
+    """
 
-    def __init__(self, name="submissions", labels=None, fields=None,
-                 parent=None, children=(), hierarchy=(None,),
-                 *args, **kwargs):
+    def __init__(
+        self,
+        name='submissions',
+        labels=None,
+        fields=None,
+        parent=None,
+        children=(),
+        hierarchy=(None,),
+        *args,
+        **kwargs
+    ):
 
         if labels is None:
             labels = {UNTRANSLATED: 'submissions'}
 
-        super(FormSection, self).__init__(name, labels, *args, **kwargs)
+        super().__init__(name, labels, *args, **kwargs)
         self.fields = fields or OrderedDict()
         self.parent = parent
         self.children = list(children)
@@ -61,10 +72,13 @@ class FormSection(FormDataDef):
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
     @classmethod
-    def from_json_definition(cls, definition, hierarchy=(None,), parent=None,
-                             translations=None):
+    def from_json_definition(
+        cls, definition, hierarchy=(None,), parent=None, translations=None
+    ):
         labels = cls._extract_json_labels(definition, translations)
-        return cls(definition['name'], labels, hierarchy=hierarchy, parent=parent)
+        return cls(
+            definition['name'], labels, hierarchy=hierarchy, parent=parent
+        )
 
     def get_label(self, lang=UNSPECIFIED_TRANSLATION):
         return [self.labels.get(lang) or self.name]
@@ -76,7 +90,7 @@ class FormSection(FormDataDef):
 
 class FormChoice(FormDataDef):
     def __init__(self, name, *args, **kwargs):
-        super(FormChoice, self).__init__(name, *args, **kwargs)
+        super().__init__(name, *args, **kwargs)
         self.name = name
         self.options = OrderedDict()
 
@@ -100,7 +114,7 @@ class FormChoice(FormDataDef):
                 _label = choice_definition['label']
             else:
                 _label = choice_definition.get('image')
-            if isinstance(_label, str_types):
+            if isinstance(_label, str):
                 _label = [_label]
             elif _label is None:
                 _label = []

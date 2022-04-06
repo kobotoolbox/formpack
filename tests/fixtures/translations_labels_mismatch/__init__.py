@@ -1,15 +1,14 @@
 # coding: utf-8
 '''
-select_one_legacy
-
+translations_labels_mismatch
 '''
 
 from ..load_fixture_json import load_fixture_json
 
 DATA = {
     'title': 'Your favourite Roman emperors',
-    'id_string': 'select_one_legacy',
+    'id_string': 'translations_labels_mismatch',
     'versions': [
-        load_fixture_json('select_one_legacy/v1'),
+        load_fixture_json('translations_labels_mismatch/v1'),
     ],
 }

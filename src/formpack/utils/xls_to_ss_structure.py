@@ -1,26 +1,24 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import datetime
 import re
 import xlrd
-
-from .future import OrderedDict, unichr
-from .string import unicode, str_types
+from collections import OrderedDict
 
 from .replace_aliases import kobo_specific_sub
+
 
 def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
     The goal: Convert an XLS file object to a python object.
 
-    This draws on code from `pyxform.xls2json_backends` and `convert_file_to_csv_string`, however
-    this works as it is expected (does not add extra sheets or perform misc conversions which are
-    a part of `pyxform.xls2json_backends.xls_to_dict`.)
+    This draws on code from `pyxform.xls2json_backends` and
+    `convert_file_to_csv_string`, however this works as it is expected (does
+    not add extra sheets or perform misc conversions which are a part of
+    `pyxform.xls2json_backends.xls_to_dict`.)
     """
+
     def _iswhitespace(string):
-        return isinstance(string, str_types) and len(string.strip()) == 0
+        return isinstance(string, str) and len(string.strip()) == 0
 
     def xls_value_to_unicode(value, value_type):
         """
@@ -33,25 +31,26 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
             # Try to display as an int if possible.
             int_value = int(value)
             if int_value == value:
-                return unicode(int_value)
+                return str(int_value)
             else:
-                return unicode(value)
+                return str(value)
         elif value_type is xlrd.XL_CELL_DATE:
             # Warn that it is better to single quote as a string.
             # error_location = cellFormatString % (ss_row_idx, ss_col_idx)
             # raise Exception(
             #   "Cannot handle excel formatted date at " + error_location)
             datetime_or_time_only = xlrd.xldate_as_tuple(
-                value, workbook.datemode)
+                value, workbook.datemode
+            )
             if datetime_or_time_only[:3] == (0, 0, 0):
                 # must be time only
-                return unicode(datetime.time(*datetime_or_time_only[3:]))
-            return unicode(datetime.datetime(*datetime_or_time_only))
+                return str(datetime.time(*datetime_or_time_only[3:]))
+            return str(datetime.datetime(*datetime_or_time_only))
         else:
             # ensure unicode and replace nbsp spaces with normal ones
             # to avoid this issue:
             # https://github.com/modilabs/pyxform/issues/83
-            return unicode(value).replace(unichr(160), ' ')
+            return str(value).replace(chr(160), ' ')
 
     def _escape_newline_chars(cell):
         return re.sub(r'\r', '\\\\r', re.sub(r'\n', '\\\\n', cell))
@@ -65,13 +64,15 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
             row_empty = True
             for col in ncols_range:
                 value = sheet.cell_value(row, col)
-                if isinstance(value, str_types):
+                if isinstance(value, str):
                     value = _escape_newline_chars(value.strip())
                 if (value is not None) and (not _iswhitespace(value)):
-                    value = xls_value_to_unicode(value, sheet.cell_type(row, col))
-                if value != "":
+                    value = xls_value_to_unicode(
+                        value, sheet.cell_type(row, col)
+                    )
+                if value != '':
                     row_empty = False
-                if value == "":
+                if value == '':
                     value = None
                 row_results.append(value)
             if not strip_empty_rows or not row_empty:

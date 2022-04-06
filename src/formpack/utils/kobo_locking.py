@@ -1,7 +1,4 @@
 # coding: utf-8
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 import io
 import itertools
 from collections import OrderedDict
@@ -14,6 +11,7 @@ from formpack.constants import (
     KOBO_LOCK_SHEET,
 )
 from formpack.utils.exceptions import FormPackLibraryLockingError
+
 
 def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     """
@@ -80,6 +78,7 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
 
     return list(locking_profiles.values())
 
+
 def revert_kobo_lock_structure(content: dict) -> None:
     """
     Revert the structure of the locks to one that is ready to be exported into
@@ -141,6 +140,7 @@ def revert_kobo_lock_structure(content: dict) -> None:
         locking_profiles.append(profile)
     content[KOBO_LOCK_SHEET] = locking_profiles
 
+
 def strip_kobo_locking_profile(content: OrderedDict) -> None:
     """
     Strip all `kobo--locking-profile` values from a survey. Used when creating
@@ -149,8 +149,9 @@ def strip_kobo_locking_profile(content: OrderedDict) -> None:
     """
     survey = content.get('survey')
     for item in survey:
-      if KOBO_LOCK_COLUMN in item:
-          item.pop(KOBO_LOCK_COLUMN)
+        if KOBO_LOCK_COLUMN in item:
+            item.pop(KOBO_LOCK_COLUMN)
+
 
 def _validate_locking_profiles(profiles):
     """

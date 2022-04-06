@@ -1,8 +1,4 @@
 # coding: utf-8
-
-from __future__ import (unicode_literals, print_function,
-                        absolute_import, division)
-
 '''
 grouped questions:
 
@@ -21,7 +17,7 @@ DATA = {
                     {
                         'type': 'text',
                         'name': 'q1',
-                        'label': 'Q1'
+                        'label': 'Q1',
                     },
                     {
                         'type': 'begin  group',
@@ -31,7 +27,7 @@ DATA = {
                     {
                         'type': 'text',
                         'name': 'g1q1',
-                        'label': 'G1Q1'
+                        'label': 'G1Q1',
                     },
                     {
                         'type': 'begin group',
@@ -41,7 +37,7 @@ DATA = {
                     {
                         'type': 'text',
                         'name': 'g1sg1q1',
-                        'label': 'G1SG1Q1'
+                        'label': 'G1SG1Q1',
                     },
                     {
                         'type': 'end group',
@@ -49,7 +45,7 @@ DATA = {
                     {
                         'type': 'text',
                         'name': 'g1q2',
-                        'label': 'G1Q2'
+                        'label': 'G1Q2',
                     },
                     {
                         'type': 'end  group',
@@ -63,7 +59,7 @@ DATA = {
                     {
                         'type': 'text',
                         'name': 'g2q1',
-                        'label': 'G2Q1'
+                        'label': 'G2Q1',
                     },
                     {
                         'type': 'end group',
@@ -71,7 +67,7 @@ DATA = {
                     {
                         'type': 'text',
                         'name': 'qz',
-                        'label': 'QZed'
+                        'label': 'QZed',
                     },
                 ]
             },
@@ -93,7 +89,7 @@ DATA = {
                     'g1/g1q2': 'respondent2\'s r2.75 :)',
                     'g2/g2q1': 'respondent2\'s r3',
                     'qz': 'respondent2\'s r4',
-                }
+                },
             ],
         }
     ],
