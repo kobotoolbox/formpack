@@ -495,16 +495,13 @@ def test_flatten_tags():
 
 
 def test_col_order():
-    assert (
-        _order_cols(
-            [
-                'label',
-                'type',
-                'name',
-            ]
-        )
-        == ['type', 'name', 'label']
-    )
+    assert _order_cols(
+        [
+            'label',
+            'type',
+            'name',
+        ]
+    ) == ['type', 'name', 'label']
 
 
 def test_flatten_translated_label_with_xpath():

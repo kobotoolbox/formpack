@@ -373,7 +373,9 @@ class TestFormPackExport(unittest.TestCase):
         )
 
     def test_translations_labels_mismatch(self):
-        title, schemas, submissions = build_fixture('translations_labels_mismatch')
+        title, schemas, submissions = build_fixture(
+            'translations_labels_mismatch'
+        )
         with self.assertRaises(TranslationError) as e:
             fp = FormPack(schemas, title)
 
