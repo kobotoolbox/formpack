@@ -1918,7 +1918,7 @@ class TestFormPackExport(unittest.TestCase):
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
             book = openpyxl.load_workbook(xls)
-            assert book.get_sheet_names() == [
+            assert book.sheetnames == [
                 'long survey name_ the quick,...',
                 'long_group_name__Victor_jagt...',
                 'long_group_name__Victor_... (1)',
@@ -1934,11 +1934,11 @@ class TestFormPackExport(unittest.TestCase):
             assert xls.isfile()
             book = openpyxl.load_workbook(xls, data_only=True)
             # Verify main sheet
-            sheet = book.get_sheet_by_name('Household survey with HXL an...')
+            sheet = book['Household survey with HXL an...']
             row_values = [cell.value for cell in sheet[2]]
             assert row_values == ['#date+start', '#date+end', '#loc+name', None]
             # Verify repeating group
-            sheet = book.get_sheet_by_name('houshold_member_repeat')
+            sheet = book['houshold_member_repeat']
             row_values = [cell.value for cell in sheet[2]]
             assert row_values == ['#beneficiary', None, None]
 
