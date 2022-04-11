@@ -129,11 +129,7 @@ def xls_to_dicts(xls_file_object, strip_empty_rows=True):
 
 def xlsx_to_lists(xls_file_object, strip_empty_rows=True):
     """
-    The goal: Convert an XLS file object to a python object.
-    This draws on code from `pyxform.xls2json_backends` and
-    `convert_file_to_csv_string`, however this works as it is expected (does
-    not add extra sheets or perform misc conversions which are a part of
-    `pyxform.xls2json_backends.xls_to_dict`.)
+    Convert an XLSX file object to a python object.
     """
 
     workbook = openpyxl.load_workbook(xls_file_object)
@@ -148,7 +144,7 @@ def xlsx_to_lists(xls_file_object, strip_empty_rows=True):
 
     def xlsx_value_to_str(value):
         """
-        Take a xls formatted value and try to make a string representation.
+        Take a xlsx formatted value and try to make a string representation.
         """
         if value is True:
             return 'TRUE'
