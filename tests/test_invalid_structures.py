@@ -1,8 +1,8 @@
 # coding: utf-8
-import unittest
 from copy import copy
 
-from nose.tools import raises
+import pytest
+import unittest
 
 from formpack import FormPack
 
@@ -28,37 +28,37 @@ class TestInvalidCases(unittest.TestCase):
             ],
         )
 
-    @raises(ValueError)
     def test_conflicting_version_ids(self):
-        FormPack(
-            id_string='idstring',
-            versions=[
-                copy(SINGLE_NOTE_SURVEY),
-                copy(SINGLE_NOTE_SURVEY),
-            ],
-        )
+        with pytest.raises(ValueError):
+            FormPack(
+                id_string='idstring',
+                versions=[
+                    copy(SINGLE_NOTE_SURVEY),
+                    copy(SINGLE_NOTE_SURVEY),
+                ],
+            )
 
-    @raises(TypeError)
     def test_formpack_cannot_have_name(self):
-        vdata = copy(SINGLE_NOTE_SURVEY)
-        FormPack(
-            id_string='idstring',
-            name='somename',
-            versions=[
-                vdata,
-            ],
-        )
+        with pytest.raises(TypeError):
+            vdata = copy(SINGLE_NOTE_SURVEY)
+            FormPack(
+                id_string='idstring',
+                name='somename',
+                versions=[
+                    vdata,
+                ],
+            )
 
-    @raises(ValueError)
     def test_formpack_version_cannot_have_name(self):
-        vdata = copy(SINGLE_NOTE_SURVEY)
-        vdata['name'] = 'somename'
-        FormPack(
-            id_string='idstring',
-            versions=[
-                vdata,
-            ],
-        )
+        with pytest.raises(ValueError):
+            vdata = copy(SINGLE_NOTE_SURVEY)
+            vdata['name'] = 'somename'
+            FormPack(
+                id_string='idstring',
+                versions=[
+                    vdata,
+                ],
+            )
 
     # TODO: remove this test of fix it
     # @raises(PyXFormError)
