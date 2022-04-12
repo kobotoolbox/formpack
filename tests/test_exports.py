@@ -372,7 +372,9 @@ class TestFormPackExport(unittest.TestCase):
         )
 
     def test_translations_labels_mismatch(self):
-        title, schemas, submissions = build_fixture('translations_labels_mismatch')
+        title, schemas, submissions = build_fixture(
+            'translations_labels_mismatch'
+        )
         with self.assertRaises(TranslationError) as e:
             fp = FormPack(schemas, title)
 
@@ -2815,6 +2817,80 @@ class TestFormPackExport(unittest.TestCase):
             export['Favorite coffee']['data'][-1],
             ['american british', '0', '0', '1', '1', 'Keurig'],
         )
+
+    def test_geojson_with_select_xml_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {'versions': 'v1', 'lang': '_xml', 'include_media_url': True}
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'an_image': 'location.jpeg',
+                        'an_image_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
+                        'current_location': 'inside',
+                    },
+                },
+            ],
+        }
+
+    def test_geojson_with_select_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {
+            'versions': 'v1',
+            'lang': UNTRANSLATED,
+            'include_media_url': True,
+        }
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'Take a photo of the location': 'location.jpeg',
+                        'Take a photo of the location_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
+                        'Where are you?': 'Inside',
+                    },
+                },
+            ],
+        }
 
     def test_geojson_point(self):
         title, schemas, submissions = build_fixture('all_geo_types')

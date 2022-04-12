@@ -635,6 +635,11 @@ class Export:
             }
         """
 
+        # Force to text otherwise might fail JSON serializing
+        self.xls_types_as_text = True
+        # Format as summary for multiple select question types
+        self.multiple_select = 'summary'
+
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
@@ -684,6 +689,10 @@ class Export:
             ]
             all_geo_field_names = [f.name for f in all_geo_fields]
 
+            all_geo_field_labels = []
+            for field in all_geo_fields:
+                all_geo_field_labels += field.get_labels(lang=self.lang)
+
             # Iterate through all geo questions and format only those that have
             # been answered
             first_geo = True
@@ -719,37 +728,17 @@ class Export:
 
                     feature_properties = OrderedDict()
                     for name, label, row_value in zip(sections, labels, row):
-                        # Grab the `Field` object since it holds precious info
-                        # that we need to format the response correctly
-                        filtered_fields = [
-                            f for f in all_fields if f.name == name
-                        ]
-                        if not filtered_fields:
-                            continue
-                        field = filtered_fields[0]
-
                         # Skip all geo fields, including the current one, as
                         # it's unnecessary to repeat in the Feature's
                         # properties. Also skip over fields that are blank
-                        if label in all_geo_field_names or not row_value:
+                        if (
+                            label in all_geo_field_names
+                            or label in all_geo_field_labels
+                            or not row_value
+                        ):
                             continue
 
-                        # Grab the translated label for choice questions if it's
-                        # available.
-                        if hasattr(field, 'choice'):
-                            value_or_none = field.choice.options[row_value][
-                                'labels'
-                            ].get(self.lang)
-                            if value_or_none is None:
-                                value = list(
-                                    field.choice.options[row_value][
-                                        'labels'
-                                    ].values()
-                                )[0]
-                        else:
-                            value = row_value
-
-                        feature_properties.update({label: value})
+                        feature_properties.update({label: row_value})
 
                     feature = {
                         'type': 'Feature',
