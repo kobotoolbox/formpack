@@ -45,9 +45,9 @@ def slugify(str_, separator=r'-'):
     """
 
     str_ = normalize(str_)
-    str_ = re.sub(r'[^\w\s' + separator + ']', '', str_, flags=re.U)
+    str_ = re.sub(rf'[^\w\s{separator}]', '', str_, flags=re.U)
     str_ = str_.strip().lower()
-    return re.sub(r'[' + separator + '\s]+', separator, str_, flags=re.U)
+    return re.sub(rf'[{separator}\s]+', separator, str_, flags=re.U)
 
 
 def ellipsize(s, max_len, ellipsis='...'):
