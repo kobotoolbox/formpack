@@ -233,16 +233,15 @@ class Export:
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
+        if self.analysis_form:
+            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
+
         if self.filter_fields:
             all_fields = [
                 field
                 for field in all_fields
                 if field.path in self.filter_fields
             ]
-
-        # TODO: For MVP, just reattach additional fields to their source
-        if self.analysis_form:
-            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
 
         # Collect all the sections regardless if they contain any fields
         all_sections = {}
@@ -429,16 +428,15 @@ class Export:
             suffix = 'meta/' if field.data_type == 'audit' else ''
             return entry.get(f'{suffix}{field.path}')
 
+        if self.analysis_form:
+            _fields = self.analysis_form.insert_analysis_fields(_fields)
+
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
         if self.filter_fields:
             _fields = tuple(
                 field for field in _fields if field.path in self.filter_fields
             )
-
-        # TODO: For MVP, just reattach additional fields to their source
-        if self.analysis_form:
-            _fields = self.analysis_form.insert_analysis_fields(_fields)
 
         # 'rows' will contain all the formatted entries for the current
         # section. If you don't have repeat-group, there is only one section

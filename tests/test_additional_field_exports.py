@@ -13,7 +13,13 @@ def test_additional_field_exports_without_labels():
 
     options = {
         'versions': 'v1',
-        'filter_fields': ['record_a_note'],
+        'filter_fields': [
+            'record_a_note',
+            'record_a_note/transcript',
+            'record_a_note/translation_en',
+            'record_a_note/translation_es',
+            'record_a_note/acme_timestamp',
+        ],
     }
     export = pack.export(**options)
     values = export.to_dict(submissions)
@@ -47,7 +53,13 @@ def test_additional_field_exports_with_labels():
 
     options = {
         'versions': 'v1',
-        'filter_fields': ['record_a_note'],
+        'filter_fields': [
+            'record_a_note',
+            'record_a_note/transcript',
+            'record_a_note/translation_en',
+            'record_a_note/translation_es',
+            'record_a_note/acme_timestamp',
+        ],
         'lang': 'English (en)',
     }
     export = pack.export(**options)
@@ -410,7 +422,11 @@ def test_additional_field_exports_all_versions_exclude_fields():
 
     options = {
         'versions': pack.versions,
-        'filter_fields': ['record_a_note', 'name_of_shop', 'name_of_clerk'],
+        'filter_fields': [
+            'record_a_note',
+            'clerk_details/name_of_shop',
+            'clerk_details/name_of_clerk',
+        ],
     }
     export = pack.export(**options)
     values = export.to_dict(submissions)
