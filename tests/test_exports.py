@@ -8,6 +8,7 @@ from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
 
+import openpyxl
 import xlrd
 from path import TempDir
 
@@ -1916,8 +1917,8 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-            book = xlrd.open_workbook(xls)
-            assert book.sheet_names() == [
+            book = openpyxl.load_workbook(xls)
+            assert book.sheetnames == [
                 'long survey name_ the quick,...',
                 'long_group_name__Victor_jagt...',
                 'long_group_name__Victor_... (1)',
@@ -1931,15 +1932,15 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-            book = xlrd.open_workbook(xls)
+            book = openpyxl.load_workbook(xls, data_only=True)
             # Verify main sheet
-            sheet = book.sheet_by_name('Household survey with HXL an...')
-            row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == ['#date+start', '#date+end', '#loc+name', '']
+            sheet = book['Household survey with HXL an...']
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == ['#date+start', '#date+end', '#loc+name', None]
             # Verify repeating group
-            sheet = book.sheet_by_name('houshold_member_repeat')
-            row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == ['#beneficiary', '', '']
+            sheet = book['houshold_member_repeat']
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == ['#beneficiary', None, None]
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
@@ -2817,6 +2818,80 @@ class TestFormPackExport(unittest.TestCase):
             export['Favorite coffee']['data'][-1],
             ['american british', '0', '0', '1', '1', 'Keurig'],
         )
+
+    def test_geojson_with_select_xml_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {'versions': 'v1', 'lang': '_xml', 'include_media_url': True}
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'an_image': 'location.jpeg',
+                        'an_image_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
+                        'current_location': 'inside',
+                    },
+                },
+            ],
+        }
+
+    def test_geojson_with_select_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {
+            'versions': 'v1',
+            'lang': UNTRANSLATED,
+            'include_media_url': True,
+        }
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'Take a photo of the location': 'location.jpeg',
+                        'Take a photo of the location_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
+                        'Where are you?': 'Inside',
+                    },
+                },
+            ],
+        }
 
     def test_geojson_point(self):
         title, schemas, submissions = build_fixture('all_geo_types')

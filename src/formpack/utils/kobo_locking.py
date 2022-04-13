@@ -3,7 +3,9 @@ import io
 import itertools
 from collections import OrderedDict
 
-from .xls_to_ss_structure import xls_to_dicts
+import xlrd
+
+from .xls_to_ss_structure import xls_to_dicts, xlsx_to_dicts
 from formpack.constants import (
     KOBO_LOCKING_RESTRICTIONS,
     KOBO_LOCK_COLUMN,
@@ -45,7 +47,10 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
         }
     ]
     """
-    survey_dict = xls_to_dicts(xls_file_object)
+    try:
+        survey_dict = xls_to_dicts(xls_file_object)
+    except xlrd.biffh.XLRDError:
+        survey_dict = xlsx_to_dicts(xls_file_object)
 
     if KOBO_LOCK_SHEET not in survey_dict:
         return

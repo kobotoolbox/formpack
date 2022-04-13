@@ -4,7 +4,6 @@ from copy import deepcopy
 
 import pytest
 import pyxform
-from nose.tools import raises
 
 from formpack import FormPack, constants
 from formpack.utils.iterator import get_first_occurrence
@@ -181,18 +180,18 @@ def test_disabled_questions_ignored():
     assert 'q2' in s1_fields
 
 
-@raises(KeyError)
 def test_missing_choice_list_breaks():
-    scontent = {
-        'content': {
-            'survey': [
-                {'type': 'select_one dogs', 'name': 'q1', 'label': ['aa']},
-            ],
-            'translations': ['en'],
-            'translated': ['label'],
+    with pytest.raises(KeyError):
+        scontent = {
+            'content': {
+                'survey': [
+                    {'type': 'select_one dogs', 'name': 'q1', 'label': ['aa']},
+                ],
+                'translations': ['en'],
+                'translated': ['label'],
+            }
         }
-    }
-    fp = FormPack(scontent, id_string='xx')
+        fp = FormPack(scontent, id_string='xx')
 
 
 def test_commented_out_missing_choice_list_does_not_break():
