@@ -12,7 +12,6 @@ def test_additional_field_exports_without_labels():
     pack.extend_survey(analysis_form)
 
     options = {
-        'include_analysis_fields': True,
         'versions': 'v1',
         'filter_fields': ['record_a_note'],
     }
@@ -47,7 +46,6 @@ def test_additional_field_exports_with_labels():
     pack.extend_survey(analysis_form)
 
     options = {
-        'include_analysis_fields': True,
         'versions': 'v1',
         'filter_fields': ['record_a_note'],
         'lang': 'English (en)',
@@ -84,7 +82,6 @@ def test_additional_field_exports_repeat_groups():
     pack.extend_survey(analysis_form)
 
     options = {
-        'include_analysis_fields': True,
         'versions': 'v1',
     }
     export = pack.export(**options)
@@ -154,7 +151,6 @@ def test_additional_field_exports_advanced():
     pack.extend_survey(analysis_form)
 
     options = {
-        'include_analysis_fields': True,
         'versions': 'v1',
         'multiple_select': 'both',
     }
@@ -325,7 +321,7 @@ def test_additional_field_exports_v2():
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
-    options = {'include_analysis_fields': True, 'versions': 'v2'}
+    options = {'versions': 'v2'}
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
@@ -360,7 +356,7 @@ def test_additional_field_exports_all_versions():
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
-    options = {'include_analysis_fields': True, 'versions': pack.versions}
+    options = {'versions': pack.versions}
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
@@ -412,7 +408,10 @@ def test_additional_field_exports_all_versions_exclude_fields():
     pack = FormPack(schemas, title=title)
     pack.extend_survey(analysis_form)
 
-    options = {'versions': pack.versions}
+    options = {
+        'versions': pack.versions,
+        'filter_fields': ['record_a_note', 'name_of_shop', 'name_of_clerk'],
+    }
     export = pack.export(**options)
     values = export.to_dict(submissions)
     main_export_sheet = values['Simple Clerk Interaction']
@@ -444,7 +443,6 @@ def test_additional_field_exports_all_versions_langs():
     pack.extend_survey(analysis_form)
 
     options = {
-        'include_analysis_fields': True,
         'versions': pack.versions,
         'lang': 'English (en)',
     }

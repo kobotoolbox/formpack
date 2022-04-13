@@ -370,7 +370,6 @@ class FormPack:
         filter_fields=(),
         xls_types_as_text=True,
         include_media_url=False,
-        include_analysis_fields=False,
     ):
         """
         Create an export for given versions of the form.
@@ -392,7 +391,6 @@ class FormPack:
             filter_fields=filter_fields,
             xls_types_as_text=xls_types_as_text,
             include_media_url=include_media_url,
-            include_analysis_fields=include_analysis_fields,
         )
 
     def autoreport(self, versions=-1):
