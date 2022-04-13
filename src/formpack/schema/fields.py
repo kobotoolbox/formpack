@@ -64,7 +64,7 @@ class FormField(FormDataDef):
         if has_stats is not None:
             self.has_stats = has_stats
         else:
-            self.has_stats = data_type != "note" and not self.analysis_question
+            self.has_stats = data_type != 'note' and not self.analysis_question
 
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
@@ -458,13 +458,25 @@ class ExtendedFormField(FormField):
 
 
 class TextField(ExtendedFormField):
-    @property
-    def _is_transcript(self):
-        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSCRIPT
+    def get_disaggregated_stats(
+        self, metrics, top_splitters, lang=UNSPECIFIED_TRANSLATION, limit=100
+    ):
 
-    @property
-    def _is_translation(self):
-        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
+        parent = super()
+        stats = parent.get_disaggregated_stats(
+            metrics, top_splitters, lang, limit
+        )
+        substats = self.get_substats(stats, metrics, top_splitters, lang)
+
+        # sort values by total frequency
+        def sum_frequencies(element):
+            return sum(v for k, v in element[1]['frequency'])
+
+        values = sorted(substats.items(), key=sum_frequencies, reverse=True)
+
+        stats.update({'values': values[:limit]})
+
+        return stats
 
     def get_labels(
         self,
@@ -487,6 +499,21 @@ class TextField(ExtendedFormField):
                 ]
         return [self._get_label(*args)]
 
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
+
+        stats = super().get_stats(metrics, lang, limit)
+
+        top = metrics.most_common(limit)
+        total = stats['total_count']
+
+        percentage = []
+        for key, val in top:
+            percentage.append((key, self._get_percentage(val, total)))
+
+        stats.update({'frequency': top, 'percentage': percentage})
+
+        return stats
+
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         if self._is_transcript:
             return [
@@ -494,6 +521,14 @@ class TextField(ExtendedFormField):
                 for code in self.languages
             ]
         return super().get_value_names()
+
+    @property
+    def _is_transcript(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSCRIPT
+
+    @property
+    def _is_translation(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
 
     def format(
         self,
@@ -523,41 +558,6 @@ class TextField(ExtendedFormField):
             return cells
 
         return {self.name: val}
-
-    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
-
-        stats = super().get_stats(metrics, lang, limit)
-
-        top = metrics.most_common(limit)
-        total = stats['total_count']
-
-        percentage = []
-        for key, val in top:
-            percentage.append((key, self._get_percentage(val, total)))
-
-        stats.update({'frequency': top, 'percentage': percentage})
-
-        return stats
-
-    def get_disaggregated_stats(
-        self, metrics, top_splitters, lang=UNSPECIFIED_TRANSLATION, limit=100
-    ):
-
-        parent = super()
-        stats = parent.get_disaggregated_stats(
-            metrics, top_splitters, lang, limit
-        )
-        substats = self.get_substats(stats, metrics, top_splitters, lang)
-
-        # sort values by total frequency
-        def sum_frequencies(element):
-            return sum(v for k, v in element[1]['frequency'])
-
-        values = sorted(substats.items(), key=sum_frequencies, reverse=True)
-
-        stats.update({'values': values[:limit]})
-
-        return stats
 
 
 class MediaField(TextField):

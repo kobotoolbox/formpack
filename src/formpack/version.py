@@ -53,19 +53,6 @@ class LabelStruct:
 
 class BaseForm:
     @staticmethod
-    def _get_translations(content: Dict[str, List]) -> List[str]:
-        return [
-            t if t is not None else UNTRANSLATED
-            for t in content.get('translations', [None])
-        ]
-
-    @staticmethod
-    def _get_fields_by_name(
-        survey: Dict[str, Union[str, List]]
-    ) -> Dict[str, Dict[str, Union[str, List]]]:
-        return {row['name']: row for row in survey if 'name' in row}
-
-    @staticmethod
     def _get_field_labels(
         field: FormField,
         translations: List[str],
@@ -75,6 +62,99 @@ class BaseForm:
                 field['label'] = [field['label']]
             return LabelStruct(labels=field['label'], translations=translations)
         return LabelStruct()
+
+    @staticmethod
+    def _get_fields_by_name(
+        survey: Dict[str, Union[str, List]]
+    ) -> Dict[str, Dict[str, Union[str, List]]]:
+        return {row['name']: row for row in survey if 'name' in row}
+
+    @staticmethod
+    def _get_translations(content: Dict[str, List]) -> List[str]:
+        return [
+            t if t is not None else UNTRANSLATED
+            for t in content.get('translations', [None])
+        ]
+
+
+class AnalysisForm(BaseForm):
+    def __init__(
+        self,
+        formpack: 'FormPack',
+        schema: Dict[str, Union[str, List]],
+    ) -> None:
+
+        self.schema = schema
+        self.formpack = formpack
+
+        survey = self.schema.get('additional_fields', [])
+        fields_by_name = self._get_fields_by_name(survey)
+        section = FormSection(name=formpack.title)
+
+        self.translations = self._get_translations(schema)
+
+        choices_definition = schema.get('additional_choices', ())
+        field_choices = FormChoice.all_from_json_definition(
+            choices_definition, self.translations
+        )
+
+        for data_def in survey:
+            data_type = data_def['type']
+            if data_type in [
+                ANALYSIS_TYPE_TRANSCRIPT,
+                ANALYSIS_TYPE_TRANSLATION,
+            ]:
+                data_def.update(
+                    {
+                        'type': 'text',
+                        'analysis_type': data_type,
+                    }
+                )
+
+            field = FormField.from_json_definition(
+                definition=data_def,
+                field_choices=field_choices,
+                section=section,
+                translations=self.translations,
+            )
+
+            field.labels = self._get_field_labels(
+                field=fields_by_name[field.name],
+                translations=self.translations,
+            )
+            section.fields[field.name] = field
+
+        self.fields = list(section.fields.values())
+        self.fields_by_source = self._get_fields_by_source()
+
+    def __repr__(self) -> str:
+        return f"<AnalysisForm parent='{self.formpack.title}'>"
+
+    def _get_fields_by_source(self) -> Dict[str, List[FormField]]:
+        fields_by_source = defaultdict(list)
+        for field in self.fields:
+            fields_by_source[field.source].append(field)
+        return fields_by_source
+
+    def _map_sections_to_analysis_fields(
+        self, survey_field: FormField
+    ) -> List[FormField]:
+        _fields = []
+        for analysis_field in self.fields_by_source[survey_field.name]:
+            analysis_field.section = survey_field.section
+            analysis_field.source_field = survey_field
+            _fields.append(analysis_field)
+        return _fields
+
+    def insert_analysis_fields(
+        self, fields: List[FormField]
+    ) -> List[FormField]:
+        _fields = []
+        for field in fields:
+            _fields.append(field)
+            if field.name in self.fields_by_source:
+                _fields += self._map_sections_to_analysis_fields(field)
+        return _fields
 
 
 class FormVersion(BaseForm):
@@ -368,83 +448,3 @@ class FormVersion(BaseForm):
         )
 
         return survey._to_pretty_xml()  # .encode('utf-8')
-
-
-class AnalysisForm(BaseForm):
-    def __init__(
-        self,
-        formpack: 'FormPack',
-        schema: Dict[str, Union[str, List]],
-    ) -> None:
-
-        self.schema = schema
-        self.formpack = formpack
-
-        survey = self.schema.get('additional_fields', [])
-        fields_by_name = self._get_fields_by_name(survey)
-        section = FormSection(name=formpack.title)
-
-        self.translations = self._get_translations(schema)
-
-        choices_definition = schema.get('additional_choices', ())
-        field_choices = FormChoice.all_from_json_definition(
-            choices_definition, self.translations
-        )
-
-        for data_def in survey:
-            data_type = data_def['type']
-            if data_type in [
-                ANALYSIS_TYPE_TRANSCRIPT,
-                ANALYSIS_TYPE_TRANSLATION,
-            ]:
-                data_def.update(
-                    {
-                        'type': 'text',
-                        'analysis_type': data_type,
-                    }
-                )
-
-            field = FormField.from_json_definition(
-                definition=data_def,
-                field_choices=field_choices,
-                section=section,
-                translations=self.translations,
-            )
-
-            field.labels = self._get_field_labels(
-                field=fields_by_name[field.name],
-                translations=self.translations,
-            )
-            section.fields[field.name] = field
-
-        self.fields = list(section.fields.values())
-        self.fields_by_source = self._get_fields_by_source()
-
-    def __repr__(self) -> str:
-        return f"<AnalysisForm parent='{self.formpack.title}'>"
-
-    def _get_fields_by_source(self) -> Dict[str, List[FormField]]:
-        fields_by_source = defaultdict(list)
-        for field in self.fields:
-            fields_by_source[field.source].append(field)
-        return fields_by_source
-
-    def _map_sections_to_analysis_fields(
-        self, survey_field: FormField
-    ) -> List[FormField]:
-        _fields = []
-        for analysis_field in self.fields_by_source[survey_field.name]:
-            analysis_field.section = survey_field.section
-            analysis_field.source_field = survey_field
-            _fields.append(analysis_field)
-        return _fields
-
-    def insert_analysis_fields(
-        self, fields: List[FormField]
-    ) -> List[FormField]:
-        _fields = []
-        for field in fields:
-            _fields.append(field)
-            if field.name in self.fields_by_source:
-                _fields += self._map_sections_to_analysis_fields(field)
-        return _fields
