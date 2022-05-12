@@ -484,6 +484,7 @@ class TextField(ExtendedFormField):
         group_sep='/',
         hierarchy_in_labels=False,
         multiple_select='both',
+        t_lang_codes=[],
         *args,
         **kwargs,
     ):
@@ -493,10 +494,17 @@ class TextField(ExtendedFormField):
             if self._is_translation:
                 return [f'{source_label} - translation ({self.language})']
             elif self._is_transcript:
-                return [
-                    f'{source_label} - transcript ({code})'
-                    for code in self.languages
-                ]
+                if t_lang_codes:
+                    return [
+                        f'{source_label} - transcript ({code})'
+                        for code in self.languages
+                        if code in t_lang_codes
+                    ]
+                else:
+                    return [
+                        f'{source_label} - transcript ({code})'
+                        for code in self.languages
+                    ]
         return [self._get_label(*args)]
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -514,12 +522,21 @@ class TextField(ExtendedFormField):
 
         return stats
 
-    def get_value_names(self, multiple_select='both', *args, **kwargs):
+    def get_value_names(
+        self, multiple_select='both', t_lang_codes=[], *args, **kwargs
+    ):
         if self._is_transcript:
-            return [
-                f'{self.source_field.name} - transcript ({code})'
-                for code in self.languages
-            ]
+            if t_lang_codes:
+                return [
+                    f'{self.source_field.name} - transcript ({code})'
+                    for code in self.languages
+                    if code in t_lang_codes
+                ]
+            else:
+                return [
+                    f'{self.source_field.name} - transcript ({code})'
+                    for code in self.languages
+                ]
         return super().get_value_names()
 
     @property
@@ -538,6 +555,7 @@ class TextField(ExtendedFormField):
         hierarchy_in_labels=False,
         multiple_select='both',
         xls_types_as_text=True,
+        t_lang_codes=[],
         *args,
         **kwargs,
     ):
@@ -550,11 +568,13 @@ class TextField(ExtendedFormField):
             except KeyError:
                 val = ''
         elif self._is_transcript:
-            cells = dict.fromkeys(self.get_value_names(), '')
+            cells = dict.fromkeys(
+                self.get_value_names(t_lang_codes=t_lang_codes), ''
+            )
             if isinstance(val, dict):
-                cells[
-                    f'{self.source_field.name} - transcript ({val["languageCode"]})'
-                ] = val['value']
+                name = f'{self.source_field.name} - transcript ({val["languageCode"]})'
+                if name in cells:
+                    cells[name] = val['value']
             return cells
 
         return {self.name: val}

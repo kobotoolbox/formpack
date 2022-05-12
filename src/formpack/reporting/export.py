@@ -90,6 +90,17 @@ class Export:
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
 
+        self.t_lang_codes = []
+        _filter_fields = []
+        for item in self.filter_fields:
+            item = re.sub(r'^_supplementalDetails/', '', item)
+            if item.split('/')[-1].startswith('transcript'):
+                self.t_lang_codes.append(item.split('_')[-1])
+                _filter_fields.append(f"{item.split('/')[0]}/transcript")
+            else:
+                _filter_fields.append(item)
+        self.filter_fields = _filter_fields
+
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
@@ -268,6 +279,7 @@ class Export:
                     hierarchy_in_labels=hierarchy_in_labels,
                     multiple_select=self.multiple_select,
                     include_media_url=self.include_media_url,
+                    t_lang_codes=self.t_lang_codes,
                 )
             )
 
@@ -297,6 +309,7 @@ class Export:
                 value_names = field.get_value_names(
                     multiple_select=self.multiple_select,
                     include_media_url=self.include_media_url,
+                    t_lang_codes=self.t_lang_codes,
                 )
                 name_lists.append(value_names)
 
@@ -487,6 +500,7 @@ class Export:
                         xls_types_as_text=self.xls_types_as_text,
                         attachment=attachment,
                         include_media_url=self.include_media_url,
+                        t_lang_codes=self.t_lang_codes,
                     )
 
                     # save fields value if they match parent mapping fields.
