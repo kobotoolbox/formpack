@@ -420,8 +420,10 @@ class Export:
             if not _sup_details:
                 return
 
-            # TODO: Fix this on KPI side so that names are consistent
-            if ANALYSIS_TYPE_TRANSLATION in name:
+            # The names for translation fields are `translated_<language code>`
+            # which must be stripped to get the value from the supplemental
+            # details dict
+            if re.match(r'^translated_', name):
                 name = 'translated'
 
             val = _sup_details.get(name)

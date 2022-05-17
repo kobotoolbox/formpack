@@ -22,32 +22,32 @@
     },
     {
       "type": "translation",
-      "name": "record_a_note/translation_en",
+      "name": "record_a_note/translated_en",
       "label": "record_a_note Translated (en)",
       "language": "en",
       "path": [
         "record_a_note",
-        "translation_en"
+        "translated_en"
       ],
       "source": "record_a_note",
       "settings": {
         "mode": "manual",
-        "engine": "engines/translation_manual"
+        "engine": "engines/translated_manual"
       }
     },
     {
       "type": "translation",
-      "name": "record_a_note/translation_es",
+      "name": "record_a_note/translated_es",
       "label": "record_a_note Translated (es)",
       "language": "es",
       "path": [
         "record_a_note",
-        "translation_es"
+        "translated_es"
       ],
       "source": "record_a_note",
       "settings": {
         "mode": "manual",
-        "engine": "engines/translation_manual"
+        "engine": "engines/translated_manual"
       }
     },
     {
