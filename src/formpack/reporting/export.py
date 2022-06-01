@@ -387,9 +387,6 @@ class Export:
         row = self._row_cache[_section_name]
         _fields = tuple(current_section.fields.values())
 
-        if self.analysis_form:
-            _fields = self.analysis_form.insert_analysis_fields(_fields)
-
         def _get_attachment(val, field, attachments):
             """
             Filter attachments for filenames that match the submission field's
