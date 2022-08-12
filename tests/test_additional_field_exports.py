@@ -176,16 +176,16 @@ def test_additional_field_exports_advanced():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note - transcript (en)',
-        'record_a_note/tone_of_voice',
-        'record_a_note/tone_of_voice/anxious',
-        'record_a_note/tone_of_voice/excited',
-        'record_a_note/tone_of_voice/confused',
+        'clerk_interactions-record_a_note/tone_of_voice',
+        'clerk_interactions-record_a_note/tone_of_voice/anxious',
+        'clerk_interactions-record_a_note/tone_of_voice/excited',
+        'clerk_interactions-record_a_note/tone_of_voice/confused',
         'goods_sold',
         'goods_sold/chocolate',
         'goods_sold/fruit',
         'goods_sold/pasta',
-        'goods_sold/comment',
-        'goods_sold/rating',
+        'clerk_interactions-goods_sold/comment',
+        'clerk_interactions-goods_sold/rating',
     ]
     assert main_export_sheet['data'] == [
         [
@@ -240,14 +240,14 @@ def test_additional_field_exports_advanced():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note - transcript (en)',
-        'record_a_note/tone_of_voice/anxious',
-        'record_a_note/tone_of_voice/excited',
-        'record_a_note/tone_of_voice/confused',
+        'clerk_interactions-record_a_note/tone_of_voice/anxious',
+        'clerk_interactions-record_a_note/tone_of_voice/excited',
+        'clerk_interactions-record_a_note/tone_of_voice/confused',
         'goods_sold/chocolate',
         'goods_sold/fruit',
         'goods_sold/pasta',
-        'goods_sold/comment',
-        'goods_sold/rating',
+        'clerk_interactions-goods_sold/comment',
+        'clerk_interactions-goods_sold/rating',
     ]
     assert main_export_sheet['data'] == [
         [
@@ -296,10 +296,10 @@ def test_additional_field_exports_advanced():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note - transcript (en)',
-        'record_a_note/tone_of_voice',
+        'clerk_interactions-record_a_note/tone_of_voice',
         'goods_sold',
-        'goods_sold/comment',
-        'goods_sold/rating',
+        'clerk_interactions-goods_sold/comment',
+        'clerk_interactions-goods_sold/rating',
     ]
     assert main_export_sheet['data'] == [
         [
@@ -349,7 +349,7 @@ def test_additional_field_exports_v2():
         'record_a_note - translation (es)',
         'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop/comment',
+        'clerk_details-name_of_shop/comment',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -384,9 +384,9 @@ def test_additional_field_exports_all_versions():
         'record_a_note - translation (es)',
         'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop/comment',
+        'clerk_details-name_of_shop/comment',
         'name_of_clerk',
-        'name_of_clerk/comment',
+        'clerk_details-name_of_clerk/comment',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -494,9 +494,9 @@ def test_additional_field_exports_all_versions_langs():
         'Registri oficiston dirantan ion - translation (es)',
         'record_a_note/acme_timestamp',
         'Kio estas la nomo de la butiko?',
-        'name_of_shop/comment',
+        'clerk_details-name_of_shop/comment',
         'name_of_clerk',
-        'name_of_clerk/comment',
+        'clerk_details-name_of_clerk/comment',
     ]
 
     options['lang'] = None
@@ -512,9 +512,9 @@ def test_additional_field_exports_all_versions_langs():
         'record_a_note - translation (es)',
         'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop/comment',
+        'clerk_details-name_of_shop/comment',
         'name_of_clerk',
-        'name_of_clerk/comment',
+        'clerk_details-name_of_clerk/comment',
     ]
 
 

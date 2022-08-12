@@ -140,7 +140,7 @@ class AnalysisForm(BaseForm):
         self, survey_field: FormField
     ) -> List[FormField]:
         _fields = []
-        for analysis_field in self.fields_by_source[survey_field.name]:
+        for analysis_field in self.fields_by_source[survey_field.qpath]:
             analysis_field.section = survey_field.section
             analysis_field.source_field = survey_field
             _fields.append(analysis_field)
@@ -152,7 +152,7 @@ class AnalysisForm(BaseForm):
         _fields = []
         for field in fields:
             _fields.append(field)
-            if field.name in self.fields_by_source:
+            if field.qpath in self.fields_by_source:
                 _fields += self._map_sections_to_analysis_fields(field)
         return _fields
 

@@ -39,6 +39,7 @@ class FormField(FormDataDef):
 
         self.data_type = data_type
         self.section = section
+        self.qpath = kwargs.get('qpath', '')
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
         self.analysis_question = False
@@ -193,6 +194,7 @@ class FormField(FormDataDef):
                   The FormField instance matching this definiton.
         """
         name = definition['name']
+        qpath = definition.get('$qpath', '')
         tags = definition.get('tags', [])
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
@@ -271,6 +273,7 @@ class FormField(FormDataDef):
             'tags': tags,
             'data_type': data_type,
             'hierarchy': hierarchy,
+            'qpath': qpath,
             'section': section,
             'choice': choice,
             'or_other': or_other,

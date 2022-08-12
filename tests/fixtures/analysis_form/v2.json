@@ -5,6 +5,7 @@
       {
         "type": "audio",
         "name": "record_a_note",
+        "$qpath": "record_a_note",
         "label": [
           "Record a clerk saying something",
           "Registri oficiston dirantan ion"
@@ -13,6 +14,7 @@
       {
         "type": "begin_group",
         "name": "clerk_details",
+        "$qpath": "clerk_details",
         "label": [
           "Some details of the clerk",
           "Kelkaj detaloj de la oficisto"
@@ -21,6 +23,7 @@
       {
         "type": "text",
         "name": "name_of_shop",
+        "$qpath": "clerk_details-name_of_shop",
         "label": [
           "What is the shop's name?",
           "Kio estas la nomo de la butiko?"
@@ -59,7 +62,7 @@
           },
           "acme_timestamp": "2021-11-01Z"
         },
-        "name_of_shop": {
+        "clerk_details-name_of_shop": {
           "comment": "Pretty cliche"
         }
       }

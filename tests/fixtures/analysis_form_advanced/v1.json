@@ -5,6 +5,7 @@
       {
         "type": "begin_group",
         "name": "clerk_interactions",
+        "$qpath": "clerk_interactions",
         "label": [
           "Clerk interactions",
           "Komizo-interagoj"
@@ -13,6 +14,7 @@
       {
         "type": "audio",
         "name": "record_a_note",
+        "$qpath": "clerk_interactions-record_a_note",
         "label": [
           "Record a clerk saying something",
           "Registri oficiston dirantan ion"
@@ -21,6 +23,7 @@
       {
         "type": "select_multiple goods",
         "name": "goods_sold",
+        "$qpath": "clerk_interactions-goods_sold",
         "label": [
           "What are some goods sold at the store?",
           "Kio estas iuj varoj venditaj en la vendejo?"
@@ -78,14 +81,14 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
+        "clerk_interactions-record_a_note": {
           "transcript": {
             "value": "Hello how may I help you?",
             "languageCode": "en"
           },
           "tone_of_voice": "excited confused"
         },
-        "goods_sold": {
+        "clerk_interactions-goods_sold": {
           "comment": "Not much diversity",
           "rating": "3"
         }
@@ -101,14 +104,14 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
+        "clerk_interactions-record_a_note": {
           "transcript": {
             "value": "Thank you for your business",
             "languageCode": "en"
           },
           "tone_of_voice": "anxious excited"
         },
-        "goods_sold": {
+        "clerk_interactions-goods_sold": {
           "rating": "2"
         }
       }
@@ -123,7 +126,7 @@
         }
       ],
       "_supplementalDetails": {
-        "goods_sold": {
+        "clerk_interactions-goods_sold": {
           "rating": "3"
         }
       }
