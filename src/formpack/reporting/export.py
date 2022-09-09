@@ -853,8 +853,6 @@ class Export:
         )
         workbook.use_zip64()
 
-        sheets = {}
-
         sheet_name_mapping = {}
 
         sheet_row_positions = defaultdict(lambda: 0)
@@ -869,23 +867,18 @@ class Export:
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
-                try:
-                    sheet_name = sheet_name_mapping[section_name]
-                except KeyError:
-                    sheet_name = unique_name_for_xls(
-                        section_name, sheet_name_mapping.values()
-                    )
+                # ensure a unique sheet_name:
+                sheet_name = sheet_name_mapping.get(section_name)
+                if not sheet_name:
+                    sheet_name = unique_name_for_xls(section_name, sheet_name_mapping.values())
                     sheet_name_mapping[section_name] = sheet_name
-                try:
-                    current_sheet = sheets[sheet_name]
-                except KeyError:
+
+                # ensure worksheet has been added to workbook
+                current_sheet = workbook.get_worksheet_by_name(sheet_name)
+                if not current_sheet:
+                    # if adding a worksheet, initialize it with labels and tags
                     current_sheet = workbook.add_worksheet(sheet_name)
-                    sheets[sheet_name] = current_sheet
-
-                    _append_row_to_sheet(
-                        current_sheet, self.labels[section_name]
-                    )
-
+                    _append_row_to_sheet(current_sheet, self.labels[section_name])
                     # Include specified tag columns as extra header rows
                     tag_rows = self.get_header_rows_for_tag_cols(section_name)
                     for tag_row in tag_rows:
