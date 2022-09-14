@@ -46,6 +46,7 @@ class Export:
         force_index=False,
         title='submissions',
         tag_cols_for_header=None,
+        hide_unused=False,
         filter_fields=(),
         xls_types_as_text=True,
         include_media_url=False,
@@ -78,6 +79,10 @@ class Export:
         self.versions = form_versions
         self.multiple_select = multiple_select
         self.copy_fields = copy_fields
+        self.hide_unused = hide_unused
+        self._col_track = None
+        if self.hide_unused:
+            self._col_track = {}
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
@@ -177,6 +182,14 @@ class Export:
         # the first one to start
         section = get_first_occurrence(version.sections.values())
         submission = FormSubmission(submission)
+        if self.hide_unused:
+            # note which cols are not empty
+            section_name = section.name
+            if section_name not in self._col_track:
+                self._col_track[section_name] = {'nonempty': set(), 'all': set()}
+            nonempty = self._col_track[section_name]['nonempty'].union(submission.nonempty_cols())
+            allcols = self._col_track[section_name]['all'].union(submission.all_cols())
+            self._col_track[section_name] = {'nonempty': nonempty, 'all': allcols}
         return self.format_one_submission([submission.data], section)
 
     def parse_submissions(self, submissions):
@@ -886,6 +899,16 @@ class Export:
 
                 for row in rows:
                     _append_row_to_sheet(current_sheet, row)
+
+        if self._col_track is not None:
+            for section_name in self._col_track.keys():
+                sheet = workbook.get_worksheet_by_name(section_name)
+                cur = self._col_track.get(section_name)
+                _not_empty_columns = cur.get('nonempty')
+                _all_columns = cur.get('all')
+                for ucol in (_all_columns - _not_empty_columns):
+                    _index = self.labels[section_name].index(ucol)
+                    sheet.set_column(_index, _index, None, None, {'hidden': 1})
 
         workbook.close()
 

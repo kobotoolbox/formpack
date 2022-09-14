@@ -53,6 +53,16 @@ class FormSubmission:
         files = []
         return self.to_xml(), files
 
+    def nonempty_cols(self):
+        cols = []
+        for col, val in self.data.items():
+            if val not in [None, '']:
+                cols.append(col)
+        return set(cols)
+
+    def all_cols(self):
+        return set(self.data.keys())
+
     @classmethod
     def from_xml(cls, xml, version=None):
         xmljson = OrderedDict(parse_xmljson_to_data(xml, [], []))
