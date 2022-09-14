@@ -82,7 +82,8 @@ class Export:
         self.hide_unused = hide_unused
         self._col_track = None
         if self.hide_unused:
-            self._col_track = {}
+            self._used_indeces = {}
+            self._num_cols = {}
         self.force_index = force_index
         self.herarchy_in_labels = hierarchy_in_labels
         self.version_id_keys = version_id_keys
@@ -182,14 +183,6 @@ class Export:
         # the first one to start
         section = get_first_occurrence(version.sections.values())
         submission = FormSubmission(submission)
-        if self.hide_unused:
-            # note which cols are not empty
-            section_name = section.name
-            if section_name not in self._col_track:
-                self._col_track[section_name] = {'nonempty': set(), 'all': set()}
-            nonempty = self._col_track[section_name]['nonempty'].union(submission.nonempty_cols())
-            allcols = self._col_track[section_name]['all'].union(submission.all_cols())
-            self._col_track[section_name] = {'nonempty': nonempty, 'all': allcols}
         return self.format_one_submission([submission.data], section)
 
     def parse_submissions(self, submissions):
@@ -892,23 +885,34 @@ class Export:
                     # if adding a worksheet, initialize it with labels and tags
                     current_sheet = workbook.add_worksheet(sheet_name)
                     _append_row_to_sheet(current_sheet, self.labels[section_name])
+
+                    if self.hide_unused:
+                        self._num_cols[section_name] = len(self.labels[section_name])
+
                     # Include specified tag columns as extra header rows
                     tag_rows = self.get_header_rows_for_tag_cols(section_name)
                     for tag_row in tag_rows:
                         _append_row_to_sheet(current_sheet, tag_row)
 
                 for row in rows:
+                    if self.hide_unused:
+                        inds = self._used_indeces.get(section_name, set())
+                        row_inds = []
+                        for (index, item) in enumerate(row):
+                            if item not in [None, '']:
+                                row_inds.append(index)
+                        inds = inds.union(row_inds)
+                        self._used_indeces[section_name] = inds
                     _append_row_to_sheet(current_sheet, row)
 
-        if self._col_track is not None:
-            for section_name in self._col_track.keys():
+        if self.hide_unused:
+            for section_name in self._used_indeces.keys():
                 sheet = workbook.get_worksheet_by_name(section_name)
-                cur = self._col_track.get(section_name)
-                _not_empty_columns = cur.get('nonempty')
-                _all_columns = cur.get('all')
-                for ucol in (_all_columns - _not_empty_columns):
-                    _index = self.labels[section_name].index(ucol)
-                    sheet.set_column(_index, _index, None, None, {'hidden': 1})
+                not_empty_colinds = self._used_indeces[section_name]
+                col_indeces = set(range(0, self._num_cols[section_name]))
+                empty_indeces = col_indeces - not_empty_colinds
+                for index in empty_indeces:
+                    sheet.set_column(index, index, None, None, {'hidden': 1})
 
         workbook.close()
 
