@@ -7,11 +7,11 @@
   "additional_fields": [
     {
       "type": "transcript",
-      "name": "record_a_note/transcript",
-      "label": "record_a_note Transcript",
+      "name": "record_a_note/transcript_en",
+      "label": "record_a_note Transcript (en)",
       "path": [
         "record_a_note",
-        "transcript"
+        "transcript_en"
       ],
       "language": "en",
       "source": "record_a_note",
@@ -22,11 +22,11 @@
     },
     {
       "type": "transcript",
-      "name": "record_a_note/transcript",
-      "label": "record_a_note Transcript",
+      "name": "record_a_note/transcript_es",
+      "label": "record_a_note Transcript (es)",
       "path": [
         "record_a_note",
-        "transcript"
+        "transcript_es"
       ],
       "language": "es",
       "source": "record_a_note",
