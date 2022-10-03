@@ -10,7 +10,7 @@
       "name": "record_a_note/transcript",
       "path": ["record_a_note", "transcript"],
       "source": "record_a_note",
-      "languages": ["en"],
+      "language": "en",
       "settings": {
         "mode": "auto",
         "engine": "engines/acme_1_speech2text"

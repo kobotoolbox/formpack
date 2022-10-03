@@ -13,7 +13,22 @@
         "record_a_note",
         "transcript"
       ],
-      "languages": ["en", "es"],
+      "language": "en",
+      "source": "record_a_note",
+      "settings": {
+        "mode": "manual",
+        "engine": "engines/transcript_manual"
+      }
+    },
+    {
+      "type": "transcript",
+      "name": "record_a_note/transcript",
+      "label": "record_a_note Transcript",
+      "path": [
+        "record_a_note",
+        "transcript"
+      ],
+      "language": "es",
       "source": "record_a_note",
       "settings": {
         "mode": "manual",
