@@ -50,10 +50,11 @@ class FormField(FormDataDef):
             self.analysis_type = kwargs.get('analysis_type')
             self.analysis_path = kwargs.get('analysis_path')
             self.settings = kwargs.get('settings')
-            if self.analysis_type == ANALYSIS_TYPE_TRANSCRIPT:
-                self.languages = kwargs.get('languages')
-            if self.analysis_type == ANALYSIS_TYPE_TRANSLATION:
-                self.language = kwargs.get('language')
+            if self.analysis_type in [
+                ANALYSIS_TYPE_TRANSCRIPT,
+                ANALYSIS_TYPE_TRANSLATION,
+            ]:
+                self.language = kwargs['language']
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -484,27 +485,17 @@ class TextField(ExtendedFormField):
         group_sep='/',
         hierarchy_in_labels=False,
         multiple_select='both',
-        t_lang_codes=[],
         *args,
         **kwargs,
     ):
         args = lang, group_sep, hierarchy_in_labels, multiple_select
-        if hasattr(self, 'source'):
+        if getattr(self, 'analysis_type', None) in [
+            ANALYSIS_TYPE_TRANSCRIPT,
+            ANALYSIS_TYPE_TRANSLATION,
+        ]:
             source_label = self.source_field._get_label(*args)
-            if self._is_translation:
-                return [f'{source_label} - translation ({self.language})']
-            elif self._is_transcript:
-                if t_lang_codes:
-                    return [
-                        f'{source_label} - transcript ({code})'
-                        for code in self.languages
-                        if code in t_lang_codes
-                    ]
-                else:
-                    return [
-                        f'{source_label} - transcript ({code})'
-                        for code in self.languages
-                    ]
+            _type = 'translation' if self._is_translation else 'transcript'
+            return [f'{source_label} - {_type} ({self.language})']
         return [self._get_label(*args)]
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -522,23 +513,6 @@ class TextField(ExtendedFormField):
 
         return stats
 
-    def get_value_names(
-        self, multiple_select='both', t_lang_codes=[], *args, **kwargs
-    ):
-        if self._is_transcript:
-            if t_lang_codes:
-                return [
-                    f'{self.source_field.name} - transcript ({code})'
-                    for code in self.languages
-                    if code in t_lang_codes
-                ]
-            else:
-                return [
-                    f'{self.source_field.name} - transcript ({code})'
-                    for code in self.languages
-                ]
-        return super().get_value_names()
-
     @property
     def _is_transcript(self):
         return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSCRIPT
@@ -555,27 +529,22 @@ class TextField(ExtendedFormField):
         hierarchy_in_labels=False,
         multiple_select='both',
         xls_types_as_text=True,
-        t_lang_codes=[],
         *args,
         **kwargs,
     ):
         if val is None:
             val = ''
 
-        if self._is_translation and isinstance(val, dict):
-            try:
-                val = val[self.language]['value']
-            except KeyError:
-                val = ''
-        elif self._is_transcript:
-            cells = dict.fromkeys(
-                self.get_value_names(t_lang_codes=t_lang_codes), ''
-            )
-            if isinstance(val, dict):
-                name = f'{self.source_field.name} - transcript ({val["languageCode"]})'
-                if name in cells:
-                    cells[name] = val['value']
-            return cells
+        if isinstance(val, dict):
+            if self._is_translation:
+                try:
+                    val = val[self.language]['value']
+                except KeyError:
+                    val = ''
+            elif self._is_transcript:
+                val = (
+                    val['value'] if val['languageCode'] == self.language else ''
+                )
 
         return {self.name: val}
 

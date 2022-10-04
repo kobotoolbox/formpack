@@ -7,8 +7,8 @@
   "additional_fields": [
     {
       "type": "transcript",
-      "name": "record_a_note/transcript",
-      "path": ["record_a_note", "transcript"],
+      "name": "record_a_note/transcript_en",
+      "path": ["record_a_note", "transcript_en"],
       "source": "record_a_note",
       "language": "en",
       "settings": {
