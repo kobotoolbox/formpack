@@ -15,6 +15,7 @@ from formpack.utils.string import orderable_with_none
 
 def test_expand_selects_with_or_other():
     assert _expand_type_to_dict('select_one xx or other').get(_OR_OTHER) == True
+    assert _expand_type_to_dict('select_one   xx    or_other').get(_OR_OTHER) == True
     assert _expand_type_to_dict('select_one_or_other xx').get(_OR_OTHER) == True
     assert (
         _expand_type_to_dict('select_multiple_or_other xx').get(_OR_OTHER)
@@ -54,6 +55,14 @@ def test_expand_select_one_or_other():
     expand_content(s1, in_place=True)
     assert s1['survey'][0]['type'] == 'select_one'
     assert s1['survey'][0]['select_from_list_name'] == 'dogs'
+
+
+def test_expand_select_one_or_other_with_spaces():
+    s1 = {'survey': [{'type': 'select_one    dogs            or_other'}]}
+    expand_content(s1, in_place=True)
+    assert s1['survey'][0]['type'] == 'select_one'
+    assert s1['survey'][0]['select_from_list_name'] == 'dogs'
+    assert s1['survey'][0][_OR_OTHER] == True
 
 
 def test_expand_select_multiple():
