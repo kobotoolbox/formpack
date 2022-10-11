@@ -303,9 +303,9 @@ def _get_special_survey_cols(
 def _expand_type_to_dict(type_str: str) -> Dict[str, Union[str, bool]]:
     SELECT_PATTERN = r'^({select_type})\s+(\S+)$'
     out = {}
-    match = re.search('( or.other)$', type_str)
+    match = re.search('\s+(or.other)$', type_str)
     if match:
-        type_str = type_str.replace(match.groups()[0], '')
+        type_str = type_str.replace(match.groups()[0], '').strip()
         out[OR_OTHER_COLUMN] = True
     match = re.search('select_(one|multiple)(_or_other)', type_str)
     if match:
