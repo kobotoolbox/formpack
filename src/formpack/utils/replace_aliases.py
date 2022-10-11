@@ -103,14 +103,12 @@ META_TYPES = [
     'end',
     'deviceid',
     'phone_number',
-    'simserial',
     'audit',
     # meta values
     'username',
     # reconsider:
     'phonenumber',
     'imei',
-    'subscriberid',
     # geo
     'start-geopoint',
 ]
