@@ -59,7 +59,7 @@
           },
           "acme_timestamp": "2021-11-01Z"
         },
-        "name_of_shop": {
+        "clerk_details-name_of_shop": {
           "comment": "Pretty cliche"
         }
       }
