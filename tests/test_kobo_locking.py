@@ -50,7 +50,7 @@ class TestKoboLocking(TestCase):
         for row_num, row_list in enumerate(sheet_content):
             for col_num, cell_value in enumerate(row_list):
                 if cell_value and cell_value is not None:
-                    worksheet.cell(row_num+1, col_num+1).value = cell_value
+                    worksheet.cell(row_num + 1, col_num + 1).value = cell_value
         xlsx_import_io = BytesIO()
         workbook_to_import.save(xlsx_import_io)
         xlsx_import_io.seek(0)

@@ -8,7 +8,13 @@ from operator import itemgetter
 import statistics
 
 from .datadef import FormDataDef, FormChoice
-from ..constants import UNSPECIFIED_TRANSLATION
+from ..constants import (
+    ANALYSIS_TYPES,
+    ANALYSIS_TYPE_CODING,
+    ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
+    UNSPECIFIED_TRANSLATION,
+)
 from ..utils import singlemode
 from ..utils.ordered_collection import OrderedDefaultdict
 
@@ -35,6 +41,20 @@ class FormField(FormDataDef):
         self.section = section
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
+        self.analysis_question = False
+
+        source = kwargs.get('source')
+        if source is not None:
+            self.source = source
+            self.analysis_question = True
+            self.analysis_type = kwargs.get('analysis_type')
+            self.analysis_path = kwargs.get('analysis_path')
+            self.settings = kwargs.get('settings')
+            if self.analysis_type in [
+                ANALYSIS_TYPE_TRANSCRIPT,
+                ANALYSIS_TYPE_TRANSLATION,
+            ]:
+                self.language = kwargs['language']
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -45,10 +65,14 @@ class FormField(FormDataDef):
         if has_stats is not None:
             self.has_stats = has_stats
         else:
-            self.has_stats = data_type != 'note'
+            self.has_stats = data_type != 'note' and not self.analysis_question
 
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
+
+    @property
+    def qpath(self):
+        return self.path.replace('/', '-')
 
     def get_labels(
         self,
@@ -139,7 +163,7 @@ class FormField(FormDataDef):
         # even if `lang` can be None, we don't want the `label` to be None.
         label = self.labels.get(lang, self.name)
         # If `label` is None, no matches are found, so return `field` name.
-        return self.name if label is None else label
+        return label or self.name
 
     def __repr__(self):
         args = (self.__class__.__name__, self.name, self.data_type)
@@ -178,12 +202,21 @@ class FormField(FormDataDef):
         labels = cls._extract_json_labels(definition, translations)
         appearance = definition.get('appearance')
         or_other = definition.get('_or_other', False)
+        source = definition.get('source')
+        analysis_type = definition.get('analysis_type', ANALYSIS_TYPE_CODING)
+        settings = definition.get('settings', {})
+        analysis_path = definition.get('path')
+        languages = definition.get('languages')
+        language = definition.get('language')
 
         # normalize spaces
         data_type = definition['type']
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
+
+        if analysis_type not in ANALYSIS_TYPES:
+            raise ValueError(f'Invalid analysis data type: {analysis_type}')
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
@@ -246,6 +279,12 @@ class FormField(FormDataDef):
             'section': section,
             'choice': choice,
             'or_other': or_other,
+            'source': source,
+            'analysis_type': analysis_type,
+            'settings': settings,
+            'analysis_path': analysis_path,
+            'language': language,
+            'languages': languages,
         }
 
         if data_type == 'select_multiple' and appearance == 'literacy':
@@ -424,21 +463,6 @@ class ExtendedFormField(FormField):
 
 
 class TextField(ExtendedFormField):
-    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
-
-        stats = super().get_stats(metrics, lang, limit)
-
-        top = metrics.most_common(limit)
-        total = stats['total_count']
-
-        percentage = []
-        for key, val in top:
-            percentage.append((key, self._get_percentage(val, total)))
-
-        stats.update({'frequency': top, 'percentage': percentage})
-
-        return stats
-
     def get_disaggregated_stats(
         self, metrics, top_splitters, lang=UNSPECIFIED_TRANSLATION, limit=100
     ):
@@ -458,6 +482,75 @@ class TextField(ExtendedFormField):
         stats.update({'values': values[:limit]})
 
         return stats
+
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        *args,
+        **kwargs,
+    ):
+        args = lang, group_sep, hierarchy_in_labels, multiple_select
+        if getattr(self, 'analysis_type', None) in [
+            ANALYSIS_TYPE_TRANSCRIPT,
+            ANALYSIS_TYPE_TRANSLATION,
+        ]:
+            source_label = self.source_field._get_label(*args)
+            _type = 'translation' if self._is_translation else 'transcript'
+            return [f'{source_label} - {_type} ({self.language})']
+        return [self._get_label(*args)]
+
+    def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
+
+        stats = super().get_stats(metrics, lang, limit)
+
+        top = metrics.most_common(limit)
+        total = stats['total_count']
+
+        percentage = []
+        for key, val in top:
+            percentage.append((key, self._get_percentage(val, total)))
+
+        stats.update({'frequency': top, 'percentage': percentage})
+
+        return stats
+
+    @property
+    def _is_transcript(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSCRIPT
+
+    @property
+    def _is_translation(self):
+        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
+
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        xls_types_as_text=True,
+        *args,
+        **kwargs,
+    ):
+        if val is None:
+            val = ''
+
+        if isinstance(val, dict):
+            if self._is_translation:
+                try:
+                    val = val[self.language]['value']
+                except KeyError:
+                    val = ''
+            elif self._is_transcript:
+                val = (
+                    val['value'] if val['languageCode'] == self.language else ''
+                )
+
+        return {self.name: val}
 
 
 class MediaField(TextField):

@@ -1,0 +1,108 @@
+{
+  "engines": {
+    "engines/transcript_manual": {
+      "details": "A human provided transcription"
+    }
+  },
+  "additional_fields": [
+    {
+      "type": "transcript",
+      "name": "record_a_note/transcript_en",
+      "label": "record_a_note Transcript (en)",
+      "path": [
+        "record_a_note",
+        "transcript_en"
+      ],
+      "language": "en",
+      "source": "record_a_note",
+      "settings": {
+        "mode": "manual",
+        "engine": "engines/transcript_manual"
+      }
+    },
+    {
+      "type": "transcript",
+      "name": "record_a_note/transcript_es",
+      "label": "record_a_note Transcript (es)",
+      "path": [
+        "record_a_note",
+        "transcript_es"
+      ],
+      "language": "es",
+      "source": "record_a_note",
+      "settings": {
+        "mode": "manual",
+        "engine": "engines/transcript_manual"
+      }
+    },
+    {
+      "type": "translation",
+      "name": "record_a_note/translation_en",
+      "label": "record_a_note Translated (en)",
+      "language": "en",
+      "path": [
+        "record_a_note",
+        "translation_en"
+      ],
+      "source": "record_a_note",
+      "settings": {
+        "mode": "manual",
+        "engine": "engines/translation_manual"
+      }
+    },
+    {
+      "type": "translation",
+      "name": "record_a_note/translation_es",
+      "label": "record_a_note Translated (es)",
+      "language": "es",
+      "path": [
+        "record_a_note",
+        "translation_es"
+      ],
+      "source": "record_a_note",
+      "settings": {
+        "mode": "manual",
+        "engine": "engines/translation_manual"
+      }
+    },
+    {
+      "type": "datetime",
+      "name": "record_a_note/acme_timestamp",
+      "path": [
+        "record_a_note",
+        "acme_timestamp"
+      ],
+      "label": [
+        "Transcription Timestamp"
+      ],
+      "source": "record_a_note"
+    },
+    {
+      "type": "text",
+      "name": "name_of_clerk/comment",
+      "path": [
+        "clerk_details-name_of_clerk",
+        "comment"
+      ],
+      "label": [
+        "Comment on the name of the clerk"
+      ],
+      "source": "clerk_details-name_of_clerk"
+    },
+    {
+      "type": "text",
+      "name": "name_of_shop/comment",
+      "path": [
+        "clerk_details-name_of_shop",
+        "comment"
+      ],
+      "label": [
+        "Comment on the name of the shop"
+      ],
+      "source": "clerk_details-name_of_shop"
+    }
+  ],
+  "translations": [
+    "English (en)"
+  ]
+}

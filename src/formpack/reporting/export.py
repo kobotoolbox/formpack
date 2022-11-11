@@ -4,16 +4,23 @@ import re
 import zipfile
 from collections import defaultdict, OrderedDict
 from inspect import isclass
-from typing import Iterator, Generator, Optional
+from typing import (
+    Dict,
+    Generator,
+    Iterator,
+    Optional,
+)
 
 import xlsxwriter
 
 from ..constants import (
+    ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
     GEO_QUESTION_TYPES,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
-from ..schema import CopyField
+from ..schema import CopyField, FormField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
@@ -60,9 +67,11 @@ class Export:
         :param tag_cols_for_header: list
         :param filter_fields: list
         :param xls_types_as_text: bool
+        :param include_media_url: bool
         """
 
         self.formpack = formpack
+        self.analysis_form = formpack.analysis_form
         self.lang = lang
         self.group_sep = group_sep
         self.title = title
@@ -80,6 +89,12 @@ class Export:
         if tag_cols_for_header is None:
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
+
+        _filter_fields = []
+        for item in self.filter_fields:
+            item = re.sub(r'^_supplementalDetails/', '', item)
+            _filter_fields.append(item)
+        self.filter_fields = _filter_fields
 
         # If some fields need to be arbitrarily copied, add them
         # to the first section
@@ -224,6 +239,9 @@ class Export:
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
+        if self.analysis_form:
+            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
+
         if self.filter_fields:
             all_fields = [
                 field
@@ -320,6 +338,7 @@ class Export:
         submission,
         current_section,
         attachments=None,
+        supplemental_details=None,
     ):
 
         # 'current_section' is the name of what will become sheets in xls.
@@ -382,17 +401,46 @@ class Export:
                 if re.match(fr'^.*/{_val}$', f['filename']) is not None
             ]
 
-        def _get_value_from_entry(entry, field):
+        def _get_value_from_supplemental_details(
+            field: FormField, supplemental_details: Dict
+        ) -> Optional[str]:
+            source, name = field.analysis_path
+            _sup_details = supplemental_details.get(source, {})
+
+            if not _sup_details:
+                return
+
+            # The names for translation and transcript fields are in the format
+            # of `translated_<language code>` which must be stripped to get the
+            # value from the supplemental details dict
+            if _name := re.match(r'^(translation|transcript)_', name):
+                name = _name.groups()[0]
+
+            val = _sup_details.get(name)
+            if val is None:
+                return ''
+
+            return val
+
+        def _get_value_from_entry(
+            entry: Dict, field: FormField, supplemental_details: Dict
+        ) -> Optional[str]:
+            if field.analysis_question and supplemental_details:
+                return _get_value_from_supplemental_details(
+                    field, supplemental_details
+                )
+
             suffix = 'meta/' if field.data_type == 'audit' else ''
             return entry.get(f'{suffix}{field.path}')
+
+        if self.analysis_form:
+            _fields = self.analysis_form.insert_analysis_fields(_fields)
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
         if self.filter_fields:
             _fields = tuple(
-                field
-                for field in current_section.fields.values()
-                if field.path in self.filter_fields
+                field for field in _fields if field.path in self.filter_fields
             )
 
         # 'rows' will contain all the formatted entries for the current
@@ -423,13 +471,17 @@ class Export:
             row.update(_empty_row)
 
             attachments = entry.get('_attachments') or attachments
+            supplemental_details = (
+                entry.get('_supplementalDetails') or supplemental_details
+            )
 
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
-
                     # get submission value for this field
-                    val = _get_value_from_entry(entry, field)
+                    val = _get_value_from_entry(
+                        entry, field, supplemental_details
+                    )
                     # get the attachment for this field
                     attachment = _get_attachment(val, field, attachments)
                     # get a mapping of {"col_name": "val", ...}
@@ -493,7 +545,8 @@ class Export:
                     chunk = self.format_one_submission(
                         entry[child_section.path],
                         child_section,
-                        attachments,
+                        attachments=attachments,
+                        supplemental_details=supplemental_details,
                     )
                     for key, value in iter(chunk.items()):
                         if key in chunks:

@@ -3,6 +3,8 @@ import unittest
 
 from formpack import FormPack
 from .fixtures import build_fixture
+from .fixtures.load_fixture_json import load_analysis_form_json
+from formpack.constants import ANALYSIS_TYPES
 
 
 class TestFormPackFixtures(unittest.TestCase):
@@ -117,3 +119,31 @@ class TestFormPackFixtures(unittest.TestCase):
         """
         fp = FormPack(**build_fixture('favcolor'))
         self.assertEqual(len(fp.versions), 2)
+
+    def test_analysis_form(self):
+        fixture = build_fixture('analysis_form')
+        assert 3 == len(fixture)
+
+        title, schemas, submissions = fixture
+        analysis_form = load_analysis_form_json('analysis_form')
+        fp = FormPack(schemas, title)
+        fp.extend_survey(analysis_form)
+
+        assert 2 == len(fp.versions)
+        assert 'Simple Clerk Interaction' == title
+
+        expected_analysis_questions = sorted(
+            [f['name'] for f in analysis_form['additional_fields']]
+        )
+        actual_analysis_questions = sorted(
+            [f.name for f in fp.analysis_form.fields]
+        )
+        assert expected_analysis_questions == actual_analysis_questions
+
+        f1 = fp.analysis_form.fields[0]
+        assert hasattr(f1, 'source') and f1.source
+        assert hasattr(f1, 'has_stats') and not f1.has_stats
+        assert (
+            hasattr(f1, 'analysis_type') and f1.analysis_type in ANALYSIS_TYPES
+        )
+        assert hasattr(f1, 'settings')

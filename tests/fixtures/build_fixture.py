@@ -31,6 +31,7 @@ def build_fixture(modulename, data_variable_name='DATA'):
         for submission in schema.pop('submissions'):
             submission.update({version_id_key: version})
             submissions.append(submission)
+
     return title, schemas, submissions
 
 

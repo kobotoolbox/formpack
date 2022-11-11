@@ -1,0 +1,102 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+      {
+        "type": "audio",
+        "name": "record_a_note",
+        "label": [
+          "Record a clerk saying something",
+          "Registri oficiston dirantan ion"
+        ]
+      },
+      {
+        "type": "begin_group",
+        "name": "clerk_details",
+        "label": [
+          "Some details of the clerk",
+          "Kelkaj detaloj de la oficisto"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "name_of_clerk",
+        "label": [
+          "What is the clerk's name?",
+          ""
+        ]
+      },
+      {
+        "type": "end_group"
+      }
+    ],
+    "settings": {
+      "version": "v1"
+    },
+    "translated": [
+      "label"
+    ],
+    "translations": [
+      "English (en)",
+      "Esperanto (es)"
+    ]
+  },
+  "submissions": [
+    {
+      "record_a_note": "clerk_interaction_1.mp3",
+      "clerk_details/name_of_clerk": "John",
+      "_attachments": [
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_1.mp3"
+        }
+      ],
+      "_supplementalDetails": {
+        "record_a_note": {
+          "transcript": {
+            "value": "Saluton, kiel mi povas helpi vin?",
+            "languageCode": "es"
+          },
+          "translation": {
+            "en": {
+              "value": "Hello how may I help you?"
+            }
+          },
+          "acme_timestamp": "2021-11-01Z"
+        },
+        "clerk_details-name_of_clerk": {
+          "comment": "Sounds like an interesting person"
+        }
+      }
+    },
+    {
+      "record_a_note": "clerk_interaction_2.mp3",
+      "clerk_details/name_of_clerk": "Alex",
+      "_attachments": [
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_2.mp3"
+        }
+      ],
+      "_supplementalDetails": {
+        "record_a_note": {
+          "transcript": {
+            "value": "Thank you for your business",
+            "languageCode": "en"
+          }
+        }
+      }
+    },
+    {
+      "record_a_note": "clerk_interaction_3.mp3",
+      "clerk_details/name_of_clerk": "Olivier",
+      "_attachments": [
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_3.mp3"
+        }
+      ],
+      "_supplementalDetails": {}
+    }
+  ]
+}
