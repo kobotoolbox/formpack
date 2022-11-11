@@ -78,14 +78,14 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
+        "clerk_interactions-record_a_note": {
           "transcript": {
             "value": "Hello how may I help you?",
             "languageCode": "en"
           },
           "tone_of_voice": "excited confused"
         },
-        "goods_sold": {
+        "clerk_interactions-goods_sold": {
           "comment": "Not much diversity",
           "rating": "3"
         }
@@ -101,14 +101,14 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
+        "clerk_interactions-record_a_note": {
           "transcript": {
             "value": "Thank you for your business",
             "languageCode": "en"
           },
           "tone_of_voice": "anxious excited"
         },
-        "goods_sold": {
+        "clerk_interactions-goods_sold": {
           "rating": "2"
         }
       }
@@ -123,7 +123,7 @@
         }
       ],
       "_supplementalDetails": {
-        "goods_sold": {
+        "clerk_interactions-goods_sold": {
           "rating": "3"
         }
       }
