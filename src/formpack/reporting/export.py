@@ -22,7 +22,7 @@ from ..constants import (
 )
 from ..schema import CopyField, FormField
 from ..submission import FormSubmission
-from ..utils.exceptions import FormPackGeoJsonError
+from ..utils.exceptions import FormPackExcelError, FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
 from ..utils.geojson import field_and_response_to_geometry
 from ..utils.iterator import get_first_occurrence
@@ -855,7 +855,35 @@ class Export:
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
-            sheet_.write_row(row=row_index, col=0, data=data)
+            for col_index, cell_value in enumerate(data):
+                # Call `write()` directly to facilitate error handling (as
+                # opposed to `write_row()`)
+                error = sheet_.write(row_index, col_index, cell_value)
+                if error == 0:
+                    continue
+                else:
+                    # Fall back on writing as a string if there are problems
+                    # like having too many URLs in the worksheet (see #309)
+                    error = sheet_.write_string(
+                        row_index, col_index, cell_value
+                    )
+                # https://xlsxwriter.readthedocs.io/worksheet.html#write_string
+                if error == -1:
+                    # Fail now if the data set doesn't fit into an Excel file
+                    raise FormPackExcelError(
+                        f'Row {row_index} or column {col_index} is out of'
+                        ' worksheet bounds'
+                    )
+                if error == -2:
+                    # If the value was truncated silently, prepend a warning
+                    # and write again
+                    cell_value = (
+                        '<WARNING: Truncated to Excel limit of 32767'
+                        ' characters!>'
+                        + cell_value
+                    )
+                    sheet_.write_string(row_index, col_index, cell_value)
+
             row_index += 1
             sheet_row_positions[sheet_] = row_index
 
