@@ -1,5 +1,4 @@
 # coding: utf-8
-import csv
 import json
 import unittest
 from collections import OrderedDict
@@ -9,7 +8,6 @@ from textwrap import dedent
 from zipfile import ZipFile
 
 import openpyxl
-import xlrd
 from path import TempDir
 
 from formpack import FormPack
@@ -18,9 +16,6 @@ from formpack.errors import TranslationError
 from formpack.schema.fields import (
     ValidationStatusCopyField,
     IdCopyField,
-    SubmissionTimeCopyField,
-    TagsCopyField,
-    NotesCopyField,
 )
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture, open_fixture_file
@@ -376,8 +371,8 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = build_fixture(
             'translations_labels_mismatch'
         )
-        with self.assertRaises(TranslationError) as e:
-            fp = FormPack(schemas, title)
+        with self.assertRaises(TranslationError):
+            FormPack(schemas, title)
 
     def test_simple_nested_grouped_repeatable(self):
         title, schemas, submissions = build_fixture(
@@ -1622,7 +1617,6 @@ class TestFormPackExport(unittest.TestCase):
             'quotes_newlines_and_long_urls'
         )
         fp = FormPack(schemas, title)
-        lss = list(submissions)
         csv_lines = list(fp.export().to_csv(submissions))
         expected_lines = []
         expected_lines.append(
