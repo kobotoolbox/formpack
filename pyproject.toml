@@ -1,4 +1,3 @@
 [tool.black]
-verbose = true
 line-length = 80
 skip-string-normalization = true
