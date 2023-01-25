@@ -55,6 +55,7 @@ TAG_COLUMNS_AND_SEPARATORS = {
 }
 
 GEO_QUESTION_TYPES = ('geopoint', 'geotrace', 'geoshape')
+MEDIA_TYPES = ('audio', 'image', 'video')
 
 # Export Settings
 EXPORT_SETTING_FIELDS = 'fields'
@@ -155,4 +156,14 @@ KOBO_LOCKING_RESTRICTIONS = [
     'language_edit',
     'form_appearance',
     'form_meta_edit',
+]
+
+# Analysis types
+ANALYSIS_TYPE_CODING = 'coding'
+ANALYSIS_TYPE_TRANSCRIPT = 'transcript'
+ANALYSIS_TYPE_TRANSLATION = 'translation'
+ANALYSIS_TYPES = [
+    ANALYSIS_TYPE_CODING,
+    ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
 ]

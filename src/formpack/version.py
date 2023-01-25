@@ -1,12 +1,21 @@
 # coding: utf-8
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+from typing import (
+    Dict,
+    List,
+    Union,
+)
 
 from pyxform import aliases as pyxform_aliases
 
-from .constants import UNTRANSLATED
+from .constants import (
+    ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
+    UNTRANSLATED,
+)
 from .errors import SchemaError
 from .errors import TranslationError
-from .schema import (FormField, FormGroup, FormSection, FormChoice)
+from .schema import FormField, FormGroup, FormSection, FormChoice
 from .submission import FormSubmission
 from .utils import parse_xml_to_xmljson, normalize_data_type
 from .utils.flatten_content import flatten_content
@@ -24,10 +33,15 @@ class LabelStruct:
 
     def __init__(self, labels=[], translations=[]):
         if len(labels) != len(translations):
-            errmsg = 'Mismatched labels and translations: [{}] [{}] ' \
-                '{}!={}'.format(', '.join(labels),
-                                ', '.join(translations), len(labels),
-                                len(translations))
+            errmsg = (
+                'Mismatched labels and translations: [{}] [{}] '
+                '{}!={}'.format(
+                    ', '.join(labels),
+                    ', '.join(map(str, translations)),
+                    len(labels),
+                    len(translations),
+                )
+            )
             raise TranslationError(errmsg)
         self._labels = labels
         self._translations = translations
@@ -37,7 +51,113 @@ class LabelStruct:
         return self._vals.get(key, default)
 
 
-class FormVersion:
+class BaseForm:
+    @staticmethod
+    def _get_field_labels(
+        field: FormField,
+        translations: List[str],
+    ) -> LabelStruct:
+        if 'label' in field:
+            if not isinstance(field['label'], list):
+                field['label'] = [field['label']]
+            return LabelStruct(labels=field['label'], translations=translations)
+        return LabelStruct()
+
+    @staticmethod
+    def _get_fields_by_name(
+        survey: Dict[str, Union[str, List]]
+    ) -> Dict[str, Dict[str, Union[str, List]]]:
+        return {row['name']: row for row in survey if 'name' in row}
+
+    @staticmethod
+    def _get_translations(content: Dict[str, List]) -> List[str]:
+        return [
+            t if t is not None else UNTRANSLATED
+            for t in content.get('translations', [None])
+        ]
+
+
+class AnalysisForm(BaseForm):
+    def __init__(
+        self,
+        formpack: 'FormPack',
+        schema: Dict[str, Union[str, List]],
+    ) -> None:
+
+        self.schema = schema
+        self.formpack = formpack
+
+        survey = self.schema.get('additional_fields', [])
+        fields_by_name = self._get_fields_by_name(survey)
+        section = FormSection(name=formpack.title)
+
+        self.translations = self._get_translations(schema)
+
+        choices_definition = schema.get('additional_choices', ())
+        field_choices = FormChoice.all_from_json_definition(
+            choices_definition, self.translations
+        )
+
+        for data_def in survey:
+            data_type = data_def['type']
+            if data_type in [
+                ANALYSIS_TYPE_TRANSCRIPT,
+                ANALYSIS_TYPE_TRANSLATION,
+            ]:
+                data_def.update(
+                    {
+                        'type': 'text',
+                        'analysis_type': data_type,
+                    }
+                )
+
+            field = FormField.from_json_definition(
+                definition=data_def,
+                field_choices=field_choices,
+                section=section,
+                translations=self.translations,
+            )
+
+            field.labels = self._get_field_labels(
+                field=fields_by_name[field.name],
+                translations=self.translations,
+            )
+            section.fields[field.name] = field
+
+        self.fields = list(section.fields.values())
+        self.fields_by_source = self._get_fields_by_source()
+
+    def __repr__(self) -> str:
+        return f"<AnalysisForm parent='{self.formpack.title}'>"
+
+    def _get_fields_by_source(self) -> Dict[str, List[FormField]]:
+        fields_by_source = defaultdict(list)
+        for field in self.fields:
+            fields_by_source[field.source].append(field)
+        return fields_by_source
+
+    def _map_sections_to_analysis_fields(
+        self, survey_field: FormField
+    ) -> List[FormField]:
+        _fields = []
+        for analysis_field in self.fields_by_source[survey_field.qpath]:
+            analysis_field.section = survey_field.section
+            analysis_field.source_field = survey_field
+            _fields.append(analysis_field)
+        return _fields
+
+    def insert_analysis_fields(
+        self, fields: List[FormField]
+    ) -> List[FormField]:
+        _fields = []
+        for field in fields:
+            _fields.append(field)
+            if field.qpath in self.fields_by_source:
+                _fields += self._map_sections_to_analysis_fields(field)
+        return _fields
+
+
+class FormVersion(BaseForm):
     @classmethod
     def verify_schema_structure(cls, struct):
         if 'content' not in struct:
@@ -51,8 +171,10 @@ class FormVersion:
 
         # QUESTION FOR ALEX: why this check ?
         if 'name' in schema:
-            raise ValueError('FormVersion should not have a name parameter. '
-                             'consider using "title" or "id_string"')
+            raise ValueError(
+                'FormVersion should not have a name parameter. '
+                'consider using "title" or "id_string"'
+            )
         self.schema = schema
         self.form_pack = form_pack
 
@@ -61,8 +183,9 @@ class FormVersion:
 
         # form version id, unique to this version of the form
         self.id = schema.get('version')
-        self.version_id_key = schema.get('version_id_key',
-                                         form_pack.default_version_id_key)
+        self.version_id_key = schema.get(
+            'version_id_key', form_pack.default_version_id_key
+        )
 
         # form string id, unique to this form, shared accross versions
         self.id_string = schema.get('id_string')
@@ -89,15 +212,14 @@ class FormVersion:
 
         content = self.schema['content']
 
-        self.translations = [t if t is not None else UNTRANSLATED
-                             for t in content.get('translations', [None])]
+        self.translations = self._get_translations(content)
 
         # TODO: put those parts in a separate method and unit test it
         survey = content.get('survey', [])
 
         survey = self._append_pseudo_questions(survey)
 
-        fields_by_name = dict([(row.get('name'), row) for row in survey])
+        fields_by_name = self._get_fields_by_name(survey)
 
         # Analyze the survey schema and extract the informations we need
         # to build the export: the sections, the choices, the fields
@@ -107,8 +229,9 @@ class FormVersion:
         # Choices are the list of values you can choose from to answer a
         # specific question. They can have translatable labels.
         choices_definition = content.get('choices', ())
-        field_choices = FormChoice.all_from_json_definition(choices_definition,
-                                                            self.translations)
+        field_choices = FormChoice.all_from_json_definition(
+            choices_definition, self.translations
+        )
 
         # Extract fields data
         group = None
@@ -190,22 +313,17 @@ class FormVersion:
 
             # If we are here, it's a regular field
             # Get the the data name and type
-            field = FormField.from_json_definition(data_definition,
-                                                   hierarchy, section,
-                                                   field_choices,
-                                                   translations=self.translations)
+            field = FormField.from_json_definition(
+                data_definition,
+                hierarchy,
+                section,
+                field_choices,
+                translations=self.translations,
+            )
             section.fields[field.name] = field
 
             _f = fields_by_name[field.name]
-            _labels = LabelStruct()
-
-            if 'label' in _f:
-                if not isinstance(_f['label'], list):
-                    _f['label'] = [_f['label']]
-                _labels = LabelStruct(labels=_f['label'],
-                                      translations=self.translations)
-
-            field.labels = _labels
+            field.labels = self._get_field_labels(_f, self.translations)
             assert 'labels' not in _f
 
     # FIXME: Find a safe way to use this. Wrapping with try/except isn't enough
@@ -232,28 +350,37 @@ class FormVersion:
         _stats = OrderedDict()
         _stats['id_string'] = self._get_id_string()
         _stats['version'] = self.id
-        _stats['row_count'] = len(self.schema.get('content', {}).get('survey', []))
+        _stats['row_count'] = len(
+            self.schema.get('content', {}).get('survey', [])
+        )
         # returns stats in the format [ key="value" ]
-        return '\n\t'.join(['%s="%s"' % (key, str(_stats[key]))
-                            for key in _stats.keys()])
+        return '\n\t'.join(
+            ['%s="%s"' % (key, str(_stats[key])) for key in _stats.keys()]
+        )
 
     def to_dict(self, **opts):
         return flatten_content(self.schema['content'], **opts)
 
     # TODO: find where to move that
     def _load_submission_xml(self, xml):
-        raise NotImplementedError("This doesn't work now that submissions "
-                                  "are out of the class. Port it to Export.")
+        raise NotImplementedError(
+            "This doesn't work now that submissions "
+            "are out of the class. Port it to Export."
+        )
         _xmljson = parse_xml_to_xmljson(xml)
         _rootatts = _xmljson.get('attributes', {})
         _id_string = _rootatts.get('id_string')
         _version_id = _rootatts.get('version')
         if _id_string != self._get_id_string():
-            raise ValueError('submission id_string does not match: %s != %s' %
-                             (self._get_id_string(), _id_string))
+            raise ValueError(
+                'submission id_string does not match: %s != %s'
+                % (self._get_id_string(), _id_string)
+            )
         if _version_id != self.form_pack.id_string:
-            raise ValueError('mismatching version id %s != %s' %
-                             (self.form_pack.id_string, _version_id))
+            raise ValueError(
+                'mismatching version id %s != %s'
+                % (self.form_pack.id_string, _version_id)
+            )
         self.submissions.append(FormSubmission.from_xml(_xmljson, self))
 
     def lookup(self, prop, default=None):
@@ -270,21 +397,22 @@ class FormVersion:
 
     def _get_title(self):
         """
-        if formversion has no name, uses form's name
+        If formversion has no name, uses form's name
         """
         if self.title is None:
             return self.form_pack.title
         return self.title
 
     def get_labels(self, lang=UNTRANSLATED, group_sep=None):
-        """ Returns a mapping of labels for {section: [field_label, ...]...}
+        """
+        Returns a mapping of labels for {section: [field_label, ...]...}
 
-            Sections and fields labels can be set to use their slug name,
-            their lone label, or one of the translated labels.
+        Sections and fields labels can be set to use their slug name,
+        their lone label, or one of the translated labels.
 
-            If a field is part of a group and a group separator is passed,
-            the group label is retrieved, possibly translated, and
-            prepended to the field label itself.
+        If a field is part of a group and a group separator is passed,
+        the group label is retrieved, possibly translated, and
+        prepended to the field label itself.
         """
 
         all_labels = OrderedDict()
@@ -294,26 +422,29 @@ class FormVersion:
             section_labels = all_labels[section_label] = []
 
             for field_name, field in section.fields.items():
-                    section_labels.extend(field.get_labels(lang, group_sep))
+                section_labels.extend(field.get_labels(lang, group_sep))
 
         return all_labels
 
     def to_xml(self, warnings=None):
         # todo: collect warnings from pyxform compilation when a list is passed
         survey = formversion_pyxform(
-            self.to_dict(remove_sheets=['translations', 'translated'],
-                         )
-                                     )
+            self.to_dict(
+                remove_sheets=['translations', 'translated'],
+            )
+        )
         title = self._get_title()
 
         if title is None:
             raise ValueError('cannot create xml on a survey with no title.')
 
-        survey.update({
-            'name': self.lookup('root_node_name', 'data'),
-            'id_string': self.lookup('id_string'),
-            'title': self.lookup('title'),
-            'version': self.lookup('id'),
-        })
+        survey.update(
+            {
+                'name': self.lookup('root_node_name', 'data'),
+                'id_string': self.lookup('id_string'),
+                'title': self.lookup('title'),
+                'version': self.lookup('id'),
+            }
+        )
 
-        return survey._to_pretty_xml() #.encode('utf-8')
+        return survey._to_pretty_xml()  # .encode('utf-8')

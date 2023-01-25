@@ -5,8 +5,13 @@ import importlib
 from copy import deepcopy
 
 
-def build_fixture(modulename, data_variable_name="DATA"):
-    fixtures = deepcopy(getattr(importlib.import_module('..%s' % modulename, __name__), data_variable_name))
+def build_fixture(modulename, data_variable_name='DATA'):
+    fixtures = deepcopy(
+        getattr(
+            importlib.import_module('..%s' % modulename, __name__),
+            data_variable_name,
+        )
+    )
 
     if 'submissions_xml' in fixtures:
         # This fixture contains XML submissions, which apparently aren't used
@@ -26,6 +31,7 @@ def build_fixture(modulename, data_variable_name="DATA"):
         for submission in schema.pop('submissions'):
             submission.update({version_id_key: version})
             submissions.append(submission)
+
     return title, schemas, submissions
 
 
@@ -39,4 +45,6 @@ def open_fixture_file(modulename, filename, *args, **kwargs):
             importlib.import_module('..%s' % modulename, __name__).__file__
         )
     )
-    return io.open(os.path.join(fixture_dir, filename), encoding='utf-8', *args, **kwargs)
+    return io.open(
+        os.path.join(fixture_dir, filename), encoding='utf-8', *args, **kwargs
+    )

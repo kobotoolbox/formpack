@@ -4,17 +4,24 @@ import re
 import zipfile
 from collections import defaultdict, OrderedDict
 from inspect import isclass
-from typing import Iterator, Generator, Optional
+from typing import (
+    Dict,
+    Generator,
+    Iterator,
+    Optional,
+)
 
 import xlsxwriter
 
 from ..constants import (
+    ANALYSIS_TYPE_TRANSCRIPT,
+    ANALYSIS_TYPE_TRANSLATION,
     GEO_QUESTION_TYPES,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
     UNSPECIFIED_HEADER_LANG,
 )
-from ..schema import CopyField
+from ..schema import CopyField, FormField
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
@@ -27,19 +34,18 @@ from ..utils.text import get_valid_filename
 
 
 class Export:
-
     def __init__(
         self,
         formpack,
         form_versions,
         lang=UNSPECIFIED_TRANSLATION,
-        group_sep="/",
+        group_sep='/',
         hierarchy_in_labels=False,
         version_id_keys=[],
-        multiple_select="both",
+        multiple_select='both',
         copy_fields=(),
         force_index=False,
-        title="submissions",
+        title='submissions',
         tag_cols_for_header=None,
         header_lang=UNSPECIFIED_HEADER_LANG,
         filter_fields=(),
@@ -66,9 +72,11 @@ class Export:
             None (`constants.UNTRANSLATED`), if not set, default value equal lang arg.
         :param filter_fields: list
         :param xls_types_as_text: bool
+        :param include_media_url: bool
         """
 
         self.formpack = formpack
+        self.analysis_form = formpack.analysis_form
         self.lang = lang
         self.header_lang = self.lang if header_lang == UNSPECIFIED_HEADER_LANG else header_lang
         self.group_sep = group_sep
@@ -88,6 +96,12 @@ class Export:
             tag_cols_for_header = []
         self.tag_cols_for_header = tag_cols_for_header
 
+        _filter_fields = []
+        for item in self.filter_fields:
+            item = re.sub(r'^_supplementalDetails/', '', item)
+            _filter_fields.append(item)
+        self.filter_fields = _filter_fields
+
         # If some fields need to be arbitrarily copied, add them
         # to the first section
         if copy_fields:
@@ -97,7 +111,9 @@ class Export:
                     if isclass(copy_field):
                         dumb_field = copy_field(section=first_section)
                     else:
-                        dumb_field = CopyField(copy_field, section=first_section)
+                        dumb_field = CopyField(
+                            copy_field, section=first_section
+                        )
                     first_section.fields[dumb_field.name] = dumb_field
 
         # Some copy fields are classes, some strings -- collect their field
@@ -178,7 +194,9 @@ class Export:
             yield formatted_chunks
 
     def reset(self):
-        """ Reset sections and indexes to initial values """
+        """
+        Reset sections and indexes to initial values
+        """
 
         # Current section and indexes in the process of generating the export
         # Those values are state used in format_one_submission to know
@@ -188,26 +206,29 @@ class Export:
         self.__r_groups_submission_mapping_values = {}
         # N.B: indexes are not affected by form versions
 
-    def get_fields_labels_tags_for_all_versions(self,
-                                                lang=UNSPECIFIED_TRANSLATION,
-                                                group_sep="/",
-                                                hierarchy_in_labels=False,
-                                                header_lang=UNSPECIFIED_TRANSLATION,
-                                                tag_cols_for_header=None):
-        """ Return 3 mappings containing field, labels, and tags by section
+    def get_fields_labels_tags_for_all_versions(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        header_lang=UNSPECIFIED_TRANSLATION,
+        tag_cols_for_header=None,
+    ):
+        """
+        Return 3 mappings containing field, labels, and tags by section
 
-            This is needed because when making an export for several
-            versions of the same form, fields get added, removed, and
-            edited. Hence we pre-generate mappings containing labels,
-            fields, and tags for all versions so we can use them later as a
-            canvas to keep the export coherent.
+        This is needed because when making an export for several
+        versions of the same form, fields get added, removed, and
+        edited. Hence we pre-generate mappings containing labels,
+        fields, and tags for all versions so we can use them later as a
+        canvas to keep the export coherent.
 
-            Labels are used as column headers.
+        Labels are used as column headers.
 
-            Field are used to create rows of data from submission.
+        Field are used to create rows of data from submission.
 
-            Tags specified by `tag_cols_for_header` are included as additional
-            column headers (in CSV and XLSX exports only).
+        Tags specified by `tag_cols_for_header` are included as additional
+        column headers (in CSV and XLSX exports only).
         """
 
         if tag_cols_for_header is None:
@@ -215,20 +236,20 @@ class Export:
         try:
             tag_cols_and_seps = {
                 col: TAG_COLUMNS_AND_SEPARATORS[col]
-                    for col in tag_cols_for_header
+                for col in tag_cols_for_header
             }
         except KeyError as e:
             raise RuntimeError(
-                '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message))
-
-        section_fields = OrderedDict()  # {section: [field_object, field_object, …], …}
-        section_labels = OrderedDict()  # {section: [field_label, field_label, …], …}
-        section_tags = OrderedDict()  # {section: [{column_name: tag_string, …}, …]}
+                '{} is not in TAG_COLUMNS_AND_SEPARATORS'.format(e.message)
+            )
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
+        if self.analysis_form:
+            all_fields = self.analysis_form.insert_analysis_fields(all_fields)
+
         if self.filter_fields:
             all_fields = [
                 field
@@ -236,7 +257,17 @@ class Export:
                 if field.path in self.filter_fields
             ]
 
+        # Collect all the sections regardless if they contain any fields
         all_sections = {}
+        for version in self.versions.values():
+            all_sections.update(version.sections)
+
+        # {section: [field_object, field_object, …], …}
+        # {section: [field_label, field_label, …], …}
+        # {section: [{column_name: tag_string, …}, …]}
+        section_fields = OrderedDict((s, []) for s in all_sections)
+        section_labels = OrderedDict((s, []) for s in all_sections)
+        section_tags = OrderedDict((s, []) for s in all_sections)
 
         # List of fields we generate ourselves to add at the very end
         # of the field list
@@ -253,7 +284,6 @@ class Export:
                     include_media_url=self.include_media_url,
                 )
             )
-            all_sections[field.section.name] = field.section
 
         for section_name, section in all_sections.items():
             # Append optional additional fields
@@ -266,7 +296,7 @@ class Export:
                 auto_field_names.append('_parent_index')
                 # Add extra fields
                 for copy_field in self.copy_field_names:
-                    auto_field_names.append("_submission_{}".format(copy_field))
+                    auto_field_names.append('_submission_{}'.format(copy_field))
 
         # Flatten field labels and names. Indeed, field.get_labels()
         # and self.names return a list because a multiple select field can
@@ -316,6 +346,7 @@ class Export:
         submission,
         current_section,
         attachments=None,
+        supplemental_details=None,
     ):
 
         # 'current_section' is the name of what will become sheets in xls.
@@ -378,17 +409,46 @@ class Export:
                 if re.match(fr'^.*/{_val}$', f['filename']) is not None
             ]
 
-        def _get_value_from_entry(entry, field):
+        def _get_value_from_supplemental_details(
+            field: FormField, supplemental_details: Dict
+        ) -> Optional[str]:
+            source, name = field.analysis_path
+            _sup_details = supplemental_details.get(source, {})
+
+            if not _sup_details:
+                return
+
+            # The names for translation and transcript fields are in the format
+            # of `translated_<language code>` which must be stripped to get the
+            # value from the supplemental details dict
+            if _name := re.match(r'^(translation|transcript)_', name):
+                name = _name.groups()[0]
+
+            val = _sup_details.get(name)
+            if val is None:
+                return ''
+
+            return val
+
+        def _get_value_from_entry(
+            entry: Dict, field: FormField, supplemental_details: Dict
+        ) -> Optional[str]:
+            if field.analysis_question and supplemental_details:
+                return _get_value_from_supplemental_details(
+                    field, supplemental_details
+                )
+
             suffix = 'meta/' if field.data_type == 'audit' else ''
             return entry.get(f'{suffix}{field.path}')
+
+        if self.analysis_form:
+            _fields = self.analysis_form.insert_analysis_fields(_fields)
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
         if self.filter_fields:
             _fields = tuple(
-                field
-                for field in current_section.fields.values()
-                if field.path in self.filter_fields
+                field for field in _fields if field.path in self.filter_fields
             )
 
         # 'rows' will contain all the formatted entries for the current
@@ -419,13 +479,17 @@ class Export:
             row.update(_empty_row)
 
             attachments = entry.get('_attachments') or attachments
+            supplemental_details = (
+                entry.get('_supplementalDetails') or supplemental_details
+            )
 
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
-
                     # get submission value for this field
-                    val = _get_value_from_entry(entry, field)
+                    val = _get_value_from_entry(
+                        entry, field, supplemental_details
+                    )
                     # get the attachment for this field
                     attachment = _get_attachment(val, field, attachments)
                     # get a mapping of {"col_name": "val", ...}
@@ -435,15 +499,22 @@ class Export:
                         multiple_select=self.multiple_select,
                         xls_types_as_text=self.xls_types_as_text,
                         attachment=attachment,
-                        include_media_url=self.include_media_url
+                        include_media_url=self.include_media_url,
                     )
 
                     # save fields value if they match parent mapping fields.
                     # Useful to map children to their parent when flattening groups.
                     if field.path in self.copy_field_names:
-                        if _section_name not in self.__r_groups_submission_mapping_values:
-                            self.__r_groups_submission_mapping_values[_section_name] = {}
-                        self.__r_groups_submission_mapping_values[_section_name].update(cells)
+                        if (
+                            _section_name
+                            not in self.__r_groups_submission_mapping_values
+                        ):
+                            self.__r_groups_submission_mapping_values[
+                                _section_name
+                            ] = {}
+                        self.__r_groups_submission_mapping_values[
+                            _section_name
+                        ].update(cells)
 
                     # fill in the canvas
                     row.update(cells)
@@ -461,7 +532,9 @@ class Export:
             if '_parent_table_name' in row:
                 row['_parent_table_name'] = current_section.parent.name
                 row['_parent_index'] = _indexes[row['_parent_table_name']]
-                extra_mapping_values = self.__get_extra_mapping_values(current_section.parent)
+                extra_mapping_values = self.__get_extra_mapping_values(
+                    current_section.parent
+                )
                 if extra_mapping_values:
                     for extra_mapping_field in self.copy_field_names:
                         row[
@@ -480,7 +553,8 @@ class Export:
                     chunk = self.format_one_submission(
                         entry[child_section.path],
                         child_section,
-                        attachments,
+                        attachments=attachments,
+                        supplemental_details=supplemental_details,
                     )
                     for key, value in iter(chunk.items()):
                         if key in chunks:
@@ -528,7 +602,7 @@ class Export:
 
         return d
 
-    def to_csv(self, submissions, sep=";", quote='"'):
+    def to_csv(self, submissions, sep=';', quote='"'):
         """
         Return a generator yielding csv lines.
 
@@ -622,18 +696,25 @@ class Export:
             }
         """
 
+        # Force to text otherwise might fail JSON serializing
+        self.xls_types_as_text = True
+        # Format as summary for multiple select question types
+        self.multiple_select = 'summary'
+
         # Consider the first section only (discard repeating groups)
         first_section_name = get_first_occurrence(self.sections.keys())
         labels = self.labels[first_section_name]
         sections = self.sections[first_section_name]
 
         # Set up some convenient properties when `yield`ing
-        feature_array_preamble = '\n'.join([
-            '{',
-            '"type": "FeatureCollection",',
-            '"name": "{name}",'.format(name=first_section_name),
-            '"features": [',
-        ])
+        feature_array_preamble = '\n'.join(
+            [
+                '{',
+                '"type": "FeatureCollection",',
+                '"name": "{name}",'.format(name=first_section_name),
+                '"features": [',
+            ]
+        )
         feature_array_epilogue = '\n]\n}'
         array_preamble = '[\n'
         array_epilogue = '\n]'
@@ -668,6 +749,10 @@ class Export:
                 f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
             ]
             all_geo_field_names = [f.name for f in all_geo_fields]
+
+            all_geo_field_labels = []
+            for field in all_geo_fields:
+                all_geo_field_labels += field.get_labels(lang=self.lang)
 
             # Iterate through all geo questions and format only those that have
             # been answered
@@ -704,42 +789,22 @@ class Export:
 
                     feature_properties = OrderedDict()
                     for name, label, row_value in zip(sections, labels, row):
-                        # Grab the `Field` object since it holds precious info
-                        # that we need to format the response correctly
-                        filtered_fields = [
-                            f for f in all_fields if f.name == name
-                        ]
-                        if not filtered_fields:
-                            continue
-                        field = filtered_fields[0]
-
                         # Skip all geo fields, including the current one, as
                         # it's unnecessary to repeat in the Feature's
                         # properties. Also skip over fields that are blank
-                        if label in all_geo_field_names or not row_value:
+                        if (
+                            label in all_geo_field_names
+                            or label in all_geo_field_labels
+                            or not row_value
+                        ):
                             continue
 
-                        # Grab the translated label for choice questions if it's
-                        # available.
-                        if hasattr(field, 'choice'):
-                            value_or_none = field.choice.options[row_value][
-                                'labels'
-                            ].get(self.lang)
-                            if value_or_none is None:
-                                value = list(
-                                    field.choice.options[row_value][
-                                        'labels'
-                                    ].values()
-                                )[0]
-                        else:
-                            value = row_value
-
-                        feature_properties.update({label: value})
+                        feature_properties.update({label: row_value})
 
                     feature = {
-                        "type": "Feature",
-                        "geometry": feature_geometry,
-                        "properties": feature_properties,
+                        'type': 'Feature',
+                        'geometry': feature_geometry,
+                        'properties': feature_properties,
                     }
 
                     if flatten:
@@ -798,11 +863,7 @@ class Export:
             # XlsxWriter doesn't have a method like this built in, so we have
             # to keep track of the current row for each sheet
             row_index = sheet_row_positions[sheet_]
-            sheet_.write_row(
-                row=row_index,
-                col=0,
-                data=data
-            )
+            sheet_.write_row(row=row_index, col=0, data=data)
             row_index += 1
             sheet_row_positions[sheet_] = row_index
 
@@ -812,7 +873,8 @@ class Export:
                     sheet_name = sheet_name_mapping[section_name]
                 except KeyError:
                     sheet_name = unique_name_for_xls(
-                        section_name, sheet_name_mapping.values())
+                        section_name, sheet_name_mapping.values()
+                    )
                     sheet_name_mapping[section_name] = sheet_name
                 try:
                     current_sheet = sheets[sheet_name]
@@ -821,8 +883,7 @@ class Export:
                     sheets[sheet_name] = current_sheet
 
                     _append_row_to_sheet(
-                        current_sheet,
-                        self.labels[section_name]
+                        current_sheet, self.labels[section_name]
                     )
 
                     # Include specified tag columns as extra header rows
@@ -840,29 +901,29 @@ class Export:
         Yield lines of and HTML table strings.
         """
 
-        yield "<table>"
+        yield '<table>'
 
         sections = list(self.labels.items())
 
-        yield "<thead>"
+        yield '<thead>'
 
         section, labels = sections[0]
-        yield "<tr><th>" + "</th><th>".join(labels) + "</th></tr>"
+        yield '<tr><th>' + '</th><th>'.join(labels) + '</th></tr>'
 
-        yield "</thead>"
+        yield '</thead>'
 
-        yield "<tbody>"
+        yield '<tbody>'
 
         for chunk in self.parse_submissions(submissions):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
                         row = [str(x) for x in row]
-                        yield "<tr><td>" + "</td><td>".join(row) + "</td></tr>"
+                        yield '<tr><td>' + '</td><td>'.join(row) + '</td></tr>'
 
-        yield "</tbody>"
+        yield '</tbody>'
 
-        yield "</table>"
+        yield '</table>'
 
     def __get_extra_mapping_values(self, section):
         """
@@ -878,7 +939,9 @@ class Export:
         if section:
             values = self.__r_groups_submission_mapping_values.get(section.name)
             if values is None:
-                return self.__get_extra_mapping_values(getattr(section, "parent"))
+                return self.__get_extra_mapping_values(
+                    getattr(section, 'parent')
+                )
             else:
                 return values
 
@@ -921,11 +984,13 @@ class Export:
                     # Even with `multiple_select='summary'`, we can still get
                     # multiple names and labels per question for things like
                     # `FormGPSField` (`geopoint`)
-                    xml_names = field.get_labels(lang=UNSPECIFIED_TRANSLATION,
-                                                 multiple_select='summary')
+                    xml_names = field.get_labels(
+                        lang=UNSPECIFIED_TRANSLATION, multiple_select='summary'
+                    )
                     assert xml_names[0] == field.name
-                    labels = field.get_labels(lang=translation,
-                                              multiple_select='summary')
+                    labels = field.get_labels(
+                        lang=translation, multiple_select='summary'
+                    )
                     for name, label in zip(xml_names, labels):
                         question_dict[name] = {
                             'label': label,
@@ -941,7 +1006,8 @@ class Export:
                 # Convert the question/choice names and labels into SPSS
                 # commands
                 spss_label_commands = spss_labels_from_variables_dict(
-                    question_dict)
+                    question_dict
+                )
                 # Write the SPSS commands into a file for this particular
                 # language
                 title = self.formpack.title
@@ -950,15 +1016,11 @@ class Export:
                         ('', translation, 'SPSS labels.sps')
                     )
                 else:
-                    rest_of_filename = ' - '.join(
-                        ('', 'SPSS labels.sps')
-                    )
+                    rest_of_filename = ' - '.join(('', 'SPSS labels.sps'))
                 # TODO: move this constant
                 MAXIMUM_FILENAME_LENGTH = 240
                 overrun = (
-                    len(title)
-                    + len(rest_of_filename)
-                    - MAXIMUM_FILENAME_LENGTH
+                    len(title) + len(rest_of_filename) - MAXIMUM_FILENAME_LENGTH
                 )
                 if overrun > 0:
                     # TODO: trim the title in a right-to-left-friendly way
@@ -968,5 +1030,6 @@ class Export:
                 z_out.writestr(
                     # `utf-8-sig` includes the BOM, which SPSS needs to
                     # recognize the encoding
-                    filename, spss_label_commands.encode('utf-8-sig')
+                    filename,
+                    spss_label_commands.encode('utf-8-sig'),
                 )

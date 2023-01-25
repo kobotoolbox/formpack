@@ -1,0 +1,118 @@
+{
+  "engines": {
+    "transcript": {
+      "details": "an external service provided by ACME, Inc."
+    }
+  },
+  "additional_fields": [
+    {
+      "type": "transcript",
+      "name": "record_a_note/transcript_en",
+      "path": [
+        "clerk_interactions-record_a_note",
+        "transcript_en"
+      ],
+      "source": "clerk_interactions-record_a_note",
+      "language": "en",
+      "settings": {
+        "mode": "auto",
+        "engine": "engines/acme_1_speech2text"
+      }
+    },
+    {
+      "type": "select_multiple",
+      "select_from_list_name": "record_a_note_tones",
+      "name": "record_a_note/tone_of_voice",
+      "path": [
+        "clerk_interactions-record_a_note",
+        "tone_of_voice"
+      ],
+      "label": [
+        "How was the tone of the clerk's voice?",
+        "Kiel estis la tono de la voĉo de la oficisto?"
+      ],
+      "source": "clerk_interactions-record_a_note"
+    },
+    {
+      "type": "text",
+      "name": "goods_sold/comment",
+      "path": [
+        "clerk_interactions-goods_sold",
+        "comment"
+      ],
+      "label": [
+        "Comment on the goods sold at the store",
+        "Komentu la varojn venditajn en la vendejo"
+      ],
+      "source": "clerk_interactions-goods_sold"
+    },
+    {
+      "type": "select_one",
+      "select_from_list_name": "goods_sold_ratings",
+      "name": "goods_sold/rating",
+      "path": [
+        "clerk_interactions-goods_sold",
+        "rating"
+      ],
+      "label": [
+        "Rate the quality of the goods sold at the store",
+        "Komentu la varojn vendojn en la vendejo"
+      ],
+      "source": "clerk_interactions-goods_sold"
+    }
+  ],
+  "additional_choices": [
+    {
+      "list_name": "goods_sold_ratings",
+      "name": 1,
+      "label": [
+        "Poor quality",
+        "Malbona kvalito"
+      ]
+    },
+    {
+      "list_name": "goods_sold_ratings",
+      "name": 2,
+      "label": [
+        "Average quality",
+        "Meza kvalito"
+      ]
+    },
+    {
+      "list_name": "ratings",
+      "name": 3,
+      "label": [
+        "High quality",
+        "Alta kvalito"
+      ]
+    },
+    {
+      "list_name": "record_a_note_tones",
+      "name": "anxious",
+      "label": [
+        "Anxious",
+        "Maltrankvila"
+      ]
+    },
+    {
+      "list_name": "record_a_note_tones",
+      "name": "excited",
+      "label": [
+        "Excited",
+        "Ekscitita"
+      ]
+    },
+    {
+      "list_name": "record_a_note_tones",
+      "name": "confused",
+      "label": [
+        "Confused",
+        "Konfuzita"
+      ]
+    }
+  ],
+  "translations": [
+    "English (en)",
+    "Esperanto (es)"
+  ]
+}

@@ -1,10 +1,8 @@
 # coding: utf-8
-
-import base64
 from io import BytesIO
 from unittest import TestCase
 
-import xlwt
+import openpyxl
 
 from formpack.constants import KOBO_LOCK_SHEET
 from formpack.utils.kobo_locking import (
@@ -46,16 +44,17 @@ class TestKoboLocking(TestCase):
             ['form_meta_edit', '', '', ''],
         ]
 
-    def _construct_xls_for_import(self, sheet_name, sheet_content):
-        workbook_to_import = xlwt.Workbook()
-        worksheet = workbook_to_import.add_sheet(sheet_name)
+    def _construct_xlsx_for_import(self, sheet_name, sheet_content):
+        workbook_to_import = openpyxl.workbook.Workbook()
+        worksheet = workbook_to_import.create_sheet(sheet_name)
         for row_num, row_list in enumerate(sheet_content):
             for col_num, cell_value in enumerate(row_list):
-                worksheet.write(row_num, col_num, cell_value)
-        xls_import_io = BytesIO()
-        workbook_to_import.save(xls_import_io)
-        xls_import_io.seek(0)
-        return xls_import_io
+                if cell_value and cell_value is not None:
+                    worksheet.cell(row_num + 1, col_num + 1).value = cell_value
+        xlsx_import_io = BytesIO()
+        workbook_to_import.save(xlsx_import_io)
+        xlsx_import_io.seek(0)
+        return xlsx_import_io
 
     def test_get_kobo_locking_profiles(self):
         expected_locking_profiles = [
@@ -112,7 +111,7 @@ class TestKoboLocking(TestCase):
             },
         ]
 
-        xls = self._construct_xls_for_import(
+        xls = self._construct_xlsx_for_import(
             KOBO_LOCK_SHEET, self.locking_profiles
         )
         actual_locking_profiles = get_kobo_locking_profiles(xls)
@@ -204,7 +203,7 @@ class TestKoboLocking(TestCase):
             {'restriction': 'form_appearance', 'core': 'locked'},
             {'restriction': 'form_meta_edit'},
         ]
-        xls = self._construct_xls_for_import(
+        xls = self._construct_xlsx_for_import(
             KOBO_LOCK_SHEET, self.locking_profiles
         )
         actual_reverted_locks = {
@@ -284,9 +283,7 @@ class TestKoboLocking(TestCase):
 
     def test_no_locking_profiles_raises_exception(self):
         no_profiles = [[row[0]] for row in self.locking_profiles]
-        xls = self._construct_xls_for_import(
-            KOBO_LOCK_SHEET, no_profiles
-        )
+        xls = self._construct_xlsx_for_import(KOBO_LOCK_SHEET, no_profiles)
         try:
             get_kobo_locking_profiles(xls)
         except FormPackLibraryLockingError as e:
@@ -295,9 +292,7 @@ class TestKoboLocking(TestCase):
     def test_locking_profile_name_is_locked_raises_exception(self):
         locking_profiles = self.locking_profiles
         locking_profiles[0][1] = 'locked'
-        xls = self._construct_xls_for_import(
-            KOBO_LOCK_SHEET, locking_profiles
-        )
+        xls = self._construct_xlsx_for_import(KOBO_LOCK_SHEET, locking_profiles)
         try:
             get_kobo_locking_profiles(xls)
         except FormPackLibraryLockingError as e:
@@ -305,10 +300,10 @@ class TestKoboLocking(TestCase):
 
     def test_invalid_restriction_raises_exception(self):
         locking_profiles = self.locking_profiles
-        locking_profiles.append(['invalid_restriction', 'locked', 'locked', 'locked'])
-        xls = self._construct_xls_for_import(
-            KOBO_LOCK_SHEET, locking_profiles
+        locking_profiles.append(
+            ['invalid_restriction', 'locked', 'locked', 'locked']
         )
+        xls = self._construct_xlsx_for_import(KOBO_LOCK_SHEET, locking_profiles)
         try:
             get_kobo_locking_profiles(xls)
         except FormPackLibraryLockingError as e:
@@ -317,11 +312,8 @@ class TestKoboLocking(TestCase):
     def test_restriction_column_missing_raises_exception(self):
         locking_profiles = self.locking_profiles
         locking_profiles[0][0] = 'something_other_than_restriction'
-        xls = self._construct_xls_for_import(
-            KOBO_LOCK_SHEET, locking_profiles
-        )
+        xls = self._construct_xlsx_for_import(KOBO_LOCK_SHEET, locking_profiles)
         try:
             get_kobo_locking_profiles(xls)
         except FormPackLibraryLockingError as e:
             assert str(e) == 'The column name `restriction` must be present.'
-

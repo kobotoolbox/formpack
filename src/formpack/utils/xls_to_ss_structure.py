@@ -1,8 +1,10 @@
 # coding: utf-8
 import datetime
 import re
-import xlrd
 from collections import OrderedDict
+
+import openpyxl
+import xlrd
 
 from .replace_aliases import kobo_specific_sub
 
@@ -11,10 +13,12 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
     """
     The goal: Convert an XLS file object to a python object.
 
-    This draws on code from `pyxform.xls2json_backends` and `convert_file_to_csv_string`, however
-    this works as it is expected (does not add extra sheets or perform misc conversions which are
-    a part of `pyxform.xls2json_backends.xls_to_dict`.)
+    This draws on code from `pyxform.xls2json_backends` and
+    `convert_file_to_csv_string`, however this works as it is expected (does
+    not add extra sheets or perform misc conversions which are a part of
+    `pyxform.xls2json_backends.xls_to_dict`.)
     """
+
     def _iswhitespace(string):
         return isinstance(string, str) and len(string.strip()) == 0
 
@@ -38,7 +42,8 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
             # raise Exception(
             #   "Cannot handle excel formatted date at " + error_location)
             datetime_or_time_only = xlrd.xldate_as_tuple(
-                value, workbook.datemode)
+                value, workbook.datemode
+            )
             if datetime_or_time_only[:3] == (0, 0, 0):
                 # must be time only
                 return str(datetime.time(*datetime_or_time_only[3:]))
@@ -64,10 +69,12 @@ def xls_to_lists(xls_file_object, strip_empty_rows=True):
                 if isinstance(value, str):
                     value = _escape_newline_chars(value.strip())
                 if (value is not None) and (not _iswhitespace(value)):
-                    value = xls_value_to_unicode(value, sheet.cell_type(row, col))
-                if value != "":
+                    value = xls_value_to_unicode(
+                        value, sheet.cell_type(row, col)
+                    )
+                if value != '':
                     row_empty = False
-                if value == "":
+                if value == '':
                     value = None
                 row_results.append(value)
             if not strip_empty_rows or not row_empty:
@@ -117,4 +124,92 @@ def xls_to_dicts(xls_file_object, strip_empty_rows=True):
     out = OrderedDict()
     for key, sheet in lists.items():
         out[key] = _parsed_sheet(sheet)
+    return out
+
+
+def xlsx_to_lists(xls_file_object, strip_empty_rows=True):
+    """
+    Convert an XLSX file object to a python object.
+    """
+
+    workbook = openpyxl.load_workbook(xls_file_object)
+
+    def is_empty(value):
+        if value is None:
+            return True
+        elif isinstance(value, str) and value.strip() == '':
+            return True
+        else:
+            return False
+
+    def xlsx_value_to_str(value):
+        """
+        Take a xlsx formatted value and try to make a string representation.
+        """
+        if value is True:
+            return 'TRUE'
+        elif value is False:
+            return 'FALSE'
+        elif isinstance(value, float) and value.is_integer():
+            # Try to display as an int if possible.
+            return str(int(value))
+        elif isinstance(value, (int, datetime.datetime, datetime.time)):
+            return str(value)
+        else:
+            # ensure unicode and replace nbsp spaces with normal ones
+            # to avoid this issue:
+            # https://github.com/modilabs/pyxform/issues/83
+            return str(value).replace(chr(160), ' ')
+
+    def xlsx_to_dict_normal_sheet(sheet):
+
+        # Check for duplicate column headers
+        column_header_list = list()
+        for cell in sheet[1]:
+            column_header = cell.value
+            # xls file with 3 columns mostly have a 3 more columns that are
+            # blank by default or something, skip during check
+            if is_empty(column_header):
+                # Preserve column order (will filter later)
+                column_header_list.append(None)
+            else:
+                clean_header = re.sub(r'( )+', ' ', column_header.strip())
+                column_header_list.append(clean_header)
+
+        result = []
+        for row in sheet.iter_rows(min_row=2):
+            row_dict = OrderedDict()
+            for column, key in enumerate(column_header_list):
+                if key is None:
+                    continue
+
+                value = row[column].value
+                if isinstance(value, str):
+                    value = value.strip()
+
+                if not is_empty(value):
+                    row_dict[key] = xlsx_value_to_str(value)
+
+            result.append(row_dict)
+
+        return result
+
+    result = OrderedDict()
+    for sheetname in workbook.sheetnames:
+        sheet = workbook[sheetname]
+        sheetname = kobo_specific_sub(sheetname)
+        result[sheetname] = xlsx_to_dict_normal_sheet(sheet)
+
+    return result
+
+
+def xlsx_to_dicts(xlsx_file_object, strip_empty_rows=True):
+    """
+    outputs an ordered dict of (sheetname, sheet_contents)
+    where sheet_contents is a list of ordered_dicts
+    """
+    lists = xlsx_to_lists(xlsx_file_object)
+    out = OrderedDict()
+    for key, sheet in lists.items():
+        out[key] = sheet
     return out

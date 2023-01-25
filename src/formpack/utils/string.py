@@ -6,25 +6,27 @@ import unicodedata
 from functools import total_ordering
 
 from ..constants import (
-    EXCEL_SHEET_NAME_SIZE_LIMIT, EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
+    EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS,
+    EXCEL_SHEET_NAME_SIZE_LIMIT,
 )
 
 
 def randstr(n):
-    return ''.join(random.choice(string.ascii_lowercase + string.digits)
-                   for _ in range(n))
+    return ''.join(
+        random.choice(string.ascii_lowercase + string.digits) for _ in range(n)
+    )
 
 
 # TODO: use a lib for that such as minibelt or ww
 def normalize(str_):
     r"""
-        Returns a new string withou non ASCII characters, trying to replace
-        them with their ASCII closest counter parts when possible.
-        :Example:
-            >>> normalize(u"H\xe9ll\xf8 W\xc3\xb6rld")
-            'Hell World'
-        This version use unicodedata and provide limited yet
-        useful results.
+    Returns a new string withou non ASCII characters, trying to replace
+    them with their ASCII closest counter parts when possible.
+    :Example:
+        >>> normalize(u"H\xe9ll\xf8 W\xc3\xb6rld")
+        'Hell World'
+    This version use unicodedata and provide limited yet
+    useful results.
     """
     str_ = unicodedata.normalize('NFKD', str_).encode('ascii', 'ignore')
     return str_.decode('ascii')
@@ -43,9 +45,9 @@ def slugify(str_, separator=r'-'):
     """
 
     str_ = normalize(str_)
-    str_ = re.sub(r'[^\w\s' + separator + ']', '', str_, flags=re.U)
+    str_ = re.sub(rf'[^\w\s{separator}]', '', str_, flags=re.U)
     str_ = str_.strip().lower()
-    return re.sub(r'[' + separator + '\s]+', separator, str_, flags=re.U)
+    return re.sub(rf'[{separator}\s]+', separator, str_, flags=re.U)
 
 
 def ellipsize(s, max_len, ellipsis='...'):
@@ -61,7 +63,8 @@ def ellipsize(s, max_len, ellipsis='...'):
     ellipsis_len = len(ellipsis)
     if max_len < ellipsis_len:
         raise Exception(
-            '`max_len` cannot be less than the length of `ellipsis`')
+            '`max_len` cannot be less than the length of `ellipsis`'
+        )
     if in_len > max_len:
         slice_end = max_len - ellipsis_len
         return s[:slice_end] + ellipsis
@@ -82,17 +85,19 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
         'This string has more tha... (1)'
     """
 
-    sheet_name = sheet_name.translate({
-        ord(c): '_' for c in EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS
-    })
+    sheet_name = sheet_name.translate(
+        {ord(c): '_' for c in EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS}
+    )
 
     candidate = ellipsize(
-        sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, base_ellipsis)
+        sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, base_ellipsis
+    )
     i = 1
     while candidate in other_sheet_names:
         candidate = ellipsize(
-            sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, '{} ({})'.format(
-                base_ellipsis, i)
+            sheet_name,
+            EXCEL_SHEET_NAME_SIZE_LIMIT,
+            '{} ({})'.format(base_ellipsis, i),
         )
         i += 1
     return candidate
@@ -108,6 +113,7 @@ def orderable_with_none(k):
     >>> [None, '', 'En']
 
     """
+
     class OrderableNone:
         @total_ordering
         class __OrderableNone:

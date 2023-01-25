@@ -1,5 +1,4 @@
 # coding: utf-8
-import csv
 import json
 import unittest
 from collections import OrderedDict
@@ -8,17 +7,15 @@ from io import BytesIO, TextIOWrapper
 from textwrap import dedent
 from zipfile import ZipFile
 
-import xlrd
+import openpyxl
 from path import TempDir
 
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
+from formpack.errors import TranslationError
 from formpack.schema.fields import (
     ValidationStatusCopyField,
     IdCopyField,
-    SubmissionTimeCopyField,
-    TagsCopyField,
-    NotesCopyField,
 )
 from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture, open_fixture_file
@@ -39,16 +36,18 @@ class TestFormPackExport(unittest.TestCase):
 
         forms = FormPack(schemas, title)
         export = forms.export().to_dict(submissions)
-        expected = OrderedDict({
-                    "Customer Satisfaction": {
-                        'fields': ["restaurant_name", "customer_enjoyment"],
-                        'data': [
-                            ["Felipes", "yes"],
-                            ["Dunkin Donuts", "no"],
-                            ["McDonalds", "no"]
-                        ]
-                    }
-               })
+        expected = OrderedDict(
+            {
+                'Customer Satisfaction': {
+                    'fields': ['restaurant_name', 'customer_enjoyment'],
+                    'data': [
+                        ['Felipes', 'yes'],
+                        ['Dunkin Donuts', 'no'],
+                        ['McDonalds', 'no'],
+                    ],
+                }
+            }
+        )
 
         self.assertEqual(export, expected)
 
@@ -60,17 +59,21 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(len(fp[0].translations), 1)
 
         export = fp.export(lang=UNTRANSLATED).to_dict(submissions)
-        expected = OrderedDict({
-                    "Customer Satisfaction": {
-                        'fields': ["Restaurant name",
-                                   "Did you enjoy your dining experience?"],
-                        'data': [
-                            ["Felipes", "Yes"],
-                            ["Dunkin Donuts", "No"],
-                            ["McDonalds", "No"]
-                        ]
-                    }
-               })
+        expected = OrderedDict(
+            {
+                'Customer Satisfaction': {
+                    'fields': [
+                        'Restaurant name',
+                        'Did you enjoy your dining experience?',
+                    ],
+                    'data': [
+                        ['Felipes', 'Yes'],
+                        ['Dunkin Donuts', 'No'],
+                        ['McDonalds', 'No'],
+                    ],
+                }
+            }
+        )
 
         self.assertDictEqual(export, expected)
 
@@ -83,13 +86,20 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(len(fp[1].translations), 2)
 
         # by default, exports use the question 'name' attribute
-        headers = fp.export(versions=0).to_dict(submissions)['Restaurant profile']['fields']
-        self.assertEqual(headers, ['restaurant_name',
-                                     'location',
-                                     '_location_latitude',
-                                     '_location_longitude',
-                                     '_location_altitude',
-                                     '_location_precision'])
+        headers = fp.export(versions=0).to_dict(submissions)[
+            'Restaurant profile'
+        ]['fields']
+        self.assertEqual(
+            headers,
+            [
+                'restaurant_name',
+                'location',
+                '_location_latitude',
+                '_location_longitude',
+                '_location_altitude',
+                '_location_precision',
+            ],
+        )
 
         # the first translation in the list is the translation that
         # appears first in the column list. in this case, 'label::english'
@@ -97,33 +107,48 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(lang=translations[0], versions=1)
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEqual(headers, ['restaurant name',
-                                    'location',
-                                    '_location_latitude',
-                                    '_location_longitude',
-                                    '_location_altitude',
-                                    '_location_precision'])
+        self.assertEqual(
+            headers,
+            [
+                'restaurant name',
+                'location',
+                '_location_latitude',
+                '_location_longitude',
+                '_location_altitude',
+                '_location_precision',
+            ],
+        )
 
         export = fp.export(lang=translations[1], versions=1)
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEqual(headers, ['nom du restaurant',
-                                    'lieu',
-                                    '_lieu_latitude',
-                                    '_lieu_longitude',
-                                    '_lieu_altitude',
-                                    '_lieu_precision'])
+        self.assertEqual(
+            headers,
+            [
+                'nom du restaurant',
+                'lieu',
+                '_lieu_latitude',
+                '_lieu_longitude',
+                '_lieu_altitude',
+                '_lieu_precision',
+            ],
+        )
 
         # TODO: make a separate test to test to test __getitem__
         export = fp.export(lang=UNTRANSLATED, versions='rpv1')
         data = export.to_dict(submissions)
         headers = data['Restaurant profile']['fields']
-        self.assertEqual(headers, ['restaurant name',
-                                    'location',
-                                    '_location_latitude',
-                                    '_location_longitude',
-                                    '_location_altitude',
-                                    '_location_precision'])
+        self.assertEqual(
+            headers,
+            [
+                'restaurant name',
+                'location',
+                '_location_latitude',
+                '_location_longitude',
+                '_location_altitude',
+                '_location_precision',
+            ],
+        )
 
     def test_export_with_choice_lists(self):
 
@@ -135,63 +160,95 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'rpV3'}
 
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEqual(export['fields'], ['restaurant_name',
-                                             'location',
-                                             '_location_latitude',
-                                             '_location_longitude',
-                                             '_location_altitude',
-                                             '_location_precision',
-                                             'eatery_type'])
-        self.assertEqual(export['data'], [['Taco Truck',
-                                             '13.42 -25.43',
-                                             '13.42',
-                                             '-25.43',
-                                             '',
-                                             '',
-                                             'takeaway'],
-                                            ['Harvest',
-                                             '12.43 -24.53',
-                                             '12.43',
-                                             '-24.53',
-                                             '',
-                                             '',
-                                             'sit_down']])
+        self.assertEqual(
+            export['fields'],
+            [
+                'restaurant_name',
+                'location',
+                '_location_latitude',
+                '_location_longitude',
+                '_location_altitude',
+                '_location_precision',
+                'eatery_type',
+            ],
+        )
+        self.assertEqual(
+            export['data'],
+            [
+                [
+                    'Taco Truck',
+                    '13.42 -25.43',
+                    '13.42',
+                    '-25.43',
+                    '',
+                    '',
+                    'takeaway',
+                ],
+                [
+                    'Harvest',
+                    '12.43 -24.53',
+                    '12.43',
+                    '-24.53',
+                    '',
+                    '',
+                    'sit_down',
+                ],
+            ],
+        )
 
         # if a language is passed, fields with available translations
         # are translated into that language
         options['lang'] = fp[1].translations[0]
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEqual(export['data'], [['Taco Truck',
-                                             '13.42 -25.43',
-                                             '13.42',
-                                             '-25.43',
-                                             '',
-                                             '',
-                                             'take-away'],
-                                            ['Harvest',
-                                             '12.43 -24.53',
-                                             '12.43',
-                                             '-24.53',
-                                             '',
-                                             '',
-                                             'sit down']])
+        self.assertEqual(
+            export['data'],
+            [
+                [
+                    'Taco Truck',
+                    '13.42 -25.43',
+                    '13.42',
+                    '-25.43',
+                    '',
+                    '',
+                    'take-away',
+                ],
+                [
+                    'Harvest',
+                    '12.43 -24.53',
+                    '12.43',
+                    '-24.53',
+                    '',
+                    '',
+                    'sit down',
+                ],
+            ],
+        )
 
         options['lang'] = fp[1].translations[1]
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
-        self.assertEqual(export['data'], [['Taco Truck',
-                                             '13.42 -25.43',
-                                             '13.42',
-                                             '-25.43',
-                                             '',
-                                             '',
-                                             'avec vente à emporter'],
-                                            ['Harvest',
-                                             '12.43 -24.53',
-                                             '12.43',
-                                             '-24.53',
-                                             '',
-                                             '',
-                                             'traditionnel']])
+        self.assertEqual(
+            export['data'],
+            [
+                [
+                    'Taco Truck',
+                    '13.42 -25.43',
+                    '13.42',
+                    '-25.43',
+                    '',
+                    '',
+                    'avec vente à emporter',
+                ],
+                [
+                    'Harvest',
+                    '12.43 -24.53',
+                    '12.43',
+                    '-24.53',
+                    '',
+                    '',
+                    'traditionnel',
+                ],
+            ],
+        )
 
     def test_headers_of_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_questions')
@@ -201,16 +258,20 @@ class TestFormPackExport(unittest.TestCase):
         # by default, groups are stripped.
         export = fp.export(**options).to_dict(submissions)
         headers = export['Grouped questions']['fields']
-        self.assertEqual(headers, ['q1', 'g1q1', 'g1sg1q1',
-                                    'g1q2', 'g2q1', 'qz'])
+        self.assertEqual(
+            headers, ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz']
+        )
 
     def test_headers_of_translated_group_exports(self):
         title, schemas, submissions = build_fixture('grouped_translated')
         fp = FormPack(schemas, title)
         options = {
-            'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
+            'versions': 'grouped_translated_v1',
+            'hierarchy_in_labels': True,
+        }
         english_export = fp.export(lang='English', **options).to_dict(
-            submissions)
+            submissions
+        )
         self.assertEqual(
             english_export[title]['fields'],
             [
@@ -223,10 +284,11 @@ class TestFormPackExport(unittest.TestCase):
                 'External Characteristics/How many segments does your body have?',
                 'Do you have body fluids that occupy intracellular space?',
                 'Do you descend from an ancestral unicellular organism?',
-            ]
+            ],
         )
         spanish_export = fp.export(lang='Español', **options).to_dict(
-            submissions)
+            submissions
+        )
         self.assertEqual(
             spanish_export[title]['fields'],
             [
@@ -239,7 +301,7 @@ class TestFormPackExport(unittest.TestCase):
                 'Características externas/¿Cuántos segmentos tiene tu cuerpo?',
                 '¿Tienes fluidos corporales que ocupan espacio intracelular?',
                 '¿Desciende de un organismo unicelular ancestral?',
-            ]
+            ],
         )
 
     def assertDictEquals(self, arg1, arg2):
@@ -252,177 +314,277 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'gqs'}
 
         export = fp.export(**options).to_dict(submissions)['Grouped questions']
-        self.assertDictEquals(export['fields'], ['q1', 'g1q1', 'g1sg1q1',
-                                             'g1q2', 'g2q1', 'qz'])
-        self.assertDictEquals(export['data'], [['respondent1\'s r1',
-                                            'respondent1\'s r2',
-                                            'respondent1\'s r2.5',
-                                            'respondent1\'s r2.75 :)',
-                                            'respondent1\'s r3',
-                                            'respondent1\'s r4'],
-                                           ['respondent2\'s r1',
-                                            'respondent2\'s r2',
-                                            'respondent2\'s r2.5',
-                                            'respondent2\'s r2.75 :)',
-                                            'respondent2\'s r3',
-                                            'respondent2\'s r4']])
+        self.assertDictEquals(
+            export['fields'], ['q1', 'g1q1', 'g1sg1q1', 'g1q2', 'g2q1', 'qz']
+        )
+        self.assertDictEquals(
+            export['data'],
+            [
+                [
+                    'respondent1\'s r1',
+                    'respondent1\'s r2',
+                    'respondent1\'s r2.5',
+                    'respondent1\'s r2.75 :)',
+                    'respondent1\'s r3',
+                    'respondent1\'s r4',
+                ],
+                [
+                    'respondent2\'s r1',
+                    'respondent2\'s r2',
+                    'respondent2\'s r2.5',
+                    'respondent2\'s r2.75 :)',
+                    'respondent2\'s r3',
+                    'respondent2\'s r4',
+                ],
+            ],
+        )
 
         options['hierarchy_in_labels'] = '/'
         export = fp.export(**options).to_dict(submissions)['Grouped questions']
-        self.assertDictEquals(export['fields'], ['q1',
-                                             'g1/g1q1',
-                                             'g1/sg1/g1sg1q1',
-                                             'g1/g1q2',
-                                             'g2/g2q1',
-                                             'qz'])
-        self.assertDictEquals(export['data'], [['respondent1\'s r1',
-                                            'respondent1\'s r2',
-                                            'respondent1\'s r2.5',
-                                            'respondent1\'s r2.75 :)',
-                                            'respondent1\'s r3',
-                                            'respondent1\'s r4'],
-                                           ['respondent2\'s r1',
-                                            'respondent2\'s r2',
-                                            'respondent2\'s r2.5',
-                                            'respondent2\'s r2.75 :)',
-                                            'respondent2\'s r3',
-                                            'respondent2\'s r4']])
+        self.assertDictEquals(
+            export['fields'],
+            ['q1', 'g1/g1q1', 'g1/sg1/g1sg1q1', 'g1/g1q2', 'g2/g2q1', 'qz'],
+        )
+        self.assertDictEquals(
+            export['data'],
+            [
+                [
+                    'respondent1\'s r1',
+                    'respondent1\'s r2',
+                    'respondent1\'s r2.5',
+                    'respondent1\'s r2.75 :)',
+                    'respondent1\'s r3',
+                    'respondent1\'s r4',
+                ],
+                [
+                    'respondent2\'s r1',
+                    'respondent2\'s r2',
+                    'respondent2\'s r2.5',
+                    'respondent2\'s r2.75 :)',
+                    'respondent2\'s r3',
+                    'respondent2\'s r4',
+                ],
+            ],
+        )
+
+    def test_translations_labels_mismatch(self):
+        title, schemas, submissions = build_fixture(
+            'translations_labels_mismatch'
+        )
+        with self.assertRaises(TranslationError):
+            FormPack(schemas, title)
+
+    def test_simple_nested_grouped_repeatable(self):
+        title, schemas, submissions = build_fixture(
+            'simple_nested_grouped_repeatable'
+        )
+        fp = FormPack(schemas, title)
+        options = {'versions': fp.versions}
+        export = fp.export(**options)
+        actual_dict = export.to_dict(submissions)
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Simple nested grouped repeatable',
+                    {'data': [[1], [2]], 'fields': ['_index']},
+                ),
+                (
+                    'cities',
+                    {
+                        'data': [
+                            [1, 'Simple nested grouped repeatable', 1],
+                            [2, 'Simple nested grouped repeatable', 2],
+                        ],
+                        'fields': [
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                    },
+                ),
+                (
+                    'respondents',
+                    {
+                        'data': [
+                            ['Caesar', '', 'cities', 1],
+                            ['Augustus', '', 'cities', 1],
+                            ['Caesar', '55', 'cities', 2],
+                            ['Augustus', '75', 'cities', 2],
+                        ],
+                        'fields': [
+                            'respondent_name',
+                            'respondent_age',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                    },
+                ),
+                (
+                    'items',
+                    {
+                        'data': [
+                            ['Sword', 'cities', 2],
+                            ['Thrown', 'cities', 2],
+                        ],
+                        'fields': [
+                            'item',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                    },
+                ),
+            ]
+        )
+
+        assert 4 == len(actual_dict)
+        assert expected_dict == actual_dict
+
+        with TempDir() as d:
+            xls = d / 'foo.xlsx'
+            export.to_xlsx(xls, submissions)
+            assert xls.isfile()
 
     def test_repeats(self):
         title, schemas, submissions = build_fixture('grouped_repeatable')
         fp = FormPack(schemas, title)
         options = {'versions': 'rgv1'}
         export = fp.export(**options).to_dict(submissions)
-        self.assertEqual(export, OrderedDict([
-                            ('Household survey with repeatable groups',
-                                {
-                                    'fields': [
-                                        'start',
-                                        'end',
-                                        'household_location',
-                                        '_index'
-                                    ],
-                                    'data': [
-                                        [
-                                            '2016-03-14T14:15:48.000-04:00',
-                                            '2016-03-14T14:18:35.000-04:00',
-                                            'montreal',
-                                            1
-                                        ],
-                                        [
-                                            '2016-03-14T14:14:10.000-04:00',
-                                            '2016-03-14T14:15:48.000-04:00',
-                                            'marseille',
-                                            2
-                                        ],
-                                        [
-                                            '2016-03-14T14:13:53.000-04:00',
-                                            '2016-03-14T14:14:10.000-04:00',
-                                            'rocky mountains',
-                                            3
-                                        ],
-                                        [
-                                            '2016-03-14T14:12:54.000-04:00',
-                                            '2016-03-14T14:13:53.000-04:00',
-                                            'toronto',
-                                            4
-                                        ],
-                                        [
-                                            '2016-03-14T14:18:35.000-04:00',
-                                            '2016-03-14T15:19:20.000-04:00',
-                                            'new york',
-                                            5
-                                        ],
-                                        [
-                                            '2016-03-14T14:11:25.000-04:00',
-                                            '2016-03-14T14:12:03.000-04:00',
-                                            'boston',
-                                            6
-                                        ]
-                                    ]
-                                }),
-                            ('houshold_member_repeat',
-                                {
-                                    'fields': [
-                                        'household_member_name',
-                                        '_parent_table_name',
-                                        '_parent_index'
-                                    ],
-                                    'data': [
-                                        [
-                                            'peter',
-                                            'Household survey with repeatable groups',
-                                            1
-                                        ],
-                                        [
-                                            'kyle',
-                                            'Household survey with repeatable groups',
-                                            2
-                                        ],
-                                        [
-                                            'linda',
-                                            'Household survey with repeatable groups',
-                                            2
-                                        ],
-                                        [
-                                            'morty',
-                                            'Household survey with repeatable groups',
-                                            3
-                                        ],
-                                        [
-                                            'tony',
-                                            'Household survey with repeatable groups',
-                                            4
-                                        ],
-                                        [
-                                            'mary',
-                                            'Household survey with repeatable groups',
-                                            4
-                                        ],
-                                        [
-                                            'emma',
-                                            'Household survey with repeatable groups',
-                                            5
-                                        ],
-                                        [
-                                            'parker',
-                                            'Household survey with repeatable groups',
-                                            5
-                                        ],
-                                        [
-                                            'amadou',
-                                            'Household survey with repeatable groups',
-                                            6
-                                        ],
-                                        [
-                                            'esteban',
-                                            'Household survey with repeatable groups',
-                                            6
-                                        ],
-                                        [
-                                            'suzie',
-                                            'Household survey with repeatable groups',
-                                            6
-                                        ],
-                                        [
-                                            'fiona',
-                                            'Household survey with repeatable groups',
-                                            6
-                                        ],
-                                        [
-                                            'phillip',
-                                            'Household survey with repeatable groups',
-                                            6
-                                        ]
-                                    ]
-                                })
-                            ])
+        self.assertEqual(
+            export,
+            OrderedDict(
+                [
+                    (
+                        'Household survey with repeatable groups',
+                        {
+                            'fields': [
+                                'start',
+                                'end',
+                                'household_location',
+                                '_index',
+                            ],
+                            'data': [
+                                [
+                                    '2016-03-14T14:15:48.000-04:00',
+                                    '2016-03-14T14:18:35.000-04:00',
+                                    'montreal',
+                                    1,
+                                ],
+                                [
+                                    '2016-03-14T14:14:10.000-04:00',
+                                    '2016-03-14T14:15:48.000-04:00',
+                                    'marseille',
+                                    2,
+                                ],
+                                [
+                                    '2016-03-14T14:13:53.000-04:00',
+                                    '2016-03-14T14:14:10.000-04:00',
+                                    'rocky mountains',
+                                    3,
+                                ],
+                                [
+                                    '2016-03-14T14:12:54.000-04:00',
+                                    '2016-03-14T14:13:53.000-04:00',
+                                    'toronto',
+                                    4,
+                                ],
+                                [
+                                    '2016-03-14T14:18:35.000-04:00',
+                                    '2016-03-14T15:19:20.000-04:00',
+                                    'new york',
+                                    5,
+                                ],
+                                [
+                                    '2016-03-14T14:11:25.000-04:00',
+                                    '2016-03-14T14:12:03.000-04:00',
+                                    'boston',
+                                    6,
+                                ],
+                            ],
+                        },
+                    ),
+                    (
+                        'houshold_member_repeat',
+                        {
+                            'fields': [
+                                'household_member_name',
+                                '_parent_table_name',
+                                '_parent_index',
+                            ],
+                            'data': [
+                                [
+                                    'peter',
+                                    'Household survey with repeatable groups',
+                                    1,
+                                ],
+                                [
+                                    'kyle',
+                                    'Household survey with repeatable groups',
+                                    2,
+                                ],
+                                [
+                                    'linda',
+                                    'Household survey with repeatable groups',
+                                    2,
+                                ],
+                                [
+                                    'morty',
+                                    'Household survey with repeatable groups',
+                                    3,
+                                ],
+                                [
+                                    'tony',
+                                    'Household survey with repeatable groups',
+                                    4,
+                                ],
+                                [
+                                    'mary',
+                                    'Household survey with repeatable groups',
+                                    4,
+                                ],
+                                [
+                                    'emma',
+                                    'Household survey with repeatable groups',
+                                    5,
+                                ],
+                                [
+                                    'parker',
+                                    'Household survey with repeatable groups',
+                                    5,
+                                ],
+                                [
+                                    'amadou',
+                                    'Household survey with repeatable groups',
+                                    6,
+                                ],
+                                [
+                                    'esteban',
+                                    'Household survey with repeatable groups',
+                                    6,
+                                ],
+                                [
+                                    'suzie',
+                                    'Household survey with repeatable groups',
+                                    6,
+                                ],
+                                [
+                                    'fiona',
+                                    'Household survey with repeatable groups',
+                                    6,
+                                ],
+                                [
+                                    'phillip',
+                                    'Household survey with repeatable groups',
+                                    6,
+                                ],
+                            ],
+                        },
+                    ),
+                ]
+            ),
         )
 
     def test_select_one_legacy(self):
-        title, schemas, submissions = build_fixture(
-            'select_one_legacy'
-        )
+        title, schemas, submissions = build_fixture('select_one_legacy')
         fp = FormPack(schemas, title)
         options = {'versions': 'romev1'}
         export = fp.export(**options).to_dict(submissions)
@@ -454,9 +616,7 @@ class TestFormPackExport(unittest.TestCase):
     def test_media_types_include_media_url(self):
         # need to make sure that filenames such as "another-julius 1).jpg"
         # don't break the export
-        title, schemas, submissions = build_fixture(
-            'media_types'
-        )
+        title, schemas, submissions = build_fixture('media_types')
         fp = FormPack(schemas, title)
         options = {'versions': 'romev1', 'include_media_url': True}
         export = fp.export(**options).to_dict(submissions)
@@ -501,9 +661,7 @@ class TestFormPackExport(unittest.TestCase):
         assert export == expected_dict
 
     def test_media_types_exclude_media_url(self):
-        title, schemas, submissions = build_fixture(
-            'media_types'
-        )
+        title, schemas, submissions = build_fixture('media_types')
         fp = FormPack(schemas, title)
         options = {'versions': 'romev1'}
         export = fp.export(**options).to_dict(submissions)
@@ -653,9 +811,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export, expected_dict)
 
     def test_select_or_other(self):
-        title, schemas, submissions = build_fixture(
-            'or_other'
-        )
+        title, schemas, submissions = build_fixture('or_other')
         fp = FormPack(schemas, title)
         options = {'versions': 'romev1'}
         export = fp.export(**options).to_dict(submissions)
@@ -717,12 +873,11 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export, expected_dict)
 
     def test_nested_repeats_with_copy_fields(self):
-        title, schemas, submissions = build_fixture(
-            'nested_grouped_repeatable')
+        title, schemas, submissions = build_fixture('nested_grouped_repeatable')
         fp = FormPack(schemas, title)
         export_dict = fp.export(
             versions='bird_nests_v1',
-            copy_fields=(IdCopyField, '_uuid', ValidationStatusCopyField)
+            copy_fields=(IdCopyField, '_uuid', ValidationStatusCopyField),
         ).to_dict(submissions)
         expected_dict = OrderedDict(
             [
@@ -933,282 +1088,204 @@ class TestFormPackExport(unittest.TestCase):
         self.assertEqual(export_dict, expected_dict)
 
     def test_nested_repeats(self):
-        title, schemas, submissions = build_fixture(
-            'nested_grouped_repeatable')
+        title, schemas, submissions = build_fixture('nested_grouped_repeatable')
         fp = FormPack(schemas, title)
         export_dict = fp.export(versions='bird_nests_v1').to_dict(submissions)
-        expected_dict = OrderedDict([
-            ('Bird nest survey with nested repeatable groups', {
-                'fields': [
-                    'start',
-                    'end',
-                    '_index'
-                ],
-                'data': [
-                    [
-                        '2017-12-27T15:53:26.000-05:00',
-                        '2017-12-27T15:58:20.000-05:00',
-                        1
-                    ],
-                    [
-                        '2017-12-27T15:58:20.000-05:00',
-                        '2017-12-27T15:58:50.000-05:00',
-                        2
-                    ]
-                ]
-            }),
-            ('group_tree', {
-                'fields': [
-                    'What_kind_of_tree_is_this',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        'pine',
-                        1,
-                        'Bird nest survey with nested repeatable groups',
-                        1
-                    ],
-                    [
-                        'spruce',
-                        2,
-                        'Bird nest survey with nested repeatable groups',
-                        1
-                    ],
-                    [
-                        'maple',
-                        3,
-                        'Bird nest survey with nested repeatable groups',
-                        2
-                    ]
-                ]
-            }),
-            ('group_nest', {
-                'fields': [
-                    'How_high_above_the_ground_is_the_nest',
-                    'How_many_eggs_are_in_the_nest',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        '13',
-                        '3',
-                        1,
-                        'group_tree',
-                        1
-                    ],
-                    [
-                        '15',
-                        '1',
-                        2,
-                        'group_tree',
-                        1
-                    ],
-                    [
-                        '10',
-                        '2',
-                        3,
-                        'group_tree',
-                        2
-                    ],
-                    [
-                        '23',
-                        '1',
-                        4,
-                        'group_tree',
-                        3
-                    ]
-                ]
-            }),
-            ('group_egg', {
-                'fields': [
-                    'Describe_the_egg',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        'brown and speckled; medium',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'brown and speckled; large; cracked',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'light tan; small',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'cream-colored',
-                        'group_nest',
-                        2
-                    ],
-                    [
-                        'reddish-brown; medium',
-                        'group_nest',
-                        3
-                    ],
-                    [
-                        'reddish-brown; small',
-                        'group_nest',
-                        3
-                    ],
-                    [
-                        'grey and speckled',
-                        'group_nest',
-                        4
-                    ]
-                ]
-            })
-        ])
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Bird nest survey with nested repeatable groups',
+                    {
+                        'fields': ['start', 'end', '_index'],
+                        'data': [
+                            [
+                                '2017-12-27T15:53:26.000-05:00',
+                                '2017-12-27T15:58:20.000-05:00',
+                                1,
+                            ],
+                            [
+                                '2017-12-27T15:58:20.000-05:00',
+                                '2017-12-27T15:58:50.000-05:00',
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_tree',
+                    {
+                        'fields': [
+                            'What_kind_of_tree_is_this',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [
+                                'pine',
+                                1,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                            ],
+                            [
+                                'spruce',
+                                2,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                            ],
+                            [
+                                'maple',
+                                3,
+                                'Bird nest survey with nested repeatable groups',
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_nest',
+                    {
+                        'fields': [
+                            'How_high_above_the_ground_is_the_nest',
+                            'How_many_eggs_are_in_the_nest',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            ['13', '3', 1, 'group_tree', 1],
+                            ['15', '1', 2, 'group_tree', 1],
+                            ['10', '2', 3, 'group_tree', 2],
+                            ['23', '1', 4, 'group_tree', 3],
+                        ],
+                    },
+                ),
+                (
+                    'group_egg',
+                    {
+                        'fields': [
+                            'Describe_the_egg',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            ['brown and speckled; medium', 'group_nest', 1],
+                            [
+                                'brown and speckled; large; cracked',
+                                'group_nest',
+                                1,
+                            ],
+                            ['light tan; small', 'group_nest', 1],
+                            ['cream-colored', 'group_nest', 2],
+                            ['reddish-brown; medium', 'group_nest', 3],
+                            ['reddish-brown; small', 'group_nest', 3],
+                            ['grey and speckled', 'group_nest', 4],
+                        ],
+                    },
+                ),
+            ]
+        )
         self.assertEqual(export_dict, expected_dict)
 
     def test_nested_repeats_with_xls_types(self):
-        title, schemas, submissions = build_fixture(
-            'nested_grouped_repeatable')
+        title, schemas, submissions = build_fixture('nested_grouped_repeatable')
         fp = FormPack(schemas, title)
         options = {'versions': 'bird_nests_v2', 'xls_types_as_text': False}
         export_dict = fp.export(**options).to_dict(submissions)
-        expected_dict = OrderedDict([
-            ('Bird nest survey with nested repeatable groups', {
-                'fields': [
-                    'start',
-                    'end',
-                    '_index'
-                ],
-                'data': [
-                    [
-                        parser.parse('2017-12-27T15:53:26.000-05:00'),
-                        parser.parse('2017-12-27T15:58:20.000-05:00'),
-                        1
-                    ],
-                    [
-                        parser.parse('2017-12-27T15:58:20.000-05:00'),
-                        parser.parse('2017-12-27T15:58:50.000-05:00'),
-                        2
-                    ]
-                ]
-            }),
-            ('group_tree', {
-                'fields': [
-                    'What_kind_of_tree_is_this',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        'pine',
-                        1,
-                        'Bird nest survey with nested repeatable groups',
-                        1
-                    ],
-                    [
-                        'spruce',
-                        2,
-                        'Bird nest survey with nested repeatable groups',
-                        1
-                    ],
-                    [
-                        'nan',
-                        3,
-                        'Bird nest survey with nested repeatable groups',
-                        2
-                    ]
-                ]
-            }),
-            ('group_nest', {
-                'fields': [
-                    'How_high_above_the_ground_is_the_nest',
-                    'How_many_eggs_are_in_the_nest',
-                    '_index',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        13,
-                        3,
-                        1,
-                        'group_tree',
-                        1
-                    ],
-                    [
-                        15,
-                        1,
-                        2,
-                        'group_tree',
-                        1
-                    ],
-                    [
-                        10,
-                        2,
-                        3,
-                        'group_tree',
-                        2
-                    ],
-                    [
-                        23,
-                        1,
-                        4,
-                        'group_tree',
-                        3
-                    ]
-                ]
-            }),
-            ('group_egg', {
-                'fields': [
-                    'Describe_the_egg',
-                    '_parent_table_name',
-                    '_parent_index'
-                ],
-                'data': [
-                    [
-                        'brown and speckled; medium',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'brown and speckled; large; cracked',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'light tan; small',
-                        'group_nest',
-                        1
-                    ],
-                    [
-                        'cream-colored',
-                        'group_nest',
-                        2
-                    ],
-                    [
-                        'reddish-brown; medium',
-                        'group_nest',
-                        3
-                    ],
-                    [
-                        'reddish-brown; small',
-                        'group_nest',
-                        3
-                    ],
-                    [
-                        'grey and speckled',
-                        'group_nest',
-                        4
-                    ]
-                ]
-            })
-        ])
+        expected_dict = OrderedDict(
+            [
+                (
+                    'Bird nest survey with nested repeatable groups',
+                    {
+                        'fields': ['start', 'end', '_index'],
+                        'data': [
+                            [
+                                parser.parse('2017-12-27T15:53:26.000-05:00'),
+                                parser.parse('2017-12-27T15:58:20.000-05:00'),
+                                1,
+                            ],
+                            [
+                                parser.parse('2017-12-27T15:58:20.000-05:00'),
+                                parser.parse('2017-12-27T15:58:50.000-05:00'),
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_tree',
+                    {
+                        'fields': [
+                            'What_kind_of_tree_is_this',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [
+                                'pine',
+                                1,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                            ],
+                            [
+                                'spruce',
+                                2,
+                                'Bird nest survey with nested repeatable groups',
+                                1,
+                            ],
+                            [
+                                'nan',
+                                3,
+                                'Bird nest survey with nested repeatable groups',
+                                2,
+                            ],
+                        ],
+                    },
+                ),
+                (
+                    'group_nest',
+                    {
+                        'fields': [
+                            'How_high_above_the_ground_is_the_nest',
+                            'How_many_eggs_are_in_the_nest',
+                            '_index',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            [13, 3, 1, 'group_tree', 1],
+                            [15, 1, 2, 'group_tree', 1],
+                            [10, 2, 3, 'group_tree', 2],
+                            [23, 1, 4, 'group_tree', 3],
+                        ],
+                    },
+                ),
+                (
+                    'group_egg',
+                    {
+                        'fields': [
+                            'Describe_the_egg',
+                            '_parent_table_name',
+                            '_parent_index',
+                        ],
+                        'data': [
+                            ['brown and speckled; medium', 'group_nest', 1],
+                            [
+                                'brown and speckled; large; cracked',
+                                'group_nest',
+                                1,
+                            ],
+                            ['light tan; small', 'group_nest', 1],
+                            ['cream-colored', 'group_nest', 2],
+                            ['reddish-brown; medium', 'group_nest', 3],
+                            ['reddish-brown; small', 'group_nest', 3],
+                            ['grey and speckled', 'group_nest', 4],
+                        ],
+                    },
+                ),
+            ]
+        )
         self.assertEqual(export_dict, expected_dict)
 
     def test_repeats_alias(self):
@@ -1217,130 +1294,86 @@ class TestFormPackExport(unittest.TestCase):
         options = {'versions': 'rgv1'}
         export = fp.export(**options).to_dict(submissions)
 
-        self.assertEqual(export, OrderedDict ([
-                            ('Grouped Repeatable Alias',
-                                {
-                                    'fields': [
-                                        'start',
-                                        'end',
-                                        'household_location',
-                                        '_index'
-                                    ],
-                                    'data': [
-                                        [
-                                            '2016-03-14T14:15:48.000-04:00',
-                                            '2016-03-14T14:18:35.000-04:00',
-                                            'montreal',
-                                            1
-                                        ],
-                                        [
-                                            '2016-03-14T14:14:10.000-04:00',
-                                            '2016-03-14T14:15:48.000-04:00',
-                                            'marseille',
-                                            2
-                                        ],
-                                        [
-                                            '2016-03-14T14:13:53.000-04:00',
-                                            '2016-03-14T14:14:10.000-04:00',
-                                            'rocky mountains',
-                                            3
-                                        ],
-                                        [
-                                            '2016-03-14T14:12:54.000-04:00',
-                                            '2016-03-14T14:13:53.000-04:00',
-                                            'toronto',
-                                            4
-                                        ],
-                                        [
-                                            '2016-03-14T14:18:35.000-04:00',
-                                            '2016-03-14T15:19:20.000-04:00',
-                                            'new york',
-                                            5
-                                        ],
-                                        [
-                                            '2016-03-14T14:11:25.000-04:00',
-                                            '2016-03-14T14:12:03.000-04:00',
-                                            'boston',
-                                            6
-                                        ]
-                                    ]
-                                }),
-                            ('houshold_member_repeat',
-                                {
-                                    'fields': [
-                                        'household_member_name',
-                                        '_parent_table_name',
-                                        '_parent_index'
-                                    ],
-                                    'data': [
-                                        [
-                                            'peter',
-                                            'Grouped Repeatable Alias',
-                                            1
-                                        ],
-                                        [
-                                            'kyle',
-                                            'Grouped Repeatable Alias',
-                                            2
-                                        ],
-                                        [
-                                            'linda',
-                                            'Grouped Repeatable Alias',
-                                            2
-                                        ],
-                                        [
-                                            'morty',
-                                            'Grouped Repeatable Alias',
-                                            3
-                                        ],
-                                        [
-                                            'tony',
-                                            'Grouped Repeatable Alias',
-                                            4
-                                        ],
-                                        [
-                                            'mary',
-                                            'Grouped Repeatable Alias',
-                                            4
-                                        ],
-                                        [
-                                            'emma',
-                                            'Grouped Repeatable Alias',
-                                            5
-                                        ],
-                                        [
-                                            'parker',
-                                            'Grouped Repeatable Alias',
-                                            5
-                                        ],
-                                        [
-                                            'amadou',
-                                            'Grouped Repeatable Alias',
-                                            6
-                                        ],
-                                        [
-                                            'esteban',
-                                            'Grouped Repeatable Alias',
-                                            6
-                                        ],
-                                        [
-                                            'suzie',
-                                            'Grouped Repeatable Alias',
-                                            6
-                                        ],
-                                        [
-                                            'fiona',
-                                            'Grouped Repeatable Alias',
-                                            6
-                                        ],
-                                        [
-                                            'phillip',
-                                            'Grouped Repeatable Alias',
-                                            6
-                                        ]
-                                    ]
-                                })
-                            ])
+        self.assertEqual(
+            export,
+            OrderedDict(
+                [
+                    (
+                        'Grouped Repeatable Alias',
+                        {
+                            'fields': [
+                                'start',
+                                'end',
+                                'household_location',
+                                '_index',
+                            ],
+                            'data': [
+                                [
+                                    '2016-03-14T14:15:48.000-04:00',
+                                    '2016-03-14T14:18:35.000-04:00',
+                                    'montreal',
+                                    1,
+                                ],
+                                [
+                                    '2016-03-14T14:14:10.000-04:00',
+                                    '2016-03-14T14:15:48.000-04:00',
+                                    'marseille',
+                                    2,
+                                ],
+                                [
+                                    '2016-03-14T14:13:53.000-04:00',
+                                    '2016-03-14T14:14:10.000-04:00',
+                                    'rocky mountains',
+                                    3,
+                                ],
+                                [
+                                    '2016-03-14T14:12:54.000-04:00',
+                                    '2016-03-14T14:13:53.000-04:00',
+                                    'toronto',
+                                    4,
+                                ],
+                                [
+                                    '2016-03-14T14:18:35.000-04:00',
+                                    '2016-03-14T15:19:20.000-04:00',
+                                    'new york',
+                                    5,
+                                ],
+                                [
+                                    '2016-03-14T14:11:25.000-04:00',
+                                    '2016-03-14T14:12:03.000-04:00',
+                                    'boston',
+                                    6,
+                                ],
+                            ],
+                        },
+                    ),
+                    (
+                        'houshold_member_repeat',
+                        {
+                            'fields': [
+                                'household_member_name',
+                                '_parent_table_name',
+                                '_parent_index',
+                            ],
+                            'data': [
+                                ['peter', 'Grouped Repeatable Alias', 1],
+                                ['kyle', 'Grouped Repeatable Alias', 2],
+                                ['linda', 'Grouped Repeatable Alias', 2],
+                                ['morty', 'Grouped Repeatable Alias', 3],
+                                ['tony', 'Grouped Repeatable Alias', 4],
+                                ['mary', 'Grouped Repeatable Alias', 4],
+                                ['emma', 'Grouped Repeatable Alias', 5],
+                                ['parker', 'Grouped Repeatable Alias', 5],
+                                ['amadou', 'Grouped Repeatable Alias', 6],
+                                ['esteban', 'Grouped Repeatable Alias', 6],
+                                ['suzie', 'Grouped Repeatable Alias', 6],
+                                ['fiona', 'Grouped Repeatable Alias', 6],
+                                ['phillip', 'Grouped Repeatable Alias', 6],
+                            ],
+                        },
+                    ),
+                ]
+            ),
         )
 
     def test_substitute_xml_names_for_missing_labels(self):
@@ -1363,26 +1396,33 @@ class TestFormPackExport(unittest.TestCase):
         # Remove a grouped question's labels
         self.assertEqual(
             schemas[0]['content']['survey'][4]['label'],
-            ['How many segments does your body have?',
-             '¿Cuántos segmentos tiene tu cuerpo?'],
+            [
+                'How many segments does your body have?',
+                '¿Cuántos segmentos tiene tu cuerpo?',
+            ],
         )
         del schemas[0]['content']['survey'][4]['label']
 
         # Remove a non-grouped question's labels
         self.assertEqual(
             schemas[0]['content']['survey'][6]['label'],
-            ['Do you have body fluids that occupy intracellular space?',
-             '¿Tienes fluidos corporales que ocupan espacio intracelular?'],
+            [
+                'Do you have body fluids that occupy intracellular space?',
+                '¿Tienes fluidos corporales que ocupan espacio intracelular?',
+            ],
         )
         del schemas[0]['content']['survey'][6]['label']
 
         fp = FormPack(schemas, title)
         options = {
-            'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
+            'versions': 'grouped_translated_v1',
+            'hierarchy_in_labels': True,
+        }
 
         # Missing labels should be replaced with XML names
         english_export = fp.export(lang='English', **options).to_dict(
-            submissions)
+            submissions
+        )
         self.assertEqual(
             english_export[title]['fields'],
             [
@@ -1395,14 +1435,14 @@ class TestFormPackExport(unittest.TestCase):
                 'external_characteristics/How_many_segments_does_your_body_have',
                 'Do_you_have_body_flu_intracellular_space',
                 'Do you descend from an ancestral unicellular organism?',
-            ]
+            ],
         )
         self.assertEqual(
-            english_export[title]['data'][0][2],
-            'spherical Radial Bilateral'
+            english_export[title]['data'][0][2], 'spherical Radial Bilateral'
         )
         spanish_export = fp.export(lang='Español', **options).to_dict(
-            submissions)
+            submissions
+        )
         self.assertEqual(
             spanish_export[title]['fields'],
             [
@@ -1415,11 +1455,10 @@ class TestFormPackExport(unittest.TestCase):
                 'external_characteristics/How_many_segments_does_your_body_have',
                 'Do_you_have_body_flu_intracellular_space',
                 '¿Desciende de un organismo unicelular ancestral?',
-            ]
+            ],
         )
         self.assertEqual(
-            spanish_export[title]['data'][0][2],
-            'spherical Radial Bilateral'
+            spanish_export[title]['data'][0][2], 'spherical Radial Bilateral'
         )
 
     def test_substitute_xml_names_for_missing_translations(self):
@@ -1431,7 +1470,9 @@ class TestFormPackExport(unittest.TestCase):
             ['Spherical', 'Esférico'],
         )
         schemas[0]['content']['choices'][0]['label'] = [
-            'Spherical', UNTRANSLATED]
+            'Spherical',
+            UNTRANSLATED,
+        ]
 
         # Remove a group's translation
         self.assertEqual(
@@ -1439,35 +1480,46 @@ class TestFormPackExport(unittest.TestCase):
             ['External Characteristics', 'Características externas'],
         )
         schemas[0]['content']['survey'][2]['label'] = [
-            'External Characteristics', UNTRANSLATED]
+            'External Characteristics',
+            UNTRANSLATED,
+        ]
 
         # Remove a grouped question's translation
         self.assertEqual(
             schemas[0]['content']['survey'][4]['label'],
-            ['How many segments does your body have?',
-             '¿Cuántos segmentos tiene tu cuerpo?'],
+            [
+                'How many segments does your body have?',
+                '¿Cuántos segmentos tiene tu cuerpo?',
+            ],
         )
         schemas[0]['content']['survey'][4]['label'] = [
-            'How many segments does your body have?', UNTRANSLATED]
+            'How many segments does your body have?',
+            UNTRANSLATED,
+        ]
 
         # Remove a non-grouped question's translation
         self.assertEqual(
             schemas[0]['content']['survey'][6]['label'],
-            ['Do you have body fluids that occupy intracellular space?',
-             '¿Tienes fluidos corporales que ocupan espacio intracelular?'],
+            [
+                'Do you have body fluids that occupy intracellular space?',
+                '¿Tienes fluidos corporales que ocupan espacio intracelular?',
+            ],
         )
         schemas[0]['content']['survey'][6]['label'] = [
             'Do you have body fluids that occupy intracellular space?',
-            UNTRANSLATED
+            UNTRANSLATED,
         ]
 
         fp = FormPack(schemas, title)
         options = {
-            'versions': 'grouped_translated_v1', 'hierarchy_in_labels': True}
+            'versions': 'grouped_translated_v1',
+            'hierarchy_in_labels': True,
+        }
 
         # All the English translations should still be present
         english_export = fp.export(lang='English', **options).to_dict(
-            submissions)
+            submissions
+        )
         self.assertEqual(
             english_export[title]['fields'],
             [
@@ -1480,16 +1532,16 @@ class TestFormPackExport(unittest.TestCase):
                 'External Characteristics/How many segments does your body have?',
                 'Do you have body fluids that occupy intracellular space?',
                 'Do you descend from an ancestral unicellular organism?',
-            ]
+            ],
         )
         self.assertEqual(
-            english_export[title]['data'][0][2],
-            'Spherical Radial Bilateral'
+            english_export[title]['data'][0][2], 'Spherical Radial Bilateral'
         )
 
         # Missing Spanish translations should be replaced with XML names
         spanish_export = fp.export(lang='Español', **options).to_dict(
-            submissions)
+            submissions
+        )
         self.assertEqual(
             spanish_export[title]['fields'],
             [
@@ -1502,18 +1554,17 @@ class TestFormPackExport(unittest.TestCase):
                 'external_characteristics/How_many_segments_does_your_body_have',
                 'Do_you_have_body_flu_intracellular_space',
                 '¿Desciende de un organismo unicelular ancestral?',
-            ]
+            ],
         )
         self.assertEqual(
-            spanish_export[title]['data'][0][2],
-            'spherical Radial Bilateral'
+            spanish_export[title]['data'][0][2], 'spherical Radial Bilateral'
         )
 
     def test_csv(self):
         title, schemas, submissions = build_fixture('grouped_questions')
         fp = FormPack(schemas, title)
         options = {'versions': 'gqs'}
-        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        csv_data = '\n'.join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "q1";"g1q1";"g1sg1q1";"g1q2";"g2q1";"qz"
@@ -1524,7 +1575,7 @@ class TestFormPackExport(unittest.TestCase):
         self.assertTextEqual(csv_data, expected)
 
         options = {'versions': 'gqs', 'hierarchy_in_labels': True}
-        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        csv_data = '\n'.join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "q1";"g1/g1q1";"g1/sg1/g1sg1q1";"g1/g1q2";"g2/g2q1";"qz"
@@ -1534,9 +1585,12 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertTextEqual(csv_data, expected)
 
-        options = {'versions': 'gqs', 'hierarchy_in_labels': True,
-                   'lang': UNTRANSLATED}
-        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        options = {
+            'versions': 'gqs',
+            'hierarchy_in_labels': True,
+            'lang': UNTRANSLATED,
+        }
+        csv_data = '\n'.join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "Q1";"Group 1/G1Q1";"Group 1/Sub Group 1/G1SG1Q1";"Group 1/G1Q2";"g2/G2Q1";"QZed"
@@ -1548,7 +1602,7 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
         options = {'versions': 'rpV3', 'lang': fp[1].translations[1]}
-        csv_data = "\n".join(fp.export(**options).to_csv(submissions))
+        csv_data = '\n'.join(fp.export(**options).to_csv(submissions))
 
         expected = """
         "nom du restaurant";"lieu";"_lieu_latitude";"_lieu_longitude";"_lieu_altitude";"_lieu_precision";"type de restaurant"
@@ -1560,9 +1614,9 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_csv_quote_escaping(self):
         title, schemas, submissions = build_fixture(
-            'quotes_newlines_and_long_urls')
+            'quotes_newlines_and_long_urls'
+        )
         fp = FormPack(schemas, title)
-        lss = list(submissions)
         csv_lines = list(fp.export().to_csv(submissions))
         expected_lines = []
         expected_lines.append(
@@ -1656,7 +1710,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'takeaway sit_down',
                     '1',
-                    '1'
+                    '1',
                 ],
                 [
                     'Harvest',
@@ -1667,7 +1721,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'sit_down',
                     '1',
-                    '0'
+                    '0',
                 ],
                 [
                     'Wololo',
@@ -1678,7 +1732,7 @@ class TestFormPackExport(unittest.TestCase):
                     '0',
                     '',
                     '0',
-                    '0'
+                    '0',
                 ],
                 [
                     'Los pollos hermanos',
@@ -1689,16 +1743,19 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     '',
                     '',
-                    ''
-                ]
-            ]
+                    '',
+                ],
+            ],
         }
 
         self.assertEqual(export, expected)
 
-        options = {'versions': 'rpV4', "group_sep": "::",
-                    'hierarchy_in_labels': True,
-                   "lang": fp[-1].translations[1]}
+        options = {
+            'versions': 'rpV4',
+            'group_sep': '::',
+            'hierarchy_in_labels': True,
+            'lang': fp[-1].translations[1],
+        }
         export = fp.export(**options).to_dict(submissions)['Restaurant profile']
 
         expected = {
@@ -1723,7 +1780,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'avec vente à emporter traditionnel',
                     '1',
-                    '1'
+                    '1',
                 ],
                 [
                     'Harvest',
@@ -1734,7 +1791,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'traditionnel',
                     '1',
-                    '0'
+                    '0',
                 ],
                 [
                     'Wololo',
@@ -1745,7 +1802,7 @@ class TestFormPackExport(unittest.TestCase):
                     '0',
                     '',
                     '0',
-                    '0'
+                    '0',
                 ],
                 [
                     'Los pollos hermanos',
@@ -1756,14 +1813,16 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     '',
                     '',
-                    ''
-                ]
-            ]
+                    '',
+                ],
+            ],
         }
 
         self.assertEqual(export, expected)
 
-    def test_export_with_split_fields_gps_fields_and_multiple_selects_xls_types(self):
+    def test_export_with_split_fields_gps_fields_and_multiple_selects_xls_types(
+        self,
+    ):
         title, schemas, submissions = restaurant_profile
         fp = FormPack(schemas, title)
         options = {'versions': 'rpV4', 'xls_types_as_text': False}
@@ -1790,7 +1849,7 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'takeaway sit_down',
                     1,
-                    1
+                    1,
                 ],
                 [
                     'Harvest',
@@ -1801,19 +1860,9 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     'sit_down',
                     1,
-                    0
-                ],
-                [
-                    'Wololo',
-                    '12.43 -24.54 1 0',
-                    12.43,
-                    -24.54,
-                    1,
                     0,
-                    '',
-                    0,
-                    0
                 ],
+                ['Wololo', '12.43 -24.54 1 0', 12.43, -24.54, 1, 0, '', 0, 0],
                 [
                     'Los pollos hermanos',
                     '12.43 -24.54 1',
@@ -1823,9 +1872,9 @@ class TestFormPackExport(unittest.TestCase):
                     '',
                     '',
                     '',
-                    ''
-                ]
-            ]
+                    '',
+                ],
+            ],
         }
 
         self.assertEqual(export, expected)
@@ -1853,20 +1902,21 @@ class TestFormPackExport(unittest.TestCase):
     def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
         fp = FormPack(schemas, title)
-        options = {'versions': 'long_survey_name__the_quick__brown_fox_jumps'
-                               '_over_the_lazy_dog_v1'}
+        options = {
+            'versions': 'long_survey_name__the_quick__brown_fox_jumps'
+            '_over_the_lazy_dog_v1'
+        }
 
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-            book = xlrd.open_workbook(xls)
-            assert book.sheet_names() == [
+            book = openpyxl.load_workbook(xls)
+            assert book.sheetnames == [
                 'long survey name_ the quick,...',
                 'long_group_name__Victor_jagt...',
-                'long_group_name__Victor_... (1)'
+                'long_group_name__Victor_... (1)',
             ]
-
 
     def test_xlsx_with_tag_headers(self):
         title, schemas, submissions = build_fixture('hxl_grouped_repeatable')
@@ -1876,33 +1926,37 @@ class TestFormPackExport(unittest.TestCase):
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
             assert xls.isfile()
-            book = xlrd.open_workbook(xls)
+            book = openpyxl.load_workbook(xls, data_only=True)
             # Verify main sheet
-            sheet = book.sheet_by_name('Household survey with HXL an...')
-            row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == [
-                '#date+start', '#date+end', '#loc+name', '']
+            sheet = book['Household survey with HXL an...']
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == ['#date+start', '#date+end', '#loc+name', None]
             # Verify repeating group
-            sheet = book.sheet_by_name('houshold_member_repeat')
-            row_values = [cell.value for cell in sheet.row(1)]
-            assert row_values == ['#beneficiary', '', '']
+            sheet = book['houshold_member_repeat']
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == ['#beneficiary', None, None]
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
 
         forms = FormPack(schemas, title)
         export = forms.export(force_index=True).to_dict(submissions)
-        expected = OrderedDict({
-                    "Customer Satisfaction": {
-                        'fields': ["restaurant_name", "customer_enjoyment",
-                                   "_index"],
-                        'data': [
-                            ["Felipes", "yes", 1],
-                            ["Dunkin Donuts", "no", 2],
-                            ["McDonalds", "no", 3]
-                        ]
-                    }
-               })
+        expected = OrderedDict(
+            {
+                'Customer Satisfaction': {
+                    'fields': [
+                        'restaurant_name',
+                        'customer_enjoyment',
+                        '_index',
+                    ],
+                    'data': [
+                        ['Felipes', 'yes', 1],
+                        ['Dunkin Donuts', 'no', 2],
+                        ['McDonalds', 'no', 3],
+                    ],
+                }
+            }
+        )
 
         self.assertEqual(export, expected)
 
@@ -1910,39 +1964,46 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = customer_satisfaction
 
         forms = FormPack(schemas, title)
-        export = forms.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField))
+        export = forms.export(
+            copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField)
+        )
         exported = export.to_dict(submissions)
-        expected = OrderedDict({
-                    "Customer Satisfaction": {
-                        'fields': ["restaurant_name", "customer_enjoyment",
-                                   "_uuid", "_submission_time", "_validation_status"],
-                        'data': [
-                            [
-                                "Felipes",
-                                "yes",
-                                "90dd7750f83011e590707c7a9125d07d",
-                                "2016-04-01 19:57:45.306805",
-                                "validation_status_approved"
-                            ],
-
-                            [
-                                "Dunkin Donuts",
-                                "no",
-                                "90dd7750f83011e590707c7a9125d08d",
-                                "2016-04-02 19:57:45.306805",
-                                "validation_status_approved"
-                            ],
-
-                            [
-                                "McDonalds",
-                                "no",
-                                "90dd7750f83011e590707c7a9125d09d",
-                                "2016-04-03 19:57:45.306805",
-                                "validation_status_approved"
-                            ]
-                        ]
-                    }
-               })
+        expected = OrderedDict(
+            {
+                'Customer Satisfaction': {
+                    'fields': [
+                        'restaurant_name',
+                        'customer_enjoyment',
+                        '_uuid',
+                        '_submission_time',
+                        '_validation_status',
+                    ],
+                    'data': [
+                        [
+                            'Felipes',
+                            'yes',
+                            '90dd7750f83011e590707c7a9125d07d',
+                            '2016-04-01 19:57:45.306805',
+                            'validation_status_approved',
+                        ],
+                        [
+                            'Dunkin Donuts',
+                            'no',
+                            '90dd7750f83011e590707c7a9125d08d',
+                            '2016-04-02 19:57:45.306805',
+                            'validation_status_approved',
+                        ],
+                        [
+                            'McDonalds',
+                            'no',
+                            '90dd7750f83011e590707c7a9125d09d',
+                            '2016-04-03 19:57:45.306805',
+                            'validation_status_approved',
+                        ],
+                    ],
+                }
+            }
+        )
 
         self.assertDictEquals(exported, expected)
 
@@ -1950,43 +2011,55 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = customer_satisfaction
 
         fp = FormPack(schemas, 'رضا العملاء')
-        export = fp.export(copy_fields=('_uuid', '_submission_time', ValidationStatusCopyField),
-                              force_index=True)
+        export = fp.export(
+            copy_fields=(
+                '_uuid',
+                '_submission_time',
+                ValidationStatusCopyField,
+            ),
+            force_index=True,
+        )
         exported = export.to_dict(submissions)
-        expected = OrderedDict({
-                    "رضا العملاء": {
-                        'fields': ["restaurant_name", "customer_enjoyment",
-                                   "_uuid", "_submission_time", "_validation_status", "_index"],
-                        'data': [
-                            [
-                                "Felipes",
-                                "yes",
-                                "90dd7750f83011e590707c7a9125d07d",
-                                "2016-04-01 19:57:45.306805",
-                                "validation_status_approved",
-                                1
-                            ],
-
-                            [
-                                "Dunkin Donuts",
-                                "no",
-                                "90dd7750f83011e590707c7a9125d08d",
-                                "2016-04-02 19:57:45.306805",
-                                "validation_status_approved",
-                                2
-                            ],
-
-                            [
-                                "McDonalds",
-                                "no",
-                                "90dd7750f83011e590707c7a9125d09d",
-                                "2016-04-03 19:57:45.306805",
-                                "validation_status_approved",
-                                3
-                            ]
-                        ]
-                    }
-               })
+        expected = OrderedDict(
+            {
+                'رضا العملاء': {
+                    'fields': [
+                        'restaurant_name',
+                        'customer_enjoyment',
+                        '_uuid',
+                        '_submission_time',
+                        '_validation_status',
+                        '_index',
+                    ],
+                    'data': [
+                        [
+                            'Felipes',
+                            'yes',
+                            '90dd7750f83011e590707c7a9125d07d',
+                            '2016-04-01 19:57:45.306805',
+                            'validation_status_approved',
+                            1,
+                        ],
+                        [
+                            'Dunkin Donuts',
+                            'no',
+                            '90dd7750f83011e590707c7a9125d08d',
+                            '2016-04-02 19:57:45.306805',
+                            'validation_status_approved',
+                            2,
+                        ],
+                        [
+                            'McDonalds',
+                            'no',
+                            '90dd7750f83011e590707c7a9125d09d',
+                            '2016-04-03 19:57:45.306805',
+                            'validation_status_approved',
+                            3,
+                        ],
+                    ],
+                }
+            }
+        )
 
         self.assertEqual(exported, expected)
 
@@ -1999,166 +2072,155 @@ class TestFormPackExport(unittest.TestCase):
         title, schemas, submissions = restaurant_profile
 
         forms = FormPack(schemas, title)
-        export = forms.export(
-            versions=forms.versions,
-            copy_fields=('_uuid',)
-        )
+        export = forms.export(versions=forms.versions, copy_fields=('_uuid',))
         exported = export.to_dict(submissions)
-        expected = OrderedDict({
-            'Restaurant profile': {
-                'fields': ['restaurant_name', 'location', '_location_latitude',
-                           '_location_longitude', '_location_altitude',
-                           '_location_precision', 'eatery_type',
-                           'eatery_type/sit_down', 'eatery_type/takeaway', '_uuid'],
-                'data': [
-                    [
-                        'Felipes',
-                        '12.34 -23.45',
-                        '12.34',
-                        '-23.45',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '5dd6ecda-b993-42fc-95c2-7856a8940acf',
+        expected = OrderedDict(
+            {
+                'Restaurant profile': {
+                    'fields': [
+                        'restaurant_name',
+                        'location',
+                        '_location_latitude',
+                        '_location_longitude',
+                        '_location_altitude',
+                        '_location_precision',
+                        'eatery_type',
+                        'eatery_type/sit_down',
+                        'eatery_type/takeaway',
+                        '_uuid',
                     ],
-
-                    [
-                        'Felipes',
-                        '12.34 -23.45',
-                        '12.34',
-                        '-23.45',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        'd6dee2e1-e0e6-4d08-9ad4-d78d77079f85',
+                    'data': [
+                        [
+                            'Felipes',
+                            '12.34 -23.45',
+                            '12.34',
+                            '-23.45',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '5dd6ecda-b993-42fc-95c2-7856a8940acf',
+                        ],
+                        [
+                            'Felipes',
+                            '12.34 -23.45',
+                            '12.34',
+                            '-23.45',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            'd6dee2e1-e0e6-4d08-9ad4-d78d77079f85',
+                        ],
+                        [
+                            'Taco Truck',
+                            '13.42 -25.43',
+                            '13.42',
+                            '-25.43',
+                            '',
+                            '',
+                            'takeaway',
+                            '',
+                            '',
+                            '3f2ac742-305a-4b0d-b7ef-f7f57fcd14dc',
+                        ],
+                        [
+                            'Harvest',
+                            '12.43 -24.53',
+                            '12.43',
+                            '-24.53',
+                            '',
+                            '',
+                            'sit_down',
+                            '',
+                            '',
+                            '3195b926-1578-4bac-80fc-735129a34090',
+                        ],
+                        [
+                            'Taco Truck',
+                            '13.42 -25.43',
+                            '13.42',
+                            '-25.43',
+                            '',
+                            '',
+                            'takeaway sit_down',
+                            '1',
+                            '1',
+                            '04cbcf32-ecbd-4801-829b-299463dcd125',
+                        ],
+                        [
+                            'Harvest',
+                            '12.43 -24.53',
+                            '12.43',
+                            '-24.53',
+                            '',
+                            '',
+                            'sit_down',
+                            '1',
+                            '0',
+                            '1f21b881-db1d-4629-9b82-f4111630187d',
+                        ],
+                        [
+                            'Wololo',
+                            '12.43 -24.54 1 0',
+                            '12.43',
+                            '-24.54',
+                            '1',
+                            '0',
+                            '',
+                            '0',
+                            '0',
+                            'fda7e49b-6c84-4cfe-b1a8-3de997ac0880',
+                        ],
+                        [
+                            'Los pollos hermanos',
+                            '12.43 -24.54 1',
+                            '12.43',
+                            '-24.54',
+                            '1',
+                            '',
+                            '',
+                            '',
+                            '',
+                            'a4277940-c8f3-4564-ad3b-14e28532a976',
+                        ],
                     ],
-
-                    [
-                        'Taco Truck',
-                        '13.42 -25.43',
-                        '13.42',
-                        '-25.43',
-                        '',
-                        '',
-                        'takeaway',
-                        '',
-                        '',
-                        '3f2ac742-305a-4b0d-b7ef-f7f57fcd14dc',
-                    ],
-
-                    [
-                        'Harvest',
-                        '12.43 -24.53',
-                        '12.43',
-                        '-24.53',
-                        '',
-                        '',
-                        'sit_down',
-                        '',
-                        '',
-                        '3195b926-1578-4bac-80fc-735129a34090',
-                    ],
-
-                    [
-                        'Taco Truck',
-                        '13.42 -25.43',
-                        '13.42',
-                        '-25.43',
-                        '',
-                        '',
-                        'takeaway sit_down',
-                        '1',
-                        '1',
-                        '04cbcf32-ecbd-4801-829b-299463dcd125',
-                    ],
-
-                    [
-                        'Harvest',
-                        '12.43 -24.53',
-                        '12.43',
-                        '-24.53',
-                        '',
-                        '',
-                        'sit_down',
-                        '1',
-                        '0',
-                        '1f21b881-db1d-4629-9b82-f4111630187d',
-                    ],
-
-                    [
-                        'Wololo',
-                        '12.43 -24.54 1 0',
-                        '12.43',
-                        '-24.54',
-                        '1',
-                        '0',
-                        '',
-                        '0',
-                        '0',
-                        'fda7e49b-6c84-4cfe-b1a8-3de997ac0880',
-                    ],
-
-                    [
-                        'Los pollos hermanos',
-                        '12.43 -24.54 1',
-                        '12.43',
-                        '-24.54',
-                        '1',
-                        '',
-                        '',
-                        '',
-                        '',
-                        'a4277940-c8f3-4564-ad3b-14e28532a976',
-                    ]
-                ]
+                }
             }
-        })
+        )
 
         self.assertDictEquals(exported, expected)
 
     def test_choices_external_as_text_field(self):
-        title, schemas, submissions = build_fixture('sanitation_report_external')
+        title, schemas, submissions = build_fixture(
+            'sanitation_report_external'
+        )
 
         fp = FormPack(schemas, title)
         export = fp.export(lang=UNTRANSLATED)
         exported = export.to_dict(submissions)
-        expected = OrderedDict([
-                    (
-                        'Sanitation report external', {
-                            'fields': [
-                                'Restaurant name',
-                                'How did this restaurant do on its sanitation report?',
-                                'Report date'
-                            ],
-                            'data': [
-                                [
-                                    'Felipes',
-                                    'A',
-                                    '012345'
-                                ],
-                                [
-                                    'Chipotle',
-                                    'C',
-                                    '012346'
-                                ],
-                                [
-                                    'Dunkin Donuts',
-                                    'D',
-                                    '012347'
-                                ],
-                                [
-                                    'Boloco',
-                                    'B',
-                                    '012348'
-                                ]
-                            ]
-                        }
-                    )
-                ])
+        expected = OrderedDict(
+            [
+                (
+                    'Sanitation report external',
+                    {
+                        'fields': [
+                            'Restaurant name',
+                            'How did this restaurant do on its sanitation report?',
+                            'Report date',
+                        ],
+                        'data': [
+                            ['Felipes', 'A', '012345'],
+                            ['Chipotle', 'C', '012346'],
+                            ['Dunkin Donuts', 'D', '012347'],
+                            ['Boloco', 'B', '012348'],
+                        ],
+                    },
+                )
+            ]
+        )
 
         self.assertEqual(exported, expected)
 
@@ -2167,17 +2229,20 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
         headers = export['Site inspection']['fields']
-        self.assertListEqual(headers, [
-            'inspector',
-            'did_you_find_the_site',
-            'was_there_damage_to_the_site',
-            'ping',
-            'rssi',
-            'is_the_gate_secure',
-            'is_plant_life_encroaching',
-            'please_rate_the_impact_of_any_defects_observed',
-            'was_there_damage_to_the_site_dupe',
-        ])
+        self.assertListEqual(
+            headers,
+            [
+                'inspector',
+                'did_you_find_the_site',
+                'was_there_damage_to_the_site',
+                'ping',
+                'rssi',
+                'is_the_gate_secure',
+                'is_plant_life_encroaching',
+                'please_rate_the_impact_of_any_defects_observed',
+                'was_there_damage_to_the_site_dupe',
+            ],
+        )
 
     def test_literacy_test_export(self):
         title, schemas, submissions = build_fixture('literacy_test')
@@ -2186,18 +2251,24 @@ class TestFormPackExport(unittest.TestCase):
         headers = export['Literacy test']['fields']
         expected_headers = (
             [
-                 'russian_passage_1/Word at flash',
-                 'russian_passage_1/Duration of exercise',
-                 'russian_passage_1/Total words attempted',
-                 'russian_passage_1',
-            ] + ['russian_passage_1/' + str(i) for i in range(1, 47)] + [
-                 'russian_passage_2/Word at flash',
-                 'russian_passage_2/Duration of exercise',
-                 'russian_passage_2/Total words attempted',
-                 'russian_passage_2',
-            ] + ['russian_passage_2/' + str(i) for i in range(1, 47)]
+                'russian_passage_1/Word at flash',
+                'russian_passage_1/Duration of exercise',
+                'russian_passage_1/Total words attempted',
+                'russian_passage_1',
+            ]
+            + ['russian_passage_1/' + str(i) for i in range(1, 47)]
+            + [
+                'russian_passage_2/Word at flash',
+                'russian_passage_2/Duration of exercise',
+                'russian_passage_2/Total words attempted',
+                'russian_passage_2',
+            ]
+            + ['russian_passage_2/' + str(i) for i in range(1, 47)]
         )
         self.assertListEqual(headers, expected_headers)
+        # avoid henious reformatting where EVERY 👏 SINGLE 👏 ITEM 👏 gets put
+        # on a separate line.
+        # fmt: off
         expected_data = [
             [
                 # Word at flash, duration of exercise, total words attempted
@@ -2244,24 +2315,28 @@ class TestFormPackExport(unittest.TestCase):
                 '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
             ],
         ]
-        self.assertListEqual(
-            export['Literacy test']['data'],
-            expected_data
-        )
+        # fmt: on
+        self.assertListEqual(export['Literacy test']['data'], expected_data)
 
     def test_headers_of_multi_version_exports_with_copy_fields(self):
-        title, schemas, submissions = build_fixture('site_inspection', "DATA_WITH_COPY_FIELDS")
+        title, schemas, submissions = build_fixture(
+            'site_inspection', 'DATA_WITH_COPY_FIELDS'
+        )
 
         fp = FormPack(schemas, title)
-        export = fp.export(versions=fp.versions.keys(),
-                           copy_fields=('_id', '_uuid', '_submission_time', ValidationStatusCopyField)).to_dict(submissions)
+        export = fp.export(
+            versions=fp.versions.keys(),
+            copy_fields=(
+                '_id',
+                '_uuid',
+                '_submission_time',
+                ValidationStatusCopyField,
+            ),
+        ).to_dict(submissions)
         headers = export['Site inspection']['fields'][-4:]
-        self.assertListEqual(headers, [
-            '_id',
-            '_uuid',
-            '_submission_time',
-            '_validation_status'
-        ])
+        self.assertListEqual(
+            headers, ['_id', '_uuid', '_submission_time', '_validation_status']
+        )
 
     def test_spss_labels(self):
         fixture_name = 'long_unicode_labels'
@@ -2282,8 +2357,9 @@ class TestFormPackExport(unittest.TestCase):
         zipped = ZipFile(raw_zip, 'r')
         for name in expected_label_file_names:
             with open_fixture_file(fixture_name, name, 'r') as expected:
-                actual = TextIOWrapper(zipped.open(name, 'r'), newline=None,
-                                       encoding='utf-8')
+                actual = TextIOWrapper(
+                    zipped.open(name, 'r'), newline=None, encoding='utf-8'
+                )
                 actual_content = actual.read()
                 expected_content = expected.read()
 
@@ -2321,8 +2397,7 @@ class TestFormPackExport(unittest.TestCase):
             'SPSS labels.sps'.format(first_translation)
         )
         expected_label_file_name = (
-            'long unicode labels to test SPSS export - '
-            'SPSS labels.sps'
+            'long unicode labels to test SPSS export - ' 'SPSS labels.sps'
         )
         # Export to an in-memory ZIP file
         raw_zip = BytesIO()
@@ -2330,10 +2405,13 @@ class TestFormPackExport(unittest.TestCase):
         raw_zip.seek(0)
         zipped = ZipFile(raw_zip, 'r')
         with open_fixture_file(
-                fixture_name, fixture_label_file_name, 'r') as expected:
-            actual = TextIOWrapper(zipped.open(expected_label_file_name, 'r'),
-                                   newline=None,
-                                   encoding='utf-8')
+            fixture_name, fixture_label_file_name, 'r'
+        ) as expected:
+            actual = TextIOWrapper(
+                zipped.open(expected_label_file_name, 'r'),
+                newline=None,
+                encoding='utf-8',
+            )
             actual_content = actual.read()
             expected_content = expected.read()
             # ToDo remove condition when Python2 support is dropped
@@ -2350,17 +2428,24 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(
             multiple_select='summary', versions=fp.versions.keys()
         ).to_dict(submissions)
-        expected = OrderedDict([(
-            'Dietary needs',
-            {
-                'fields': ['restaurant_name', 'dietary_accommodations'],
-                'data': [
-                    ["Melba's", 'gluten_free'],
-                    ['Land of Kush', 'vegan vegetarian'],
-                    ['Sweet 27', 'gluten_free vegan vegetarian lactose_free'],
-                ],
-            },
-        )])
+        expected = OrderedDict(
+            [
+                (
+                    'Dietary needs',
+                    {
+                        'fields': ['restaurant_name', 'dietary_accommodations'],
+                        'data': [
+                            ["Melba's", 'gluten_free'],
+                            ['Land of Kush', 'vegan vegetarian'],
+                            [
+                                'Sweet 27',
+                                'gluten_free vegan vegetarian lactose_free',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
         assert export == expected
 
     def test_select_multiple_details(self):
@@ -2369,23 +2454,27 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(
             multiple_select='details', versions=fp.versions.keys()
         ).to_dict(submissions)
-        expected = OrderedDict([(
-            'Dietary needs',
-            {
-                'fields': [
-                    'restaurant_name',
-                    'dietary_accommodations/gluten_free',
-                    'dietary_accommodations/vegan',
-                    'dietary_accommodations/vegetarian',
-                    'dietary_accommodations/lactose_free',
-                ],
-                'data': [
-                    ["Melba's", '1', '0', '0', '0'],
-                    ['Land of Kush', '0', '1', '1', '0'],
-                    ['Sweet 27', '1', '1', '1', '1'],
-                ],
-            },
-        )])
+        expected = OrderedDict(
+            [
+                (
+                    'Dietary needs',
+                    {
+                        'fields': [
+                            'restaurant_name',
+                            'dietary_accommodations/gluten_free',
+                            'dietary_accommodations/vegan',
+                            'dietary_accommodations/vegetarian',
+                            'dietary_accommodations/lactose_free',
+                        ],
+                        'data': [
+                            ["Melba's", '1', '0', '0', '0'],
+                            ['Land of Kush', '0', '1', '1', '0'],
+                            ['Sweet 27', '1', '1', '1', '1'],
+                        ],
+                    },
+                )
+            ]
+        )
         assert export == expected
 
     def test_select_multiple_both(self):
@@ -2394,31 +2483,42 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(
             multiple_select='both', versions=fp.versions.keys()
         ).to_dict(submissions)
-        expected = OrderedDict([(
-            'Dietary needs',
-            {
-                'fields': [
-                    'restaurant_name',
-                    'dietary_accommodations',
-                    'dietary_accommodations/gluten_free',
-                    'dietary_accommodations/vegan',
-                    'dietary_accommodations/vegetarian',
-                    'dietary_accommodations/lactose_free',
-                ],
-                'data': [
-                    ["Melba's", 'gluten_free', '1', '0', '0', '0'],
-                    ['Land of Kush', 'vegan vegetarian', '0', '1', '1', '0'],
-                    [
-                        'Sweet 27',
-                        'gluten_free vegan vegetarian lactose_free',
-                        '1',
-                        '1',
-                        '1',
-                        '1',
-                    ],
-                ],
-            },
-        )])
+        expected = OrderedDict(
+            [
+                (
+                    'Dietary needs',
+                    {
+                        'fields': [
+                            'restaurant_name',
+                            'dietary_accommodations',
+                            'dietary_accommodations/gluten_free',
+                            'dietary_accommodations/vegan',
+                            'dietary_accommodations/vegetarian',
+                            'dietary_accommodations/lactose_free',
+                        ],
+                        'data': [
+                            ["Melba's", 'gluten_free', '1', '0', '0', '0'],
+                            [
+                                'Land of Kush',
+                                'vegan vegetarian',
+                                '0',
+                                '1',
+                                '1',
+                                '0',
+                            ],
+                            [
+                                'Sweet 27',
+                                'gluten_free vegan vegetarian lactose_free',
+                                '1',
+                                '1',
+                                '1',
+                                '1',
+                            ],
+                        ],
+                    },
+                )
+            ]
+        )
         assert export == expected
 
     def test_select_multiple_with_different_options_in_multiple_versions(self):
@@ -2429,28 +2529,101 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(versions=fp.versions.keys()).to_dict(submissions)
 
         headers = export['Favorite coffee']['fields']
-        self.assertListEqual(headers, [
-            'favorite_coffee_type',
-            'favorite_coffee_type/french',
-            'favorite_coffee_type/italian',
-            'favorite_coffee_type/american',
-            'favorite_coffee_type/british',
-            'brand_of_coffee_machine'
-        ])
+        self.assertListEqual(
+            headers,
+            [
+                'favorite_coffee_type',
+                'favorite_coffee_type/french',
+                'favorite_coffee_type/italian',
+                'favorite_coffee_type/american',
+                'favorite_coffee_type/british',
+                'brand_of_coffee_machine',
+            ],
+        )
 
         # Check length of each row
         for row in export['Favorite coffee']['data']:
             self.assertEqual(len(headers), len(row))
 
         # Ensure latest submissions is not shifted
-        self.assertListEqual(export['Favorite coffee']['data'][-1], [
-            'american british',
-            '0',
-            '0',
-            '1',
-            '1',
-            'Keurig'
-        ])
+        self.assertListEqual(
+            export['Favorite coffee']['data'][-1],
+            ['american british', '0', '0', '1', '1', 'Keurig'],
+        )
+
+    def test_geojson_with_select_xml_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {'versions': 'v1', 'lang': '_xml', 'include_media_url': True}
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'an_image': 'location.jpeg',
+                        'an_image_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
+                        'current_location': 'inside',
+                    },
+                },
+            ],
+        }
+
+    def test_geojson_with_select_label(self):
+        title, schemas, submissions = build_fixture('geojson_and_selects')
+        fp = FormPack(schemas, title)
+
+        options = {
+            'versions': 'v1',
+            'lang': UNTRANSLATED,
+            'include_media_url': True,
+        }
+        export = fp.export(**options)
+        geojson_gen = export.to_geojson(
+            submissions, geo_question_name='geo_location'
+        )
+        geojson_str = ''.join(geojson_gen)
+        geojson_obj = json.loads(geojson_str)
+
+        assert geojson_obj == {
+            'type': 'FeatureCollection',
+            'name': 'Geo and selects',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [
+                            -76.60869,
+                            39.306938,
+                            11.0,
+                        ],
+                    },
+                    'properties': {
+                        'Take a photo of the location': 'location.jpeg',
+                        'Take a photo of the location_URL': 'https://kc.kobo.org/media/original?media_file=/path/to/location.jpeg',
+                        'Where are you?': 'Inside',
+                    },
+                },
+            ],
+        }
 
     def test_geojson_point(self):
         title, schemas, submissions = build_fixture('all_geo_types')
@@ -2500,7 +2673,6 @@ class TestFormPackExport(unittest.TestCase):
                 },
             ],
         }
-
 
     def test_geojson_trace(self):
         title, schemas, submissions = build_fixture('all_geo_types')
@@ -2620,10 +2792,10 @@ class TestFormPackExport(unittest.TestCase):
         # Can't test an invalid `geopoint` by itself; it'll blow up
         # `FormGPSField.format()`
         submissions = [
-            {'Trace': '1 2 3 4'}, # Not enough points
-            {'Trace': '1 2 3 4;1'}, # Second point is bogus
-            {'Trace': '1 2 3 4;1 2 banana'}, # Second point is still bogus
-            {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;13 14 15 16'}, # Not closed
+            {'Trace': '1 2 3 4'},  # Not enough points
+            {'Trace': '1 2 3 4;1'},  # Second point is bogus
+            {'Trace': '1 2 3 4;1 2 banana'},  # Second point is still bogus
+            {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;13 14 15 16'},  # Not closed
             # The following are okay and must appear in the export
             {'Trace': '1 2 3 4;5 6 7 8'},
             {'Shape': '1 2 3 4;5 6 7 8;9 10 11 12;1 2 3 4'},
@@ -2631,16 +2803,16 @@ class TestFormPackExport(unittest.TestCase):
         for s in submissions:
             s[fp.default_version_id_key] = get_first_occurrence(fp.versions)
         export = fp.export(versions=fp.versions.keys())
-        geojson_obj = json.loads(''.join(
-            export.to_geojson(submissions, flatten=True)
-        ))
+        geojson_obj = json.loads(
+            ''.join(export.to_geojson(submissions, flatten=True))
+        )
         assert len(geojson_obj['features']) == 2
         assert geojson_obj['features'][0]['geometry'] == {
-            "coordinates": [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
-            "type": "LineString",
+            'coordinates': [[2.0, 1.0, 3.0], [6.0, 5.0, 7.0]],
+            'type': 'LineString',
         }
         assert geojson_obj['features'][1]['geometry'] == {
-            "coordinates": [
+            'coordinates': [
                 [
                     [2.0, 1.0, 3.0],
                     [10.0, 9.0, 11.0],
@@ -2648,7 +2820,7 @@ class TestFormPackExport(unittest.TestCase):
                     [2.0, 1.0, 3.0],
                 ]
             ],
-            "type": "Polygon",
+            'type': 'Polygon',
         }
 
     def test_geojson_unflattened(self):

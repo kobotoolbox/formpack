@@ -16,9 +16,7 @@ MAIN_SCHEMA = {
         'name': {
             'type': 'string',
         },
-        'label': {
-            'type': ['array', 'string']
-        },
+        'label': {'type': ['array', 'string']},
     },
     'required': ['type', 'name'],
 }
@@ -57,24 +55,24 @@ LABEL_OPTIONAL_SCHEMA = {
 
 
 _ROW_SCHEMA = {
-        'type': 'object',
-        'oneOf': [
-            SELECT_SCHEMA,
-            MAIN_SCHEMA,
-            LABEL_OPTIONAL_SCHEMA,
-            {
-                'properties': {
-                    'type': {
-                        'type': 'string',
-                        'enum': [
-                            'end_group',
-                            'end_repeat',
-                        ]
-                    }
+    'type': 'object',
+    'oneOf': [
+        SELECT_SCHEMA,
+        MAIN_SCHEMA,
+        LABEL_OPTIONAL_SCHEMA,
+        {
+            'properties': {
+                'type': {
+                    'type': 'string',
+                    'enum': [
+                        'end_group',
+                        'end_repeat',
+                    ],
                 }
             }
-        ]
-    }
+        },
+    ],
+}
 
 _ALL_ROW_COLUMNS = [
     'name',
@@ -88,17 +86,24 @@ _ALL_ROW_COLUMNS = [
 
 _ALL_PROPS = {
     'type': 'object',
-    'properties': dict([
-        (col, {'type': [
-            'string',
-            'boolean',
-            'array',
-            'object',
-            # null values probably should be filtered out?
-            # 'null'
-        ]})
-        for col in _ALL_ROW_COLUMNS
-    ])
+    'properties': dict(
+        [
+            (
+                col,
+                {
+                    'type': [
+                        'string',
+                        'boolean',
+                        'array',
+                        'object',
+                        # null values probably should be filtered out?
+                        # 'null'
+                    ]
+                },
+            )
+            for col in _ALL_ROW_COLUMNS
+        ]
+    ),
 }
 
 ROW_SCHEMA = {
@@ -106,7 +111,7 @@ ROW_SCHEMA = {
     'allOf': [
         _ALL_PROPS,
         _ROW_SCHEMA,
-    ]
+    ],
 }
 
 

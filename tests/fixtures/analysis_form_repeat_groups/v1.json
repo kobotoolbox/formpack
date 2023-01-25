@@ -1,0 +1,170 @@
+{
+  "version": "v1",
+  "content": {
+    "survey": [
+      {
+        "type": "text",
+        "name": "enumerator_name",
+        "label": [
+          "What is your name?",
+          "Kio estas via nomo?"
+        ]
+      },
+      {
+        "type": "begin_repeat",
+        "name": "stores",
+        "label": [
+          "Stores",
+          "Vendejoj"
+        ]
+      },
+      {
+        "type": "text",
+        "name": "store_name",
+        "label": [
+          "What is the store name?",
+          "Kio estas la nomo de la vendejo?"
+        ]
+      },
+      {
+        "type": "begin_group",
+        "name": "recordings",
+        "label": [
+          "Recordings",
+          "Registradoj"
+        ]
+      },
+      {
+        "type": "begin_repeat",
+        "name": "record_interactions",
+        "label": [
+          "Record interactions",
+          "Registri interagojn"
+        ]
+      },
+      {
+        "type": "audio",
+        "name": "record_a_note",
+        "label": [
+          "Record a clerk saying something",
+          "Registri oficiston dirantan ion"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "begin_repeat",
+        "name": "record_ambient_noises",
+        "label": [
+          "Record ambient noises",
+          "Registri ĉirkaŭajn bruojn"
+        ]
+      },
+      {
+        "type": "audio",
+        "name": "record_a_noise",
+        "label": [
+          "Record some abient noise",
+          "Registru iun ĉirkaŭan bruon"
+        ]
+      },
+      {
+        "type": "end_repeat"
+      },
+      {
+        "type": "end_group"
+      },
+      {
+        "type": "end_repeat"
+      }
+    ],
+    "settings": {
+      "version": "v1"
+    },
+    "translated": [
+      "label"
+    ],
+    "translations": [
+      "English (en)",
+      "Esperanto (es)"
+    ]
+  },
+  "submissions": [
+    {
+      "enumerator_name": "John Doe",
+      "stores": [
+        {
+          "stores/store_name": "Costco",
+          "stores/recordings/record_interactions": [
+            {
+              "stores/recordings/record_interactions/record_a_note": "clerk_interaction_1.mp3"
+            },
+            {
+              "stores/recordings/record_interactions/record_a_note": "clerk_interaction_2.mp3"
+            },
+            {
+              "stores/recordings/record_interactions/record_a_note": "clerk_interaction_3.mp3"
+            }
+          ],
+          "stores/recordings/record_ambient_noises": [
+            {
+              "stores/recordings/record_ambient_noises/record_a_noise": "noise_1.mp3"
+            },
+            {
+              "stores/recordings/record_ambient_noises/record_a_noise": "noise_2.mp3"
+            }
+          ]
+        }
+      ],
+      "_attachments": [
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_1.mp3"
+        },
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_2.mp3"
+        },
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "clerk_interaction_3.mp3"
+        },
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "noise_1.mp3"
+        },
+        {
+          "mimetype": "audio/mpeg",
+          "filename": "noise_2.mp3"
+        }
+      ],
+      "_supplementalDetails": {
+        "record_a_note": {
+          "transcript": [
+            {
+              "_index": 0,
+              "value": "Hello how may I help you?"
+            },
+            {
+              "_index": 2,
+              "value": "Thank you for your business"
+            }
+          ]
+        },
+        "record_a_noise": {
+          "comment_on_noise_level": [
+            {
+              "_index": 0,
+              "value": "Lot's of noise"
+            },
+            {
+              "_index": 1,
+              "value": "Quiet"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
