@@ -24,12 +24,14 @@ class FormPack:
         root_node_name='data',
         asset_type=None,
         submissions_xml=None,
+        default_image_max_pixels=None,
     ):
         """
         :param versions: list. Versions of the asset. It must be sorted in ascending order. From oldest to newest.
         :param title: string. The human readable name of the form.
         :param id_string: The human readable id of the form.
         :param default_version_id_key: string. The name of the field in submissions which stores the version ID
+        :param default_image_max_pixels: string. (numeric) When not None, questions type=image get assigned max-pixels parameter
         """
         # @TODO: Complete the signature for __init__
 
@@ -47,6 +49,7 @@ class FormPack:
 
         self.id_string = id_string
         self.root_node_name = root_node_name
+        self.default_image_max_pixels = default_image_max_pixels
 
         self.title = title
         self.strict_schema = strict_schema
