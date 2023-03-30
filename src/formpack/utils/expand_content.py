@@ -322,7 +322,10 @@ def _expand_type_to_dict(type_str: str) -> Dict[str, Union[str, bool]]:
             (type_, list_name) = match.groups()
             matched_type = selects[select_type]
             out['type'] = matched_type
-            out['select_from_list_name'] = list_name
+            ref_field_name = 'select_from_list_name'
+            if 'from_file' in matched_type:
+                ref_field_name = 'file'
+            out[ref_field_name] = list_name
             return out
     # if it does not expand, we return the original string
     return {'type': type_str}
