@@ -50,6 +50,12 @@ def get_kobo_locking_profiles(xls_file_object: io.BytesIO) -> list:
     try:
         survey_dict = xls_to_dicts(xls_file_object)
     except xlrd.biffh.XLRDError:
+        # Do not call `xlsx_to_dicts()` inside here: if it fails, *this* xlrd
+        # exception is what appears as the first traceback, followed by "During
+        # handling of the above exception, another exception occurred", below
+        # which is finally the `xlsx_to_dicts()` error
+        survey_dict = None
+    if not survey_dict:
         survey_dict = xlsx_to_dicts(xls_file_object)
 
     if KOBO_LOCK_SHEET not in survey_dict:

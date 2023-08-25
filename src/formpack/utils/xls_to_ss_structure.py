@@ -131,7 +131,6 @@ def xlsx_to_lists(xls_file_object, strip_empty_rows=True):
     """
     Convert an XLSX file object to a python object.
     """
-
     workbook = openpyxl.load_workbook(xls_file_object)
 
     def is_empty(value):
@@ -162,34 +161,35 @@ def xlsx_to_lists(xls_file_object, strip_empty_rows=True):
             return str(value).replace(chr(160), ' ')
 
     def xlsx_to_dict_normal_sheet(sheet):
-
-        # Check for duplicate column headers
         column_header_list = list()
-        for cell in sheet[1]:
-            column_header = cell.value
-            # xls file with 3 columns mostly have a 3 more columns that are
-            # blank by default or something, skip during check
+        header_row = next(sheet.iter_rows(max_row=1, values_only=True))
+        # zero-based column enumeration
+        for col_idx, column_header in enumerate(header_row):
             if is_empty(column_header):
-                # Preserve column order (will filter later)
-                column_header_list.append(None)
+                continue
             else:
                 clean_header = re.sub(r'( )+', ' ', column_header.strip())
-                column_header_list.append(clean_header)
+                column_header_list.append((col_idx, clean_header))
 
         result = []
-        for row in sheet.iter_rows(min_row=2):
-            row_dict = OrderedDict()
-            for column, key in enumerate(column_header_list):
-                if key is None:
-                    continue
+        if not column_header_list:
+            return result
 
-                value = row[column].value
+        # `max_col_idx` is zero-based, but `max_col` argument to `iter_rows()`
+        # is one-based
+        max_col_idx, _ = column_header_list[-1]
+        for row in sheet.iter_rows(
+            min_row=2, max_col=max_col_idx + 1, values_only=True
+        ):
+            row_dict = OrderedDict()
+            for col_idx, column_header in column_header_list:
+                # `row` returned by `iter_rows()` is a tuple, so zero-based
+                # access is used
+                value = row[col_idx]
                 if isinstance(value, str):
                     value = value.strip()
-
                 if not is_empty(value):
-                    row_dict[key] = xlsx_value_to_str(value)
-
+                    row_dict[column_header] = xlsx_value_to_str(value)
             result.append(row_dict)
 
         return result
