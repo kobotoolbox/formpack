@@ -5,7 +5,7 @@ Quotes, newlines, and long URLs: oh, my!
 Double quotation marks need to be escaped (by doubling them!) in CSV exports,
     e.g. `Introduce excerpts with "` would become `Introduce excerpts with ""`.
 
-Excel does not tolerate hyperlinks with URLs longer than 255 characters. Not
+Excel does not tolerate hyperlinks with URLs longer than 2079 characters. Not
 that we ever explicitly create Excel hyperlinks, but
 https://github.com/jmcnamara/XlsxWriter tries to be helpful and add them
 automatically. Excessively long URLs should just be written as strings.
@@ -65,7 +65,7 @@ DATA = {
                         "world.%20In%20fact%2C%20it%20is%20always%20because%20"
                         "of%20one%20person%20that%20all%20the%20changes%20that"
                         "%20matter%20in%20the%20world%20come%20about.%20So%20"
-                        "be%20that%20one%20person."
+                        "be%20that%20one%20person" + ("!" * 3000)
                     ),
                     "Some_other_question": "yes",
                 },

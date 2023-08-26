@@ -1,4 +1,5 @@
 # coding: utf-8
+import io
 import json
 import unittest
 from collections import OrderedDict
@@ -8,6 +9,7 @@ from textwrap import dedent
 from zipfile import ZipFile
 
 import openpyxl
+import pytest
 from path import TempDir
 
 from formpack import FormPack
@@ -1634,7 +1636,7 @@ class TestFormPackExport(unittest.TestCase):
             'n%20make%20a%20difference%20in%20the%20world.%20In%20fact%2C%20it'
             '%20is%20always%20because%20of%20one%20person%20that%20all%20the%2'
             '0changes%20that%20matter%20in%20the%20world%20come%20about.%20So%'
-            '20be%20that%20one%20person.";"yes"'
+            '20be%20that%20one%20person' + ('!' * 3000) + '";"yes"'
         )
         expected_lines.append(
             '"Hi, my name is Roger.""\n\nI like to enter quotes randomly and '
@@ -1917,6 +1919,97 @@ class TestFormPackExport(unittest.TestCase):
                 'long_group_name__Victor_jagt...',
                 'long_group_name__Victor_... (1)',
             ]
+
+    def test_xlsx_too_long_string(self):
+        """
+        Make sure a warning is prepended when a response exceeds the maximum
+        number of characters allowed in an Excel cell. Also, verify that
+        subsequent responses in the same row render properly (see #309).
+        """
+        MAX_CHARS_IN_CELL = 32767
+        title, schemas, submissions = build_fixture(
+            'quotes_newlines_and_long_urls'
+        )
+        fp = FormPack(schemas, title)
+        too_long = 'x' * (MAX_CHARS_IN_CELL + 1)
+        submissions[0]['Enter_some_long_text_and_linebreaks_here'] = too_long
+        expected_first_row = [
+            (
+                '<WARNING: Truncated to Excel limit of 32767 characters!>'
+                + too_long
+            )[:MAX_CHARS_IN_CELL],
+            'yes',
+        ]
+        with TempDir() as d:
+            xls = d / 'foo.xlsx'
+            fp.export().to_xlsx(xls, submissions)
+            assert xls.isfile()
+            book = openpyxl.load_workbook(xls)
+            sheet = book[title]
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == expected_first_row
+
+    def test_xlsx_too_long_url(self):
+        """
+        A too-long URL should be written, intact, as a plain string.
+        """
+        title, schemas, submissions = build_fixture(
+            'quotes_newlines_and_long_urls'
+        )
+        fp = FormPack(schemas, title)
+        expected_first_row = [
+            'Check out this URL I found:\nhttps://now.read.this/?Never%20forg'
+            'et%20that%20you%20are%20one%20of%20a%20kind.%20Never%20forget%20t'
+            'hat%20if%20there%20weren%27t%20any%20need%20for%20you%20in%20all%'
+            '20your%20uniqueness%20to%20be%20on%20this%20earth%2C%20you%20woul'
+            'dn%27t%20be%20here%20in%20the%20first%20place.%20And%20never%20fo'
+            'rget%2C%20no%20matter%20how%20overwhelming%20life%27s%20challenge'
+            's%20and%20problems%20seem%20to%20be%2C%20that%20one%20person%20ca'
+            'n%20make%20a%20difference%20in%20the%20world.%20In%20fact%2C%20it'
+            '%20is%20always%20because%20of%20one%20person%20that%20all%20the%2'
+            '0changes%20that%20matter%20in%20the%20world%20come%20about.%20So%'
+            '20be%20that%20one%20person' + ('!' * 3000),
+            'yes'
+        ]
+        with TempDir() as d:
+            xls = d / 'foo.xlsx'
+            fp.export().to_xlsx(xls, submissions)
+            assert xls.isfile()
+            book = openpyxl.load_workbook(xls)
+            sheet = book[title]
+            row_values = [cell.value for cell in sheet[2]]
+            assert row_values == expected_first_row
+
+    @pytest.mark.slow
+    def test_xlsx_too_many_urls(self):
+        """
+        Excel doesn't allow more than 65,530 URLs per worksheet. URLs beyond
+        this limit should be written as plain strings.
+        """
+        GOODNESS_LOOK_AT_THOSE_URLS = 65530
+        title, schemas, submissions = build_fixture(
+            'quotes_newlines_and_long_urls'
+        )
+        version = submissions[0]['__version__']
+        # There's already a URL in the fixture data, but add 1 here just to
+        # make it obvious that the limit is being exceeded
+        for i in range(GOODNESS_LOOK_AT_THOSE_URLS + 1):
+            submissions.append(
+                {
+                    'Enter_some_long_text_and_linebreaks_here': f'http://{i}',
+                    'Some_other_question': 'yes',
+                    '__version__': version,
+                }
+            )
+        expected_last_row = [f'http://{i}', 'yes']
+        fp = FormPack(schemas, title)
+        # Faster than writing to a file, but still takes about 5 seconds
+        temporary_xlsx = io.BytesIO()
+        fp.export().to_xlsx(temporary_xlsx, submissions)
+        book = openpyxl.load_workbook(temporary_xlsx, read_only=True)
+        sheet = book[title]
+        row_values = [cell.value for cell in sheet[len(submissions) + 1]]
+        assert row_values == expected_last_row
 
     def test_xlsx_with_tag_headers(self):
         title, schemas, submissions = build_fixture('hxl_grouped_repeatable')
