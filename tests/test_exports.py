@@ -2359,8 +2359,8 @@ class TestFormPackExport(unittest.TestCase):
             + ['russian_passage_2/' + str(i) for i in range(1, 47)]
         )
         self.assertListEqual(headers, expected_headers)
-        # avoid henious reformatting where EVERY 👏 SINGLE 👏 ITEM 👏 gets put
-        # on a separate line.
+        # avoid heinous python-black reformatting where
+        # EVERY 👏 SINGLE 👏 ITEM 👏 gets put on a separate line.
         # fmt: off
         expected_data = [
             [
