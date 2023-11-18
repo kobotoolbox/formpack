@@ -83,11 +83,18 @@
             "value": "Hello how may I help you?",
             "languageCode": "en"
           },
-          "tone_of_voice": "excited confused"
+          "qual": [
+            {
+              "uuid": "tone_of_voice",
+              "val": [{"uuid": "excited"}, {"uuid": "confused"}]
+            }
+          ]
         },
         "clerk_interactions-goods_sold": {
-          "comment": "Not much diversity",
-          "rating": "3"
+          "qual": [
+            {"uuid": "comment", "val": "Not much diversity"},
+            {"uuid": "rating", "val": {"uuid": "3"}}
+          ]
         }
       }
     },
@@ -106,10 +113,17 @@
             "value": "Thank you for your business",
             "languageCode": "en"
           },
-          "tone_of_voice": "anxious excited"
+          "qual": [
+            {
+              "uuid": "tone_of_voice",
+              "val": [{"uuid": "anxious"}, {"uuid": "excited"}]
+            }
+          ]
         },
         "clerk_interactions-goods_sold": {
-          "rating": "2"
+          "qual": [
+            {"uuid": "rating", "val": {"uuid": "2"}}
+          ]
         }
       }
     },
@@ -124,7 +138,9 @@
       ],
       "_supplementalDetails": {
         "clerk_interactions-goods_sold": {
-          "rating": "3"
+          "qual": [
+            {"uuid": "rating", "val": {"uuid": "3"}}
+          ]
         }
       }
     }

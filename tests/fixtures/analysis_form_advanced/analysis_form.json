@@ -20,94 +20,97 @@
       }
     },
     {
-      "type": "select_multiple",
-      "select_from_list_name": "record_a_note_tones",
+      "type": "qual_select_multiple",
       "name": "record_a_note/tone_of_voice",
       "path": [
         "clerk_interactions-record_a_note",
         "tone_of_voice"
       ],
-      "label": [
+      "label": "How was the tone of the clerk's voice?",
+      "labels__for_future_use": [
         "How was the tone of the clerk's voice?",
         "Kiel estis la tono de la voĉo de la oficisto?"
       ],
-      "source": "clerk_interactions-record_a_note"
+      "source": "clerk_interactions-record_a_note",
+      "choices": [
+        {
+          "uuid": "anxious",
+          "labels": {
+            "_default": "Anxious",
+            "en": "Anxious",
+            "es": "Maltrankvila"
+          }
+        },
+        {
+          "uuid": "excited",
+          "labels": {
+            "_default": "Excited",
+            "en": "Excited",
+            "es": "Ekscitita"
+          }
+        },
+        {
+          "uuid": "confused",
+          "labels": {
+            "_default": "Confused",
+            "en": "Confused",
+            "es": "Konfuzita"
+          }
+        }
+      ]
     },
     {
-      "type": "text",
+      "type": "qual_text",
       "name": "goods_sold/comment",
       "path": [
         "clerk_interactions-goods_sold",
         "comment"
       ],
-      "label": [
+      "label": "Comment on the goods sold at the store",
+      "labels__for_future_use": [
         "Comment on the goods sold at the store",
         "Komentu la varojn venditajn en la vendejo"
       ],
       "source": "clerk_interactions-goods_sold"
     },
     {
-      "type": "select_one",
-      "select_from_list_name": "goods_sold_ratings",
+      "type": "qual_select_one",
       "name": "goods_sold/rating",
       "path": [
         "clerk_interactions-goods_sold",
         "rating"
       ],
-      "label": [
+      "label": "Rate the quality of the goods sold at the store",
+      "labels__for_future_use": [
         "Rate the quality of the goods sold at the store",
         "Komentu la varojn vendojn en la vendejo"
       ],
-      "source": "clerk_interactions-goods_sold"
-    }
-  ],
-  "additional_choices": [
-    {
-      "list_name": "goods_sold_ratings",
-      "name": 1,
-      "label": [
-        "Poor quality",
-        "Malbona kvalito"
-      ]
-    },
-    {
-      "list_name": "goods_sold_ratings",
-      "name": 2,
-      "label": [
-        "Average quality",
-        "Meza kvalito"
-      ]
-    },
-    {
-      "list_name": "ratings",
-      "name": 3,
-      "label": [
-        "High quality",
-        "Alta kvalito"
-      ]
-    },
-    {
-      "list_name": "record_a_note_tones",
-      "name": "anxious",
-      "label": [
-        "Anxious",
-        "Maltrankvila"
-      ]
-    },
-    {
-      "list_name": "record_a_note_tones",
-      "name": "excited",
-      "label": [
-        "Excited",
-        "Ekscitita"
-      ]
-    },
-    {
-      "list_name": "record_a_note_tones",
-      "name": "confused",
-      "label": [
-        "Confused",
-        "Konfuzita"
+      "source": "clerk_interactions-goods_sold",
+      "choices": [
+        {
+          "uuid": "1",
+          "labels": {
+            "_default": "Poor quality",
+            "en": "Poor quality",
+            "es": "Malbona kvalito"
+          }
+        },
+        {
+          "uuid": "2",
+          "labels": {
+            "_default": "Average quality",
+            "en": "Average quality",
+            "es": "Meza kvalito"
+          }
+        },
+        {
+          "uuid": "3",
+          "labels": {
+            "_default": "High quality",
+            "en": "High quality",
+            "es": "Alta kvalito"
+          }
+        }
       ]
     }
   ],

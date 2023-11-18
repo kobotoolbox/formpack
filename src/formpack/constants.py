@@ -154,13 +154,3 @@ KOBO_LOCKING_RESTRICTIONS = [
     'form_appearance',
     'form_meta_edit',
 ]
-
-# Analysis types
-ANALYSIS_TYPE_CODING = 'coding'
-ANALYSIS_TYPE_TRANSCRIPT = 'transcript'
-ANALYSIS_TYPE_TRANSLATION = 'translation'
-ANALYSIS_TYPES = [
-    ANALYSIS_TYPE_CODING,
-    ANALYSIS_TYPE_TRANSCRIPT,
-    ANALYSIS_TYPE_TRANSLATION,
-]

@@ -14,8 +14,6 @@ from typing import (
 import xlsxwriter
 
 from ..constants import (
-    ANALYSIS_TYPE_TRANSCRIPT,
-    ANALYSIS_TYPE_TRANSLATION,
     GEO_QUESTION_TYPES,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
@@ -338,7 +336,6 @@ class Export:
         submission,
         current_section,
         attachments=None,
-        supplemental_details=None,
     ):
 
         # 'current_section' is the name of what will become sheets in xls.
@@ -401,38 +398,6 @@ class Export:
                 if re.match(fr'^.*/{_val}$', f['filename']) is not None
             ]
 
-        def _get_value_from_supplemental_details(
-            field: FormField, supplemental_details: Dict
-        ) -> Optional[str]:
-            source, name = field.analysis_path
-            _sup_details = supplemental_details.get(source, {})
-
-            if not _sup_details:
-                return
-
-            # The names for translation and transcript fields are in the format
-            # of `translated_<language code>` which must be stripped to get the
-            # value from the supplemental details dict
-            if _name := re.match(r'^(translation|transcript)_', name):
-                name = _name.groups()[0]
-
-            val = _sup_details.get(name)
-            if val is None:
-                return ''
-
-            return val
-
-        def _get_value_from_entry(
-            entry: Dict, field: FormField, supplemental_details: Dict
-        ) -> Optional[str]:
-            if field.analysis_question and supplemental_details:
-                return _get_value_from_supplemental_details(
-                    field, supplemental_details
-                )
-
-            suffix = 'meta/' if field.data_type == 'audit' else ''
-            return entry.get(f'{suffix}{field.path}')
-
         if self.analysis_form:
             _fields = self.analysis_form.insert_analysis_fields(_fields)
 
@@ -471,17 +436,12 @@ class Export:
             row.update(_empty_row)
 
             attachments = entry.get('_attachments') or attachments
-            supplemental_details = (
-                entry.get('_supplementalDetails') or supplemental_details
-            )
 
             for field in _fields:
                 # TODO: pass a context to fields so they can all format ?
                 if field.can_format:
                     # get submission value for this field
-                    val = _get_value_from_entry(
-                        entry, field, supplemental_details
-                    )
+                    val = field.get_value_from_entry(entry)
                     # get the attachment for this field
                     attachment = _get_attachment(val, field, attachments)
                     # get a mapping of {"col_name": "val", ...}
@@ -546,7 +506,6 @@ class Export:
                         entry[child_section.path],
                         child_section,
                         attachments=attachments,
-                        supplemental_details=supplemental_details,
                     )
                     for key, value in iter(chunk.items()):
                         if key in chunks:
