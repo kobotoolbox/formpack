@@ -61,11 +61,15 @@
             "en": {
               "value": "Hello how may I help you?"
             }
-          },
-          "acme_timestamp": "2021-11-01Z"
+          }
         },
         "clerk_details-name_of_clerk": {
-          "comment": "Sounds like an interesting person"
+          "qual": [
+            {
+              "uuid": "comment",
+              "val": "Sounds like an interesting person"
+            }
+          ]
         }
       }
     },

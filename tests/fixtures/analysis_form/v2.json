@@ -56,11 +56,15 @@
           "transcript": {
             "value": "Hello how may I help you?",
             "languageCode": "en"
-          },
-          "acme_timestamp": "2021-11-01Z"
+          }
         },
         "clerk_details-name_of_shop": {
-          "comment": "Pretty cliche"
+          "qual": [
+            {
+              "uuid": "comment",
+              "val": "Pretty cliche"
+            }
+          ]
         }
       }
     },

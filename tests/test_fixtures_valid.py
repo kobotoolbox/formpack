@@ -4,7 +4,6 @@ import unittest
 from formpack import FormPack
 from .fixtures import build_fixture
 from .fixtures.load_fixture_json import load_analysis_form_json
-from formpack.constants import ANALYSIS_TYPES
 
 
 class TestFormPackFixtures(unittest.TestCase):
@@ -143,7 +142,8 @@ class TestFormPackFixtures(unittest.TestCase):
         f1 = fp.analysis_form.fields[0]
         assert hasattr(f1, 'source') and f1.source
         assert hasattr(f1, 'has_stats') and not f1.has_stats
-        assert (
-            hasattr(f1, 'analysis_type') and f1.analysis_type in ANALYSIS_TYPES
-        )
         assert hasattr(f1, 'settings')
+        assert f1.data_type in (
+            'transcript',
+            'translation',
+        ) or f1.data_type.startswith('qual_')

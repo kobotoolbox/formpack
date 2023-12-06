@@ -1,9 +1,11 @@
 # coding: utf-8
+import csv
 import random
 import re
 import string
 import unicodedata
 from functools import total_ordering
+from io import StringIO
 
 from ..constants import (
     EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS,
@@ -136,3 +138,20 @@ def orderable_with_none(k):
     if k is None:
         return OrderableNone()
     return k
+
+
+def list_to_csv(l):
+    """
+    Given a list, return a string of Excel-style comma separated values
+    """
+    sio = list_to_csv.string_io
+    sio.seek(0)
+    sio.truncate()
+    list_to_csv.csv_writer.writerow(l)
+    sio.seek(0)
+    return sio.read().strip()  # writerow() adds CRLF
+
+
+# avoid instantiating these things over and over again for each exported value
+list_to_csv.string_io = StringIO()
+list_to_csv.csv_writer = csv.writer(list_to_csv.string_io)

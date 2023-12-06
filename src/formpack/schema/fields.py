@@ -8,15 +8,10 @@ from operator import itemgetter
 import statistics
 
 from .datadef import FormDataDef, FormChoice
-from ..constants import (
-    ANALYSIS_TYPES,
-    ANALYSIS_TYPE_CODING,
-    ANALYSIS_TYPE_TRANSCRIPT,
-    ANALYSIS_TYPE_TRANSLATION,
-    UNSPECIFIED_TRANSLATION,
-)
+from ..constants import UNSPECIFIED_TRANSLATION
 from ..utils import singlemode
 from ..utils.ordered_collection import OrderedDefaultdict
+from ..utils.string import list_to_csv
 
 
 class FormField(FormDataDef):
@@ -47,14 +42,8 @@ class FormField(FormDataDef):
         if source is not None:
             self.source = source
             self.analysis_question = True
-            self.analysis_type = kwargs.get('analysis_type')
-            self.analysis_path = kwargs.get('analysis_path')
             self.settings = kwargs.get('settings')
-            if self.analysis_type in [
-                ANALYSIS_TYPE_TRANSCRIPT,
-                ANALYSIS_TYPE_TRANSLATION,
-            ]:
-                self.language = kwargs['language']
+            self.language = kwargs['language']
 
         hierarchy = list(hierarchy) if hierarchy is not None else [None]
         self.hierarchy = hierarchy + [self]
@@ -92,6 +81,9 @@ class FormField(FormDataDef):
         """
         args = lang, group_sep, hierarchy_in_labels, multiple_select
         return [self._get_label(*args)]
+
+    def get_value_from_entry(self, entry):
+        return entry.get(self.path)
 
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         return super().get_value_names()
@@ -203,9 +195,7 @@ class FormField(FormDataDef):
         appearance = definition.get('appearance')
         or_other = definition.get('_or_other', False)
         source = definition.get('source')
-        analysis_type = definition.get('analysis_type', ANALYSIS_TYPE_CODING)
         settings = definition.get('settings', {})
-        analysis_path = definition.get('path')
         languages = definition.get('languages')
         language = definition.get('language')
 
@@ -214,9 +204,6 @@ class FormField(FormDataDef):
 
         if ' ' in data_type:
             raise ValueError('invalid data_type: %s' % data_type)
-
-        if analysis_type not in ANALYSIS_TYPES:
-            raise ValueError(f'Invalid analysis data type: {analysis_type}')
 
         if data_type in ('select_one', 'select_multiple'):
             choice_id = definition['select_from_list_name']
@@ -260,7 +247,7 @@ class FormField(FormDataDef):
             'audio': MediaField,
             'file': MediaField,
             'background-audio': MediaField,
-            'audit': MediaField,
+            'audit': AuditField,
             # numeric
             'integer': NumField,
             'decimal': NumField,
@@ -268,6 +255,16 @@ class FormField(FormDataDef):
             # legacy type, treat them as text
             'select_one_external': partial(TextField, data_type=data_type),
             'cascading_select': partial(TextField, data_type=data_type),
+            # qualitative analysis and NLP
+            'qual_auto_keyword_count': QualField,
+            'qual_integer': QualNumField,
+            'qual_note': QualField,
+            'qual_select_multiple': QualSelectMultipleField,
+            'qual_select_one': QualSelectOneField,
+            'qual_tags': QualTagsField,
+            'qual_text': QualField,
+            'transcript': QualTranscriptField,
+            'translation': QualTranslationField,
         }
 
         args = {
@@ -280,9 +277,7 @@ class FormField(FormDataDef):
             'choice': choice,
             'or_other': or_other,
             'source': source,
-            'analysis_type': analysis_type,
             'settings': settings,
-            'analysis_path': analysis_path,
             'language': language,
             'languages': languages,
         }
@@ -493,13 +488,6 @@ class TextField(ExtendedFormField):
         **kwargs,
     ):
         args = lang, group_sep, hierarchy_in_labels, multiple_select
-        if getattr(self, 'analysis_type', None) in [
-            ANALYSIS_TYPE_TRANSCRIPT,
-            ANALYSIS_TYPE_TRANSLATION,
-        ]:
-            source_label = self.source_field._get_label(*args)
-            _type = 'translation' if self._is_translation else 'transcript'
-            return [f'{source_label} - {_type} ({self.language})']
         return [self._get_label(*args)]
 
     def get_stats(self, metrics, lang=UNSPECIFIED_TRANSLATION, limit=100):
@@ -517,14 +505,6 @@ class TextField(ExtendedFormField):
 
         return stats
 
-    @property
-    def _is_transcript(self):
-        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSCRIPT
-
-    @property
-    def _is_translation(self):
-        return getattr(self, 'analysis_type', '') == ANALYSIS_TYPE_TRANSLATION
-
     def format(
         self,
         val,
@@ -539,18 +519,151 @@ class TextField(ExtendedFormField):
         if val is None:
             val = ''
 
-        if isinstance(val, dict):
-            if self._is_translation:
-                try:
-                    val = val[self.language]['value']
-                except KeyError:
-                    val = ''
-            elif self._is_transcript:
-                val = (
-                    val['value'] if val['languageCode'] == self.language else ''
-                )
-
         return {self.name: val}
+
+
+class QualField(TextField):
+    def _get_label(self, *args, **kwargs):
+        source_label = self.source_field._get_label(*args, **kwargs)
+        # hard-coded first label because qualitative analysis does not yet
+        # support translated labels
+        return f'{source_label} - {self.labels[0]}'
+
+    def get_labels(self, *args, **kwargs):
+        return [self._get_label(*args, **kwargs)]
+
+    def get_value_from_entry(self, entry):
+        name = self.name.split('/')[-1]
+
+        try:
+            responses = entry['_supplementalDetails'][self.source_field.qpath][
+                'qual'
+            ]
+        except KeyError:
+            return ''
+
+        # sure would be nice if this were a dict with uuids as keys instead of
+        # a list requiring this kind of iteration
+        for response in responses:
+            if response['uuid'] == name:
+                return response['val']
+
+        return ''
+
+
+class QualNumField(QualField):
+    """
+    Perhaps this should subclass `NumField` instead, but that has no benefit as
+    long as analysis questions are excluded from the auto report
+    """
+    def format(self, val, xls_types_as_text=True, *args, **kwargs):
+        if val is None:
+            val = ''
+
+        if xls_types_as_text:
+            return {self.name: val}
+
+        return {self.name: self.try_get_number(val)}
+
+
+class QualSelectMultipleField(QualField):
+    def get_value_from_entry(self, entry):
+        """
+        The shape of `entry` is dictated by
+        kobo.apps.subsequences.utils.stream_with_extras() in kpi.
+        """
+        val = super().get_value_from_entry(entry)
+        if not val:
+            return ''
+        assert isinstance(val, list)
+        chosen_responses = [r['uuid'] for r in val]
+        chosen_response_labels = []
+        for choice in self.choices:
+            if choice['uuid'] in chosen_responses:
+                # hard-coded `_default` language because qualitative
+                # analysis does not yet support translated labels
+                chosen_response_labels.append(choice['labels']['_default'])
+        if not chosen_response_labels:
+            # return unaltered value if no matching choice could be found; it
+            # could contain an error message
+            return val
+        return list_to_csv(chosen_response_labels)
+
+
+class QualSelectOneField(QualField):
+    def get_value_from_entry(self, entry):
+        """
+        The shape of `entry` is dictated by
+        `kobo.apps.subsequences.utils.stream_with_extras()` in kpi.
+        """
+        val = super().get_value_from_entry(entry)
+        if not val:
+            return ''
+        assert isinstance(val, dict)
+        chosen_response = val['uuid']
+        for choice in self.choices:
+            if choice['uuid'] == chosen_response:
+                # hard-coded `_default` language because qualitative
+                # analysis does not yet support translated labels
+                return choice['labels']['_default']
+        # return unaltered value if no matching choice could be found; it could
+        # contain an error message
+        return val
+
+
+class QualTagsField(QualField):
+    def get_value_from_entry(self, entry):
+        val = super().get_value_from_entry(entry)
+        return list_to_csv(val)
+
+
+class QualTranscriptField(QualField):
+    def _get_label(self, *args, **kwargs):
+        source_label = self.source_field._get_label(*args, **kwargs)
+        return f'{source_label} - transcript ({self.language})'
+
+    def get_value_from_entry(self, entry):
+        name = self.name.split('/')[-1]
+
+        try:
+            responses = entry['_supplementalDetails'][self.source_field.qpath]
+        except KeyError:
+            return ''
+
+        name_without_lang, lang = name.split('_')
+        assert name_without_lang == 'transcript'
+
+        try:
+            response = responses['transcript']
+        except KeyError:
+            return ''
+
+        if response.get('languageCode') == lang:
+            return response['value']
+        else:
+            return ''
+
+
+class QualTranslationField(QualField):
+    def _get_label(self, *args, **kwargs):
+        source_label = self.source_field._get_label(*args, **kwargs)
+        return f'{source_label} - translation ({self.language})'
+
+    def get_value_from_entry(self, entry):
+        name = self.name.split('/')[-1]
+
+        try:
+            responses = entry['_supplementalDetails'][self.source_field.qpath]
+        except KeyError:
+            return ''
+
+        name_without_lang, lang = name.split('_')
+        assert name_without_lang == 'translation'
+
+        try:
+            return responses['translation'][lang]['value']
+        except KeyError:
+            return ''
 
 
 class MediaField(TextField):
@@ -586,6 +699,11 @@ class MediaField(TextField):
             self.name: val,
             f'{self.name}_URL': download_url,
         }
+
+
+class AuditField(MediaField):
+    def get_value_from_entry(self, entry):
+        return entry.get('meta/' + self.path)
 
 
 class DateField(ExtendedFormField):

@@ -8,11 +8,7 @@ from typing import (
 
 from pyxform import aliases as pyxform_aliases
 
-from .constants import (
-    ANALYSIS_TYPE_TRANSCRIPT,
-    ANALYSIS_TYPE_TRANSLATION,
-    UNTRANSLATED,
-)
+from .constants import UNTRANSLATED
 from .errors import SchemaError
 from .errors import TranslationError
 from .schema import FormField, FormGroup, FormSection, FormChoice
@@ -93,35 +89,26 @@ class AnalysisForm(BaseForm):
 
         self.translations = self._get_translations(schema)
 
-        choices_definition = schema.get('additional_choices', ())
-        field_choices = FormChoice.all_from_json_definition(
-            choices_definition, self.translations
-        )
-
         for data_def in survey:
-            data_type = data_def['type']
-            if data_type in [
-                ANALYSIS_TYPE_TRANSCRIPT,
-                ANALYSIS_TYPE_TRANSLATION,
-            ]:
-                data_def.update(
-                    {
-                        'type': 'text',
-                        'analysis_type': data_type,
-                    }
-                )
-
             field = FormField.from_json_definition(
                 definition=data_def,
-                field_choices=field_choices,
                 section=section,
                 translations=self.translations,
             )
 
-            field.labels = self._get_field_labels(
-                field=fields_by_name[field.name],
-                translations=self.translations,
-            )
+            # qualitative analysis labels and choices are fundamentally
+            # different from XLSForm, but this is kind of a hack. when (if)
+            # qualitative analysis gets full support for translated labels,
+            # this will have to change
+            try:
+                # should become a dictionary (like choice labels) with language
+                # codes as keys and labels as values once translations are
+                # supported
+                field.labels = [data_def['label']]
+            except KeyError:
+                field.labels = []
+            field.choices = data_def.get('choices', [])
+
             section.fields[field.name] = field
 
         self.fields = list(section.fields.values())

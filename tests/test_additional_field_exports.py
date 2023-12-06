@@ -19,7 +19,6 @@ def test_additional_field_exports_without_labels():
             '_supplementalDetails/record_a_note/transcript_es',
             '_supplementalDetails/record_a_note/translation_en',
             '_supplementalDetails/record_a_note/translation_es',
-            '_supplementalDetails/record_a_note/acme_timestamp',
         ],
     }
     export = pack.export(**options)
@@ -33,7 +32,6 @@ def test_additional_field_exports_without_labels():
         'record_a_note - transcript (es)',
         'record_a_note - translation (en)',
         'record_a_note - translation (es)',
-        'record_a_note/acme_timestamp',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -42,7 +40,6 @@ def test_additional_field_exports_without_labels():
         'Saluton, kiel mi povas helpi vin?',
         'Hello how may I help you?',
         '',
-        '2021-11-01Z',
     ]
 
 
@@ -60,7 +57,6 @@ def test_additional_field_exports_with_labels():
             '_supplementalDetails/record_a_note/transcript_es',
             '_supplementalDetails/record_a_note/translation_en',
             '_supplementalDetails/record_a_note/translation_es',
-            '_supplementalDetails/record_a_note/acme_timestamp',
         ],
         'lang': 'English (en)',
     }
@@ -75,7 +71,6 @@ def test_additional_field_exports_with_labels():
         'Record a clerk saying something - transcript (es)',
         'Record a clerk saying something - translation (en)',
         'Record a clerk saying something - translation (es)',
-        'Transcription Timestamp',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -84,7 +79,6 @@ def test_additional_field_exports_with_labels():
         'Saluton, kiel mi povas helpi vin?',
         'Hello how may I help you?',
         '',
-        '2021-11-01Z',
     ]
 
 
@@ -176,51 +170,39 @@ def test_additional_field_exports_advanced():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note - transcript (en)',
-        'record_a_note/tone_of_voice',
-        'record_a_note/tone_of_voice/anxious',
-        'record_a_note/tone_of_voice/excited',
-        'record_a_note/tone_of_voice/confused',
+        "record_a_note - How was the tone of the clerk's voice?",
         'goods_sold',
         'goods_sold/chocolate',
         'goods_sold/fruit',
         'goods_sold/pasta',
-        'goods_sold/comment',
-        'goods_sold/rating',
+        'goods_sold - Comment on the goods sold at the store',
+        'goods_sold - Rate the quality of the goods sold at the store',
     ]
     assert main_export_sheet['data'] == [
         [
             'clerk_interaction_1.mp3',
             'Hello how may I help you?',
-            'excited confused',
-            '0',
-            '1',
-            '1',
+            'Excited,Confused',
             'chocolate',
             '1',
             '0',
             '0',
             'Not much diversity',
-            '3',
+            'High quality',
         ],
         [
             'clerk_interaction_2.mp3',
             'Thank you for your business',
-            'anxious excited',
-            '1',
-            '1',
-            '0',
+            'Anxious,Excited',
             'chocolate fruit pasta',
             '1',
             '1',
             '1',
             '',
-            '2',
+            'Average quality',
         ],
         [
             'clerk_interaction_3.mp3',
-            '',
-            '',
-            '',
             '',
             '',
             'pasta',
@@ -228,7 +210,7 @@ def test_additional_field_exports_advanced():
             '0',
             '1',
             '',
-            '3',
+            'High quality',
         ],
     ]
 
@@ -240,51 +222,43 @@ def test_additional_field_exports_advanced():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note - transcript (en)',
-        'record_a_note/tone_of_voice/anxious',
-        'record_a_note/tone_of_voice/excited',
-        'record_a_note/tone_of_voice/confused',
+        "record_a_note - How was the tone of the clerk's voice?",
         'goods_sold/chocolate',
         'goods_sold/fruit',
         'goods_sold/pasta',
-        'goods_sold/comment',
-        'goods_sold/rating',
+        'goods_sold - Comment on the goods sold at the store',
+        'goods_sold - Rate the quality of the goods sold at the store',
     ]
     assert main_export_sheet['data'] == [
         [
             'clerk_interaction_1.mp3',
             'Hello how may I help you?',
-            '0',
-            '1',
-            '1',
+            'Excited,Confused',
             '1',
             '0',
             '0',
             'Not much diversity',
-            '3',
+            'High quality',
         ],
         [
             'clerk_interaction_2.mp3',
             'Thank you for your business',
-            '1',
-            '1',
-            '0',
+            'Anxious,Excited',
             '1',
             '1',
             '1',
             '',
-            '2',
+            'Average quality',
         ],
         [
             'clerk_interaction_3.mp3',
             '',
             '',
-            '',
-            '',
             '0',
             '0',
             '1',
             '',
-            '3',
+            'High quality',
         ],
     ]
 
@@ -296,27 +270,27 @@ def test_additional_field_exports_advanced():
     assert main_export_sheet['fields'] == [
         'record_a_note',
         'record_a_note - transcript (en)',
-        'record_a_note/tone_of_voice',
+        "record_a_note - How was the tone of the clerk's voice?",
         'goods_sold',
-        'goods_sold/comment',
-        'goods_sold/rating',
+        'goods_sold - Comment on the goods sold at the store',
+        'goods_sold - Rate the quality of the goods sold at the store',
     ]
     assert main_export_sheet['data'] == [
         [
             'clerk_interaction_1.mp3',
             'Hello how may I help you?',
-            'excited confused',
+            'Excited,Confused',
             'chocolate',
             'Not much diversity',
-            '3',
+            'High quality',
         ],
         [
             'clerk_interaction_2.mp3',
             'Thank you for your business',
-            'anxious excited',
+            'Anxious,Excited',
             'chocolate fruit pasta',
             '',
-            '2',
+            'Average quality',
         ],
         [
             'clerk_interaction_3.mp3',
@@ -324,7 +298,7 @@ def test_additional_field_exports_advanced():
             '',
             'pasta',
             '',
-            '3',
+            'High quality',
         ],
     ]
 
@@ -347,9 +321,8 @@ def test_additional_field_exports_v2():
         'record_a_note - transcript (es)',
         'record_a_note - translation (en)',
         'record_a_note - translation (es)',
-        'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop/comment',
+        'name_of_shop - Comment on the name of the shop',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -358,7 +331,6 @@ def test_additional_field_exports_v2():
         '',
         '',
         '',
-        '2021-11-01Z',
         'Save On',
         'Pretty cliche',
     ]
@@ -382,11 +354,10 @@ def test_additional_field_exports_all_versions():
         'record_a_note - transcript (es)',
         'record_a_note - translation (en)',
         'record_a_note - translation (es)',
-        'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop/comment',
+        'name_of_shop - Comment on the name of the shop',
         'name_of_clerk',
-        'name_of_clerk/comment',
+        'name_of_clerk - Comment on the name of the clerk',
     ]
     response0 = main_export_sheet['data'][0]
     assert response0 == [
@@ -395,7 +366,6 @@ def test_additional_field_exports_all_versions():
         'Saluton, kiel mi povas helpi vin?',
         'Hello how may I help you?',
         '',
-        '2021-11-01Z',
         '',
         '',
         'John',
@@ -408,7 +378,6 @@ def test_additional_field_exports_all_versions():
         '',
         '',
         '',
-        '2021-11-01Z',
         'Save On',
         'Pretty cliche',
         '',
@@ -474,11 +443,10 @@ def test_additional_field_exports_all_versions_langs():
         'Record a clerk saying something - transcript (es)',
         'Record a clerk saying something - translation (en)',
         'Record a clerk saying something - translation (es)',
-        'Transcription Timestamp',
         "What is the shop's name?",
-        'Comment on the name of the shop',
+        "What is the shop's name? - Comment on the name of the shop",
         "What is the clerk's name?",
-        'Comment on the name of the clerk',
+        "What is the clerk's name? - Comment on the name of the clerk",
     ]
 
     options['lang'] = 'Esperanto (es)'
@@ -492,11 +460,10 @@ def test_additional_field_exports_all_versions_langs():
         'Registri oficiston dirantan ion - transcript (es)',
         'Registri oficiston dirantan ion - translation (en)',
         'Registri oficiston dirantan ion - translation (es)',
-        'record_a_note/acme_timestamp',
         'Kio estas la nomo de la butiko?',
-        'name_of_shop/comment',
+        'Kio estas la nomo de la butiko? - Comment on the name of the shop',
         'name_of_clerk',
-        'name_of_clerk/comment',
+        'name_of_clerk - Comment on the name of the clerk',
     ]
 
     options['lang'] = None
@@ -510,11 +477,10 @@ def test_additional_field_exports_all_versions_langs():
         'record_a_note - transcript (es)',
         'record_a_note - translation (en)',
         'record_a_note - translation (es)',
-        'record_a_note/acme_timestamp',
         'name_of_shop',
-        'name_of_shop/comment',
+        'name_of_shop - Comment on the name of the shop',
         'name_of_clerk',
-        'name_of_clerk/comment',
+        'name_of_clerk - Comment on the name of the clerk',
     ]
 
 
@@ -530,9 +496,10 @@ def test_simple_report_with_analysis_form():
 
     assert stats.submissions_count == 6
 
-    stats = set([n for f, n, d in stats])
-    analysis_fields = set(
-        [f._get_label(lang=lang) for f in pack.analysis_form.fields]
-    )
+    stats = [n for f, n, d in stats]
     # Ensure analysis fields aren't making it into the report
-    assert not stats.intersection(analysis_fields)
+    assert stats == [
+        'record_a_note',
+        "What is the shop's name?",
+        "What is the clerk's name?",
+    ]
