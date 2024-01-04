@@ -28,6 +28,16 @@ def test_expand_selects_with_or_other():
     assert _expand_type_to_dict('select_one_or_other').get(_OR_OTHER) == True
 
 
+def test_expand_select_x_from_file():
+    row_type_dict = _expand_type_to_dict('select_one_from_file file.csv')
+    assert 'select_from_list_name' not in row_type_dict
+    assert row_type_dict.get('file') == 'file.csv'
+
+    row_type_dict = _expand_type_to_dict('select_multiple_from_file file.csv')
+    assert 'select_from_list_name' not in row_type_dict
+    assert row_type_dict.get('file') == 'file.csv'
+
+
 def test_expand_select_one():
     s1 = {'survey': [{'type': 'select_one dogs'}]}
     expand_content(s1, in_place=True)
