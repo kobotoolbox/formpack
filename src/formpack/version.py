@@ -14,6 +14,8 @@ from .errors import TranslationError
 from .schema import FormField, FormGroup, FormSection, FormChoice
 from .submission import FormSubmission
 from .utils import parse_xml_to_xmljson, normalize_data_type
+from .utils.xlsform_parameters import parameters_string_to_dict, parameters_dict_to_string
+
 from .utils.flatten_content import flatten_content
 from .utils.xform_tools import formversion_pyxform
 from .validators import validate_content
@@ -346,7 +348,18 @@ class FormVersion(BaseForm):
         )
 
     def to_dict(self, **opts):
-        return flatten_content(self.schema['content'], **opts)
+        content = flatten_content(self.schema['content'], **opts)
+        im_max_pixs = self.form_pack.default_image_max_pixels
+        if im_max_pixs is not None:
+            for row in content.get('survey'):
+                if row.get('type') == 'image':
+                    rparams = parameters_string_to_dict(row.get('parameters', ''))
+                    if rparams.get('max-pixels') == '-1':
+                        del rparams['max-pixels']
+                    elif 'max-pixels' not in rparams:
+                        rparams['max-pixels'] = str(im_max_pixs)
+                    row['parameters'] = parameters_dict_to_string(rparams)
+        return content
 
     # TODO: find where to move that
     def _load_submission_xml(self, xml):
