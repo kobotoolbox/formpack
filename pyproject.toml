@@ -4,5 +4,8 @@ skip-string-normalization = true
 
 [tool.pytest.ini_options]
 markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "slow: marks tests as slow (not executed by default - select with '-m \"slow\"')",
+]
+addopts = [
+    '-m not slow',
 ]
