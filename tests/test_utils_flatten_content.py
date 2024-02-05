@@ -108,6 +108,7 @@ def test_flatten_select_or_other():
 
 
 def test_flatten_select_x_from_file():
+    # Search terms: select_one_from_file, select_multiple_from_file
     for x in 'one', 'multiple':
         s1 = {
             'survey': [
