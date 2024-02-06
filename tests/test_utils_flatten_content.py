@@ -107,16 +107,18 @@ def test_flatten_select_or_other():
     assert 'select_from_list_name' not in row0
 
 
-def test_flatten_select_one_from_file():
-    s1 = {
-        'survey': [
-            {'type': 'select_one_from_file', 'file': 'fruits.csv'}
-        ]
-    }
-    flatten_content(s1, in_place=True)
-    row0 = s1['survey'][0]
-    assert row0['type'] == 'select_one_from_file fruits.csv'
-    assert 'file' not in row0
+def test_flatten_select_x_from_file():
+    # Search terms: select_one_from_file, select_multiple_from_file
+    for x in 'one', 'multiple':
+        s1 = {
+            'survey': [
+                {'type': f'select_{x}_from_file', 'file': 'fruits.csv'}
+            ]
+        }
+        flatten_content(s1, in_place=True)
+        row0 = s1['survey'][0]
+        assert row0['type'] == f'select_{x}_from_file fruits.csv'
+        assert 'file' not in row0
 
 
 def test_flatten_select():

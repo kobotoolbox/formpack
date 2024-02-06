@@ -251,6 +251,9 @@ def _flatten_survey_row(row):
                 row['type'] = '{} {} or_other'.format(_type, _list_name)
             else:
                 row['type'] = '{} {}'.format(_type, _list_name)
-        elif row['type'] == 'select_one_from_file' and 'file' in row:
+        elif (
+            row['type'] in ('select_one_from_file', 'select_multiple_from_file')
+            and 'file' in row
+        ):
             _file = row.pop('file')
             row['type'] = '{} {}'.format(_type, _file)
