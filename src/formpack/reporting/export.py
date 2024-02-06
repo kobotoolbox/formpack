@@ -17,6 +17,7 @@ from ..constants import (
     GEO_QUESTION_TYPES,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
+    UNSPECIFIED_HEADER_LANG,
 )
 from ..schema import CopyField, FormField
 from ..submission import FormSubmission
@@ -44,6 +45,7 @@ class Export:
         force_index=False,
         title='submissions',
         tag_cols_for_header=None,
+        header_lang=UNSPECIFIED_HEADER_LANG,
         filter_fields=(),
         xls_types_as_text=True,
         include_media_url=False,
@@ -63,6 +65,9 @@ class Export:
         :param force_index: bool.
         :param title: string
         :param tag_cols_for_header: list
+        lang_header
+        :param header_lang: string, False (`constants.UNSPECIFIED_TRANSLATION`), or
+            None (`constants.UNTRANSLATED`), if not set, default value equal lang arg.
         :param filter_fields: list
         :param xls_types_as_text: bool
         :param include_media_url: bool
@@ -71,6 +76,7 @@ class Export:
         self.formpack = formpack
         self.analysis_form = formpack.analysis_form
         self.lang = lang
+        self.header_lang = self.lang if header_lang == UNSPECIFIED_HEADER_LANG else header_lang
         self.group_sep = group_sep
         self.title = title
         self.versions = form_versions
@@ -120,6 +126,7 @@ class Export:
             lang,
             group_sep,
             hierarchy_in_labels,
+            self.header_lang,
             tag_cols_for_header,
         )
         self.sections, self.labels, self.tags = res
@@ -202,6 +209,7 @@ class Export:
         lang=UNSPECIFIED_TRANSLATION,
         group_sep='/',
         hierarchy_in_labels=False,
+        header_lang=UNSPECIFIED_TRANSLATION,
         tag_cols_for_header=None,
     ):
         """
@@ -267,7 +275,7 @@ class Export:
             section_fields.setdefault(field.section.name, []).append(field)
             section_labels.setdefault(field.section.name, []).append(
                 field.get_labels(
-                    lang=lang,
+                    lang=header_lang,
                     group_sep=group_sep,
                     hierarchy_in_labels=hierarchy_in_labels,
                     multiple_select=self.multiple_select,
