@@ -143,7 +143,7 @@ class RemoteFormPack:
             _v['date_deployed'] = _v.pop('date_deployed', None)
             self.versions.append(_v)
         return FormPack(versions=self.versions, id_string=self.uid,
-                        title=self.asset.name, ellipsize_title=False,
+                        title=self.asset.name,
                         )
 
     def stats(self):
