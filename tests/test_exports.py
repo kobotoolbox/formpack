@@ -444,7 +444,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             export.to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
 
     def test_repeats(self):
         title, schemas, submissions = build_fixture('grouped_repeatable')
@@ -1889,7 +1889,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
 
     def test_xlsx_with_types(self):
         title, schemas, submissions = build_fixture('nested_grouped_repeatable')
@@ -1899,7 +1899,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
 
     def test_xlsx_long_sheet_names_and_invalid_chars(self):
         title, schemas, submissions = build_fixture('long_names')
@@ -1912,7 +1912,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
             book = openpyxl.load_workbook(xls)
             assert book.sheetnames == [
                 'long survey name_ the quick,...',
@@ -1943,7 +1943,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export().to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
             book = openpyxl.load_workbook(xls)
             sheet = book[title]
             row_values = [cell.value for cell in sheet[2]]
@@ -1974,7 +1974,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export().to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
             book = openpyxl.load_workbook(xls)
             sheet = book[title]
             row_values = [cell.value for cell in sheet[2]]
@@ -2018,7 +2018,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'foo.xlsx'
             fp.export(**options).to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
             book = openpyxl.load_workbook(xls, data_only=True)
             # Verify main sheet
             sheet = book['Household survey with HXL an...']
@@ -2159,7 +2159,7 @@ class TestFormPackExport(unittest.TestCase):
         with TempDir() as d:
             xls = d / 'test.xlsx'
             fp.export().to_xlsx(xls, submissions)
-            assert xls.isfile()
+            assert xls.is_file()
 
     def test_copy_fields_multiple_versions(self):
         title, schemas, submissions = restaurant_profile
