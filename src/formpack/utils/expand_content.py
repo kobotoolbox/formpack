@@ -18,9 +18,8 @@ from typing import (
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .iterator import get_first_occurrence
-from .replace_aliases import META_TYPES, selects
+from .replace_aliases import MEDIA_TYPES, META_TYPES, selects
 from ..constants import (
-    MEDIA_TYPES,
     OR_OTHER_COLUMN,
     TAG_COLUMNS_AND_SEPARATORS,
     UNTRANSLATED,
