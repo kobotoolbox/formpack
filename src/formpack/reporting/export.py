@@ -14,7 +14,6 @@ from typing import (
 import xlsxwriter
 
 from ..constants import (
-    GEO_QUESTION_TYPES,
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
@@ -24,7 +23,7 @@ from ..utils.exceptions import FormPackExcelError, FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
 from ..utils.geojson import field_and_response_to_geometry
 from ..utils.iterator import get_first_occurrence
-from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES
+from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES, GEO_TYPES
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unique_name_for_xls
 from ..utils.text import get_valid_filename
@@ -697,7 +696,7 @@ class Export:
 
             all_fields = version.sections[first_section_name].fields.values()
             all_geo_fields = [
-                f for f in all_fields if f.data_type in GEO_QUESTION_TYPES
+                f for f in all_fields if f.data_type in GEO_TYPES
             ]
             all_geo_field_names = [f.name for f in all_geo_fields]
 

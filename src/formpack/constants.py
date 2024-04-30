@@ -51,9 +51,6 @@ TAG_COLUMNS_AND_SEPARATORS = {
     'hxl': '',
 }
 
-GEO_QUESTION_TYPES = ('geopoint', 'geotrace', 'geoshape')
-MEDIA_TYPES = ('audio', 'image', 'video')
-
 # Export Settings
 EXPORT_SETTING_FIELDS = 'fields'
 EXPORT_SETTING_FIELDS_FROM_ALL_VERSIONS = 'fields_from_all_versions'
