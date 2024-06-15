@@ -377,6 +377,11 @@ class TestFormPackExport(unittest.TestCase):
             FormPack(schemas, title)
 
     def test_translations_with_select_multiple_from_file(self):
+        """
+        Make sure that exports do not crash if `select_multiple_from_file` is
+        used in a multi-language form. See #322
+        """
+
         title, schemas, submissions = restaurant_profile
 
         # Add a `select_multiple_from_file` question to existing `rpV4` schema
@@ -401,8 +406,14 @@ class TestFormPackExport(unittest.TestCase):
         # Feed this schema with `file` back into formpack again
         fp = FormPack([fp.versions['rpV4'].schema], title)
 
-        # Fails here with
-        # `formpack.errors.TranslationError: Mismatched labels and translations: [restaurant name, nom du restaurant] [english, french, None] 2!=3`
+        # At this point, issue #322 would have already caused
+        # `TranslationError: Mismatched labels and translations`, but perform a
+        # simple export anyway, adding a response for `suppliers`
+        submissions[-1]['suppliers'] = 'SFG Ocsys'
+        export = fp.export(versions=fp.versions)
+        actual_dict = export.to_dict(submissions)
+        assert actual_dict['Restaurant profile']['fields'][-1] == 'suppliers'
+        assert actual_dict['Restaurant profile']['data'][-1][-1] == 'SFG Ocsys'
 
     def test_simple_nested_grouped_repeatable(self):
         title, schemas, submissions = build_fixture(
