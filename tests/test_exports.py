@@ -376,6 +376,34 @@ class TestFormPackExport(unittest.TestCase):
         with self.assertRaises(TranslationError):
             FormPack(schemas, title)
 
+    def test_translations_with_select_multiple_from_file(self):
+        title, schemas, submissions = restaurant_profile
+
+        # Add a `select_multiple_from_file` question to existing `rpV4` schema
+        assert schemas[-1]['version'] == 'rpV4'
+        schemas[-1]['content']['survey'].append(
+            {
+                'type': 'select_multiple_from_file suppliers.csv',
+                'name': 'suppliers',
+                'label::english': 'suppliers',
+                'label::french': 'fournisseurs',
+            }
+        )
+        fp = FormPack(schemas[-1:], title)
+
+        # Expect that a `file` column has been added; see
+        # `test_expand_content.test_expand_select_x_from_file()`
+        assert (
+            fp.versions['rpV4'].schema['content']['survey'][-1]['file']
+            == 'suppliers.csv'
+        )
+
+        # Feed this schema with `file` back into formpack again
+        fp = FormPack([fp.versions['rpV4'].schema], title)
+
+        # Fails here with
+        # `formpack.errors.TranslationError: Mismatched labels and translations: [restaurant name, nom du restaurant] [english, french, None] 2!=3`
+
     def test_simple_nested_grouped_repeatable(self):
         title, schemas, submissions = build_fixture(
             'simple_nested_grouped_repeatable'
