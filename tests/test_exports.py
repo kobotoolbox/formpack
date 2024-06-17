@@ -376,6 +376,45 @@ class TestFormPackExport(unittest.TestCase):
         with self.assertRaises(TranslationError):
             FormPack(schemas, title)
 
+    def test_translations_with_select_multiple_from_file(self):
+        """
+        Make sure that exports do not crash if `select_multiple_from_file` is
+        used in a multi-language form. See #322
+        """
+
+        title, schemas, submissions = restaurant_profile
+
+        # Add a `select_multiple_from_file` question to existing `rpV4` schema
+        assert schemas[-1]['version'] == 'rpV4'
+        schemas[-1]['content']['survey'].append(
+            {
+                'type': 'select_multiple_from_file suppliers.csv',
+                'name': 'suppliers',
+                'label::english': 'suppliers',
+                'label::french': 'fournisseurs',
+            }
+        )
+        fp = FormPack(schemas[-1:], title)
+
+        # Expect that a `file` column has been added; see
+        # `test_expand_content.test_expand_select_x_from_file()`
+        assert (
+            fp.versions['rpV4'].schema['content']['survey'][-1]['file']
+            == 'suppliers.csv'
+        )
+
+        # Feed this schema with `file` back into formpack again
+        fp = FormPack([fp.versions['rpV4'].schema], title)
+
+        # At this point, issue #322 would have already caused
+        # `TranslationError: Mismatched labels and translations`, but perform a
+        # simple export anyway, adding a response for `suppliers`
+        submissions[-1]['suppliers'] = 'SFG Ocsys'
+        export = fp.export(versions=fp.versions)
+        actual_dict = export.to_dict(submissions)
+        assert actual_dict['Restaurant profile']['fields'][-1] == 'suppliers'
+        assert actual_dict['Restaurant profile']['data'][-1][-1] == 'SFG Ocsys'
+
     def test_simple_nested_grouped_repeatable(self):
         title, schemas, submissions = build_fixture(
             'simple_nested_grouped_repeatable'

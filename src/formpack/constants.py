@@ -51,6 +51,14 @@ TAG_COLUMNS_AND_SEPARATORS = {
     'hxl': '',
 }
 
+# Which columns can contain media filenames? Do not confuse this with question
+# types that can collect media! From https://xlsform.org/en/#media:
+#     You can include questions in your form that display images or that play
+#     video or audio files
+#     …
+#     Media is translatable in the same way as labels and hints…
+MEDIA_COLUMN_NAMES = ('audio', 'image', 'video')
+
 # Export Settings
 EXPORT_SETTING_FIELDS = 'fields'
 EXPORT_SETTING_FIELDS_FROM_ALL_VERSIONS = 'fields_from_all_versions'

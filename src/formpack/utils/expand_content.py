@@ -18,8 +18,9 @@ from typing import (
 
 from .array_to_xpath import EXPANDABLE_FIELD_TYPES
 from .iterator import get_first_occurrence
-from .replace_aliases import MEDIA_TYPES, META_TYPES, selects
+from .replace_aliases import META_TYPES, selects
 from ..constants import (
+    MEDIA_COLUMN_NAMES,
     OR_OTHER_COLUMN,
     TAG_COLUMNS_AND_SEPARATORS,
     UNTRANSLATED,
@@ -186,7 +187,7 @@ def _get_known_translated_cols(translated_cols: List[str]) -> List[str]:
 
     _translated_cols = []
     for col in translated_cols:
-        if col in MEDIA_TYPES:
+        if col in MEDIA_COLUMN_NAMES:
             col = f'media::{col}'
         _translated_cols.append(col)
 
@@ -207,7 +208,7 @@ def _get_special_survey_cols(
         'hint::English',
     For more examples, see tests.
     """
-    RE_MEDIA_TYPES = '|'.join(MEDIA_TYPES)
+    RE_MEDIA_COLUMN_NAMES = '|'.join(MEDIA_COLUMN_NAMES)
 
     uniq_cols = OrderedDict()
     special = OrderedDict()
@@ -238,14 +239,14 @@ def _get_special_survey_cols(
                 column=column_name,
                 translation=UNTRANSLATED,
             )
-        if ':' not in column_name and column_name not in MEDIA_TYPES:
+        if ':' not in column_name and column_name not in MEDIA_COLUMN_NAMES:
             continue
         if column_name.startswith('bind:'):
             continue
         if column_name.startswith('body:'):
             continue
         mtch = re.match(
-            rf'^(media\s*::?\s*)?({RE_MEDIA_TYPES})\s*::?\s*([^:]+)$',
+            rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})\s*::?\s*([^:]+)$',
             column_name,
         )
         if mtch:
@@ -260,7 +261,9 @@ def _get_special_survey_cols(
                 translation=translation,
             )
             continue
-        mtch = re.match(rf'^(media\s*::?\s*)?({RE_MEDIA_TYPES})$', column_name)
+        mtch = re.match(
+            rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$', column_name
+        )
         if mtch:
             matched = mtch.groups()
             media_type = matched[1]
