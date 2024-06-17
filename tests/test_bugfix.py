@@ -9,9 +9,6 @@ def test_repair_file_column():
         'settings': {},
         'survey': [
             {
-                '$kuid': 'qt1C9CFUj',
-                '$qpath': 'interviewer_name_text',
-                '$xpath': 'interviewer_name_text',
                 'label': [
                     "Введіть ім'я співробітника:",
                     "Enter interviewer's name",
@@ -20,9 +17,6 @@ def test_repair_file_column():
                 'type': 'text',
             },
             {
-                '$kuid': 'bHGP1YkRq',
-                '$qpath': 'oblast',
-                '$xpath': 'oblast',
                 'label': ['Область', 'Oblast'],
                 'media::file': [None, None, 'oblast.csv'],
                 'name': 'oblast',
