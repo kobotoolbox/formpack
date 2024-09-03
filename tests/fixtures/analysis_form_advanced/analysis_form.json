@@ -9,10 +9,10 @@
       "type": "transcript",
       "name": "record_a_note/transcript_en",
       "path": [
-        "clerk_interactions-record_a_note",
+        "clerk_interactions/record_a_note",
         "transcript_en"
       ],
-      "source": "clerk_interactions-record_a_note",
+      "source": "clerk_interactions/record_a_note",
       "language": "en",
       "settings": {
         "mode": "auto",
@@ -23,7 +23,7 @@
       "type": "qual_select_multiple",
       "name": "record_a_note/tone_of_voice",
       "path": [
-        "clerk_interactions-record_a_note",
+        "clerk_interactions/record_a_note",
         "tone_of_voice"
       ],
       "label": "How was the tone of the clerk's voice?",
@@ -31,7 +31,7 @@
         "How was the tone of the clerk's voice?",
         "Kiel estis la tono de la voĉo de la oficisto?"
       ],
-      "source": "clerk_interactions-record_a_note",
+      "source": "clerk_interactions/record_a_note",
       "choices": [
         {
           "uuid": "anxious",
@@ -63,7 +63,7 @@
       "type": "qual_text",
       "name": "goods_sold/comment",
       "path": [
-        "clerk_interactions-goods_sold",
+        "clerk_interactions/goods_sold",
         "comment"
       ],
       "label": "Comment on the goods sold at the store",
@@ -71,13 +71,13 @@
         "Comment on the goods sold at the store",
         "Komentu la varojn venditajn en la vendejo"
       ],
-      "source": "clerk_interactions-goods_sold"
+      "source": "clerk_interactions/goods_sold"
     },
     {
       "type": "qual_select_one",
       "name": "goods_sold/rating",
       "path": [
-        "clerk_interactions-goods_sold",
+        "clerk_interactions/goods_sold",
         "rating"
       ],
       "label": "Rate the quality of the goods sold at the store",
@@ -85,7 +85,7 @@
         "Rate the quality of the goods sold at the store",
         "Komentu la varojn vendojn en la vendejo"
       ],
-      "source": "clerk_interactions-goods_sold",
+      "source": "clerk_interactions/goods_sold",
       "choices": [
         {
           "uuid": "1",

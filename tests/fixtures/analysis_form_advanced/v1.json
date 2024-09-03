@@ -78,7 +78,7 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions-record_a_note": {
+        "clerk_interactions/record_a_note": {
           "transcript": {
             "value": "Hello how may I help you?",
             "languageCode": "en"
@@ -90,7 +90,7 @@
             }
           ]
         },
-        "clerk_interactions-goods_sold": {
+        "clerk_interactions/goods_sold": {
           "qual": [
             {"uuid": "comment", "val": "Not much diversity"},
             {"uuid": "rating", "val": {"uuid": "3"}}
@@ -108,7 +108,7 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions-record_a_note": {
+        "clerk_interactions/record_a_note": {
           "transcript": {
             "value": "Thank you for your business",
             "languageCode": "en"
@@ -120,7 +120,7 @@
             }
           ]
         },
-        "clerk_interactions-goods_sold": {
+        "clerk_interactions/goods_sold": {
           "qual": [
             {"uuid": "rating", "val": {"uuid": "2"}}
           ]
@@ -137,7 +137,7 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions-goods_sold": {
+        "clerk_interactions/goods_sold": {
           "qual": [
             {"uuid": "rating", "val": {"uuid": "3"}}
           ]
