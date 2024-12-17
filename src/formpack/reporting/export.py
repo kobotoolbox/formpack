@@ -184,7 +184,9 @@ class Export:
         self.reset()
         form_version = self.versions[version_uid] if version_uid else None
         for submission in submissions:
-            formatted_chunks = self.parse_one_submission(submission, version=form_version)
+            formatted_chunks = self.parse_one_submission(
+                submission, version=form_version
+            )
             if not formatted_chunks:
                 continue
             yield formatted_chunks
@@ -702,7 +704,8 @@ class Export:
 
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
-            version = self.versions[version_uid] if version_uid else self.get_version_for_submission(submission)
+            version = self.versions[version_uid] if version_uid \
+                else self.get_version_for_submission(submission)
             formatted_chunks = self.parse_one_submission(submission, version)
             if not formatted_chunks:
                 continue
