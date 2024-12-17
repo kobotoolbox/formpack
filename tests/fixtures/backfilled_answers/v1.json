@@ -1,0 +1,21 @@
+{
+  "version": "v1",
+    "content": {
+        "survey": [
+            {
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "restaurant name"
+            }
+        ]
+    },
+    "submissions": [
+      {
+      "restaurant_name": "Potato Heaven"
+    },
+    {
+      "restaurant_name": "Potato Purgatory",
+      "restaurant_location": "0 0 0 0"
+    }
+    ]
+}
