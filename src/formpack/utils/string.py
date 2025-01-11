@@ -75,10 +75,14 @@ def ellipsize(s, max_len, ellipsis='...'):
 
 def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
     r"""
-    Return a sheet name that does not collide with any string in the iterable
-    `other_sheet_names` and does not exceed the Excel sheet name length limit.
-    Characters that are not allowed in sheet names are replaced with
-    underscores.
+    Return a unique Excel-compatible worksheet name that does not collide
+    with a sheet name in the iterable `other_sheet_names`
+      1. Apply substitutions for worksheet names
+        a. Use '_' for disallowed characters ([]:*?/\)
+        b. Use '_' for leading or trailing apostrophes (')
+      2. Limit worksheet name length to <= 31 characters, truncate with
+         base_ellipsis
+      3. Ensure uniqueness with an incrementing parenthesized integer (n)
     :Example:
         >>> unique_name_for_xls(
         ...     'This string has more than 31 characters!',
@@ -90,6 +94,7 @@ def unique_name_for_xls(sheet_name, other_sheet_names, base_ellipsis='...'):
     sheet_name = sheet_name.translate(
         {ord(c): '_' for c in EXCEL_FORBIDDEN_WORKSHEET_NAME_CHARACTERS}
     )
+    sheet_name = re.sub(r"(^'|'$)", '_', sheet_name)
 
     candidate = ellipsize(
         sheet_name, EXCEL_SHEET_NAME_SIZE_LIMIT, base_ellipsis
