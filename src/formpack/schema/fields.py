@@ -241,6 +241,7 @@ class FormField(FormDataDef):
             # geo
             'geopoint': FormGPSField,
             'start-geopoint': FormGPSField,
+            'background-geopoint': FormGPSField,
             # media
             'video': MediaField,
             'image': MediaField,
