@@ -438,13 +438,14 @@ class FormVersion(BaseForm):
         if title is None:
             raise ValueError('cannot create xml on a survey with no title.')
 
-        survey.update(
-            {
-                'name': self.lookup('root_node_name', 'data'),
-                'id_string': self.lookup('id_string'),
-                'title': self.lookup('title'),
-                'version': self.lookup('id'),
-            }
-        )
+        # pyxform 3.0.0 has removed the ability to call `survey.update()`
+        # https://github.com/XLSForm/pyxform/commit/6918b400d3cf6c9151db2104137afe2c52dd68e4
+        for k, v in {
+            'name': self.lookup('root_node_name', 'data'),
+            'id_string': self.lookup('id_string'),
+            'title': self.lookup('title'),
+            'version': self.lookup('id'),
+        }.items():
+            survey[k] = v
 
         return survey._to_pretty_xml()  # .encode('utf-8')
