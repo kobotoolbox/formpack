@@ -1,6 +1,9 @@
 # coding: utf-8
+import contextlib
 import io
 import json
+import pathlib
+import tempfile
 import unittest
 from collections import OrderedDict
 from dateutil import parser
@@ -10,7 +13,6 @@ from zipfile import ZipFile
 
 import openpyxl
 import pytest
-from path import TempDir
 
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
@@ -24,6 +26,13 @@ from .fixtures import build_fixture, open_fixture_file
 
 customer_satisfaction = build_fixture('customer_satisfaction')
 restaurant_profile = build_fixture('restaurant_profile')
+
+
+@contextlib.contextmanager
+def TempDir():
+    """ A small helper to avoid needing the entire path.py library """
+    with tempfile.TemporaryDirectory() as d:
+        yield pathlib.Path(d)
 
 
 class TestFormPackExport(unittest.TestCase):

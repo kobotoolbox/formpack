@@ -6,7 +6,6 @@ requirements = [
     'begins',
     'jsonschema',
     'lxml',
-    'path.py',
     'pyquery',
     'pyxform',
     'statistics',
