@@ -171,14 +171,22 @@ class Export:
         submission = FormSubmission(submission)
         return self.format_one_submission([submission.data], section)
 
-    def parse_submissions(self, submissions):
+    def parse_submissions(self, submissions, version_uid=None):
         """
         Return a generator yielding formatted 'chunks' for each submission from
         the data set
+
+        Args:
+            version_uid (str): optional, explicit version uid to use for all
+                submission instead of inferring the version from the submissions
+                themselves
         """
         self.reset()
+        form_version = self.versions[version_uid] if version_uid else None
         for submission in submissions:
-            formatted_chunks = self.parse_one_submission(submission)
+            formatted_chunks = self.parse_one_submission(
+                submission, version=form_version
+            )
             if not formatted_chunks:
                 continue
             yield formatted_chunks
@@ -542,7 +550,6 @@ class Export:
         """
 
         d = OrderedDict()
-
         for section, labels in self.labels.items():
             d[section] = {'fields': list(labels), 'data': []}
 
@@ -552,12 +559,19 @@ class Export:
 
         return d
 
-    def to_csv(self, submissions, sep=';', quote='"'):
+    def to_csv(self, submissions, version_uid=None, sep=';', quote='"'):
         """
         Return a generator yielding csv lines.
 
         We don't use the csv module to avoid buffering the lines
         in memory.
+
+        Args:
+            version_uid (str): optional, explicit version uid to use for all
+                submissions instead of inferring the version from the submissions
+                themselves
+            sep (str): optional, separator char, default ';'
+            quote (str): optional, quote char, default '"'
         """
 
         sections = list(self.labels.items())
@@ -591,7 +605,7 @@ class Export:
         for tag_row in tag_rows:
             yield format_line(tag_row, sep, quote)
 
-        for chunk in self.parse_submissions(submissions):
+        for chunk in self.parse_submissions(submissions, version_uid=version_uid):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
@@ -600,6 +614,7 @@ class Export:
     def to_geojson(
         self,
         submissions: Iterator,
+        version_uid: str = None,
         flatten: bool = True,
         geo_question_name: Optional[str] = None,
     ) -> Generator:
@@ -689,7 +704,8 @@ class Export:
 
             # We need direct access to the field objects (available inside the
             # version) and the unformatted submission data
-            version = self.get_version_for_submission(submission)
+            version = self.versions[version_uid] if version_uid \
+                else self.get_version_for_submission(submission)
             formatted_chunks = self.parse_one_submission(submission, version)
             if not formatted_chunks:
                 continue
@@ -792,7 +808,7 @@ class Export:
 
         return table
 
-    def to_xlsx(self, filename, submissions):
+    def to_xlsx(self, filename, submissions, version_uid=None):
         workbook = xlsxwriter.Workbook(
             filename,
             {
@@ -845,7 +861,7 @@ class Export:
             row_index += 1
             sheet_row_positions[sheet_] = row_index
 
-        for chunk in self.parse_submissions(submissions):
+        for chunk in self.parse_submissions(submissions, version_uid=version_uid):
             for section_name, rows in chunk.items():
                 try:
                     sheet_name = sheet_name_mapping[section_name]
@@ -874,7 +890,7 @@ class Export:
 
         workbook.close()
 
-    def to_html(self, submissions):
+    def to_html(self, submissions, version_uid=None):
         """
         Yield lines of and HTML table strings.
         """
@@ -892,7 +908,7 @@ class Export:
 
         yield '<tbody>'
 
-        for chunk in self.parse_submissions(submissions):
+        for chunk in self.parse_submissions(submissions, version_uid=version_uid):
             for section_name, rows in chunk.items():
                 if section == section_name:
                     for row in rows:
