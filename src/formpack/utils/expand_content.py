@@ -233,7 +233,7 @@ def _get_special_survey_cols(
     _pluck_uniq_cols('choices')
 
     for column_name in uniq_cols.keys():
-        if column_name in ['label', 'hint']:
+        if column_name.lower() in ['label', 'hint']:
             _mark_special(
                 column_name=column_name,
                 column=column_name,

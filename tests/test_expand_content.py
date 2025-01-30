@@ -604,5 +604,11 @@ def test_expand_translations_null_lang():
     assert s1 == s1_copy
 
 
+def test_expand_ignores_case():
+    s1 = {'survey': [{'type': 'text', 'Label': 'hi'}]}
+    expand_content(s1, in_place=True)
+    assert s1.get('translated') == ['Label']
+
+
 def _s(rows):
     return {'survey': [dict([[key, 'x']]) for key in rows]}
