@@ -53,6 +53,7 @@ def _expand_translatable_content(
             row[_expandable_col][_nti] = _oldval
         if col_shortname != _expandable_col:
             row[_expandable_col][cur_translation_index] = row[col_shortname]
+            breakpoint()
             del row[col_shortname]
 
 
@@ -94,7 +95,67 @@ def _get_translations_from_special_cols(
     return translations, set(translated_cols)
 
 
+def clean_column_name(column_name: str) -> str:
+    RE_MEDIA_COLUMN_NAMES = '|'.join(MEDIA_COLUMN_NAMES)
+
+    # "LaBeL" -> "label", "HiNT" -> "hint"
+    if column_name.lower() in ['label', 'hint']:
+        return column_name.lower()
+
+    # "Bind:Some:Thing" -> "bind:Some:Thing", "BodY:" -> "body:"
+    match = re.match(r'^(bind|body):.*', column_name, flags=re.IGNORECASE)
+    if match:
+        lower_cased = match.group(0).lower()
+        return re.sub(r'^(bind|body)', lower_cased, column_name, flags=re.IGNORECASE)
+
+    # "Media:Audio::ES" -> "media:audio::ES", "ViDeO : ES" -> "video : ES"
+    match = re.match(
+        rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})\s*::?\s*([^:]+)$',
+        column_name,
+        flags=re.IGNORECASE
+    )
+    if match:
+        matched = match.groups()
+        lower_media_prefix = matched[0].lower()
+        lower_media_type = matched[1].lower()
+        return re.sub(rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})(\s*::?\s*)([^:]+)$',
+                          rf'{lower_media_prefix}{lower_media_type}\3\4',
+                          column_name, flags=re.IGNORECASE)
+
+    # "Media: AuDiO" -> "media: audio", "VIDEO" -> "video"
+    match = re.match(
+        rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$', column_name
+    )
+    if match:
+        matched = match.groups()
+        lower_media_prefix = matched[0].lower()
+        lower_media_type = matched[1].lower()
+        return  re.sub(rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$',
+                          rf'{lower_media_prefix}{lower_media_type}',
+                          column_name, flags=re.IGNORECASE)
+
+    match = re.match(r'^([^:]+)(\s*::?\s*)([^:]+)$', column_name)
+    if match:
+        # example: label::x, constraint_message::x, hint::x
+        matched = match.groups()
+        lower_column_shortname = matched[0].lower()
+        return re.sub(r'^([^:]+)(\s*::?\s*)([^:]+)$', rf'{lower_column_shortname}\2\3', column_name,
+                          flags=re.IGNORECASE)
+    return column_name.lower()
+
+
+def preprocess_columns(content: Dict[str, List[Any]]) -> None:
+
+    for sheet, rows in content.items():
+        for row in rows:
+            for column_name, value in row.copy().items():
+                cleaned_name = clean_column_name(column_name)
+                del row[column_name]
+                row[cleaned_name] = value
+
 def expand_content_in_place(content: Dict[str, List[Any]]) -> None:
+    preprocess_columns(content)
+
     specials, translations, transl_cols = _get_special_survey_cols(content)
 
     if len(translations) > 0:
@@ -233,7 +294,7 @@ def _get_special_survey_cols(
     _pluck_uniq_cols('choices')
 
     for column_name in uniq_cols.keys():
-        if column_name.lower() in ['label', 'hint']:
+        if column_name in ['label', 'hint']:
             _mark_special(
                 column_name=column_name,
                 column=column_name,

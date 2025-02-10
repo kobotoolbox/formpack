@@ -1,6 +1,8 @@
 # coding: utf-8
 import copy
 from collections import OrderedDict
+from ddt import data, ddt, unpack
+from unittest import TestCase
 
 from formpack import FormPack
 from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
@@ -11,6 +13,8 @@ from formpack.utils.expand_content import _get_special_survey_cols
 from formpack.utils.expand_content import expand_content, _expand_type_to_dict
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.string import orderable_with_none
+
+from formpack.src.formpack.utils.expand_content import clean_column_name
 
 
 def test_expand_selects_with_or_other():
@@ -612,3 +616,21 @@ def test_expand_ignores_case():
 
 def _s(rows):
     return {'survey': [dict([[key, 'x']]) for key in rows]}
+
+@ddt
+class ColumnTestCase(TestCase):
+    @data(
+        ('FOO', 'foo'),
+        ('LABEL', 'label'),
+        ('HINT', 'hint'),
+        ('BIND::FOO', 'bind::FOO'),
+        ('BODY : FOO', 'body : FOO'),
+        ('MEDIA:AUDIO:Spanish', 'media:audio:Spanish'),
+        ('VIDEO :: SPANISH', 'video :: SPANISH'),
+        ('MEDIA:AUDIO', 'media:audio'),
+        ('IMAGE', 'image'),
+        ('LABEL : SPANISH', 'label : Spanish')
+    )
+    @unpack
+    def test_clean_column_name(self, name, expected):
+        assert clean_column_name(name) == expected
