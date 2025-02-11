@@ -95,18 +95,28 @@ def _get_translations_from_special_cols(
     return translations, set(translated_cols)
 
 
-def clean_column_name(column_name: str) -> str:
+def clean_column_name(column_name: str, already_seen: dict[str, str]) -> str:
+    """
+
+    Preserves ":" vs "::" and any spaces around the colons
+    """
     RE_MEDIA_COLUMN_NAMES = '|'.join(MEDIA_COLUMN_NAMES)
+    if column_name in already_seen:
+        return already_seen[column_name]
 
     # "LaBeL" -> "label", "HiNT" -> "hint"
     if column_name.lower() in ['label', 'hint']:
-        return column_name.lower()
+        cleaned = column_name.lower()
+        already_seen[column_name] = cleaned
+        return cleaned
 
     # "Bind:Some:Thing" -> "bind:Some:Thing", "BodY:" -> "body:"
     match = re.match(r'^(bind|body):.*', column_name, flags=re.IGNORECASE)
     if match:
-        lower_cased = match.group(0).lower()
-        return re.sub(r'^(bind|body)', lower_cased, column_name, flags=re.IGNORECASE)
+        lower_cased = match.groups()[0].lower()
+        cleaned = re.sub(r'^(bind|body)', lower_cased, column_name, flags=re.IGNORECASE)
+        already_seen[column_name] = cleaned
+        return cleaned
 
     # "Media:Audio::ES" -> "media:audio::ES", "ViDeO : ES" -> "video : ES"
     match = re.match(
@@ -116,40 +126,47 @@ def clean_column_name(column_name: str) -> str:
     )
     if match:
         matched = match.groups()
-        lower_media_prefix = matched[0].lower()
+        lower_media_prefix = matched[0].lower() if matched[0] else ''
         lower_media_type = matched[1].lower()
-        return re.sub(rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})(\s*::?\s*)([^:]+)$',
+        cleaned = re.sub(rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})(\s*::?\s*)([^:]+)$',
                           rf'{lower_media_prefix}{lower_media_type}\3\4',
                           column_name, flags=re.IGNORECASE)
+        already_seen[column_name] = cleaned
+        return cleaned
 
     # "Media: AuDiO" -> "media: audio", "VIDEO" -> "video"
     match = re.match(
-        rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$', column_name
+        rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$', column_name, flags=re.IGNORECASE
     )
     if match:
         matched = match.groups()
-        lower_media_prefix = matched[0].lower()
+        lower_media_prefix = matched[0].lower() if matched[0] else ''
         lower_media_type = matched[1].lower()
-        return  re.sub(rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$',
+        cleaned = re.sub(rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$',
                           rf'{lower_media_prefix}{lower_media_type}',
                           column_name, flags=re.IGNORECASE)
+        already_seen[column_name] = cleaned
 
     match = re.match(r'^([^:]+)(\s*::?\s*)([^:]+)$', column_name)
     if match:
         # example: label::x, constraint_message::x, hint::x
         matched = match.groups()
         lower_column_shortname = matched[0].lower()
-        return re.sub(r'^([^:]+)(\s*::?\s*)([^:]+)$', rf'{lower_column_shortname}\2\3', column_name,
+        cleaned = re.sub(r'^([^:]+)(\s*::?\s*)([^:]+)$', rf'{lower_column_shortname}\2\3', column_name,
                           flags=re.IGNORECASE)
-    return column_name.lower()
+        already_seen[column_name] = cleaned
+        return cleaned
+    cleaned = column_name.lower()
+    already_seen[column_name] = cleaned
+    return cleaned
 
 
 def preprocess_columns(content: Dict[str, List[Any]]) -> None:
-
+    seen = {}
     for sheet, rows in content.items():
         for row in rows:
             for column_name, value in row.copy().items():
-                cleaned_name = clean_column_name(column_name)
+                cleaned_name = clean_column_name(column_name, seen)
                 del row[column_name]
                 row[cleaned_name] = value
 
