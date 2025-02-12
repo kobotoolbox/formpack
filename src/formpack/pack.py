@@ -137,7 +137,6 @@ class FormPack:
         unique accross an entire FormPack. It can be None, but only for
         one version in the FormPack.
         """
-        breakpoint()
         replace_aliases(schema['content'], in_place=True)
         expand_content(schema['content'], in_place=True)
 

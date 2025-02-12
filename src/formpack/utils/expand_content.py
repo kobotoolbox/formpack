@@ -53,7 +53,6 @@ def _expand_translatable_content(
             row[_expandable_col][_nti] = _oldval
         if col_shortname != _expandable_col:
             row[_expandable_col][cur_translation_index] = row[col_shortname]
-            breakpoint()
             del row[col_shortname]
 
 
