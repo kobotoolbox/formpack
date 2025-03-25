@@ -58,7 +58,7 @@
             "languageCode": "en"
           }
         },
-        "clerk_details-name_of_shop": {
+        "clerk_details/name_of_shop": {
           "qual": [
             {
               "uuid": "comment",
