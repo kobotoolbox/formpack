@@ -63,7 +63,7 @@
             }
           }
         },
-        "clerk_details-name_of_clerk": {
+        "clerk_details/name_of_clerk": {
           "qual": [
             {
               "uuid": "comment",
