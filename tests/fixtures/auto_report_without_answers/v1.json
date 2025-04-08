@@ -1,0 +1,80 @@
+{
+    "id_string": "auto_report",
+    "version": "atwav1",
+    "content": {
+        "survey": [
+            {
+                "type": "select_one favorite_coffee",
+                "name": "favorite_coffee",
+                "label": "Favorite coffee"
+            },
+            {
+                "type": "select one type_of_coffee",
+                "name": "type_of_coffee",
+                "label": "Type of coffee"
+            }
+        ],
+        "choices": [
+            {
+                "list_name": "favorite_coffee",
+                "name": "nespresso",
+                "label": "Nespresso"
+            },
+            {
+                "list_name": "favorite_coffee",
+                "name": "keurig",
+                "label": "Keurig"
+            },
+            {
+                "list_name": "favorite_coffee",
+                "name": "tim_hortons",
+                "label": "Tim Hortons"
+            },
+            {
+                "list_name": "type_of_coffee",
+                "name": "latte",
+                "label": "Latte"
+            },
+            {
+                "list_name": "type_of_coffee",
+                "name": "regular",
+                "label": "Regular"
+            },
+            {
+                "list_name": "type_of_coffee",
+                "name": "espresso",
+                "label": "Espresso"
+            }
+        ]
+    },
+    "submissions": [
+        {
+            "favorite_coffee": "tim_hortons",
+            "type_of_coffee": "latte"
+        },
+        {
+            "favorite_coffee": "nespresso",
+            "type_of_coffee": "espresso"
+        },
+        {
+            "favorite_coffee": "keurig",
+            "type_of_coffee": null
+        },
+        {
+            "favorite_coffee": null,
+            "type_of_coffee": "latte"
+        },
+        {
+            "favorite_coffee": null,
+            "type_of_coffee": "latte"
+        },
+        {
+            "favorite_coffee": null,
+            "type_of_coffee": "latte"
+        },
+        {
+            "favorite_coffee": null,
+            "type_of_coffee": "latte"
+        }
+    ]
+}
