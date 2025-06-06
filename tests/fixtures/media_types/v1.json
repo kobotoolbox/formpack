@@ -85,6 +85,25 @@
             "filename": "/path/to/audit.csv"
           }
       ]
+    },
+    {
+      "fav_emperor": "tiberius",
+      "image_of_emperor": "tiberius.jpg",
+      "another_image_of_emperor": "",
+      "meta/audit": "audit.csv",
+      "meta/versionID": "romev1",
+      "meta/instanceID": "uuid:40805f86-2638-46f1-ab5a-72f4632474b7",
+      "_attachments": [
+        {
+          "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/tiberius.jpg",
+          "filename": "/path/to/tiberius.jpg",
+          "is_deleted": true
+        },
+        {
+          "download_url": "https://kc.kobo.org/media/original?media_file=/path/to/audit.csv",
+          "filename": "/path/to/audit.csv"
+        }
+      ]
     }
   ]
 }

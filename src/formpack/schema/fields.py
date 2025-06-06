@@ -685,17 +685,19 @@ class MediaField(TextField):
     ):
         if val is None:
             val = ''
+        attachment = attachment[0] if attachment else {}
+        is_deleted = attachment.get('is_deleted', False)
 
-        if not include_media_url:
-            return {self.name: val}
-
-        download_url = (
-            attachment[0].get('download_url', '') if attachment else ''
-        )
-        return {
-            self.name: val,
-            f'{self.name}_URL': download_url,
+        result = {
+            self.name: val
         }
+
+        if include_media_url:
+            download_url = attachment.get('download_url', '')
+            result[f'{self.name}_URL'] = (
+                download_url if not is_deleted else 'Deleted'
+            )
+        return result
 
 
 class AuditField(MediaField):

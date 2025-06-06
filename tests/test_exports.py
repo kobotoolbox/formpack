@@ -703,6 +703,15 @@ class TestFormPackExport(unittest.TestCase):
                                 '',
                                 '',
                             ],
+                            [
+                                'audit.csv',
+                                'https://kc.kobo.org/media/original?media_file=/path/to/audit.csv',
+                                'tiberius',
+                                'tiberius.jpg',
+                                'Deleted',
+                                '',
+                                '',
+                            ]
                         ],
                     },
                 )
@@ -739,6 +748,12 @@ class TestFormPackExport(unittest.TestCase):
                                 'augustus.jpg',
                                 '',
                             ],
+                            [
+                                'audit.csv',
+                                'tiberius',
+                                'tiberius.jpg',
+                                '',
+                            ]
                         ],
                     },
                 )
