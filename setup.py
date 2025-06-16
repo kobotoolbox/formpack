@@ -19,7 +19,7 @@ dep_links = [
 
 setup(
     name='formpack',
-    version='3.0.0',
+    version='3.0.1',
     description='Manipulation tools for KoBo forms',
     author='the formpack contributors (https://github.com/kobotoolbox/formpack/graphs/contributors)',
     url='https://github.com/kobotoolbox/formpack/',
