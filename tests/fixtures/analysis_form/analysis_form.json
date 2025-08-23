@@ -1,83 +1,38 @@
 {
-  "engines": {
-    "engines/transcript_manual": {
-      "details": "A human provided transcription"
-    }
-  },
   "additional_fields": [
     {
       "type": "transcript",
       "name": "record_a_note/transcript_en",
-      "path": [
-        "record_a_note",
-        "transcript_en"
-      ],
       "language": "en",
-      "source": "record_a_note",
-      "settings": {
-        "mode": "manual",
-        "engine": "engines/transcript_manual"
-      }
+      "source": "record_a_note"
     },
     {
       "type": "transcript",
       "name": "record_a_note/transcript_es",
-      "path": [
-        "record_a_note",
-        "transcript_es"
-      ],
       "language": "es",
-      "source": "record_a_note",
-      "settings": {
-        "mode": "manual",
-        "engine": "engines/transcript_manual"
-      }
+      "source": "record_a_note"
     },
     {
       "type": "translation",
       "name": "record_a_note/translation_en",
       "language": "en",
-      "path": [
-        "record_a_note",
-        "translation_en"
-      ],
-      "source": "record_a_note",
-      "settings": {
-        "mode": "manual",
-        "engine": "engines/translation_manual"
-      }
+      "source": "record_a_note"
     },
     {
       "type": "translation",
       "name": "record_a_note/translation_es",
       "language": "es",
-      "path": [
-        "record_a_note",
-        "translation_es"
-      ],
-      "source": "record_a_note",
-      "settings": {
-        "mode": "manual",
-        "engine": "engines/translation_manual"
-      }
+      "source": "record_a_note"
     },
     {
       "type": "qual_text",
       "name": "name_of_clerk/comment",
-      "path": [
-        "clerk_details/name_of_clerk",
-        "comment"
-      ],
       "label": "Comment on the name of the clerk",
       "source": "clerk_details/name_of_clerk"
     },
     {
       "type": "qual_text",
       "name": "name_of_shop/comment",
-      "path": [
-        "clerk_details/name_of_shop",
-        "comment"
-      ],
       "label": "Comment on the name of the shop",
       "source": "clerk_details/name_of_shop"
     }

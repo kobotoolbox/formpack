@@ -1,31 +1,19 @@
 {
-  "engines": {
-    "transcript": {
-      "details": "an external service provided by ACME, Inc."
-    }
-  },
   "additional_fields": [
     {
       "type": "text",
       "name": "record_a_note/transcript",
-      "path": ["record_a_note", "transcript"],
-      "source": "record_a_note",
-      "analysis_type": "transcript",
-      "settings": {
-        "mode": "auto",
-        "engine": "engines/acme_1_speech2text"
-      }
+      "source": "record_a_note"
     },
     {
       "type": "text",
       "name": "record_a_noise/comment_on_noise_level",
-      "path": ["record_a_noise", "comment_on_noise_level"],
-      "label": [
+      "label": "Comment on noise level",
+      "labels__for_future_use": [
         "Comment on noise level",
         "Komentu pri brunivelo"
       ],
-      "source": "record_a_noise",
-      "analysis_type": "coding"
+      "source": "record_a_noise"
     }
   ],
   "translations": [
