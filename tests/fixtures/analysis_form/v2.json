@@ -52,11 +52,9 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
-          "transcript": {
-            "value": "Hello how may I help you?",
-            "languageCode": "en"
-          }
+        "record_a_note/transcript__en": {
+          "value": "Hello how may I help you?",
+          "language": "en"
         },
         "clerk_details/name_of_shop": {
           "qual": [
@@ -78,11 +76,9 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
-          "transcript": {
-            "value": "Thank you for your business",
-            "languageCode": "en"
-          }
+        "record_a_note/transcript__en": {
+          "value": "Thank you for your business",
+          "language": "en"
         }
       }
     },

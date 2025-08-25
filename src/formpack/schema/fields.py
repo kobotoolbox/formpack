@@ -620,24 +620,9 @@ class QualTranscriptField(QualField):
         return f'{source_label} - transcript ({self.language})'
 
     def get_value_from_entry(self, entry):
-        name = self.name.split('/')[-1]
-
         try:
-            responses = entry['_supplementalDetails'][self.source_field.path]
+            return entry['_supplementalDetails'][self.name]['value']
         except KeyError:
-            return ''
-
-        name_without_lang, lang = name.split('_')
-        assert name_without_lang == 'transcript'
-
-        try:
-            response = responses['transcript']
-        except KeyError:
-            return ''
-
-        if response.get('languageCode') == lang:
-            return response['value']
-        else:
             return ''
 
 
@@ -647,18 +632,8 @@ class QualTranslationField(QualField):
         return f'{source_label} - translation ({self.language})'
 
     def get_value_from_entry(self, entry):
-        name = self.name.split('/')[-1]
-
         try:
-            responses = entry['_supplementalDetails'][self.source_field.path]
-        except KeyError:
-            return ''
-
-        name_without_lang, lang = name.split('_')
-        assert name_without_lang == 'translation'
-
-        try:
-            return responses['translation'][lang]['value']
+            return entry['_supplementalDetails'][self.name]['value']
         except KeyError:
             return ''
 

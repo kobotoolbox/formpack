@@ -132,7 +132,14 @@ class TestFormPackFixtures(unittest.TestCase):
         assert 'Simple Clerk Interaction' == title
 
         expected_analysis_questions = sorted(
-            [f['name'] for f in analysis_form['additional_fields']]
+            (
+                'record_a_note/transcript__en',
+                'record_a_note/transcript__es',
+                'record_a_note/translation__en',
+                'record_a_note/translation__es',
+                'name_of_clerk/comment',
+                'name_of_shop/comment',
+            )
         )
         actual_analysis_questions = sorted(
             [f.name for f in fp.analysis_form.fields]

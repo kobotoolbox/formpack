@@ -81,15 +81,13 @@ class AnalysisForm(BaseForm):
         formpack: 'FormPack',
         schema: Dict[str, Union[str, List]],
     ) -> None:
-
         self.schema = schema
         self.formpack = formpack
 
-        survey = self.schema.get('additional_fields', [])
-        fields_by_name = self._get_fields_by_name(survey)
+        survey = self.schema
         section = FormSection(name=formpack.title)
 
-        self.translations = self._get_translations(schema)
+        self.translations = [UNTRANSLATED]
 
         for data_def in survey:
             field = FormField.from_json_definition(
