@@ -137,8 +137,8 @@ class TestFormPackFixtures(unittest.TestCase):
                 'record_a_note/transcript__es',
                 'record_a_note/translation__en',
                 'record_a_note/translation__es',
-                'name_of_clerk/comment',
-                'name_of_shop/comment',
+                'clerk_details/name_of_clerk/comment',
+                'clerk_details/name_of_shop/comment',
             )
         )
         actual_analysis_questions = sorted(

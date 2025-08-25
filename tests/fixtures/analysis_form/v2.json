@@ -56,14 +56,12 @@
           "value": "Hello how may I help you?",
           "language": "en"
         },
-        "clerk_details/name_of_shop": {
-          "qual": [
-            {
-              "uuid": "comment",
-              "val": "Pretty cliche"
-            }
-          ]
-        }
+        "clerk_details/name_of_shop/qual": [
+          {
+            "uuid": "comment",
+            "val": "Pretty cliche"
+          }
+        ]
       }
     },
     {

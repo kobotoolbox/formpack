@@ -25,13 +25,13 @@
   },
   {
     "type": "qual_text",
-    "name": "name_of_clerk/comment",
+    "name": "clerk_details/name_of_clerk/comment",
     "label": "Comment on the name of the clerk",
     "source": "clerk_details/name_of_clerk"
   },
   {
     "type": "qual_text",
-    "name": "name_of_shop/comment",
+    "name": "clerk_details/name_of_shop/comment",
     "label": "Comment on the name of the shop",
     "source": "clerk_details/name_of_shop"
   }
