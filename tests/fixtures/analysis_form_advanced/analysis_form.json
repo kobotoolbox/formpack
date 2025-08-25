@@ -7,7 +7,7 @@
   },
   {
     "type": "qual_select_multiple",
-    "name": "record_a_note/tone_of_voice",
+    "name": "clerk_interactions/record_a_note/tone_of_voice",
     "label": "How was the tone of the clerk's voice?",
     "labels__for_future_use": [
       "How was the tone of the clerk's voice?",
@@ -43,7 +43,7 @@
   },
   {
     "type": "qual_text",
-    "name": "goods_sold/comment",
+    "name": "clerk_interactions/goods_sold/comment",
     "label": "Comment on the goods sold at the store",
     "labels__for_future_use": [
       "Comment on the goods sold at the store",
@@ -53,7 +53,7 @@
   },
   {
     "type": "qual_select_one",
-    "name": "goods_sold/rating",
+    "name": "clerk_interactions/goods_sold/rating",
     "label": "Rate the quality of the goods sold at the store",
     "labels__for_future_use": [
       "Rate the quality of the goods sold at the store",

@@ -530,19 +530,24 @@ class QualField(TextField):
         return [self._get_label(*args, **kwargs)]
 
     def get_value_from_entry(self, entry):
-        name = self.name.split('/')[-1]
+        name_parts = self.name.split('/')
+        # must have at least the source question path and the qual field uuid
+        assert len(name_parts) >= 2
+        field_uuid = name_parts[-1]
+        # is it still necessary to have a separate `source` attribute?
+        source = '/'.join(name_parts[:-1])
+        assert source == self.source
+        response_key = source + '/qual'  # all responses nested within this
 
         try:
-            responses = entry['_supplementalDetails'][self.source_field.path][
-                'qual'
-            ]
+            responses = entry['_supplementalDetails'][response_key]
         except KeyError:
             return ''
 
         # sure would be nice if this were a dict with uuids as keys instead of
         # a list requiring this kind of iteration
         for response in responses:
-            if response['uuid'] == name:
+            if response['uuid'] == field_uuid:
                 return response['val']
 
         return ''

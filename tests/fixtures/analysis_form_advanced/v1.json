@@ -82,20 +82,16 @@
           "value": "Hello how may I help you?",
           "language": "en"
         },
-        "clerk_interactions/record_a_note": {
-          "qual": [
-            {
-              "uuid": "tone_of_voice",
-              "val": [{"uuid": "excited"}, {"uuid": "confused"}]
-            }
-          ]
-        },
-        "clerk_interactions/goods_sold": {
-          "qual": [
-            {"uuid": "comment", "val": "Not much diversity"},
-            {"uuid": "rating", "val": {"uuid": "3"}}
-          ]
-        }
+        "clerk_interactions/record_a_note/qual": [
+          {
+            "uuid": "tone_of_voice",
+            "val": [{"uuid": "excited"}, {"uuid": "confused"}]
+          }
+        ],
+        "clerk_interactions/goods_sold/qual": [
+          {"uuid": "comment", "val": "Not much diversity"},
+          {"uuid": "rating", "val": {"uuid": "3"}}
+        ]
       }
     },
     {
@@ -112,19 +108,15 @@
           "value": "Thank you for your business",
           "language": "en"
         },
-        "clerk_interactions/record_a_note": {
-          "qual": [
-            {
-              "uuid": "tone_of_voice",
-              "val": [{"uuid": "anxious"}, {"uuid": "excited"}]
-            }
-          ]
-        },
-        "clerk_interactions/goods_sold": {
-          "qual": [
-            {"uuid": "rating", "val": {"uuid": "2"}}
-          ]
-        }
+        "clerk_interactions/record_a_note/qual": [
+          {
+            "uuid": "tone_of_voice",
+            "val": [{"uuid": "anxious"}, {"uuid": "excited"}]
+          }
+        ],
+        "clerk_interactions/goods_sold/qual": [
+          {"uuid": "rating", "val": {"uuid": "2"}}
+        ]
       }
     },
     {
@@ -137,11 +129,9 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions/goods_sold": {
-          "qual": [
-            {"uuid": "rating", "val": {"uuid": "3"}}
-          ]
-        }
+        "clerk_interactions/goods_sold/qual": [
+          {"uuid": "rating", "val": {"uuid": "3"}}
+        ]
       }
     }
   ]
