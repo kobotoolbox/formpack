@@ -1,43 +1,38 @@
-{
-  "additional_fields": [
-    {
-      "type": "transcript",
-      "name": "record_a_note/transcript_en",
-      "language": "en",
-      "source": "record_a_note"
-    },
-    {
-      "type": "transcript",
-      "name": "record_a_note/transcript_es",
-      "language": "es",
-      "source": "record_a_note"
-    },
-    {
-      "type": "translation",
-      "name": "record_a_note/translation_en",
-      "language": "en",
-      "source": "record_a_note"
-    },
-    {
-      "type": "translation",
-      "name": "record_a_note/translation_es",
-      "language": "es",
-      "source": "record_a_note"
-    },
-    {
-      "type": "qual_text",
-      "name": "name_of_clerk/comment",
-      "label": "Comment on the name of the clerk",
-      "source": "clerk_details/name_of_clerk"
-    },
-    {
-      "type": "qual_text",
-      "name": "name_of_shop/comment",
-      "label": "Comment on the name of the shop",
-      "source": "clerk_details/name_of_shop"
-    }
-  ],
-  "translations": [
-    "English (en)"
-  ]
-}
+[
+  {
+    "type": "transcript",
+    "name": "record_a_note/transcript__en",
+    "language": "en",
+    "source": "record_a_note"
+  },
+  {
+    "type": "transcript",
+    "name": "record_a_note/transcript__es",
+    "language": "es",
+    "source": "record_a_note"
+  },
+  {
+    "type": "translation",
+    "name": "record_a_note/translation__en",
+    "language": "en",
+    "source": "record_a_note"
+  },
+  {
+    "type": "translation",
+    "name": "record_a_note/translation__es",
+    "language": "es",
+    "source": "record_a_note"
+  },
+  {
+    "type": "qual_text",
+    "name": "name_of_clerk/comment",
+    "label": "Comment on the name of the clerk",
+    "source": "clerk_details/name_of_clerk"
+  },
+  {
+    "type": "qual_text",
+    "name": "name_of_shop/comment",
+    "label": "Comment on the name of the shop",
+    "source": "clerk_details/name_of_shop"
+  }
+]

@@ -1,96 +1,90 @@
-{
-  "additional_fields": [
-    {
-      "type": "transcript",
-      "name": "record_a_note/transcript_en",
-      "source": "clerk_interactions/record_a_note",
-      "language": "en"
-    },
-    {
-      "type": "qual_select_multiple",
-      "name": "record_a_note/tone_of_voice",
-      "label": "How was the tone of the clerk's voice?",
-      "labels__for_future_use": [
-        "How was the tone of the clerk's voice?",
-        "Kiel estis la tono de la voĉo de la oficisto?"
-      ],
-      "source": "clerk_interactions/record_a_note",
-      "choices": [
-        {
-          "uuid": "anxious",
-          "labels": {
-            "_default": "Anxious",
-            "en": "Anxious",
-            "es": "Maltrankvila"
-          }
-        },
-        {
-          "uuid": "excited",
-          "labels": {
-            "_default": "Excited",
-            "en": "Excited",
-            "es": "Ekscitita"
-          }
-        },
-        {
-          "uuid": "confused",
-          "labels": {
-            "_default": "Confused",
-            "en": "Confused",
-            "es": "Konfuzita"
-          }
+[
+  {
+    "type": "transcript",
+    "name": "clerk_interactions/record_a_note/transcript__en",
+    "source": "clerk_interactions/record_a_note",
+    "language": "en"
+  },
+  {
+    "type": "qual_select_multiple",
+    "name": "record_a_note/tone_of_voice",
+    "label": "How was the tone of the clerk's voice?",
+    "labels__for_future_use": [
+      "How was the tone of the clerk's voice?",
+      "Kiel estis la tono de la voĉo de la oficisto?"
+    ],
+    "source": "clerk_interactions/record_a_note",
+    "choices": [
+      {
+        "uuid": "anxious",
+        "labels": {
+          "_default": "Anxious",
+          "en": "Anxious",
+          "es": "Maltrankvila"
         }
-      ]
-    },
-    {
-      "type": "qual_text",
-      "name": "goods_sold/comment",
-      "label": "Comment on the goods sold at the store",
-      "labels__for_future_use": [
-        "Comment on the goods sold at the store",
-        "Komentu la varojn venditajn en la vendejo"
-      ],
-      "source": "clerk_interactions/goods_sold"
-    },
-    {
-      "type": "qual_select_one",
-      "name": "goods_sold/rating",
-      "label": "Rate the quality of the goods sold at the store",
-      "labels__for_future_use": [
-        "Rate the quality of the goods sold at the store",
-        "Komentu la varojn vendojn en la vendejo"
-      ],
-      "source": "clerk_interactions/goods_sold",
-      "choices": [
-        {
-          "uuid": "1",
-          "labels": {
-            "_default": "Poor quality",
-            "en": "Poor quality",
-            "es": "Malbona kvalito"
-          }
-        },
-        {
-          "uuid": "2",
-          "labels": {
-            "_default": "Average quality",
-            "en": "Average quality",
-            "es": "Meza kvalito"
-          }
-        },
-        {
-          "uuid": "3",
-          "labels": {
-            "_default": "High quality",
-            "en": "High quality",
-            "es": "Alta kvalito"
-          }
+      },
+      {
+        "uuid": "excited",
+        "labels": {
+          "_default": "Excited",
+          "en": "Excited",
+          "es": "Ekscitita"
         }
-      ]
-    }
-  ],
-  "translations": [
-    "English (en)",
-    "Esperanto (es)"
-  ]
-}
+      },
+      {
+        "uuid": "confused",
+        "labels": {
+          "_default": "Confused",
+          "en": "Confused",
+          "es": "Konfuzita"
+        }
+      }
+    ]
+  },
+  {
+    "type": "qual_text",
+    "name": "goods_sold/comment",
+    "label": "Comment on the goods sold at the store",
+    "labels__for_future_use": [
+      "Comment on the goods sold at the store",
+      "Komentu la varojn venditajn en la vendejo"
+    ],
+    "source": "clerk_interactions/goods_sold"
+  },
+  {
+    "type": "qual_select_one",
+    "name": "goods_sold/rating",
+    "label": "Rate the quality of the goods sold at the store",
+    "labels__for_future_use": [
+      "Rate the quality of the goods sold at the store",
+      "Komentu la varojn vendojn en la vendejo"
+    ],
+    "source": "clerk_interactions/goods_sold",
+    "choices": [
+      {
+        "uuid": "1",
+        "labels": {
+          "_default": "Poor quality",
+          "en": "Poor quality",
+          "es": "Malbona kvalito"
+        }
+      },
+      {
+        "uuid": "2",
+        "labels": {
+          "_default": "Average quality",
+          "en": "Average quality",
+          "es": "Meza kvalito"
+        }
+      },
+      {
+        "uuid": "3",
+        "labels": {
+          "_default": "High quality",
+          "en": "High quality",
+          "es": "Alta kvalito"
+        }
+      }
+    ]
+  }
+]

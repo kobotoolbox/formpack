@@ -52,16 +52,13 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
-          "transcript": {
-            "value": "Saluton, kiel mi povas helpi vin?",
-            "languageCode": "es"
-          },
-          "translation": {
-            "en": {
-              "value": "Hello how may I help you?"
-            }
-          }
+        "record_a_note/transcript__es": {
+          "value": "Saluton, kiel mi povas helpi vin?",
+          "language": "es"
+        },
+        "record_a_note/translation__en": {
+          "value": "Hello how may I help you?",
+          "language": "en"
         },
         "clerk_details/name_of_clerk": {
           "qual": [
@@ -83,11 +80,9 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note": {
-          "transcript": {
-            "value": "Thank you for your business",
-            "languageCode": "en"
-          }
+        "record_a_note/transcript__en": {
+          "value": "Thank you for your business",
+          "language": "en"
         }
       }
     },

@@ -78,11 +78,11 @@
         }
       ],
       "_supplementalDetails": {
+        "clerk_interactions/record_a_note/transcript__en": {
+          "value": "Hello how may I help you?",
+          "language": "en"
+        },
         "clerk_interactions/record_a_note": {
-          "transcript": {
-            "value": "Hello how may I help you?",
-            "languageCode": "en"
-          },
           "qual": [
             {
               "uuid": "tone_of_voice",
@@ -108,11 +108,11 @@
         }
       ],
       "_supplementalDetails": {
+        "clerk_interactions/record_a_note/transcript__en": {
+          "value": "Thank you for your business",
+          "language": "en"
+        },
         "clerk_interactions/record_a_note": {
-          "transcript": {
-            "value": "Thank you for your business",
-            "languageCode": "en"
-          },
           "qual": [
             {
               "uuid": "tone_of_voice",

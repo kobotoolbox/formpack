@@ -15,10 +15,10 @@ def test_additional_field_exports_without_labels():
         'versions': 'v1',
         'filter_fields': [
             'record_a_note',
-            '_supplementalDetails/record_a_note/transcript_en',
-            '_supplementalDetails/record_a_note/transcript_es',
-            '_supplementalDetails/record_a_note/translation_en',
-            '_supplementalDetails/record_a_note/translation_es',
+            '_supplementalDetails/record_a_note/transcript__en',
+            '_supplementalDetails/record_a_note/transcript__es',
+            '_supplementalDetails/record_a_note/translation__en',
+            '_supplementalDetails/record_a_note/translation__es',
         ],
     }
     export = pack.export(**options)
@@ -53,10 +53,10 @@ def test_additional_field_exports_with_labels():
         'versions': 'v1',
         'filter_fields': [
             'record_a_note',
-            '_supplementalDetails/record_a_note/transcript_en',
-            '_supplementalDetails/record_a_note/transcript_es',
-            '_supplementalDetails/record_a_note/translation_en',
-            '_supplementalDetails/record_a_note/translation_es',
+            '_supplementalDetails/record_a_note/transcript__en',
+            '_supplementalDetails/record_a_note/transcript__es',
+            '_supplementalDetails/record_a_note/translation__en',
+            '_supplementalDetails/record_a_note/translation__es',
         ],
         'lang': 'English (en)',
     }
