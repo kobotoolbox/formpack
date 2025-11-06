@@ -39,7 +39,7 @@ def _expand_translatable_content(
     special_column_details: Dict[str, Optional[str]],
 ) -> None:
     _scd = special_column_details
-    if 'translation' in _scd:
+    if 'translation' in _scd and _scd['translation'] is not UNTRANSLATED:
         translations = content['translations']
         cur_translation = _scd['translation']
         cur_translation_index = translations.index(cur_translation)
@@ -87,7 +87,7 @@ def _get_translations_from_special_cols(
 ) -> Tuple[List[str], Set[str]]:
     translated_cols = []
     for colname, parsedvals in iter(special_cols.items()):
-        if 'translation' in parsedvals:
+        if 'translation' in parsedvals and parsedvals['translation'] is not UNTRANSLATED:
             translated_cols.append(parsedvals['column'])
             if parsedvals['translation'] not in translations:
                 translations.append(parsedvals['translation'])

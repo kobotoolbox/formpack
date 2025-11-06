@@ -1,6 +1,8 @@
 # coding: utf-8
+from copy import deepcopy
 
-from formpack.utils.bugfix import repair_file_column_content_in_place
+from formpack.constants import UNTRANSLATED
+from formpack.utils.bugfix import repair_media_column_content_in_place
 
 
 def test_repair_file_column():
@@ -26,7 +28,36 @@ def test_repair_file_column():
         'translated': ['label', 'media::file'],
         'translations': ['Ukrainian', 'English', None],
     }
-    assert repair_file_column_content_in_place(content)
+    assert repair_media_column_content_in_place(content)
     assert content['survey'][1]['file'] == 'oblast.csv'
     assert content['translated'] == ['label']
     assert content['translations'] == ['Ukrainian', 'English']
+
+
+def test_repair_media_image_none_plus_value_and_translations():
+    content = {
+        'schema': '1',
+        'settings': {},
+        'survey': [
+            {
+                'label': ['Código de participante'],
+                'name': 'repro_media',
+                'type': 'text',
+                'media::image': [None, 'repro_test.png'],
+                '$xpath': 'repro_media',
+            }
+        ],
+        'translated': ['label', 'media::image'],
+        'translations': [UNTRANSLATED, 'big-image'],
+    }
+    content_copy = deepcopy(content)
+
+    assert repair_media_column_content_in_place(content_copy) is True
+    assert 'image' in content_copy['survey'][0]
+    assert content_copy['survey'][0]['image'] == 'repro_test.png'
+
+    # 'media::image' token must be removed from translated
+    assert 'media::image' not in content_copy['translated']
+    assert 'label' in content_copy['translated']
+    resulting_translations = content_copy['translations']
+    assert resulting_translations in (['big-image'], [UNTRANSLATED], [None])
