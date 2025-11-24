@@ -57,7 +57,7 @@ TAG_COLUMNS_AND_SEPARATORS = {
 #     video or audio files
 #     …
 #     Media is translatable in the same way as labels and hints…
-MEDIA_COLUMN_NAMES = ('audio', 'image', 'video')
+MEDIA_COLUMN_NAMES = ('audio', 'image', 'video', 'big-image')
 
 # Export Settings
 EXPORT_SETTING_FIELDS = 'fields'
