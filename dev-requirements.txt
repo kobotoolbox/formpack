@@ -7,6 +7,7 @@
 # Install testing / development requirements
 coverage[toml]==6.5.0
 coveralls==3.3.1
+ddt==1.7.2
 flake8==7.1.1
 funcsigs==1.0.2
 geojson-rewind==1.1.0
