@@ -52,16 +52,20 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note/transcript__en": {
-          "value": "Hello how may I help you?",
-          "language": "en"
-        },
-        "clerk_details/name_of_shop/qual": [
-          {
-            "uuid": "comment",
-            "val": "Pretty cliche"
+        "record_a_note": {
+          "transcript": {
+            "value": "Hello how may I help you?",
+            "languageCode": "en"
           }
-        ]
+        },
+        "clerk_details/name_of_shop": {
+          "qual": [
+            {
+              "uuid": "uuid_for_comment",
+              "value": "Pretty cliche"
+            }
+          ]
+        }
       }
     },
     {
@@ -74,9 +78,11 @@
         }
       ],
       "_supplementalDetails": {
-        "record_a_note/transcript__en": {
-          "value": "Thank you for your business",
-          "language": "en"
+        "record_a_note": {
+          "transcript": {
+            "value": "Thank you for your business",
+            "languageCode": "en"
+          }
         }
       }
     },

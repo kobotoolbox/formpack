@@ -78,20 +78,48 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions/record_a_note/transcript__en": {
-          "value": "Hello how may I help you?",
-          "language": "en"
+        "clerk_interactions/record_a_note": {
+          "transcript": {
+            "value": "Hello how may I help you?",
+            "languageCode": "en"
+          },
+          "qual": [
+            {
+              "uuid": "uuid_for_tone_of_voice",
+              "value": [
+                {
+                  "uuid": "uuid_for_excited",
+                  "labels": {
+                    "_default": "Excited"
+                  }
+                },
+                {
+                  "uuid": "uuid_for_confused",
+                  "labels": {
+                    "_default": "Confused"
+                  }
+                }
+              ]
+            }
+          ]
         },
-        "clerk_interactions/record_a_note/qual": [
-          {
-            "uuid": "tone_of_voice",
-            "val": [{"uuid": "excited"}, {"uuid": "confused"}]
-          }
-        ],
-        "clerk_interactions/goods_sold/qual": [
-          {"uuid": "comment", "val": "Not much diversity"},
-          {"uuid": "rating", "val": {"uuid": "3"}}
-        ]
+        "clerk_interactions/goods_sold": {
+          "qual": [
+            {
+              "uuid": "uuid_for_comment",
+              "value": "Not much diversity"
+            },
+            {
+              "uuid": "uuid_for_rating",
+              "value": {
+                "uuid": "uuid_for_3",
+                "labels": {
+                  "_default": "3"
+                }
+              }
+            }
+          ]
+        }
       }
     },
     {
@@ -104,19 +132,44 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions/record_a_note/transcript__en": {
-          "value": "Thank you for your business",
-          "language": "en"
+        "clerk_interactions/record_a_note": {
+          "transcript": {
+            "value": "Thank you for your business",
+            "languageCode": "en"
+          },
+          "qual": [
+            {
+              "uuid": "uuid_for_tone_of_voice",
+              "value": [
+                {
+                  "uuid": "uuid_for_anxious",
+                  "labels": {
+                    "_default": "Anxious"
+                  }
+                },
+                {
+                  "uuid": "uuid_for_excited",
+                  "labels": {
+                    "_default": "Excited"
+                  }
+                }
+              ]
+            }
+          ]
         },
-        "clerk_interactions/record_a_note/qual": [
-          {
-            "uuid": "tone_of_voice",
-            "val": [{"uuid": "anxious"}, {"uuid": "excited"}]
-          }
-        ],
-        "clerk_interactions/goods_sold/qual": [
-          {"uuid": "rating", "val": {"uuid": "2"}}
-        ]
+        "clerk_interactions/goods_sold": {
+          "qual": [
+            {
+              "uuid": "uuid_for_rating",
+              "value": {
+                "uuid": "uuid_for_2",
+                "labels": {
+                  "_default": "2"
+                }
+              }
+            }
+          ]
+        }
       }
     },
     {
@@ -129,9 +182,19 @@
         }
       ],
       "_supplementalDetails": {
-        "clerk_interactions/goods_sold/qual": [
-          {"uuid": "rating", "val": {"uuid": "3"}}
-        ]
+        "clerk_interactions/goods_sold": {
+          "qual": [
+            {
+              "uuid": "uuid_for_rating",
+              "value": {
+                "uuid": "uuid_for_3",
+                "labels": {
+                  "_default": "3"
+                }
+              }
+            }
+          ]
+        }
       }
     }
   ]

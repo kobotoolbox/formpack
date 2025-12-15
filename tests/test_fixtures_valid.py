@@ -133,12 +133,12 @@ class TestFormPackFixtures(unittest.TestCase):
 
         expected_analysis_questions = sorted(
             (
-                'record_a_note/transcript__en',
-                'record_a_note/transcript__es',
-                'record_a_note/translation__en',
-                'record_a_note/translation__es',
-                'clerk_details/name_of_clerk/comment',
-                'clerk_details/name_of_shop/comment',
+                'record_a_note/transcript_en',
+                'record_a_note/transcript_es',
+                'record_a_note/translation_en',
+                'record_a_note/translation_es',
+                'clerk_details/name_of_clerk/uuid_for_comment',
+                'clerk_details/name_of_shop/uuid_for_comment',
             )
         )
         actual_analysis_questions = sorted(
@@ -146,11 +146,11 @@ class TestFormPackFixtures(unittest.TestCase):
         )
         assert expected_analysis_questions == actual_analysis_questions
 
-        f1 = fp.analysis_form.fields[0]
-        assert hasattr(f1, 'source') and f1.source
-        assert hasattr(f1, 'has_stats') and not f1.has_stats
-        assert hasattr(f1, 'settings')
-        assert f1.data_type in (
-            'transcript',
-            'translation',
-        ) or f1.data_type.startswith('qual_')
+        for field in fp.analysis_form.fields:
+            assert hasattr(field, 'source') and field.source
+            assert hasattr(field, 'has_stats') and not field.has_stats
+            assert hasattr(field, 'settings')
+            assert field.data_type in (
+                'transcript',
+                'translation',
+            ) or field.data_type.startswith('qual')

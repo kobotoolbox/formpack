@@ -1,13 +1,13 @@
 [
   {
     "type": "transcript",
-    "name": "clerk_interactions/record_a_note/transcript__en",
+    "name": "clerk_interactions/record_a_note/transcript_en",
     "source": "clerk_interactions/record_a_note",
     "language": "en"
   },
   {
-    "type": "qual_select_multiple",
-    "name": "clerk_interactions/record_a_note/tone_of_voice",
+    "type": "qualSelectMultiple",
+    "name": "clerk_interactions/record_a_note/uuid_for_tone_of_voice",
     "label": "How was the tone of the clerk's voice?",
     "labels__for_future_use": [
       "How was the tone of the clerk's voice?",
@@ -16,7 +16,7 @@
     "source": "clerk_interactions/record_a_note",
     "choices": [
       {
-        "uuid": "anxious",
+        "uuid": "uuid_for_anxious",
         "labels": {
           "_default": "Anxious",
           "en": "Anxious",
@@ -24,7 +24,7 @@
         }
       },
       {
-        "uuid": "excited",
+        "uuid": "uuid_for_excited",
         "labels": {
           "_default": "Excited",
           "en": "Excited",
@@ -32,7 +32,7 @@
         }
       },
       {
-        "uuid": "confused",
+        "uuid": "uuid_for_confused",
         "labels": {
           "_default": "Confused",
           "en": "Confused",
@@ -42,8 +42,8 @@
     ]
   },
   {
-    "type": "qual_text",
-    "name": "clerk_interactions/goods_sold/comment",
+    "type": "qualText",
+    "name": "clerk_interactions/goods_sold/uuid_for_comment",
     "label": "Comment on the goods sold at the store",
     "labels__for_future_use": [
       "Comment on the goods sold at the store",
@@ -52,8 +52,8 @@
     "source": "clerk_interactions/goods_sold"
   },
   {
-    "type": "qual_select_one",
-    "name": "clerk_interactions/goods_sold/rating",
+    "type": "qualSelectOne",
+    "name": "clerk_interactions/goods_sold/uuid_for_rating",
     "label": "Rate the quality of the goods sold at the store",
     "labels__for_future_use": [
       "Rate the quality of the goods sold at the store",
@@ -62,7 +62,7 @@
     "source": "clerk_interactions/goods_sold",
     "choices": [
       {
-        "uuid": "1",
+        "uuid": "uuid_for_1",
         "labels": {
           "_default": "Poor quality",
           "en": "Poor quality",
@@ -70,7 +70,7 @@
         }
       },
       {
-        "uuid": "2",
+        "uuid": "uuid_for_2",
         "labels": {
           "_default": "Average quality",
           "en": "Average quality",
@@ -78,7 +78,7 @@
         }
       },
       {
-        "uuid": "3",
+        "uuid": "uuid_for_3",
         "labels": {
           "_default": "High quality",
           "en": "High quality",
