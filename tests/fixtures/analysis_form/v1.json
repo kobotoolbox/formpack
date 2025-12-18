@@ -65,12 +65,12 @@
           }
         },
         "clerk_details/name_of_clerk": {
-          "qual": [
-            {
+          "qual": {
+            "uuid_for_comment": {
               "uuid": "uuid_for_comment",
               "value": "Sounds like an interesting person"
             }
-          ]
+          }
         }
       }
     },

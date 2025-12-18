@@ -83,8 +83,8 @@
             "value": "Hello how may I help you?",
             "languageCode": "en"
           },
-          "qual": [
-            {
+          "qual": {
+            "uuid_for_tone_of_voice": {
               "uuid": "uuid_for_tone_of_voice",
               "value": [
                 {
@@ -101,15 +101,15 @@
                 }
               ]
             }
-          ]
+          }
         },
         "clerk_interactions/goods_sold": {
-          "qual": [
-            {
+          "qual": {
+            "uuid_for_comment": {
               "uuid": "uuid_for_comment",
               "value": "Not much diversity"
             },
-            {
+            "uuid_for_rating": {
               "uuid": "uuid_for_rating",
               "value": {
                 "uuid": "uuid_for_3",
@@ -118,7 +118,7 @@
                 }
               }
             }
-          ]
+          }
         }
       }
     },
@@ -137,8 +137,8 @@
             "value": "Thank you for your business",
             "languageCode": "en"
           },
-          "qual": [
-            {
+          "qual": {
+            "uuid_for_tone_of_voice": {
               "uuid": "uuid_for_tone_of_voice",
               "value": [
                 {
@@ -155,11 +155,11 @@
                 }
               ]
             }
-          ]
+         }
         },
         "clerk_interactions/goods_sold": {
-          "qual": [
-            {
+          "qual": {
+            "uuid_for_rating": {
               "uuid": "uuid_for_rating",
               "value": {
                 "uuid": "uuid_for_2",
@@ -168,7 +168,7 @@
                 }
               }
             }
-          ]
+          }
         }
       }
     },
@@ -183,8 +183,8 @@
       ],
       "_supplementalDetails": {
         "clerk_interactions/goods_sold": {
-          "qual": [
-            {
+          "qual": {
+            "uuid_for_rating": {
               "uuid": "uuid_for_rating",
               "value": {
                 "uuid": "uuid_for_3",
@@ -193,7 +193,7 @@
                 }
               }
             }
-          ]
+          }
         }
       }
     }
