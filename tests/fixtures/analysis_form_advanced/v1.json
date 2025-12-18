@@ -85,7 +85,6 @@
           },
           "qual": {
             "uuid_for_tone_of_voice": {
-              "uuid": "uuid_for_tone_of_voice",
               "value": [
                 {
                   "uuid": "uuid_for_excited",
@@ -106,11 +105,9 @@
         "clerk_interactions/goods_sold": {
           "qual": {
             "uuid_for_comment": {
-              "uuid": "uuid_for_comment",
               "value": "Not much diversity"
             },
             "uuid_for_rating": {
-              "uuid": "uuid_for_rating",
               "value": {
                 "uuid": "uuid_for_3",
                 "labels": {
@@ -139,7 +136,6 @@
           },
           "qual": {
             "uuid_for_tone_of_voice": {
-              "uuid": "uuid_for_tone_of_voice",
               "value": [
                 {
                   "uuid": "uuid_for_anxious",
@@ -160,7 +156,6 @@
         "clerk_interactions/goods_sold": {
           "qual": {
             "uuid_for_rating": {
-              "uuid": "uuid_for_rating",
               "value": {
                 "uuid": "uuid_for_2",
                 "labels": {
@@ -185,7 +180,6 @@
         "clerk_interactions/goods_sold": {
           "qual": {
             "uuid_for_rating": {
-              "uuid": "uuid_for_rating",
               "value": {
                 "uuid": "uuid_for_3",
                 "labels": {
