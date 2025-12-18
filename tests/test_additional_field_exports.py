@@ -321,6 +321,7 @@ def test_additional_field_exports_v2():
         'record_a_note - transcript (es)',
         'record_a_note - translation (en)',
         'record_a_note - translation (es)',
+        # `name_of_clerk` is absent in v2
         'name_of_shop',
         'name_of_shop - Comment on the name of the shop',
     ]
@@ -395,6 +396,9 @@ def test_additional_field_exports_all_versions_exclude_fields():
         'versions': pack.versions,
         'filter_fields': [
             'record_a_note',
+            # FIXME: These make no sense because `name_of_*` are regular survey questions, not "additional fields"
+            # Or is the idea that by selecting the source fields the related additional fields come along automatically?
+            # But if that's true, why do we explicitly request the additional fields in `test_additional_field_exports_with_labels()`?
             '_supplementalDetails/clerk_details/name_of_shop',
             '_supplementalDetails/clerk_details/name_of_clerk',
         ],

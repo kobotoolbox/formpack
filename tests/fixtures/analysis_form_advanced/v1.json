@@ -85,15 +85,39 @@
           },
           "qual": [
             {
-              "uuid": "tone_of_voice",
-              "val": [{"uuid": "excited"}, {"uuid": "confused"}]
+              "uuid": "uuid_for_tone_of_voice",
+              "value": [
+                {
+                  "uuid": "uuid_for_excited",
+                  "labels": {
+                    "_default": "Excited"
+                  }
+                },
+                {
+                  "uuid": "uuid_for_confused",
+                  "labels": {
+                    "_default": "Confused"
+                  }
+                }
+              ]
             }
           ]
         },
         "clerk_interactions/goods_sold": {
           "qual": [
-            {"uuid": "comment", "val": "Not much diversity"},
-            {"uuid": "rating", "val": {"uuid": "3"}}
+            {
+              "uuid": "uuid_for_comment",
+              "value": "Not much diversity"
+            },
+            {
+              "uuid": "uuid_for_rating",
+              "value": {
+                "uuid": "uuid_for_3",
+                "labels": {
+                  "_default": "3"
+                }
+              }
+            }
           ]
         }
       }
@@ -115,14 +139,35 @@
           },
           "qual": [
             {
-              "uuid": "tone_of_voice",
-              "val": [{"uuid": "anxious"}, {"uuid": "excited"}]
+              "uuid": "uuid_for_tone_of_voice",
+              "value": [
+                {
+                  "uuid": "uuid_for_anxious",
+                  "labels": {
+                    "_default": "Anxious"
+                  }
+                },
+                {
+                  "uuid": "uuid_for_excited",
+                  "labels": {
+                    "_default": "Excited"
+                  }
+                }
+              ]
             }
           ]
         },
         "clerk_interactions/goods_sold": {
           "qual": [
-            {"uuid": "rating", "val": {"uuid": "2"}}
+            {
+              "uuid": "uuid_for_rating",
+              "value": {
+                "uuid": "uuid_for_2",
+                "labels": {
+                  "_default": "2"
+                }
+              }
+            }
           ]
         }
       }
@@ -139,7 +184,15 @@
       "_supplementalDetails": {
         "clerk_interactions/goods_sold": {
           "qual": [
-            {"uuid": "rating", "val": {"uuid": "3"}}
+            {
+              "uuid": "uuid_for_rating",
+              "value": {
+                "uuid": "uuid_for_3",
+                "labels": {
+                  "_default": "3"
+                }
+              }
+            }
           ]
         }
       }

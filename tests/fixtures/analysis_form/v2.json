@@ -61,8 +61,8 @@
         "clerk_details/name_of_shop": {
           "qual": [
             {
-              "uuid": "comment",
-              "val": "Pretty cliche"
+              "uuid": "uuid_for_comment",
+              "value": "Pretty cliche"
             }
           ]
         }

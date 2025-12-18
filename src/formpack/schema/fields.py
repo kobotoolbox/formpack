@@ -253,13 +253,13 @@ class FormField(FormDataDef):
             'select_one_external': partial(TextField, data_type=data_type),
             'cascading_select': partial(TextField, data_type=data_type),
             # qualitative analysis and NLP
-            'qual_auto_keyword_count': QualField,
-            'qual_integer': QualNumField,
-            'qual_note': QualField,
-            'qual_select_multiple': QualSelectMultipleField,
-            'qual_select_one': QualSelectOneField,
-            'qual_tags': QualTagsField,
-            'qual_text': QualField,
+            'qualAutoKeywordCount': QualField,
+            'qualInteger': QualNumField,
+            'qualNote': QualField,
+            'qualSelectMultiple': QualSelectMultipleField,
+            'qualSelectOne': QualSelectOneField,
+            'qualTags': QualTagsField,
+            'qualText': QualField,
             'transcript': QualTranscriptField,
             'translation': QualTranslationField,
         }
@@ -530,20 +530,25 @@ class QualField(TextField):
         return [self._get_label(*args, **kwargs)]
 
     def get_value_from_entry(self, entry):
-        name = self.name.split('/')[-1]
+        name_parts = self.name.split('/')
+        # must have at least the source question path and the qual field uuid
+        assert len(name_parts) >= 2
+        field_uuid = name_parts[-1]
+        # is it still necessary to have a separate `source` attribute?
+        source = '/'.join(name_parts[:-1])
+        assert source == self.source
 
         try:
-            responses = entry['_supplementalDetails'][self.source_field.path][
-                'qual'
-            ]
+            # all responses nested within `qual`
+            responses = entry['_supplementalDetails'][source]['qual']
         except KeyError:
             return ''
 
         # sure would be nice if this were a dict with uuids as keys instead of
         # a list requiring this kind of iteration
         for response in responses:
-            if response['uuid'] == name:
-                return response['val']
+            if response['uuid'] == field_uuid:
+                return response['value']
 
         return ''
 
@@ -614,53 +619,61 @@ class QualTagsField(QualField):
         return list_to_csv(val)
 
 
-class QualTranscriptField(QualField):
+class QualNameSplittingTransxField(QualField):
+    """
+    The (largely pre-refactor) structure of `_supplementalDetails` should be
+    changed to match the improved structure of `analysis_form`, and this `name`
+    splitting logic should be trashed.
+    """
+    def get_value_from_entry(self, entry):
+        name_parts = self.name.split('/')
+        # must have at least the source question path and `transcript_??` or
+        # `translation_??` (where `??` is the language code)
+        assert len(name_parts) >= 2
+        transx, _lang = name_parts[-1].split('_')  # 🤢
+        assert transx in ('transcript', 'translation')
+        assert _lang == self.language
+        # is it still necessary to have a separate `source` attribute?
+        source = '/'.join(name_parts[:-1])
+        assert source == self.source
+
+        try:
+            responses = entry['_supplementalDetails'][source][transx]
+        except KeyError:
+            return ''
+
+        # A transcript does not have a dictionary with language keys:
+        #     {'transcript': {'languageCode': 'en', 'value': 'i am a raisin'}}
+        if responses.get('languageCode') == self.language:
+            # Grab the value directly
+            return responses['value']
+
+        # However, translations do have an outer dictionary with language keys:
+        #     {
+        #         'translation': {
+        #             'es': {'languageCode': 'es', 'value': 'soy una pasa'},
+        #             'fr': {
+        #                 'languageCode': 'fr',
+        #                 'value': 'je suis un raisin sec',
+        #             },
+        #         }
+        #     }
+        try:
+            return responses[self.language]['value']
+        except KeyError:
+            return ''
+
+
+class QualTranscriptField(QualNameSplittingTransxField):
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
         return f'{source_label} - transcript ({self.language})'
 
-    def get_value_from_entry(self, entry):
-        name = self.name.split('/')[-1]
 
-        try:
-            responses = entry['_supplementalDetails'][self.source_field.path]
-        except KeyError:
-            return ''
-
-        name_without_lang, lang = name.split('_')
-        assert name_without_lang == 'transcript'
-
-        try:
-            response = responses['transcript']
-        except KeyError:
-            return ''
-
-        if response.get('languageCode') == lang:
-            return response['value']
-        else:
-            return ''
-
-
-class QualTranslationField(QualField):
+class QualTranslationField(QualNameSplittingTransxField):
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
         return f'{source_label} - translation ({self.language})'
-
-    def get_value_from_entry(self, entry):
-        name = self.name.split('/')[-1]
-
-        try:
-            responses = entry['_supplementalDetails'][self.source_field.path]
-        except KeyError:
-            return ''
-
-        name_without_lang, lang = name.split('_')
-        assert name_without_lang == 'translation'
-
-        try:
-            return responses['translation'][lang]['value']
-        except KeyError:
-            return ''
 
 
 class MediaField(TextField):
