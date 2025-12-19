@@ -59,12 +59,11 @@
           }
         },
         "clerk_details/name_of_shop": {
-          "qual": [
-            {
-              "uuid": "uuid_for_comment",
+          "qual": {
+            "uuid_for_comment": {
               "value": "Pretty cliche"
             }
-          ]
+          }
         }
       }
     },

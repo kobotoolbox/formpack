@@ -544,11 +544,8 @@ class QualField(TextField):
         except KeyError:
             return ''
 
-        # sure would be nice if this were a dict with uuids as keys instead of
-        # a list requiring this kind of iteration
-        for response in responses:
-            if response['uuid'] == field_uuid:
-                return response['value']
+        if question_response := responses.get(field_uuid):
+            return question_response['value']
 
         return ''
 
