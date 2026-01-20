@@ -1740,6 +1740,24 @@ class TestFormPackExport(unittest.TestCase):
         )
         assert rows[1] == ('"#loc+name";"#indicator+diet";"";"";""')
 
+    def test_csv_with_backfilled_data(self):
+        title, schemas, submissions = build_fixture('backfilled_answers')
+        fp = FormPack(schemas, title)
+        assert len(fp.versions) == 2
+
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+        csv_lines = list(export.to_csv(submissions, version_uid='v2'))
+
+        # Ensure the submission with backfilled data
+        # (i.e. added after initial submission under a new form version)
+        # makes it in to the export
+        expected_values = [['Potato Heaven', None, None, None, None, None],
+                           ['Potato Purgatory', '0 0 0 0', '0', '0', '0', '0'],
+                           ['Potato Limbo', '0 1 0 0', '0', '1', '0', '0']]
+        expected_lines = [';'.join(f'"{val or ""}"' for val in row) for row in expected_values]
+        assert csv_lines[1:] == expected_lines
+
     # disabled for now
     # @raises(RuntimeError)
     # def test_csv_on_repeatable_groups(self):
@@ -2091,6 +2109,28 @@ class TestFormPackExport(unittest.TestCase):
             sheet = book['houshold_member_repeat']
             row_values = [cell.value for cell in sheet[2]]
             assert row_values == ['#beneficiary', None, None]
+
+    def test_xslx_with_backfilled_data(self):
+        title, schemas, submissions = build_fixture('backfilled_answers')
+        fp = FormPack(schemas, title)
+        assert len(fp.versions) == 2
+        export = fp.export(versions=fp.versions.keys())
+        temporary_xlsx = io.BytesIO()
+        export.to_xlsx(temporary_xlsx, submissions, version_uid='v2')
+
+        # Ensure the submission with backfilled data
+        # (i.e. added after initial submission under a new form version)
+        # makes it in to the export
+        expected_rows = [['Potato Heaven',None, None,None,None,None],
+                           ['Potato Purgatory', '0 0 0 0', '0', '0', '0', '0'],
+                           ['Potato Limbo', '0 1 0 0', '0', '1', '0', '0']]
+        book = openpyxl.load_workbook(temporary_xlsx, read_only=True)
+        sheet = book[title]
+        rows = [row for row in sheet][1:]
+
+        rows_as_lists = [[cell.value for cell in row] for row in rows]
+
+        assert rows_as_lists == expected_rows
 
     def test_force_index(self):
         title, schemas, submissions = customer_satisfaction
@@ -3123,3 +3163,23 @@ class TestFormPackExport(unittest.TestCase):
                 ],
             },
         ]
+
+    def test_geojson_with_backfilled_data(self):
+        title, schemas, submissions = build_fixture('backfilled_answers')
+        fp = FormPack(schemas, title)
+        assert len(fp.versions) == 2
+
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+        geojson_gen = export.to_geojson(submissions, version_uid='v2')
+        geojson_str = ''.join(geojson_gen)
+
+        # Ensure the submission with backfilled geodata
+        # (i.e. added after initial submission under a new form version)
+        # makes it in to the export
+        geojson_obj = json.loads(geojson_str)
+        assert len(geojson_obj['features']) == 2
+        answer1 = geojson_obj['features'][0]
+        assert answer1['properties']['restaurant_name'] == 'Potato Purgatory'
+        answer2 = geojson_obj['features'][1]
+        assert answer2['properties']['restaurant_name'] == 'Potato Limbo'
