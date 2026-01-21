@@ -595,6 +595,22 @@ class TestAutoReport(unittest.TestCase):
                 assert percentage_responses == frequency_responses
                 assert percentage_responses[-1] == '...'
 
+    def test_disaggregate_without_answers(self):
+
+        title, schemas, submissions = build_fixture('auto_report_without_answers')  # noqa
+        fp = FormPack(schemas, title)
+
+        report = fp.autoreport()
+        stats = report.get_stats(submissions, split_by="favorite_coffee")
+
+        stats = [
+            (unicode(repr(field)), field_name, stats_dict)
+            for field, field_name, stats_dict in stats
+        ]
+
+        for stat in stats:
+            assert len(submissions) == stat[2]['total_count']
+
     def test_stats_with_non_numeric_value_for_numeric_field(self):
         """
         A string response to an integer question, for example, should not cause
