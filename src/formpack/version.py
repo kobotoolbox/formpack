@@ -137,10 +137,21 @@ class AnalysisForm(BaseForm):
         self, fields: List[FormField]
     ) -> List[FormField]:
         _fields = []
+        i = 0
         for field in fields:
             _fields.append(field)
+        seen = set()
+        # DFS-ish traversal
+        while i < len(_fields):
+            # add any children of _fields[i]
+            field = _fields[i]
+            if field.path in seen:
+                continue
             if field.path in self.fields_by_source:
-                _fields += self._map_sections_to_analysis_fields(field)
+                # insert any child fields just after their source fields
+                _fields[i+1:i+1] = self._map_sections_to_analysis_fields(field)
+            i += 1
+            seen.add(field.path)
         return _fields
 
 

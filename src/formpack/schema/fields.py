@@ -1,17 +1,18 @@
 # coding: utf-8
+import logging
 import math
-from collections import defaultdict, OrderedDict
-from dateutil import parser
+import statistics
+from collections import OrderedDict, defaultdict
 from functools import partial
 from operator import itemgetter
 
-import statistics
+from dateutil import parser
 
-from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
 from ..utils import singlemode
 from ..utils.ordered_collection import OrderedDefaultdict
 from ..utils.string import list_to_csv
+from .datadef import FormChoice, FormDataDef
 
 
 class FormField(FormDataDef):
@@ -262,6 +263,7 @@ class FormField(FormDataDef):
             'qualText': QualField,
             'transcript': QualTranscriptField,
             'translation': QualTranslationField,
+            'qualVerification': QualVerificationField,
         }
 
         args = {
@@ -671,6 +673,26 @@ class QualTranslationField(QualNameSplittingTransxField):
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
         return f'{source_label} - translation ({self.language})'
+
+
+class QualVerificationField(QualField):
+    def _get_label(self, *args, **kwargs):
+        source_label = self.source_field._get_label(*args, **kwargs)
+        return f'{source_label} - verified'
+
+    def get_value_from_entry(self, entry):
+        name_parts = self.name.split('/')
+        # source question path, analysis question uuid, "verified"
+        assert len(name_parts) >= 3
+        analysis_question_uuid = name_parts[-2]
+        survey_question_path = '/'.join(name_parts[:-2])
+        try:
+            response = entry['_supplementalDetails'][survey_question_path][
+                'qual'
+            ][analysis_question_uuid]
+        except KeyError:
+            return ''
+        return response.get('verified', False)
 
 
 class MediaField(TextField):
