@@ -141,7 +141,7 @@ class AnalysisForm(BaseForm):
         for field in fields:
             _fields.append(field)
         seen = set()
-        # DFS-ish traversal
+        # modified depth-first traversal
         while i < len(_fields):
             # add any children of _fields[i]
             field = _fields[i]
