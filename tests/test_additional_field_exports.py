@@ -184,7 +184,7 @@ def test_additional_field_exports_advanced():
             'clerk_interaction_1.mp3',
             'Hello how may I help you?',
             'Excited,Confused',
-            False,
+            True,
             'chocolate',
             '1',
             '0',
@@ -239,7 +239,7 @@ def test_additional_field_exports_advanced():
             'clerk_interaction_1.mp3',
             'Hello how may I help you?',
             'Excited,Confused',
-            False,
+            True,
             '1',
             '0',
             '0',
@@ -289,7 +289,7 @@ def test_additional_field_exports_advanced():
             'clerk_interaction_1.mp3',
             'Hello how may I help you?',
             'Excited,Confused',
-            False,
+            True,
             'chocolate',
             'Not much diversity',
             'High quality',
@@ -519,3 +519,4 @@ def test_simple_report_with_analysis_form():
         "What is the shop's name?",
         "What is the clerk's name?",
     ]
+

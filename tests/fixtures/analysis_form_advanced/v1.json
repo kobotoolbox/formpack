@@ -85,6 +85,7 @@
           },
           "qual": {
             "uuid_for_tone_of_voice": {
+              "verified": true,
               "value": [
                 {
                   "uuid": "uuid_for_excited",
