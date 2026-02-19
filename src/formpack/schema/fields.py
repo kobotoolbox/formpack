@@ -521,6 +521,8 @@ class TextField(ExtendedFormField):
 
 
 class QualField(TextField):
+    SUPPLEMENTAL_DETAILS_FIELD = '_supplementalDetails'
+
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
         # hard-coded first label because qualitative analysis does not yet
@@ -541,7 +543,7 @@ class QualField(TextField):
 
         try:
             # all responses nested within `qual`
-            responses = entry['_supplementalDetails'][source]['qual']
+            responses = entry[self.SUPPLEMENTAL_DETAILS_FIELD][source]['qual']
         except KeyError:
             return ''
 
@@ -686,7 +688,7 @@ class QualVerificationField(QualField):
         analysis_question_uuid = name_parts[-2]
         survey_question_path = '/'.join(name_parts[:-2])
         try:
-            response = entry['_supplementalDetails'][survey_question_path][
+            response = entry[self.SUPPLEMENTAL_DETAILS_FIELD][survey_question_path][
                 'qual'
             ][analysis_question_uuid]
         except KeyError:
