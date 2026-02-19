@@ -688,9 +688,9 @@ class QualVerificationField(QualField):
         analysis_question_uuid = name_parts[-2]
         survey_question_path = '/'.join(name_parts[:-2])
         try:
-            response = entry[self.SUPPLEMENTAL_DETAILS_FIELD][survey_question_path][
-                'qual'
-            ][analysis_question_uuid]
+            response = entry[self.SUPPLEMENTAL_DETAILS_FIELD][
+                survey_question_path
+            ]['qual'][analysis_question_uuid]
         except KeyError:
             return ''
         return response.get('verified', False)
