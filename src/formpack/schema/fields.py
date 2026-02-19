@@ -263,6 +263,7 @@ class FormField(FormDataDef):
             'transcript': QualTranscriptField,
             'translation': QualTranslationField,
             'qualVerification': QualVerificationField,
+            'qualSource': QualSourceField,
         }
 
         args = {
@@ -676,14 +677,18 @@ class QualTranslationField(QualNameSplittingTransxField):
         return f'{source_label} - translation ({self.language})'
 
 
-class QualVerificationField(QualField):
+class QualMetadataField(QualField):
+    @property
+    def value_field(self):
+        raise NotImplementedError()
+
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
-        return f'{source_label} - verified'
+        return f'{source_label} - {self.value_field}'
 
     def get_value_from_entry(self, entry):
         name_parts = self.name.split('/')
-        # source question path, analysis question uuid, "verified"
+        # source question path, analysis question uuid, value field
         assert len(name_parts) >= 3
         analysis_question_uuid = name_parts[-2]
         survey_question_path = '/'.join(name_parts[:-2])
@@ -693,7 +698,19 @@ class QualVerificationField(QualField):
             ]['qual'][analysis_question_uuid]
         except KeyError:
             return ''
-        return response.get('verified', False)
+        return response.get(self.value_field, False)
+
+
+class QualVerificationField(QualMetadataField):
+    @property
+    def value_field(self):
+        return 'verified'
+
+
+class QualSourceField(QualMetadataField):
+    @property
+    def value_field(self):
+        return 'source'
 
 
 class MediaField(TextField):
