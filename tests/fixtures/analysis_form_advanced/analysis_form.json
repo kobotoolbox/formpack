@@ -42,6 +42,12 @@
     ]
   },
   {
+    "type": "qualVerification",
+    "name": "clerk_interactions/record_a_note/uuid_for_tone_of_voice/verified",
+    "label": "verified",
+    "source": "clerk_interactions/record_a_note/uuid_for_tone_of_voice"
+  },
+  {
     "type": "qualText",
     "name": "clerk_interactions/goods_sold/uuid_for_comment",
     "label": "Comment on the goods sold at the store",

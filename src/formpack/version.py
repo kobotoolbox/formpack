@@ -1,25 +1,22 @@
 # coding: utf-8
 from collections import OrderedDict, defaultdict
-from typing import (
-    Dict,
-    List,
-    Union,
-)
+from typing import Dict, List, Union
 
 from pyxform import aliases as pyxform_aliases
 
 from .constants import UNTRANSLATED
-from .errors import SchemaError
-from .errors import TranslationError
-from .schema import FormField, FormGroup, FormSection, FormChoice
+from .errors import SchemaError, TranslationError
+from .schema import FormChoice, FormField, FormGroup, FormSection
 from .submission import FormSubmission
-from .utils import parse_xml_to_xmljson, normalize_data_type
-from .utils.xlsform_parameters import parameters_string_to_dict, parameters_dict_to_string
-
+from .utils import normalize_data_type, parse_xml_to_xmljson
+from .utils.dft import dft_recurse
 from .utils.flatten_content import flatten_content
 from .utils.xform_tools import formversion_pyxform
+from .utils.xlsform_parameters import (
+    parameters_dict_to_string,
+    parameters_string_to_dict,
+)
 from .validators import validate_content
-
 
 YES_NO = pyxform_aliases.yes_no
 
@@ -123,24 +120,37 @@ class AnalysisForm(BaseForm):
             fields_by_source[field.source].append(field)
         return fields_by_source
 
-    def _map_sections_to_analysis_fields(
-        self, survey_field: FormField
-    ) -> List[FormField]:
-        _fields = []
-        for analysis_field in self.fields_by_source[survey_field.path]:
-            analysis_field.section = survey_field.section
-            analysis_field.source_field = survey_field
-            _fields.append(analysis_field)
-        return _fields
+    def _map_sections_to_analysis_field(
+        self,
+        survey_fields_by_path: dict[str, FormField],
+        analysis_field: FormField,
+    ) -> FormField:
+        if (
+            not hasattr(analysis_field, 'source')
+            or analysis_field.source not in survey_fields_by_path
+        ):
+            return analysis_field
+        survey_field = survey_fields_by_path[analysis_field.source]
+        analysis_field.section = survey_field.section
+        analysis_field.source_field = survey_field
+        return analysis_field
 
     def insert_analysis_fields(
-        self, fields: List[FormField]
+        self, survey_fields: List[FormField]
     ) -> List[FormField]:
+        all_fields = [*survey_fields, *self.fields]
+        survey_fields_by_path = {field.path: field for field in all_fields}
         _fields = []
-        for field in fields:
-            _fields.append(field)
-            if field.path in self.fields_by_source:
-                _fields += self._map_sections_to_analysis_fields(field)
+        for field in survey_fields:
+            _fields.extend(
+                dft_recurse(
+                    root=field,
+                    tree=self.fields_by_source,
+                    process_field=lambda node: self._map_sections_to_analysis_field(
+                        survey_fields_by_path, node
+                    ),
+                )
+            )
         return _fields
 
 

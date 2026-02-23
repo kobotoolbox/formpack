@@ -1,17 +1,17 @@
 # coding: utf-8
 import math
-from collections import defaultdict, OrderedDict
-from dateutil import parser
+import statistics
+from collections import OrderedDict, defaultdict
 from functools import partial
 from operator import itemgetter
 
-import statistics
+from dateutil import parser
 
-from .datadef import FormDataDef, FormChoice
 from ..constants import UNSPECIFIED_TRANSLATION
 from ..utils import singlemode
 from ..utils.ordered_collection import OrderedDefaultdict
 from ..utils.string import list_to_csv
+from .datadef import FormChoice, FormDataDef
 
 
 class FormField(FormDataDef):
@@ -262,6 +262,8 @@ class FormField(FormDataDef):
             'qualText': QualField,
             'transcript': QualTranscriptField,
             'translation': QualTranslationField,
+            'qualVerification': QualVerificationField,
+            'qualSource': QualSourceField,
         }
 
         args = {
@@ -520,6 +522,8 @@ class TextField(ExtendedFormField):
 
 
 class QualField(TextField):
+    SUPPLEMENTAL_DETAILS_FIELD = '_supplementalDetails'
+
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
         # hard-coded first label because qualitative analysis does not yet
@@ -540,7 +544,7 @@ class QualField(TextField):
 
         try:
             # all responses nested within `qual`
-            responses = entry['_supplementalDetails'][source]['qual']
+            responses = entry[self.SUPPLEMENTAL_DETAILS_FIELD][source]['qual']
         except KeyError:
             return ''
 
@@ -671,6 +675,42 @@ class QualTranslationField(QualNameSplittingTransxField):
     def _get_label(self, *args, **kwargs):
         source_label = self.source_field._get_label(*args, **kwargs)
         return f'{source_label} - translation ({self.language})'
+
+
+class QualMetadataField(QualField):
+    @property
+    def value_field(self):
+        raise NotImplementedError()
+
+    def _get_label(self, *args, **kwargs):
+        source_label = self.source_field._get_label(*args, **kwargs)
+        return f'{source_label} - {self.value_field}'
+
+    def get_value_from_entry(self, entry):
+        name_parts = self.name.split('/')
+        # source question path, analysis question uuid, value field
+        assert len(name_parts) >= 3
+        analysis_question_uuid = name_parts[-2]
+        survey_question_path = '/'.join(name_parts[:-2])
+        try:
+            response = entry[self.SUPPLEMENTAL_DETAILS_FIELD][
+                survey_question_path
+            ]['qual'][analysis_question_uuid]
+        except KeyError:
+            return ''
+        return response.get(self.value_field, False)
+
+
+class QualVerificationField(QualMetadataField):
+    @property
+    def value_field(self):
+        return 'verified'
+
+
+class QualSourceField(QualMetadataField):
+    @property
+    def value_field(self):
+        return 'source'
 
 
 class MediaField(TextField):
