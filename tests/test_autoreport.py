@@ -647,3 +647,57 @@ class TestAutoReport(unittest.TestCase):
         ]
         for i, stat in enumerate(stats):
             assert stat == expected[i]
+
+    def test_stats_with_non_finite_float_value(self):
+        """
+        Non-finite float values (Inf, -Inf, nan) for a decimal field should
+        be treated as if no response was provided (not_provided).
+        """
+        title = 'Just one decimal'
+        schemas = [
+            {
+                'content': {
+                    'survey': [
+                        {
+                            'type': 'decimal',
+                            'name': 'the_number',
+                            'label': 'Enter the number!',
+                        }
+                    ]
+                }
+            }
+        ]
+        submissions = [
+            {'the_number': '1.0'},
+            {'the_number': '2.0'},
+            {'the_number': '3.0'},
+            {'the_number': 'Inf'},
+            {'the_number': '-Inf'},
+            {'the_number': 'nan'},
+        ]
+        fp = FormPack(schemas, title)
+
+        report = fp.autoreport()
+        stats = report.get_stats(submissions)
+
+        assert stats.submissions_count == len(submissions)
+
+        stats = [(str(repr(f)), n, d) for f, n, d in stats]
+        expected = [
+            (
+                "<NumField name='the_number' type='decimal'>",
+                'the_number',
+                {
+                    'mean': 2.0,
+                    'median': 2.0,
+                    'mode': '*',
+                    'not_provided': 3,
+                    'provided': 3,
+                    'show_graph': False,
+                    'stdev': 1.0,
+                    'total_count': 6,
+                },
+            )
+        ]
+        for i, stat in enumerate(stats):
+            assert stat == expected[i]
