@@ -872,7 +872,10 @@ class NumField(FormField):
         if self.data_type == 'integer':
             yield int(raw_values)
         else:
-            yield float(raw_values)
+            value = float(raw_values)
+            if not math.isfinite(value):
+                raise ValueError(f'Non-finite float value: {raw_values!r}')
+            yield value
 
     def format(self, val, xls_types_as_text=True, *args, **kwargs):
         if val is None:
