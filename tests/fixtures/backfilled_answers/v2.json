@@ -1,0 +1,23 @@
+{
+    "version": "v2",
+    "content": {
+        "survey": [
+            {
+                "type": "text",
+                "name": "restaurant_name",
+                "label": "restaurant name"
+            },
+           {
+                "type": "geopoint",
+                "name": "restaurant_location",
+                "label": "restaurant location"
+           }
+        ]
+    },
+  "submissions": [
+        {
+      "restaurant_name": "Potato Limbo",
+      "restaurant_location": "0 1 0 0"
+    }
+  ]
+}
