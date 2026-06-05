@@ -1,6 +1,7 @@
 # coding: utf-8
 import json
 import re
+import warnings
 import zipfile
 from collections import defaultdict, OrderedDict
 from inspect import isclass
@@ -816,7 +817,14 @@ class Export:
             for col_index, cell_value in enumerate(data):
                 # Call `write()` directly to facilitate error handling (as
                 # opposed to `write_row()`)
-                error = sheet_.write(row_index, col_index, cell_value)
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        'ignore',
+                        message='Ignoring URL',
+                        category=UserWarning,
+                        module='xlsxwriter',
+                    )
+                    error = sheet_.write(row_index, col_index, cell_value)
                 if error == 0:
                     continue
                 else:
