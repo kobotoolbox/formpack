@@ -570,6 +570,26 @@ class QualNumField(QualField):
 
 
 class QualSelectMultipleField(QualField):
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        *args,
+        **kwargs,
+    ):
+        label = self._get_label(lang, group_sep, hierarchy_in_labels)
+        return [
+            f'{label}{group_sep}Option {i}'
+            for i in range(1, len(self.choices) + 1)
+        ]
+
+    def get_value_names(self, *args, **kwargs):
+        return [
+            f'{self.name}/Option {i}'
+            for i in range(1, len(self.choices) + 1)
+        ]
+
     def get_value_from_entry(self, entry):
         """
         The shape of `entry` is dictated by
@@ -577,7 +597,7 @@ class QualSelectMultipleField(QualField):
         """
         val = super().get_value_from_entry(entry)
         if not val:
-            return ''
+            return []
         assert isinstance(val, list)
         chosen_responses = [r['uuid'] for r in val]
         chosen_response_labels = []
@@ -589,8 +609,20 @@ class QualSelectMultipleField(QualField):
         if not chosen_response_labels:
             # return unaltered value if no matching choice could be found; it
             # could contain an error message
-            return val
-        return list_to_csv(chosen_response_labels)
+            return [str(val)]
+        return chosen_response_labels
+
+    def format(self, val, *args, **kwargs):
+        cells = dict.fromkeys(self.get_value_names(), '')
+        if not val or not isinstance(val, list):
+            return cells
+
+        for i, label in enumerate(val):
+            if i >= len(self.choices):
+                break
+            cells[f'{self.name}/Option {i + 1}'] = label
+
+        return cells
 
 
 class QualSelectOneField(QualField):
