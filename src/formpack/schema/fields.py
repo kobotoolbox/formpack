@@ -575,20 +575,32 @@ class QualSelectMultipleField(QualField):
         lang=UNSPECIFIED_TRANSLATION,
         group_sep='/',
         hierarchy_in_labels=False,
+        multiple_select='both',
         *args,
         **kwargs,
     ):
+        labels = []
         label = self._get_label(lang, group_sep, hierarchy_in_labels)
-        return [
-            f'{label}{group_sep}Option {i}'
-            for i in range(1, len(self.choices) + 1)
-        ]
+        if multiple_select in ('both', 'summary'):
+            labels.append(label)
 
-    def get_value_names(self, *args, **kwargs):
-        return [
-            f'{self.name}/Option {i}'
-            for i in range(1, len(self.choices) + 1)
-        ]
+        if multiple_select in ('both', 'details'):
+            for choice in self.choices:
+                option_label = choice['labels'].get(lang) or choice['labels']['_default']
+                labels.append('{}{}{}'.format(label, group_sep, option_label))
+
+        return labels
+
+    def get_value_names(self, multiple_select='both', *args, **kwargs):
+        names = []
+        if multiple_select in ('both', 'summary'):
+            names.append(self.name)
+
+        if multiple_select in ('both', 'details'):
+            for choice in self.choices:
+                names.append(self.name + '/' + choice['uuid'])
+
+        return names
 
     def get_value_from_entry(self, entry):
         """
@@ -599,28 +611,43 @@ class QualSelectMultipleField(QualField):
         if not val:
             return []
         assert isinstance(val, list)
-        chosen_responses = [r['uuid'] for r in val]
-        chosen_response_labels = []
-        for choice in self.choices:
-            if choice['uuid'] in chosen_responses:
-                # hard-coded `_default` language because qualitative
-                # analysis does not yet support translated labels
-                chosen_response_labels.append(choice['labels']['_default'])
-        if not chosen_response_labels:
-            # return unaltered value if no matching choice could be found; it
-            # could contain an error message
-            return [str(val)]
-        return chosen_response_labels
+        return [r.get('uuid', str(r)) if isinstance(r, dict) else str(r) for r in val]
 
-    def format(self, val, *args, **kwargs):
-        cells = dict.fromkeys(self.get_value_names(), '')
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        xls_types_as_text=True,
+        *args,
+        **kwargs,
+    ):
+        _zero, _one = ('0', '1') if xls_types_as_text else (0, 1)
         if not val or not isinstance(val, list):
-            return cells
+            return dict.fromkeys(
+                self.get_value_names(multiple_select=multiple_select), ''
+            )
 
-        for i, label in enumerate(val):
-            if i >= len(self.choices):
-                break
-            cells[f'{self.name}/Option {i + 1}'] = label
+        cells = dict.fromkeys(
+            self.get_value_names(multiple_select=multiple_select), _zero
+        )
+
+        if multiple_select in ('both', 'summary'):
+            res = []
+            for v in val:
+                label = v
+                for choice in self.choices:
+                    if choice['uuid'] == v:
+                        label = choice['labels'].get(lang) or choice['labels']['_default']
+                        break
+                res.append(label)
+            cells[self.name] = ' '.join(res)
+
+        if multiple_select in ('both', 'details'):
+            for choice_val in val:
+                cells[self.name + '/' + choice_val] = _one
 
         return cells
 
