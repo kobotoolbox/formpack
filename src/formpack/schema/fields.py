@@ -630,6 +630,19 @@ class QualSelectMultipleField(QualField):
                 self.get_value_names(multiple_select=multiple_select), ''
             )
 
+        known_uuids = {choice['uuid'] for choice in self.choices}
+        if not any(v in known_uuids for v in val):
+            return super().format(
+                val,
+                lang=lang,
+                group_sep=group_sep,
+                hierarchy_in_labels=hierarchy_in_labels,
+                multiple_select=multiple_select,
+                xls_types_as_text=xls_types_as_text,
+                *args,
+                **kwargs,
+            )
+
         cells = dict.fromkeys(
             self.get_value_names(multiple_select=multiple_select), _zero
         )
@@ -640,14 +653,16 @@ class QualSelectMultipleField(QualField):
                 label = v
                 for choice in self.choices:
                     if choice['uuid'] == v:
-                        label = choice['labels'].get(lang) or choice['labels']['_default']
+                        label = choice['labels'].get(lang) or \
+                            choice['labels']['_default']
                         break
                 res.append(label)
             cells[self.name] = ' '.join(res)
 
         if multiple_select in ('both', 'details'):
             for choice_val in val:
-                cells[self.name + '/' + choice_val] = _one
+                if choice_val in known_uuids:
+                    cells[self.name + '/' + choice_val] = _one
 
         return cells
 
