@@ -635,18 +635,10 @@ class QualSelectMultipleField(QualField):
 
         known_uuids = {choice['uuid'] for choice in self.choices}
         if not any(v in known_uuids for v in val):
-            if multiple_select == 'details':
-                return _empty.copy()
-            return super().format(
-                val,
-                lang=lang,
-                group_sep=group_sep,
-                hierarchy_in_labels=hierarchy_in_labels,
-                multiple_select=multiple_select,
-                xls_types_as_text=xls_types_as_text,
-                *args,
-                **kwargs,
-            )
+            cells = _empty.copy()
+            if multiple_select in ('both', 'summary'):
+                cells[self.name] = val
+            return cells
 
         cells = _empty.copy()
 
