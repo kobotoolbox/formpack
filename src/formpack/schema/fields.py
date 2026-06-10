@@ -625,13 +625,16 @@ class QualSelectMultipleField(QualField):
         **kwargs,
     ):
         _zero, _one = ('0', '1') if xls_types_as_text else (0, 1)
+        _empty = dict.fromkeys(
+            self.get_value_names(multiple_select=multiple_select), _zero
+        )
         if not val or not isinstance(val, list):
-            return dict.fromkeys(
-                self.get_value_names(multiple_select=multiple_select), ''
-            )
+            return _empty.copy()
 
         known_uuids = {choice['uuid'] for choice in self.choices}
         if not any(v in known_uuids for v in val):
+            if multiple_select == 'details':
+                return _empty.copy()
             return super().format(
                 val,
                 lang=lang,
@@ -643,9 +646,7 @@ class QualSelectMultipleField(QualField):
                 **kwargs,
             )
 
-        cells = dict.fromkeys(
-            self.get_value_names(multiple_select=multiple_select), _zero
-        )
+        cells = _empty.copy()
 
         if multiple_select in ('both', 'summary'):
             res = []
