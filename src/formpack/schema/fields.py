@@ -628,6 +628,8 @@ class QualSelectMultipleField(QualField):
         _empty = dict.fromkeys(
             self.get_value_names(multiple_select=multiple_select), _zero
         )
+        if multiple_select in ('both', 'summary'):
+            _empty[self.name] = ''
         if not val or not isinstance(val, list):
             return _empty.copy()
 
