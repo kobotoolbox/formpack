@@ -651,7 +651,6 @@ class QualSelectMultipleField(QualField):
         if multiple_select in ('both', 'summary'):
             res = []
             for v in val:
-                label = v
                 for choice in self.choices:
                     if choice['uuid'] == v:
                         label = choice['labels'].get(lang) or \
