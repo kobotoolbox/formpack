@@ -655,8 +655,8 @@ class QualSelectMultipleField(QualField):
                     if choice['uuid'] == v:
                         label = choice['labels'].get(lang) or \
                             choice['labels']['_default']
+                        res.append(label)
                         break
-                res.append(label)
             cells[self.name] = ' '.join(res)
 
         if multiple_select in ('both', 'details'):
