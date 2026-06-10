@@ -637,7 +637,7 @@ class QualSelectMultipleField(QualField):
         if not any(v in known_uuids for v in val):
             cells = _empty.copy()
             if multiple_select in ('both', 'summary'):
-                cells[self.name] = val
+                cells[self.name] = ''
             return cells
 
         cells = _empty.copy()
