@@ -624,6 +624,11 @@ class QualSelectMultipleField(QualField):
         *args,
         **kwargs,
     ):
+        """
+        Same than FormChoiceFieldWithMultipleSelect format().
+        NOTE: This implementation ignores unknown UUID's in the input values array
+        silently.
+        """
         _zero, _one = ('0', '1') if xls_types_as_text else (0, 1)
         _empty = dict.fromkeys(
             self.get_value_names(multiple_select=multiple_select), _zero
