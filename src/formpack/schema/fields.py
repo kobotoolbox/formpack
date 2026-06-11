@@ -570,6 +570,38 @@ class QualNumField(QualField):
 
 
 class QualSelectMultipleField(QualField):
+    def get_labels(
+        self,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        *args,
+        **kwargs,
+    ):
+        labels = []
+        label = self._get_label(lang, group_sep, hierarchy_in_labels)
+        if multiple_select in ('both', 'summary'):
+            labels.append(label)
+
+        if multiple_select in ('both', 'details'):
+            for choice in self.choices:
+                option_label = choice['labels'].get(lang) or choice['labels']['_default']
+                labels.append('{}{}{}'.format(label, group_sep, option_label))
+
+        return labels
+
+    def get_value_names(self, multiple_select='both', *args, **kwargs):
+        names = []
+        if multiple_select in ('both', 'summary'):
+            names.append(self.name)
+
+        if multiple_select in ('both', 'details'):
+            for choice in self.choices:
+                names.append(self.name + '/' + choice['uuid'])
+
+        return names
+
     def get_value_from_entry(self, entry):
         """
         The shape of `entry` is dictated by
@@ -577,20 +609,55 @@ class QualSelectMultipleField(QualField):
         """
         val = super().get_value_from_entry(entry)
         if not val:
-            return ''
+            return []
         assert isinstance(val, list)
-        chosen_responses = [r['uuid'] for r in val]
-        chosen_response_labels = []
-        for choice in self.choices:
-            if choice['uuid'] in chosen_responses:
-                # hard-coded `_default` language because qualitative
-                # analysis does not yet support translated labels
-                chosen_response_labels.append(choice['labels']['_default'])
-        if not chosen_response_labels:
-            # return unaltered value if no matching choice could be found; it
-            # could contain an error message
-            return val
-        return list_to_csv(chosen_response_labels)
+        return [r.get('uuid', str(r)) if isinstance(r, dict) else str(r) for r in val]
+
+    def format(
+        self,
+        val,
+        lang=UNSPECIFIED_TRANSLATION,
+        group_sep='/',
+        hierarchy_in_labels=False,
+        multiple_select='both',
+        xls_types_as_text=True,
+        *args,
+        **kwargs,
+    ):
+        """
+        Same than FormChoiceFieldWithMultipleSelect format().
+        NOTE: This implementation ignores unknown UUID's in the input values array
+        silently.
+        """
+        _zero, _one = ('0', '1') if xls_types_as_text else (0, 1)
+        _empty = dict.fromkeys(
+            self.get_value_names(multiple_select=multiple_select), _zero
+        )
+        if multiple_select in ('both', 'summary'):
+            _empty[self.name] = ''
+        if not val or not isinstance(val, list):
+            return _empty.copy()
+
+        known_uuids = {choice['uuid'] for choice in self.choices}
+        cells = _empty.copy()
+
+        if multiple_select in ('both', 'summary'):
+            res = []
+            for v in val:
+                for choice in self.choices:
+                    if choice['uuid'] == v:
+                        label = choice['labels'].get(lang) or \
+                            choice['labels']['_default']
+                        res.append(label)
+                        break
+            cells[self.name] = ' '.join(res)
+
+        if multiple_select in ('both', 'details'):
+            for choice_val in val:
+                if choice_val in known_uuids:
+                    cells[self.name + '/' + choice_val] = _one
+
+        return cells
 
 
 class QualSelectOneField(QualField):
