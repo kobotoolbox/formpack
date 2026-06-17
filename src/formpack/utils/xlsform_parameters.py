@@ -10,7 +10,7 @@ import re
 def parameters_string_to_dict(params_str):
     dd = {}
     # print(params_str)
-    for param in re.split('\s+', params_str):
+    for param in re.split(r'\s+', params_str):
         if '=' in param:
             (key, val) = param.split('=')
             dd[key] = val
