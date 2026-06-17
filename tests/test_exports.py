@@ -2,6 +2,7 @@
 import contextlib
 import io
 import json
+import warnings
 import pathlib
 import tempfile
 import unittest
@@ -2068,7 +2069,14 @@ class TestFormPackExport(unittest.TestCase):
         fp = FormPack(schemas, title)
         # Faster than writing to a file, but still takes about 5 seconds
         temporary_xlsx = io.BytesIO()
-        fp.export().to_xlsx(temporary_xlsx, submissions)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'error',
+                message='Ignoring URL',
+                category=UserWarning,
+                module='xlsxwriter',
+            )
+            fp.export().to_xlsx(temporary_xlsx, submissions)
         book = openpyxl.load_workbook(temporary_xlsx, read_only=True)
         sheet = book[title]
         row_values = [cell.value for cell in sheet[len(submissions) + 1]]
