@@ -817,14 +817,7 @@ class Export:
             for col_index, cell_value in enumerate(data):
                 # Call `write()` directly to facilitate error handling (as
                 # opposed to `write_row()`)
-                with warnings.catch_warnings():
-                    warnings.filterwarnings(
-                        'ignore',
-                        message='Ignoring URL',
-                        category=UserWarning,
-                        module='xlsxwriter',
-                    )
-                    error = sheet_.write(row_index, col_index, cell_value)
+                error = sheet_.write(row_index, col_index, cell_value)
                 if error == 0:
                     continue
                 else:
@@ -853,32 +846,41 @@ class Export:
             row_index += 1
             sheet_row_positions[sheet_] = row_index
 
-        for chunk in self.parse_submissions(submissions):
-            for section_name, rows in chunk.items():
-                try:
-                    sheet_name = sheet_name_mapping[section_name]
-                except KeyError:
-                    sheet_name = unique_name_for_xls(
-                        section_name, sheet_name_mapping.values()
-                    )
-                    sheet_name_mapping[section_name] = sheet_name
-                try:
-                    current_sheet = sheets[sheet_name]
-                except KeyError:
-                    current_sheet = workbook.add_worksheet(sheet_name)
-                    sheets[sheet_name] = current_sheet
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore',
+                message='Ignoring URL',
+                category=UserWarning,
+                module='xlsxwriter',
+            )
+            for chunk in self.parse_submissions(submissions):
+                for section_name, rows in chunk.items():
+                    try:
+                        sheet_name = sheet_name_mapping[section_name]
+                    except KeyError:
+                        sheet_name = unique_name_for_xls(
+                            section_name, sheet_name_mapping.values()
+                        )
+                        sheet_name_mapping[section_name] = sheet_name
+                    try:
+                        current_sheet = sheets[sheet_name]
+                    except KeyError:
+                        current_sheet = workbook.add_worksheet(sheet_name)
+                        sheets[sheet_name] = current_sheet
 
-                    _append_row_to_sheet(
-                        current_sheet, self.labels[section_name]
-                    )
+                        _append_row_to_sheet(
+                            current_sheet, self.labels[section_name]
+                        )
 
-                    # Include specified tag columns as extra header rows
-                    tag_rows = self.get_header_rows_for_tag_cols(section_name)
-                    for tag_row in tag_rows:
-                        _append_row_to_sheet(current_sheet, tag_row)
+                        # Include specified tag columns as extra header rows
+                        tag_rows = self.get_header_rows_for_tag_cols(
+                            section_name
+                        )
+                        for tag_row in tag_rows:
+                            _append_row_to_sheet(current_sheet, tag_row)
 
-                for row in rows:
-                    _append_row_to_sheet(current_sheet, row)
+                    for row in rows:
+                        _append_row_to_sheet(current_sheet, row)
 
         workbook.close()
 
