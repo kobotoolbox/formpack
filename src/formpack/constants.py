@@ -22,6 +22,9 @@ UNSPECIFIED_TRANSLATION = False
 #   X     | En        | Fr
 UNTRANSLATED = None
 
+# This constant is used to signify that the arg header_lang is not set
+UNSPECIFIED_HEADER_LANG = "UNSPECIFIED_HEADER_LANG"
+
 # the column used to denote "or_other" in a select question type
 # this is non-standard XLSForm
 OR_OTHER_COLUMN = '_or_other'
