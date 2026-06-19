@@ -1,16 +1,19 @@
 # coding: utf-8
 import copy
 from collections import OrderedDict
+from ddt import data, ddt, unpack
+from unittest import TestCase
 
 from formpack import FormPack
 from formpack.constants import OR_OTHER_COLUMN as _OR_OTHER
 from formpack.constants import UNTRANSLATED
-from formpack.utils.expand_content import SCHEMA_VERSION
+from formpack.utils.expand_content import SCHEMA_VERSION, clean_column_name
 from formpack.utils.expand_content import _expand_tags
 from formpack.utils.expand_content import _get_special_survey_cols
 from formpack.utils.expand_content import expand_content, _expand_type_to_dict
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.string import orderable_with_none
+
 
 
 def test_expand_selects_with_or_other():
@@ -604,5 +607,29 @@ def test_expand_translations_null_lang():
     assert s1 == s1_copy
 
 
+def test_expand_ignores_case():
+    s1 = {'survey': [{'type': 'text', 'Label': 'hi'}]}
+    expand_content(s1, in_place=True)
+    assert s1.get('translated') == ['Label']
+
+
 def _s(rows):
     return {'survey': [dict([[key, 'x']]) for key in rows]}
+
+@ddt
+class ColumnTestCase(TestCase):
+    @data(
+        ('FOO', 'foo'),
+        ('LABEL', 'label'),
+        ('HINT', 'hint'),
+        ('BIND::FOO', 'bind::FOO'),
+        ('BODY : FOO', 'body : FOO'),
+        ('MEDIA:AUDIO:Spanish', 'media:audio:Spanish'),
+        ('VIDEO :: SPANISH', 'video :: SPANISH'),
+        ('MEDIA:AUDIO', 'media:audio'),
+        ('IMAGE', 'image'),
+        ('LABEL : SPANISH', 'label : SPANISH')
+    )
+    @unpack
+    def test_clean_column_name(self, name, expected):
+        assert clean_column_name(name) == expected
