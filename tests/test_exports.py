@@ -3152,6 +3152,195 @@ class TestFormPackExport(unittest.TestCase):
         self.assertIsNotNone(nullable_value)
         self.assertIsNone(nullable_value.text)
 
+    def test_kml_extended_data_raises_on_count_mismatch(self):
+        export = Export.__new__(Export)
+        kml_str = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<kml xmlns="http://earth.google.com/kml/2.2">\n'
+            '  <Document>\n'
+            '    <Placemark><description>one</description></Placemark>\n'
+            '    <Placemark><description>two</description></Placemark>\n'
+            '  </Document>\n'
+            '</kml>'
+        )
+        geojson_data = {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {'type': 'Point', 'coordinates': [1, 2, 0]},
+                    'properties': OrderedDict([('start', '2026-07-01')]),
+                }
+            ],
+        }
+
+        with self.assertRaises(RuntimeError):
+            export._add_extended_data_to_kml(
+                kml_str,
+                geojson_data,
+                ['716ddcf9-e83a-41ce-855a-120c712df3e0'],
+            )
+
+    def test_kml_extended_data_returns_original_on_parse_error(self):
+        export = Export.__new__(Export)
+        broken_kml = '<kml><Placemark>'
+
+        result = export._add_extended_data_to_kml(
+            broken_kml,
+            {'type': 'FeatureCollection', 'features': []},
+            [],
+        )
+
+        self.assertEqual(result, broken_kml)
+
+    def test_collect_survey_instances_falls_back_to_meta_root_uuid(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        submission = dict(submissions[0])
+        submission.pop('_uuid', None)
+        submission['meta/rootUuid'] = (
+            'uuid:716ddcf9-e83a-41ce-855a-120c712df3e0'
+        )
+
+        survey_instances = export._collect_survey_instances([submission])
+
+        self.assertEqual(
+            survey_instances,
+            ['716ddcf9-e83a-41ce-855a-120c712df3e0'] * 3,
+        )
+
+    def test_collect_survey_instances_skips_invalid_and_uses_instance_id(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        invalid_submission = {'invalid': 'data'}
+        submission = dict(submissions[0])
+        submission.pop('_uuid', None)
+        submission.pop('meta/rootUuid', None)
+        submission['meta/instanceID'] = 'instance-123'
+        submission['Trace'] = '1 2 3 4;broken'
+
+        survey_instances = export._collect_survey_instances(
+            [invalid_submission, submission]
+        )
+
+        self.assertEqual(survey_instances, ['instance-123', 'instance-123'])
+
+    def test_normalize_feature_collection_handles_list_and_passthrough(self):
+        export = Export.__new__(Export)
+        payload = [
+            'ignore-me',
+            {
+                'type': 'FeatureCollection',
+                'name': 'nested',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {'type': 'Point', 'coordinates': [1, 2, 0]},
+                        'properties': {'a': 1},
+                    }
+                ],
+            },
+            {
+                'type': 'Feature',
+                'geometry': {'type': 'Point', 'coordinates': [3, 4, 0]},
+                'properties': {'b': 2},
+            },
+        ]
+
+        normalized = export._normalize_feature_collection(payload)
+        self.assertEqual(normalized['type'], 'FeatureCollection')
+        self.assertEqual(normalized['name'], 'nested')
+        self.assertEqual(len(normalized['features']), 2)
+        self.assertEqual(
+            export._normalize_feature_collection('passthrough'),
+            'passthrough',
+        )
+
+    def test_normalize_feature_collection_handles_empty_and_mixed_dict_features(
+        self,
+    ):
+        export = Export.__new__(Export)
+
+        self.assertEqual(
+            export._normalize_feature_collection([]),
+            {'type': 'FeatureCollection', 'features': []},
+        )
+
+        normalized = export._normalize_feature_collection(
+            {
+                'type': 'FeatureCollection',
+                'features': [
+                    'raw-value',
+                    {
+                        'type': 'Feature',
+                        'geometry': {'type': 'Point', 'coordinates': [1, 2, 0]},
+                        'properties': 'not-a-dict',
+                    },
+                ],
+            }
+        )
+        self.assertEqual(normalized['features'][0], 'raw-value')
+        self.assertEqual(
+            normalized['features'][1]['properties'],
+            'not-a-dict',
+        )
+
+        self.assertEqual(
+            export._normalize_feature_collection({'features': 'not-a-list'}),
+            {'features': 'not-a-list'},
+        )
+
+    def test_style_kml_icon_ignores_styles_without_iconstyle(self):
+        export = Export.__new__(Export)
+        style = ET.fromstring(
+            '<Style xmlns="http://earth.google.com/kml/2.2"></Style>'
+        )
+
+        export._style_kml_icon(ET, style, 'http://earth.google.com/kml/2.2')
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+        self.assertIsNone(style.find('kml:ListStyle', namespace))
+
+    def test_update_placemark_metadata_handles_missing_name_geometry_and_properties(
+        self,
+    ):
+        export = Export.__new__(Export)
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+
+        placemark = ET.fromstring(
+            '<Placemark xmlns="http://earth.google.com/kml/2.2">'
+            '<description>placeholder</description>'
+            '</Placemark>'
+        )
+        export._update_placemark_metadata(
+            ET,
+            placemark,
+            OrderedDict([('a', 1)]),
+            None,
+            namespace,
+        )
+        self.assertIsNotNone(placemark.find('kml:ExtendedData', namespace))
+
+        placemark_no_props = ET.fromstring(
+            '<Placemark xmlns="http://earth.google.com/kml/2.2">'
+            '<description>placeholder</description>'
+            '</Placemark>'
+        )
+        export._update_placemark_metadata(
+            ET,
+            placemark_no_props,
+            OrderedDict(),
+            None,
+            namespace,
+        )
+        self.assertIsNone(
+            placemark_no_props.find('kml:ExtendedData', namespace)
+        )
+
     def test_kml_export_description_uses_survey_instance(self):
         title, schemas, submissions = build_fixture('all_geo_types')
         fp = FormPack(schemas, title)

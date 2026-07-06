@@ -7,6 +7,7 @@ import warnings
 import zipfile
 from collections import defaultdict, OrderedDict
 from inspect import isclass
+from pathlib import Path
 from typing import (
     Dict,
     Generator,
@@ -16,7 +17,7 @@ from typing import (
 from xml.etree import ElementTree as ET
 
 import xlsxwriter
-from geojson2kml.buildkml import build_kml as build_geojson_kml
+from geojson2kml import convert_file as convert_geojson_file
 
 from ..constants import (
     TAG_COLUMNS_AND_SEPARATORS,
@@ -32,6 +33,12 @@ from ..utils.replace_aliases import EXTENDED_MEDIA_TYPES, GEO_TYPES
 from ..utils.spss import spss_labels_from_variables_dict
 from ..utils.string import unique_name_for_xls
 from ..utils.text import get_valid_filename
+
+KML_NAMESPACE = 'http://earth.google.com/kml/2.2'
+GX_NAMESPACE = 'http://www.google.com/kml/ext/2.2'
+
+ET.register_namespace('', KML_NAMESPACE)
+ET.register_namespace('gx', GX_NAMESPACE)
 
 
 class Export:
@@ -785,23 +792,25 @@ class Export:
             yield array_epilogue
 
     def to_kml(self, submissions, flatten=True):
-        submissions = list(submissions)
-        geojson = "".join(self.to_geojson(submissions, flatten=True))
+        geojson = "".join(self.to_geojson(submissions, flatten=flatten))
         geojson = json.loads(geojson)
 
         survey_instances = self._collect_survey_instances(submissions)
         normalized_geojson = self._normalize_feature_collection(geojson)
 
-        with tempfile.NamedTemporaryFile(suffix='.kml', delete=False) as handle:
-            tmp_path = handle.name
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_dir_path = Path(tmp_dir)
+            geojson_path = tmp_dir_path / 'export.geojson'
+            geojson_path.write_text(
+                json.dumps(normalized_geojson), encoding='utf-8'
+            )
 
-        try:
-            build_geojson_kml(normalized_geojson, output_path=tmp_path)
-            with open(tmp_path, 'r', encoding='utf-8') as handle:
+            kml_path = convert_geojson_file(str(geojson_path), tmp_dir)
+            with open(kml_path, 'r', encoding='utf-8') as handle:
                 kml_text = handle.read()
             kml_text = re.sub(
                 r'http://www\.opengis\.net/kml/2\.2',
-                'http://earth.google.com/kml/2.2',
+                KML_NAMESPACE,
                 kml_text,
             )
 
@@ -810,10 +819,7 @@ class Export:
                 kml_text, normalized_geojson, survey_instances
             )
 
-            yield kml_text
-        finally:
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)
+        yield kml_text
 
     def to_table(self, submissions):
 
@@ -1066,14 +1072,12 @@ class Export:
         Parses the KML XML and inserts <ExtendedData> elements containing
         <Data> children for each property in the corresponding GeoJSON feature.
         """
-        self._register_kml_namespaces(ET)
-
         try:
             root = ET.fromstring(kml_text)
-        except Exception:
+        except ET.ParseError:
             return kml_text
 
-        ns_uri = 'http://earth.google.com/kml/2.2'
+        ns_uri = KML_NAMESPACE
         ns = {'kml': ns_uri}
 
         document = root.find('kml:Document', ns)
@@ -1085,6 +1089,12 @@ class Export:
 
         features = geojson_data.get('features', [])
         placemarks = root.findall('.//kml:Placemark', ns)
+        if not (len(placemarks) == len(features) == len(survey_instances)):
+            raise RuntimeError(
+                'KML placemark count does not match GeoJSON feature count '
+                'or survey instance count'
+            )
+
         for placemark, feature, survey_instance in zip(
             placemarks, features, survey_instances
         ):
@@ -1214,10 +1224,6 @@ class Export:
                 for feature in features
             ],
         }
-
-    def _register_kml_namespaces(self, ET):
-        ET.register_namespace('', 'http://earth.google.com/kml/2.2')
-        ET.register_namespace('gx', 'http://www.google.com/kml/ext/2.2')
 
     def _style_kml_icon(self, ET, style, ns_uri):
         ns = {'kml': ns_uri}
