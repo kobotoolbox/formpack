@@ -3001,6 +3001,20 @@ class TestFormPackExport(unittest.TestCase):
         # If flattening failed, you'd see nested FeatureCollections or missing geometry.
         self.assertGreaterEqual(len(placemarks), 3)
 
+    def test_kml_export_accepts_submission_iterator(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        submission_iterator = iter(submissions)
+        kml_str = ''.join(export.to_kml(submission_iterator, flatten=True))
+        root = ET.fromstring(kml_str)
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+        placemarks = root.findall('.//kml:Placemark', namespace)
+
+        self.assertGreaterEqual(len(placemarks), 3)
+
     def test_kml_export_schema_data_types_map_correctly(self):
         title, schemas, submissions = build_fixture('all_geo_types')
         fp = FormPack(schemas, title)

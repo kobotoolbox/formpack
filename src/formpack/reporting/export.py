@@ -1,6 +1,5 @@
 # coding: utf-8
 import json
-import os
 import re
 import tempfile
 import warnings
@@ -792,6 +791,7 @@ class Export:
             yield array_epilogue
 
     def to_kml(self, submissions, flatten=True):
+        submissions = list(submissions)
         geojson = "".join(self.to_geojson(submissions, flatten=flatten))
         geojson = json.loads(geojson)
 
@@ -1109,17 +1109,11 @@ class Export:
         return kml_output
 
     def _build_extended_data(self, ET, properties):
-        extended_data = ET.Element(
-            '{http://earth.google.com/kml/2.2}ExtendedData'
-        )
+        extended_data = ET.Element(f'{{{KML_NAMESPACE}}}ExtendedData')
         for key, value in properties.items():
-            data = ET.SubElement(
-                extended_data, '{http://earth.google.com/kml/2.2}Data'
-            )
+            data = ET.SubElement(extended_data, f'{{{KML_NAMESPACE}}}Data')
             data.set('name', str(key))
-            value_elem = ET.SubElement(
-                data, '{http://earth.google.com/kml/2.2}value'
-            )
+            value_elem = ET.SubElement(data, f'{{{KML_NAMESPACE}}}value')
             value_elem.text = str(value) if value is not None else ''
         return extended_data
 
@@ -1239,7 +1233,7 @@ class Export:
             icon,
             ns_uri,
             'href',
-            'http://maps.google.com/mapfiles/kml/paddle/red-circle.png',
+            'https://maps.google.com/mapfiles/kml/paddle/red-circle.png',
         )
 
         hotspot = self._upsert_kml_child(ET, icon_style, ns_uri, 'hotSpot')
@@ -1255,7 +1249,7 @@ class Export:
             item_icon,
             ns_uri,
             'href',
-            'http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png',
+            'https://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png',
         )
 
     def _update_placemark_metadata(
