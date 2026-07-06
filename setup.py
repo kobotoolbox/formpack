@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     'begins',
+    'geojson2kml',
     'jsonschema',
     'lxml',
     'pyquery',

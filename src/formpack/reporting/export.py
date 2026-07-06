@@ -1,6 +1,8 @@
 # coding: utf-8
 import json
+import os
 import re
+import tempfile
 import warnings
 import zipfile
 from collections import defaultdict, OrderedDict
@@ -11,8 +13,10 @@ from typing import (
     Iterator,
     Optional,
 )
+from xml.etree import ElementTree as ET
 
 import xlsxwriter
+from geojson2kml.buildkml import build_kml as build_geojson_kml
 
 from ..constants import (
     TAG_COLUMNS_AND_SEPARATORS,
@@ -780,6 +784,37 @@ class Export:
         else:
             yield array_epilogue
 
+    def to_kml(self, submissions, flatten=True):
+        submissions = list(submissions)
+        geojson = "".join(self.to_geojson(submissions, flatten=True))
+        geojson = json.loads(geojson)
+
+        survey_instances = self._collect_survey_instances(submissions)
+        normalized_geojson = self._normalize_feature_collection(geojson)
+
+        with tempfile.NamedTemporaryFile(suffix='.kml', delete=False) as handle:
+            tmp_path = handle.name
+
+        try:
+            build_geojson_kml(normalized_geojson, output_path=tmp_path)
+            with open(tmp_path, 'r', encoding='utf-8') as handle:
+                kml_text = handle.read()
+            kml_text = re.sub(
+                r'http://www\.opengis\.net/kml/2\.2',
+                'http://earth.google.com/kml/2.2',
+                kml_text,
+            )
+
+            # Add ExtendedData elements to map properties correctly
+            kml_text = self._add_extended_data_to_kml(
+                kml_text, normalized_geojson, survey_instances
+            )
+
+            yield kml_text
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
     def to_table(self, submissions):
 
         table = OrderedDict(((s, [list(l)]) for s, l in self.labels.items()))
@@ -1021,3 +1056,234 @@ class Export:
                     filename,
                     spss_label_commands.encode('utf-8-sig'),
                 )
+
+    def _add_extended_data_to_kml(
+        self, kml_text, geojson_data, survey_instances
+    ):
+        """
+        Add ExtendedData elements to KML placemarks for all GeoJSON properties.
+
+        Parses the KML XML and inserts <ExtendedData> elements containing
+        <Data> children for each property in the corresponding GeoJSON feature.
+        """
+        self._register_kml_namespaces(ET)
+
+        try:
+            root = ET.fromstring(kml_text)
+        except Exception:
+            return kml_text
+
+        ns_uri = 'http://earth.google.com/kml/2.2'
+        ns = {'kml': ns_uri}
+
+        document = root.find('kml:Document', ns)
+        if document is not None and document.find('kml:name', ns) is None:
+            document.insert(0, ET.Element(f'{{{ns_uri}}}name'))
+
+        for style in root.findall('.//kml:Style', ns):
+            self._style_kml_icon(ET, style, ns_uri)
+
+        features = geojson_data.get('features', [])
+        placemarks = root.findall('.//kml:Placemark', ns)
+        for placemark, feature, survey_instance in zip(
+            placemarks, features, survey_instances
+        ):
+            properties = feature.get('properties', {})
+            self._update_placemark_metadata(
+                ET, placemark, properties, survey_instance, ns
+            )
+
+        kml_output = ET.tostring(root, encoding='unicode', method='xml')
+        if not kml_output.startswith('<?xml'):
+            kml_output = '<?xml version="1.0" encoding="UTF-8"?>\n' + kml_output
+        return kml_output
+
+    def _build_extended_data(self, ET, properties):
+        extended_data = ET.Element(
+            '{http://earth.google.com/kml/2.2}ExtendedData'
+        )
+        for key, value in properties.items():
+            data = ET.SubElement(
+                extended_data, '{http://earth.google.com/kml/2.2}Data'
+            )
+            data.set('name', str(key))
+            value_elem = ET.SubElement(
+                data, '{http://earth.google.com/kml/2.2}value'
+            )
+            value_elem.text = str(value) if value is not None else ''
+        return extended_data
+
+    def _collect_survey_instances(self, submissions):
+        survey_instances = []
+        first_section_name = get_first_occurrence(self.sections.keys())
+        self.reset()
+
+        for submission in submissions:
+            version = self.get_version_for_submission(submission)
+            formatted_chunks = self.parse_one_submission(submission, version)
+            if not formatted_chunks:
+                continue
+
+            all_fields = version.sections[first_section_name].fields.values()
+            all_geo_fields = [
+                field for field in all_fields if field.data_type in GEO_TYPES
+            ]
+            rows = formatted_chunks[first_section_name]
+
+            survey_instance = submission.get('_uuid')
+            if not survey_instance:
+                survey_instance = submission.get('meta/rootUuid')
+            if not survey_instance:
+                survey_instance = submission.get('meta/instanceID')
+            if isinstance(survey_instance, str):
+                survey_instance = survey_instance.replace('uuid:', '', 1)
+
+            for geo_field in all_geo_fields:
+                for _row in rows:
+                    try:
+                        geo_response = submission[geo_field.path]
+                        field_and_response_to_geometry(geo_field, geo_response)
+                    except (KeyError, FormPackGeoJsonError, RuntimeError):
+                        continue
+                    survey_instances.append(survey_instance)
+
+        return survey_instances
+
+    def _geometry_element(self, placemark, ns):
+        geometry = placemark.find('kml:Point', ns)
+        if geometry is not None:
+            return geometry
+        geometry = placemark.find('kml:LineString', ns)
+        if geometry is not None:
+            return geometry
+        return placemark.find('kml:Polygon', ns)
+
+    def _normalize_feature_collection(self, payload):
+        if isinstance(payload, list):
+            return self._normalize_feature_list(payload)
+        if isinstance(payload, dict):
+            return self._normalize_feature_dict(payload)
+        return payload
+
+    def _normalize_feature_dict(self, payload):
+        normalized = dict(payload)
+        features = payload.get('features', [])
+        if not isinstance(features, list):
+            return normalized
+
+        normalized_features = []
+        for feature in features:
+            if not isinstance(feature, dict):
+                normalized_features.append(feature)
+                continue
+
+            normalized_feature = dict(feature)
+            properties = feature.get('properties', {})
+            if isinstance(properties, dict):
+                normalized_feature['properties'] = OrderedDict(
+                    properties.items()
+                )
+            normalized_features.append(normalized_feature)
+
+        normalized['features'] = normalized_features
+        return normalized
+
+    def _normalize_feature_list(self, payload):
+        features = []
+        name = None
+        for item in payload:
+            if not isinstance(item, dict):
+                continue
+            item_features = item.get('features')
+            if isinstance(item_features, list):
+                features.extend(item_features)
+                if not name and item.get('name'):
+                    name = item['name']
+                continue
+            if isinstance(item.get('geometry'), dict):
+                features.append(item)
+
+        if not features:
+            return {'type': 'FeatureCollection', 'features': []}
+
+        return {
+            'type': 'FeatureCollection',
+            'name': name,
+            'features': [
+                self._normalize_feature_collection(feature)
+                for feature in features
+            ],
+        }
+
+    def _register_kml_namespaces(self, ET):
+        ET.register_namespace('', 'http://earth.google.com/kml/2.2')
+        ET.register_namespace('gx', 'http://www.google.com/kml/ext/2.2')
+
+    def _style_kml_icon(self, ET, style, ns_uri):
+        ns = {'kml': ns_uri}
+        icon_style = style.find('kml:IconStyle', ns)
+        if icon_style is None:
+            return
+
+        self._upsert_kml_child(ET, icon_style, ns_uri, 'scale', '1.3')
+
+        icon = self._upsert_kml_child(ET, icon_style, ns_uri, 'Icon')
+        self._upsert_kml_child(
+            ET,
+            icon,
+            ns_uri,
+            'href',
+            'http://maps.google.com/mapfiles/kml/paddle/red-circle.png',
+        )
+
+        hotspot = self._upsert_kml_child(ET, icon_style, ns_uri, 'hotSpot')
+        hotspot.set('x', '32')
+        hotspot.set('y', '1')
+        hotspot.set('xunits', 'pixels')
+        hotspot.set('yunits', 'pixels')
+
+        list_style = self._upsert_kml_child(ET, style, ns_uri, 'ListStyle')
+        item_icon = self._upsert_kml_child(ET, list_style, ns_uri, 'ItemIcon')
+        self._upsert_kml_child(
+            ET,
+            item_icon,
+            ns_uri,
+            'href',
+            'http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png',
+        )
+
+    def _update_placemark_metadata(
+        self, ET, placemark, properties, survey_instance, ns
+    ):
+        name = placemark.find('kml:name', ns)
+        if name is not None:
+            placemark.remove(name)
+
+        description = placemark.find('kml:description', ns)
+        if description is not None and survey_instance:
+            description.text = (
+                f'\n        Survey Instance: {survey_instance}\n      '
+            )
+
+        if not properties:
+            return
+
+        existing_extended_data = placemark.find('kml:ExtendedData', ns)
+        if existing_extended_data is not None:
+            placemark.remove(existing_extended_data)
+
+        extended_data = self._build_extended_data(ET, properties)
+        geometry = self._geometry_element(placemark, ns)
+        if geometry is not None:
+            geometry_index = list(placemark).index(geometry)
+            placemark.insert(geometry_index, extended_data)
+            return
+        placemark.append(extended_data)
+
+    def _upsert_kml_child(self, ET, parent, ns_uri, tag, text=None):
+        child = parent.find(f'kml:{tag}', {'kml': ns_uri})
+        if child is None:
+            child = ET.SubElement(parent, f'{{{ns_uri}}}{tag}')
+        if text is not None:
+            child.text = text
+        return child

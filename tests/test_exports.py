@@ -6,6 +6,7 @@ import warnings
 import pathlib
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from collections import OrderedDict
 from dateutil import parser
 from io import BytesIO, TextIOWrapper
@@ -18,6 +19,7 @@ import pytest
 from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.errors import TranslationError
+from formpack.reporting.export import Export
 from formpack.schema.fields import (
     ValidationStatusCopyField,
     IdCopyField,
@@ -2947,6 +2949,231 @@ class TestFormPackExport(unittest.TestCase):
                 },
             ],
         }
+
+    def test_kml_export_contains_all_geo_types(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+
+        export = fp.export(versions=fp.versions.keys())
+        kml_str = ''.join(export.to_kml(submissions, flatten=True))
+        root = ET.fromstring(kml_str)
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+        placemarks = root.findall('.//kml:Placemark', namespace)
+        self.assertGreaterEqual(len(placemarks), 3)
+
+        geometry_tags = {
+            'Point': any(
+                placemark.find('kml:Point', namespace) is not None
+                for placemark in placemarks
+            ),
+            'LineString': any(
+                placemark.find('kml:LineString', namespace) is not None
+                for placemark in placemarks
+            ),
+            'Polygon': any(
+                placemark.find('kml:Polygon', namespace) is not None
+                for placemark in placemarks
+            ),
+        }
+        self.assertDictEqual(
+            geometry_tags,
+            {
+                'Point': True,
+                'LineString': True,
+                'Polygon': True,
+            },
+        )
+
+    def test_kml_export_always_flattens(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        # Call with flatten=False
+        kml_str = ''.join(export.to_kml(submissions, flatten=False))
+        root = ET.fromstring(kml_str)
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+        placemarks = root.findall('.//kml:Placemark', namespace)
+
+        # If flattening failed, you'd see nested FeatureCollections or missing geometry.
+        self.assertGreaterEqual(len(placemarks), 3)
+
+    def test_kml_export_schema_data_types_map_correctly(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        kml_str = ''.join(export.to_kml(submissions, flatten=True))
+        root = ET.fromstring(kml_str)
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+        placemarks = root.findall('.//kml:Placemark', namespace)
+
+        # Map schema field names to expected KML geometry tags
+        expected = {
+            'geopoint': 'Point',
+            'geotrace': 'LineString',
+            'geoshape': 'Polygon',
+        }
+
+        for field_name, geometry_tag in expected.items():
+            found = any(
+                placemark.find(f'kml:{geometry_tag}', namespace) is not None
+                for placemark in placemarks
+            )
+            self.assertTrue(
+                found, f"{field_name} should produce {geometry_tag}"
+            )
+
+    def test_kml_export_maps_geojson_properties_to_extended_data(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        kml_str = ''.join(export.to_kml(submissions[:1], flatten=True))
+        root = ET.fromstring(kml_str)
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+
+        extended_data_elements = root.findall('.//kml:ExtendedData', namespace)
+
+        # Should have at least one ExtendedData element per placemark
+        _ = root.findall('.//kml:Placemark', namespace)
+        self.assertGreater(
+            len(extended_data_elements),
+            0,
+            'KML should contain ExtendedData elements for properties',
+        )
+
+        # Each ExtendedData should contain Data elements with name and value
+        for extended_data in extended_data_elements:
+            data_elements = extended_data.findall('kml:Data', namespace)
+            self.assertGreater(
+                len(data_elements),
+                0,
+                'ExtendedData should contain Data elements',
+            )
+
+            # Each Data element should have name attribute and value child
+            for data_elem in data_elements:
+                self.assertIsNotNone(
+                    data_elem.get('name'),
+                    'Data element should have name attribute',
+                )
+                value_elem = data_elem.find('kml:value', namespace)
+                self.assertIsNotNone(
+                    value_elem, 'Data element should contain value element'
+                )
+
+        # Verify specific expected properties appear in ExtendedData
+        # (based on all_geo_types fixture fields)
+        expected_properties = {
+            'start',
+            'end',
+            'Just_a_regular_text_question',
+            'Multiple_choice_question',
+            'Multiple_select_question',
+        }
+        found_properties = set()
+        for extended_data in extended_data_elements:
+            for data_elem in extended_data.findall('kml:Data', namespace):
+                prop_name = data_elem.get('name')
+                if prop_name in expected_properties:
+                    found_properties.add(prop_name)
+
+        self.assertGreater(
+            len(found_properties),
+            0,
+            'ExtendedData should contain expected properties from fixture',
+        )
+
+    def test_kml_extended_data_preserves_all_geojson_properties(self):
+        export = Export.__new__(Export)
+        kml_str = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<kml xmlns="http://earth.google.com/kml/2.2">\n'
+            '  <Document>\n'
+            '    <Placemark>\n'
+            '      <name>None</name>\n'
+            '      <description>placeholder</description>\n'
+            '      <Point><coordinates>1,2,0</coordinates></Point>\n'
+            '    </Placemark>\n'
+            '  </Document>\n'
+            '</kml>'
+        )
+        geojson_data = {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {'type': 'Point', 'coordinates': [1, 2, 0]},
+                    'properties': OrderedDict(
+                        [
+                            ('start', '2026-07-01T13:08:06.524-04:00'),
+                            ('_uuid', '716ddcf9-e83a-41ce-855a-120c712df3e0'),
+                            ('__version__', 'abc123'),
+                            (
+                                'meta/rootUuid',
+                                'uuid:716ddcf9-e83a-41ce-855a-120c712df3e0',
+                            ),
+                            ('nullable', None),
+                        ]
+                    ),
+                }
+            ],
+        }
+
+        updated_kml = export._add_extended_data_to_kml(
+            kml_str,
+            geojson_data,
+            ['716ddcf9-e83a-41ce-855a-120c712df3e0'],
+        )
+        root = ET.fromstring(updated_kml)
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+
+        data_names = [
+            data_elem.get('name')
+            for data_elem in root.findall(
+                './/kml:ExtendedData/kml:Data', namespace
+            )
+        ]
+        self.assertEqual(
+            data_names,
+            ['start', '_uuid', '__version__', 'meta/rootUuid', 'nullable'],
+        )
+
+        nullable_value = root.find(
+            ".//kml:ExtendedData/kml:Data[@name='nullable']/kml:value",
+            namespace,
+        )
+        self.assertIsNotNone(nullable_value)
+        self.assertIsNone(nullable_value.text)
+
+    def test_kml_export_description_uses_survey_instance(self):
+        title, schemas, submissions = build_fixture('all_geo_types')
+        fp = FormPack(schemas, title)
+        export = fp.export(versions=fp.versions.keys())
+
+        submission = dict(submissions[0])
+        submission['_uuid'] = '716ddcf9-e83a-41ce-855a-120c712df3e0'
+
+        kml_str = ''.join(export.to_kml([submission], flatten=True))
+        root = ET.fromstring(kml_str)
+
+        namespace = {'kml': 'http://earth.google.com/kml/2.2'}
+        descriptions = root.findall(
+            './/kml:Placemark/kml:description', namespace
+        )
+
+        self.assertGreater(len(descriptions), 0)
+        for description in descriptions:
+            self.assertEqual(
+                description.text.strip(),
+                'Survey Instance: 716ddcf9-e83a-41ce-855a-120c712df3e0',
+            )
 
     def test_geojson_invalid(self):
         title, schemas, _ = build_fixture('all_geo_types')
