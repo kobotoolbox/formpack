@@ -549,7 +549,9 @@ class QualField(TextField):
             return ''
 
         if question_response := responses.get(field_uuid):
-            return question_response['value']
+            # `value` is absent when the response only carries a `verified`
+            # flag, and when a result is awaiting review
+            return question_response.get('value', '')
 
         return ''
 
@@ -713,8 +715,10 @@ class QualNameSplittingTransxField(QualField):
         # A transcript does not have a dictionary with language keys:
         #     {'transcript': {'languageCode': 'en', 'value': 'i am a raisin'}}
         if responses.get('languageCode') == self.language:
-            # Grab the value directly
-            return responses['value']
+            # Grab the value directly. `value` is absent while the result is
+            # awaiting review:
+            #     {'transcript': {'languageCode': 'en', 'pendingReview': True}}
+            return responses.get('value', '')
 
         # However, translations do have an outer dictionary with language keys:
         #     {

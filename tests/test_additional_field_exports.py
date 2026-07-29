@@ -1,5 +1,7 @@
 # coding: utf-8
 import unittest
+from copy import deepcopy
+
 from formpack import FormPack
 from .fixtures import build_fixture
 from .fixtures.load_fixture_json import load_analysis_form_json
@@ -518,6 +520,81 @@ def test_additional_field_exports_all_versions_langs():
         'name_of_clerk',
         'name_of_clerk - Comment on the name of the clerk',
     ]
+
+
+def test_transcript_pending_review_exports_as_blank():
+    """
+    KPI omits `value` from a transcript that has been generated but not yet
+    accepted, sending `pendingReview` instead. Such a transcript must export
+    as an empty string rather than raising `KeyError`
+    """
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
+
+    submissions = deepcopy(submissions)
+    submissions[0]['_supplementalDetails']['record_a_note']['transcript'] = {
+        'languageCode': 'es',
+        'regionCode': None,
+        'pendingReview': True,
+    }
+
+    options = {
+        'versions': 'v1',
+        'filter_fields': [
+            'record_a_note',
+            '_supplementalDetails/record_a_note/transcript_en',
+            '_supplementalDetails/record_a_note/transcript_es',
+            '_supplementalDetails/record_a_note/translation_en',
+            '_supplementalDetails/record_a_note/translation_es',
+        ],
+    }
+    export = pack.export(**options)
+    values = export.to_dict(submissions)
+    main_export_sheet = values['Simple Clerk Interaction']
+
+    response0 = main_export_sheet['data'][0]
+    assert response0 == [
+        'clerk_interaction_1.mp3',
+        '',
+        '',
+        'Hello how may I help you?',
+        '',
+    ]
+
+
+def test_qual_response_without_value_exports_as_blank():
+    """
+    A qualitative analysis response may legitimately carry only a `verified`
+    flag, with no `value`
+    """
+    title, schemas, submissions = build_fixture('analysis_form')
+    analysis_form = load_analysis_form_json('analysis_form')
+    pack = FormPack(schemas, title=title)
+    pack.extend_survey(analysis_form)
+
+    submissions = deepcopy(submissions)
+    supplement = submissions[0]['_supplementalDetails']
+    supplement['clerk_details/name_of_clerk']['qual']['uuid_for_comment'] = {
+        'uuid': 'uuid_for_comment',
+        'verified': True,
+    }
+
+    qual_field = 'clerk_details/name_of_clerk/uuid_for_comment'
+    options = {
+        'versions': 'v1',
+        'filter_fields': [
+            'clerk_details/name_of_clerk',
+            f'_supplementalDetails/{qual_field}',
+        ],
+    }
+    export = pack.export(**options)
+    values = export.to_dict(submissions)
+    main_export_sheet = values['Simple Clerk Interaction']
+
+    response0 = main_export_sheet['data'][0]
+    assert response0 == ['John', '']
 
 
 def test_simple_report_with_analysis_form():
