@@ -524,9 +524,10 @@ def test_additional_field_exports_all_versions_langs():
 
 def test_transcript_pending_review_exports_as_blank():
     """
-    KPI omits `value` from a transcript that has been generated but not yet
-    accepted, sending `pendingReview` instead. Such a transcript must export
-    as an empty string rather than raising `KeyError`
+    Before kobotoolbox/kpi#7344, KPI omitted `value` from a transcript that
+    had been generated but not yet accepted, sending `pendingReview` instead.
+    formpack must still tolerate that shape and export such a transcript as an
+    empty string rather than raising `KeyError`
     """
     title, schemas, submissions = build_fixture('analysis_form')
     analysis_form = load_analysis_form_json('analysis_form')
