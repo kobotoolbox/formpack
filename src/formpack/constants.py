@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 
 # In the core formpack code, the default `lang` parameter conflicted
 # with the desired representation of the JSON form, where "null" would
@@ -58,6 +59,26 @@ TAG_COLUMNS_AND_SEPARATORS = {
 #     …
 #     Media is translatable in the same way as labels and hints…
 MEDIA_COLUMN_NAMES = ('audio', 'image', 'video', 'big-image')
+
+# Compiled patterns describing XLSForm column headers, kept here so other
+# consumers (e.g. kpi's import validation) rely on the exact same rules as
+# `formpack.utils.expand_content._get_special_survey_cols()`. Separators are
+# one or two colons with optional surrounding whitespace.
+_MEDIA_NAMES = '|'.join(MEDIA_COLUMN_NAMES)
+# translated media column, e.g. `image::English (en)`, `media::image::Français`
+MEDIA_COLUMN_WITH_LANG_RE = re.compile(
+    rf'^(media\s*::?\s*)?({_MEDIA_NAMES})\s*::?\s*([^:]+)$'
+)
+# untranslated media column, e.g. `image`, `media::image`
+MEDIA_COLUMN_RE = re.compile(rf'^(media\s*::?\s*)?({_MEDIA_NAMES})$')
+# any other translated column, e.g. `label::English (en)`, `hint::Français`
+TRANSLATED_COLUMN_RE = re.compile(r'^([^:]+)\s*::?\s*([^:]+)$')
+
+# Submission fields that store the form version id, possibly mangled,
+# e.g. `__version__`, `_version_`, `_version__001`
+FUZZY_VERSION_ID_KEY = '_version_'
+INFERRED_VERSION_ID_KEY = '__inferred_version__'
+FUZZY_VERSION_RE = re.compile(r'^__?version__?(\d{3})?$')
 
 # Export Settings
 EXPORT_SETTING_FIELDS = 'fields'

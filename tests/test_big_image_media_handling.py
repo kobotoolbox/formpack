@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from formpack import FormPack
@@ -60,10 +62,20 @@ def test_formpack_raises_error_when_big_image_not_in_media_names(monkeypatch):
         'translations': [None],
     }
 
-    # Patch MEDIA_COLUMN_NAMES to exclude 'big-image'
+    # Patch MEDIA_COLUMN_NAMES, and the patterns compiled from it in
+    # formpack.constants, to exclude 'big-image'
+    media_names = ('image', 'audio', 'video')
+    media_re = '|'.join(media_names)
     monkeypatch.setattr(
-        'formpack.utils.expand_content.MEDIA_COLUMN_NAMES',
-        ('image', 'audio', 'video')
+        'formpack.utils.expand_content.MEDIA_COLUMN_NAMES', media_names
+    )
+    monkeypatch.setattr(
+        'formpack.utils.expand_content.MEDIA_COLUMN_WITH_LANG_RE',
+        re.compile(rf'^(media\s*::?\s*)?({media_re})\s*::?\s*([^:]+)$'),
+    )
+    monkeypatch.setattr(
+        'formpack.utils.expand_content.MEDIA_COLUMN_RE',
+        re.compile(rf'^(media\s*::?\s*)?({media_re})$'),
     )
     expand_content(content, in_place=True)
 

@@ -21,8 +21,11 @@ from .iterator import get_first_occurrence
 from .replace_aliases import META_TYPES, selects
 from ..constants import (
     MEDIA_COLUMN_NAMES,
+    MEDIA_COLUMN_RE,
+    MEDIA_COLUMN_WITH_LANG_RE,
     OR_OTHER_COLUMN,
     TAG_COLUMNS_AND_SEPARATORS,
+    TRANSLATED_COLUMN_RE,
     UNTRANSLATED,
 )
 
@@ -208,8 +211,6 @@ def _get_special_survey_cols(
         'hint::English',
     For more examples, see tests.
     """
-    RE_MEDIA_COLUMN_NAMES = '|'.join(MEDIA_COLUMN_NAMES)
-
     uniq_cols = OrderedDict()
     special = OrderedDict()
 
@@ -245,10 +246,7 @@ def _get_special_survey_cols(
             continue
         if column_name.startswith('body:'):
             continue
-        mtch = re.match(
-            rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})\s*::?\s*([^:]+)$',
-            column_name,
-        )
+        mtch = MEDIA_COLUMN_WITH_LANG_RE.match(column_name)
         if mtch:
             matched = mtch.groups()
             media_type = matched[1]
@@ -261,9 +259,7 @@ def _get_special_survey_cols(
                 translation=translation,
             )
             continue
-        mtch = re.match(
-            rf'^(media\s*::?\s*)?({RE_MEDIA_COLUMN_NAMES})$', column_name
-        )
+        mtch = MEDIA_COLUMN_RE.match(column_name)
         if mtch:
             matched = mtch.groups()
             media_type = matched[1]
@@ -275,7 +271,7 @@ def _get_special_survey_cols(
                 translation=UNTRANSLATED,
             )
             continue
-        mtch = re.match(r'^([^:]+)\s*::?\s*([^:]+)$', column_name)
+        mtch = TRANSLATED_COLUMN_RE.match(column_name)
         if mtch:
             # example: label::x, constraint_message::x, hint::x
             matched = mtch.groups()
