@@ -194,7 +194,7 @@ class AutoReport:
 
             for field in reversed_fields:
 
-                if field.has_stats:
+                if field.has_stats and field.name not in fields_to_skip:
 
                     raw_value = entry.get(field.path)
 
