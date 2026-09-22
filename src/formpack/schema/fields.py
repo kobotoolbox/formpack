@@ -73,6 +73,7 @@ class FormField(FormDataDef):
             )
         self._mangled_name = True
         self.name = '_'.join([self.name, self.data_type, version_id])
+        return self.name
 
     def get_labels(
         self,
