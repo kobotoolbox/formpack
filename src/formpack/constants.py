@@ -76,6 +76,8 @@ TRANSLATED_COLUMN_RE = re.compile(r'^([^:]+)\s*::?\s*([^:]+)$')
 
 # Submission fields that store the form version id, possibly mangled,
 # e.g. `__version__`, `_version_`, `_version__001`
+# These are NOT used by formpack in any way, but they are imported by kpi
+# to cope with https://github.com/kobotoolbox/kpi/issues/1465
 FUZZY_VERSION_ID_KEY = '_version_'
 INFERRED_VERSION_ID_KEY = '__inferred_version__'
 FUZZY_VERSION_RE = re.compile(r'^__?version__?(\d{3})?$')
