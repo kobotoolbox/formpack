@@ -156,6 +156,11 @@ def expand_content_in_place(content: Dict[str, List[Any]]) -> None:
             if key in row:
                 _expand_translatable_content(content, row, key, vals)
 
+    for row in content.get('external_choices', []):
+        for key, vals in iter(specials.items()):
+            if key in row:
+                _expand_translatable_content(content, row, key, vals)
+
     if 'settings' in content and isinstance(content['settings'], list):
         if len(content['settings']) > 0:
             content['settings'] = content['settings'][0]
@@ -232,6 +237,7 @@ def _get_special_survey_cols(
 
     _pluck_uniq_cols('survey')
     _pluck_uniq_cols('choices')
+    _pluck_uniq_cols('external_choices')
 
     for column_name in uniq_cols.keys():
         if column_name in ['label', 'hint']:
