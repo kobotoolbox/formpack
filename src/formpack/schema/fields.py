@@ -1460,16 +1460,13 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
             'details': only the details column
         """
         _zero, _one = ('0', '1') if xls_types_as_text else (0, 1)
+        value_names = self.get_value_names(multiple_select=multiple_select)
         if val is None:
             # If the value is missing, do not imply that any response was
             # received: fill with empty strings instead of zeros
-            return dict.fromkeys(
-                self.get_value_names(multiple_select=multiple_select), ''
-            )
+            return dict.fromkeys(value_names, '')
 
-        cells = dict.fromkeys(
-            self.get_value_names(multiple_select=multiple_select), _zero
-        )
+        cells = dict.fromkeys(value_names, _zero)
         if multiple_select in ('both', 'summary'):
             res = []
             for v in val.split():
@@ -1490,7 +1487,10 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
 
         if multiple_select in ('both', 'details'):
             for choice in val.split():
-                cells[self.name + '/' + choice] = _one
+                cell_name=f'{self.name}/{choice}'
+                if cell_name not in value_names:
+                    continue
+                cells[cell_name] = _one
 
         return cells
 

@@ -2717,6 +2717,27 @@ class TestFormPackExport(unittest.TestCase):
             ['american british', '0', '0', '1', '1', 'Keurig'],
         )
 
+    def test_select_multiple_with_unknown_options(self):
+        title, schemas, submissions = build_fixture('favorite_coffee')
+        fp = FormPack(schemas, title)
+        self.assertEqual(len(fp.versions), 2)
+        busted_submission = {
+            '__version__': 'fcv2',
+            'brand_of_coffee_machine': 'Keurig',
+            'favorite_coffee_type': 'american narnian'
+        }
+        submissions = [busted_submission, *submissions]
+        export = fp.export(multiple_select='both', versions=fp.versions.keys()).to_dict(submissions)
+        for submission in export['Favorite coffee']['data']:
+            self.assertEqual(len(submission), 6)
+        first_submission = export['Favorite coffee']['data'][0]
+        self.assertListEqual(
+            first_submission,
+            ['american narnian','0','0','1','0', 'Keurig']
+        )
+
+
+
     def test_geojson_with_select_xml_label(self):
         title, schemas, submissions = build_fixture('geojson_and_selects')
         fp = FormPack(schemas, title)
