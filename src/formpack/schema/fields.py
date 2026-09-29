@@ -1488,7 +1488,7 @@ class FormChoiceFieldWithMultipleSelect(FormChoiceField):
         if multiple_select in ('both', 'details'):
             for choice in val.split():
                 cell_name=f'{self.name}/{choice}'
-                if cell_name not in value_names:
+                if cell_name not in cells:
                     continue
                 cells[cell_name] = _one
 
