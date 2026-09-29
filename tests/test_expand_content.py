@@ -415,6 +415,7 @@ def test_expand_translated_external_choice_sheets():
         'translations': ['En', 'Fr'],
     }
 
+
 def test_expand_untranslated_external_choice_sheets():
     s1 = {
         'survey': [
