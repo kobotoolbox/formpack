@@ -415,6 +415,55 @@ def test_expand_translated_external_choice_sheets():
         'translations': ['En', 'Fr'],
     }
 
+def test_expand_untranslated_external_choice_sheets():
+    s1 = {
+        'survey': [
+            {
+                'type': 'select_one_external yn',
+                'label': 'Select1',
+                'choice_filter': 'yn=${yn}'
+            }
+        ],
+        'external_choices': [
+            {
+                'list_name': 'yn',
+                'name': 'y',
+                'label': 'Y'
+            },
+            {
+                'list_name': 'yn',
+                'name': 'n',
+                'label': 'Y'
+            },
+        ],
+    }
+    expand_content(s1, in_place=True)
+    assert s1 == {
+        'survey': [
+            {
+                'type': 'select_one_external',
+                'select_from_list_name': 'yn',
+                'label': ['Select1'],
+                'choice_filter': 'yn=${yn}'
+            }
+        ],
+        'external_choices': [
+            {
+                'list_name': 'yn',
+                'name': 'y',
+                'label': ['Y'],
+            },
+            {
+                'list_name': 'yn',
+                'name': 'n',
+                'label': ['Y'],
+            },
+        ],
+        'schema': SCHEMA_VERSION,
+        'translated': ['label'],
+        'translations': [UNTRANSLATED],
+    }
+
 
 def test_expand_hints_and_labels():
     """
