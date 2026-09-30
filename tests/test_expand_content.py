@@ -363,6 +363,110 @@ def test_expand_translated_choice_sheets():
     }
 
 
+def test_expand_translated_external_choice_sheets():
+    s1 = {
+        'survey': [
+            {
+                'type': 'select_one_external yn',
+                'label::En': 'English Select1',
+                'label::Fr': 'French Select1',
+                'choice_filter': 'yn=${yn}'
+            }
+        ],
+        'external_choices': [
+            {
+                'list_name': 'yn',
+                'name': 'y',
+                'label::En': 'En Y',
+                'label::Fr': 'Fr Y',
+            },
+            {
+                'list_name': 'yn',
+                'name': 'n',
+                'label::En': 'En N',
+                'label::Fr': 'Fr N',
+            },
+        ],
+        'translations': ['En', 'Fr'],
+    }
+    expand_content(s1, in_place=True)
+    assert s1 == {
+        'survey': [
+            {
+                'type': 'select_one_external',
+                'select_from_list_name': 'yn',
+                'label': ['English Select1', 'French Select1'],
+                'choice_filter': 'yn=${yn}'
+            }
+        ],
+        'external_choices': [
+            {
+                'list_name': 'yn',
+                'name': 'y',
+                'label': ['En Y', 'Fr Y'],
+            },
+            {
+                'list_name': 'yn',
+                'name': 'n',
+                'label': ['En N', 'Fr N'],
+            },
+        ],
+        'schema': SCHEMA_VERSION,
+        'translated': ['label'],
+        'translations': ['En', 'Fr'],
+    }
+
+
+def test_expand_untranslated_external_choice_sheets():
+    s1 = {
+        'survey': [
+            {
+                'type': 'select_one_external yn',
+                'label': 'Select1',
+                'choice_filter': 'yn=${yn}'
+            }
+        ],
+        'external_choices': [
+            {
+                'list_name': 'yn',
+                'name': 'y',
+                'label': 'Y'
+            },
+            {
+                'list_name': 'yn',
+                'name': 'n',
+                'label': 'Y'
+            },
+        ],
+    }
+    expand_content(s1, in_place=True)
+    assert s1 == {
+        'survey': [
+            {
+                'type': 'select_one_external',
+                'select_from_list_name': 'yn',
+                'label': ['Select1'],
+                'choice_filter': 'yn=${yn}'
+            }
+        ],
+        'external_choices': [
+            {
+                'list_name': 'yn',
+                'name': 'y',
+                'label': ['Y'],
+            },
+            {
+                'list_name': 'yn',
+                'name': 'n',
+                'label': ['Y'],
+            },
+        ],
+        'schema': SCHEMA_VERSION,
+        'translated': ['label'],
+        'translations': [UNTRANSLATED],
+    }
+
+
 def test_expand_hints_and_labels():
     """
     This was an edge case that triggered some weird behavior
