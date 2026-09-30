@@ -65,6 +65,64 @@ class TestFormPackExport(unittest.TestCase):
 
         self.assertEqual(export, expected)
 
+    def test_geopoint_types_export_to_component_columns(self):
+        expected_fields = [
+            'location',
+            '_location_latitude',
+            '_location_longitude',
+            '_location_altitude',
+            '_location_precision',
+        ]
+        submissions = [
+            {
+                '__version__': 'v1',
+                '_uuid': 'complete-geopoint',
+                'location': '12.34 -23.45 100.5 4.2',
+            },
+            {
+                '__version__': 'v1',
+                '_uuid': 'two-dimensional-geopoint',
+                'location': '13.42 -25.43',
+            },
+            {
+                '__version__': 'v1',
+                '_uuid': 'missing-geopoint',
+                'location': None,
+            },
+        ]
+        expected_data = [
+            ['12.34 -23.45 100.5 4.2', '12.34', '-23.45', '100.5', '4.2'],
+            ['13.42 -25.43', '13.42', '-25.43', '', ''],
+            ['', '', '', '', ''],
+        ]
+
+        for field_type in (
+            'geopoint',
+            'start-geopoint',
+            'background-geopoint',
+        ):
+            with self.subTest(field_type=field_type):
+                schema = {
+                    'id_string': 'geo',
+                    'version': 'v1',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {
+                                'type': field_type,
+                                'name': 'location',
+                                'label': 'Location',
+                            }
+                        ]
+                    },
+                }
+                export = FormPack([schema], 'Geo').export().to_dict(
+                    submissions
+                )['Geo']
+
+                self.assertEqual(export['fields'], expected_fields)
+                self.assertEqual(export['data'], expected_data)
+
     def test_generator_export_labels_without_translations(self):
 
         title, schemas, submissions = customer_satisfaction
