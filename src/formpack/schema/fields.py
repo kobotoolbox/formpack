@@ -37,6 +37,7 @@ class FormField(FormDataDef):
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
         self.analysis_question = False
+        self.previous_xpaths = []
 
         source = kwargs.get('source')
         if source is not None:

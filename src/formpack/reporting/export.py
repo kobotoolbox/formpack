@@ -22,7 +22,7 @@ from ..constants import (
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
-from ..schema import CopyField, FormField
+from ..schema import CopyField, FormField, FormSection
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackExcelError, FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
@@ -143,6 +143,7 @@ class Export:
         for section_name, fields in self.sections.items():
             self._row_cache[section_name] = OrderedDict.fromkeys(fields, '')
             self._empty_row[section_name] = dict(self._row_cache[section_name])
+        section_tree_by_version_combination = {}
 
     def get_version_for_submission(self, submission):
         """
@@ -170,6 +171,7 @@ class Export:
                 submission instead of inferring the version from the submission
                 itself
         """
+        breakpoint()
         if not version:
             version = self.get_version_for_submission(submission)
         if not version:
@@ -178,9 +180,30 @@ class Export:
             return None
         # `format_one_submission()` will recurse through all the sections; get
         # the first one to start
-        section = get_first_occurrence(version.sections.values())
+        versions = [version for version in self.versions.values()]
+        all_sections = OrderedDict({})
+        for version in versions:
+            for section_name, section_obj in version.sections.items():
+                if existing_section := all_sections.get(section_name):
+                    child_names = [child.name for child in existing_section.children]
+                    for child in section_obj.children:
+                        if child.name not in child_names:
+                            existing_section.children.append(child)
+                else:
+                    all_sections[section_name] = section_obj
+        version_keys = [version.id for version in versions]
+        fields = self.formpack.get_fields_for_versions(version_keys)
+        for section in all_sections.values():
+            section.fields = {}
+        for field in fields:
+            section_name = field.section.name
+            section = all_sections.get(section_name)
+            section.fields[field.name]=field
+
+        section = get_first_occurrence(all_sections.values())
         submission = FormSubmission(submission)
-        return self.format_one_submission([submission.data], section)
+        fmo = self.format_one_submission([submission.data], section)
+        return fmo
 
     def parse_submissions(self, submissions):
         """
@@ -284,7 +307,6 @@ class Export:
                     include_media_url=self.include_media_url,
                 )
             )
-
         for section_name, section in all_sections.items():
             # Append optional additional fields
             auto_field_names = auto_fields[section_name] = []
@@ -524,7 +546,7 @@ class Export:
                             chunks[key] = value
 
             _indexes[_section_name] += 1
-
+        breakpoint()
         return chunks
 
     def get_header_rows_for_tag_cols(self, section_name):

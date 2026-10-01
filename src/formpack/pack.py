@@ -264,7 +264,7 @@ class FormPack:
         #       `positions[f'{section.name}_{field2.name}']` would be `(0, 1)`
         positions = {}
 
-        # Create the initial field mappings from the first form version
+        # Create the initial field mappings from the most recent form version
         versions_desc = list(reversed(self._get_versions(versions).values()))
 
         # Copy fields need to be pushed at the end. So let's process them separately.
@@ -279,7 +279,6 @@ class FormPack:
                     positions[section_field_name] = (index, 0)
                     tmp2d.append([field_object])
                     index += 1
-
         for version in versions_desc[1:]:
             index = 0
             for section_name, section in version.sections.items():
@@ -297,6 +296,8 @@ class FormPack:
                             new_object = self._combine_field_choices(
                                 field_object, latest_field_object
                             )
+                            if field_object.path != latest_field_object.path:
+                                new_object.previous_xpaths.append(latest_field_object.path)
                             tmp2d[position[0]][position[1]] = new_object
                         else:
                             try:
@@ -315,7 +316,6 @@ class FormPack:
                             )
 
                         index += 1
-
         all_fields = []
 
         # We need to flatten the 2d list before returning it.
@@ -329,7 +329,6 @@ class FormPack:
             else:
                 all_fields.append(field)
                 first_dimension.pop(0)
-
         # Then flatten tmp2d
         for first_dimension in tmp2d:
             for field in first_dimension:
