@@ -161,6 +161,25 @@ class Export:
         except KeyError:
             return None
 
+
+    def get_versions_for_submission(self, submission):
+        """
+        Returns all versions under which the submission has been edited, from
+        meta/formVersions
+
+        The assumption is that meta/formVersions will always be in descending order
+        by recency
+        """
+
+        version_id_list = submission.get('meta/formVersions').split(' ')
+        versions = [
+                v for version_id in version_id_list
+                                      if (v := self.versions.get(version_id)) is not None
+                                     ]
+
+        return versions
+
+
     def parse_one_submission(self, submission, version=None):
         """
         Parse a single submission and return a formatted 'chunks' structure;
@@ -171,7 +190,6 @@ class Export:
                 submission instead of inferring the version from the submission
                 itself
         """
-        breakpoint()
         if not version:
             version = self.get_version_for_submission(submission)
         if not version:
@@ -182,15 +200,18 @@ class Export:
         # the first one to start
         versions = [version for version in self.versions.values()]
         all_sections = OrderedDict({})
+        child_names_by_parent = defaultdict(set)
         for version in versions:
             for section_name, section_obj in version.sections.items():
                 if existing_section := all_sections.get(section_name):
-                    child_names = [child.name for child in existing_section.children]
+                    existing_child_names = child_names_by_parent[section_name]
                     for child in section_obj.children:
-                        if child.name not in child_names:
+                        if child.name not in existing_child_names:
                             existing_section.children.append(child)
+                            existing_child_names.add(child.name)
                 else:
                     all_sections[section_name] = section_obj
+                    child_names_by_parent[section_name] = set([child.name for child in section_obj.children])
         version_keys = [version.id for version in versions]
         fields = self.formpack.get_fields_for_versions(version_keys)
         for section in all_sections.values():
@@ -546,7 +567,6 @@ class Export:
                             chunks[key] = value
 
             _indexes[_section_name] += 1
-        breakpoint()
         return chunks
 
     def get_header_rows_for_tag_cols(self, section_name):
