@@ -2,6 +2,7 @@
 import contextlib
 import io
 import json
+import uuid
 import warnings
 import pathlib
 import tempfile
@@ -10,6 +11,7 @@ import xml.etree.ElementTree as ET
 from collections import OrderedDict
 from dateutil import parser
 from io import BytesIO, TextIOWrapper
+from unittest.mock import patch
 from textwrap import dedent
 from zipfile import ZipFile
 
@@ -20,6 +22,7 @@ from formpack import FormPack
 from formpack.constants import UNTRANSLATED
 from formpack.errors import TranslationError
 from formpack.reporting.export import Export
+from formpack.schema import FormSection
 from formpack.schema.fields import (
     ValidationStatusCopyField,
     IdCopyField,
@@ -2590,6 +2593,7 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_select_multiple_summary(self):
         title, schemas, submissions = build_fixture('dietary_needs')
+        breakpoint()
         fp = FormPack(schemas, title)
         export = fp.export(
             multiple_select='summary', versions=fp.versions.keys()
@@ -3561,3 +3565,83 @@ class TestFormPackExport(unittest.TestCase):
                 ],
             },
         ]
+
+    def test_parse_one_submission_caches_version_results(self):
+        form = {
+            'title': 'Many versions',
+            'id_string': 'many_versions',
+            'versions': [
+                {
+                    "id_string": "many_versions",
+                    "version": "v1",
+                    "version_id_key": "__version__",
+                    "content": {
+                        "survey": [
+                            {
+                                "type": "text",
+                                "name": "qv1",
+                                "label": "q"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id_string": "many_versions",
+                    "version": "v2",
+                    "version_id_key": "__version__",
+                    "content": {
+                        "survey": [
+                            {
+                                "type": "text",
+                                "name": "qv2",
+                                "label": "q"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id_string": "many_versions",
+                    "version": "v3",
+                    "version_id_key": "__version__",
+                    "content": {
+                        "survey": [
+                            {
+                                "type": "text",
+                                "name": "qv3",
+                                "label": "q"
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+
+        def create_submission_from_versions(version_ids):
+            submission = { "_uuid": str(uuid.uuid4()) }
+            if 'v1' in version_ids:
+                submission["qv1"] = 'answer1'
+                submission['version'] = 'v1'
+            if 'v2' in version_ids:
+                submission['qv2'] = 'answer2'
+                submission['version'] = 'v2'
+            if 'v3' in version_ids:
+                submission['qv3'] = 'answer3'
+                submission['version'] = 'v3'
+            submission['meta/formVersions'] = ' '.join(version_ids)
+            return submission
+
+        title, schemas, submissions = restaurant_profile
+        submissions = []
+        for versions_set in [['v1'], ['v2'], ['v3'], ['v3','v1'], ['v3','v2'], ['v2', 'v1'], ['v3', 'v2', 'v1']]:
+            # 2 submissions per version combination
+            submissions.append(create_submission_from_versions(versions_set))
+            submissions.append(create_submission_from_versions(versions_set))
+
+
+
+        fp = FormPack(form['versions'], form['title'])
+        export = fp.export(versions=fp.versions.keys())
+        with patch.object(export, 'create_synthetic_frankenversion', return_value=FormSection(name='Many versions')) as mock_frankenversion:
+            exported = export.to_dict(submissions)
+
+        breakpoint()

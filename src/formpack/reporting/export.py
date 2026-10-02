@@ -144,7 +144,7 @@ class Export:
         for section_name, fields in self.sections.items():
             self._row_cache[section_name] = OrderedDict.fromkeys(fields, '')
             self._empty_row[section_name] = dict(self._row_cache[section_name])
-        section_tree_by_version_combination = {}
+        self.top_section_by_version_combination = {}
 
     def get_version_for_submission(self, submission):
         """
@@ -172,7 +172,7 @@ class Export:
         by recency
         """
 
-        version_id_list = submission.get('meta/formVersions').split(' ')
+        version_id_list = submission.get('meta/formVersions','').split(' ')
         versions = [
                 v for version_id in version_id_list
                                       if (v := self.versions.get(version_id)) is not None
@@ -180,40 +180,12 @@ class Export:
 
         return versions
 
-
-    def parse_one_submission(self, submission, version=None):
-        """
-        Parse a single submission and return a formatted 'chunks' structure;
-        see format_one_submission() for details
-
-        Args:
-            version (FormVersion): optional, explicit version to use for this
-                submission instead of inferring the version from the submission
-                itself
-        """
-        if not version:
-            version = self.get_version_for_submission(submission)
-        if not version:
-            # TODO: somehow include this submission anyway; see
-            # https://github.com/kobotoolbox/formpack/issues/164
-            return None
-        # `format_one_submission()` will recurse through all the sections; get
-        # the first one to start
-        versions = [version for version in self.versions.values()]
-        all_sections = OrderedDict({})
-        child_names_by_parent = defaultdict(set)
-        for version in versions:
-            for section_name, section_obj in version.sections.items():
-                existing_child_names = child_names_by_parent[section_name]
-                for child in section_obj.children:
-                    if child.name not in existing_child_names:
-                        existing_child_names.add(child.name)
-                if not all_sections.get(section_name):
-                    all_sections[section_name] = copy.copy(section_obj)
-
+    def create_synthetic_frankenversion(self, versions):
         version_keys = [version.id for version in versions]
         # this method already handles getting the latest version of fields and
         # storing all old xpaths
+        all_sections = OrderedDict({})
+        child_names_by_parent = defaultdict(set)
         fields = self.formpack.get_fields_for_versions(version_keys)
         for section in all_sections.values():
             # replace all hierarchy pointers with the new copies
@@ -235,9 +207,36 @@ class Export:
             section = all_sections.get(section_name)
             section.fields[field.name]=field
 
-        section = get_first_occurrence(all_sections.values())
+        return get_first_occurrence(all_sections.values())
+
+    def parse_one_submission(self, submission, version=None):
+        """
+        Parse a single submission and return a formatted 'chunks' structure;
+        see format_one_submission() for details
+
+        Args:
+            version (FormVersion): optional, explicit version to use for this
+                submission instead of inferring the version from the submission
+                itself
+        """
+        breakpoint()
+        if version:
+            section = get_first_occurrence(version.sections.values())
+            return self.format_one_submission([submission.data], section)
+        versions = self.get_versions_for_submission(submission)
+        if not versions:
+            version = self.get_version_for_submission(submission)
+            if version:
+                return self.format_one_submission([submission.data], version)
+            return None
+        version_ids = tuple(v.id for v in versions)
+        if existing_section := self.top_section_by_version_combination.get(version_ids):
+            return self.format_one_submission([submission.data],existing_section)
+        synthetic_frankensection = self.create_synthetic_frankenversion(versions)
+
+        self.top_section_by_version_combination[version_ids] = synthetic_frankensection
         submission = FormSubmission(submission)
-        fmo = self.format_one_submission([submission.data], section)
+        fmo = self.format_one_submission([submission.data], synthetic_frankensection)
         return fmo
 
     def parse_submissions(self, submissions):
