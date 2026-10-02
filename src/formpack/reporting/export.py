@@ -1,4 +1,5 @@
 # coding: utf-8
+import copy
 import json
 import re
 import tempfile
@@ -203,19 +204,32 @@ class Export:
         child_names_by_parent = defaultdict(set)
         for version in versions:
             for section_name, section_obj in version.sections.items():
-                if existing_section := all_sections.get(section_name):
-                    existing_child_names = child_names_by_parent[section_name]
-                    for child in section_obj.children:
-                        if child.name not in existing_child_names:
-                            existing_section.children.append(child)
-                            existing_child_names.add(child.name)
-                else:
-                    all_sections[section_name] = section_obj
-                    child_names_by_parent[section_name] = set([child.name for child in section_obj.children])
+                existing_child_names = child_names_by_parent[section_name]
+                for child in section_obj.children:
+                    if child.name not in existing_child_names:
+                        existing_child_names.add(child.name)
+                if not all_sections.get(section_name):
+                    all_sections[section_name] = copy.copy(section_obj)
+
         version_keys = [version.id for version in versions]
+        # this method already handles getting the latest version of fields and
+        # storing all old xpaths
         fields = self.formpack.get_fields_for_versions(version_keys)
         for section in all_sections.values():
+            # replace all hierarchy pointers with the new copies
             section.fields = {}
+            child_names = child_names_by_parent[section.name]
+            section.children = [all_sections[name] for name in child_names]
+            section.hierarchy = [
+                all_sections.get(s.name, s)
+                for s in section.hierarchy[:-1]
+                if s is not None
+            ] + [section]
+            if section.parent:
+                section.parent = all_sections.get(
+                    section.parent.name, section.parent
+                )
+
         for field in fields:
             section_name = field.section.name
             section = all_sections.get(section_name)

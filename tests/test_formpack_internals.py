@@ -518,3 +518,110 @@ def test_fields_for_versions_list_index_out_of_range():
     field_names = [field.name for field in all_fields]
     assert len(all_fields) == 3
     assert field_names == expected
+
+
+def test_move_field_between_non_repeating_groups():
+    """
+    Ensure a field that get moved in and out of non-repeating groups at the same level
+    is recognized as the same field and previous xpaths are stored
+    """
+    fp = FormPack(
+        [
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'group1', 'type': 'begin_group'},
+                        {'name': 'q1', 'type': 'text'},
+                        {'type': 'end_group'},
+                    ]
+                },
+                'version': 'v1',
+            },
+            # move question out of group
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'q1', 'type': 'text'},
+                    ]
+                },
+                'version': 'v2',
+            },
+            # add question to different group
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'group2', 'type': 'begin_group'},
+                        {'name': 'q1', 'type': 'text'},
+                        {'type': 'end_group'},
+                    ]
+                },
+                'version': 'v3',
+            },
+        ]
+    )
+    fields = fp.get_fields_for_versions(fp.versions)
+    field_and_section_names = [
+        (field.name, field.section.name) for field in fields
+    ]
+    assert field_and_section_names == [
+        ('q1', 'Submissions'),
+    ]
+    field = fields[0]
+    assert field.path == 'group2/q1'
+    assert list(field.previous_xpaths) == ['q1', 'group1/q1']
+
+def test_move_field_between_repeating_groups():
+    """
+    Ensure a field that get moved in and out of repeating groups at the same level
+    is treated as a new field each time
+    """
+    fp = FormPack(
+        [
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'group1', 'type': 'begin_repeat'},
+                        {'name': 'q1', 'type': 'text'},
+                        {'type': 'end_repeat'},
+                    ]
+                },
+                'version': 'v1',
+            },
+            # move question out of group
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'q1', 'type': 'text'},
+                    ]
+                },
+                'version': 'v2',
+            },
+            # add question back to repeating group, within a non-repeating group
+            {
+                'content': {
+                    'survey': [
+                        {'name': 'group1', 'type': 'begin_repeat'},
+                        {'name': 'inner_group', 'type': 'begin_group'},
+                        {'name': 'q1', 'type': 'text'},
+                        {'type': 'end_group'},
+                        {'type': 'end_repeat'},
+                    ]
+                },
+                'version': 'v3',
+            },
+        ]
+    )
+    fields = fp.get_fields_for_versions(fp.versions)
+    field_and_section_names = [
+        (field.name, field.section.name) for field in fields
+    ]
+    assert field_and_section_names == [
+        ('q1', 'group1'),
+        ('q1', 'Submissions'),
+    ]
+    grouped_field = fields[0]
+    assert grouped_field.path == 'group1/inner_group/q1'
+    assert list(grouped_field.previous_xpaths.keys()) == ['group1/q1']
+    top_level_field = fields[1]
+    assert top_level_field.path == 'q1'
+    assert list(top_level_field.previous_xpaths.keys()) == []
