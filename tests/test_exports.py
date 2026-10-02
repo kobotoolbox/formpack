@@ -2593,7 +2593,6 @@ class TestFormPackExport(unittest.TestCase):
 
     def test_select_multiple_summary(self):
         title, schemas, submissions = build_fixture('dietary_needs')
-        breakpoint()
         fp = FormPack(schemas, title)
         export = fp.export(
             multiple_select='summary', versions=fp.versions.keys()
@@ -3572,43 +3571,43 @@ class TestFormPackExport(unittest.TestCase):
             'id_string': 'many_versions',
             'versions': [
                 {
-                    "id_string": "many_versions",
-                    "version": "v1",
-                    "version_id_key": "__version__",
-                    "content": {
-                        "survey": [
+                    'id_string': 'many_versions',
+                    'version': 'v1',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
                             {
-                                "type": "text",
-                                "name": "qv1",
-                                "label": "q"
+                                'type': 'text',
+                                'name': 'qv1',
+                                'label': 'q'
                             }
                         ]
                     }
                 },
                 {
-                    "id_string": "many_versions",
-                    "version": "v2",
-                    "version_id_key": "__version__",
-                    "content": {
-                        "survey": [
+                    'id_string': 'many_versions',
+                    'version': 'v2',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
                             {
-                                "type": "text",
-                                "name": "qv2",
-                                "label": "q"
+                                'type': 'text',
+                                'name': 'qv2',
+                                'label': 'q'
                             }
                         ]
                     }
                 },
                 {
-                    "id_string": "many_versions",
-                    "version": "v3",
-                    "version_id_key": "__version__",
-                    "content": {
-                        "survey": [
+                    'id_string': 'many_versions',
+                    'version': 'v3',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
                             {
-                                "type": "text",
-                                "name": "qv3",
-                                "label": "q"
+                                'type': 'text',
+                                'name': 'qv3',
+                                'label': 'q'
                             }
                         ]
                     }
@@ -3617,9 +3616,9 @@ class TestFormPackExport(unittest.TestCase):
         }
 
         def create_submission_from_versions(version_ids):
-            submission = { "_uuid": str(uuid.uuid4()) }
+            submission = { '_uuid': str(uuid.uuid4()) }
             if 'v1' in version_ids:
-                submission["qv1"] = 'answer1'
+                submission['qv1'] = 'answer1'
                 submission['version'] = 'v1'
             if 'v2' in version_ids:
                 submission['qv2'] = 'answer2'
@@ -3630,18 +3629,40 @@ class TestFormPackExport(unittest.TestCase):
             submission['meta/formVersions'] = ' '.join(version_ids)
             return submission
 
-        title, schemas, submissions = restaurant_profile
         submissions = []
-        for versions_set in [['v1'], ['v2'], ['v3'], ['v3','v1'], ['v3','v2'], ['v2', 'v1'], ['v3', 'v2', 'v1']]:
+        for versions_set in [
+            ['v1'],
+            ['v2'],
+            ['v3'],
+            ['v3','v1'],
+            ['v3','v2'],
+            ['v2', 'v1'],
+            ['v3', 'v2', 'v1']
+        ]:
             # 2 submissions per version combination
             submissions.append(create_submission_from_versions(versions_set))
             submissions.append(create_submission_from_versions(versions_set))
 
-
-
         fp = FormPack(form['versions'], form['title'])
         export = fp.export(versions=fp.versions.keys())
-        with patch.object(export, 'create_synthetic_frankenversion', return_value=FormSection(name='Many versions')) as mock_frankenversion:
-            exported = export.to_dict(submissions)
+        with patch.object(
+            export,
+            'create_synthetic_frankenversion',
+            return_value=FormSection(name='Many versions')
+        ) as mock_frankenversion:
+            export.to_dict(submissions)
 
-        breakpoint()
+        assert len(mock_frankenversion.mock_calls) == 7
+        called_version_numbers = [
+            [v.id for v in call.args[0]]
+            for call in mock_frankenversion.mock_calls
+        ]
+        assert called_version_numbers == [
+            ['v1'],
+            ['v2'],
+            ['v3'],
+            ['v3', 'v1'],
+            ['v3', 'v2'],
+            ['v2', 'v1'],
+            ['v3', 'v2', 'v1'],
+        ]

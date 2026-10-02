@@ -219,24 +219,24 @@ class Export:
                 submission instead of inferring the version from the submission
                 itself
         """
-        breakpoint()
+        form_submission = FormSubmission(submission)
         if version:
             section = get_first_occurrence(version.sections.values())
-            return self.format_one_submission([submission.data], section)
+            return self.format_one_submission([form_submission.data], section)
         versions = self.get_versions_for_submission(submission)
         if not versions:
             version = self.get_version_for_submission(submission)
             if version:
-                return self.format_one_submission([submission.data], version)
+                section = get_first_occurrence(version.sections.values())
+                return self.format_one_submission([form_submission.data], section)
             return None
         version_ids = tuple(v.id for v in versions)
         if existing_section := self.top_section_by_version_combination.get(version_ids):
-            return self.format_one_submission([submission.data],existing_section)
+            return self.format_one_submission([form_submission.data],existing_section)
         synthetic_frankensection = self.create_synthetic_frankenversion(versions)
 
         self.top_section_by_version_combination[version_ids] = synthetic_frankensection
-        submission = FormSubmission(submission)
-        fmo = self.format_one_submission([submission.data], synthetic_frankensection)
+        fmo = self.format_one_submission([form_submission.data], synthetic_frankensection)
         return fmo
 
     def parse_submissions(self, submissions):
