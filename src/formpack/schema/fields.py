@@ -81,13 +81,12 @@ class FormField(FormDataDef):
         return [self._get_label(*args)]
 
     def get_value_from_entry(self, entry):
-        if value := entry.get(self.path):
+        if (value := entry.get(self.path)) is not None:
             return value
         for path in self.previous_xpaths.keys():
-            if value := entry.get(path):
+            if (value := entry.get(path)) is not None:
                 return value
         return None
-
 
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         return super().get_value_names()
