@@ -3634,10 +3634,10 @@ class TestFormPackExport(unittest.TestCase):
             ['v1'],
             ['v2'],
             ['v3'],
-            ['v3','v1'],
-            ['v3','v2'],
-            ['v2', 'v1'],
-            ['v3', 'v2', 'v1']
+            ['v1','v3'],
+            ['v2','v3'],
+            ['v1', 'v2'],
+            ['v1', 'v2', 'v3']
         ]:
             # 2 submissions per version combination
             submissions.append(create_submission_from_versions(versions_set))
@@ -3651,7 +3651,7 @@ class TestFormPackExport(unittest.TestCase):
             return_value=FormSection(name='Many versions')
         ) as mock_frankenversion:
             export.to_dict(submissions)
-
+        # only called once per version combination
         assert len(mock_frankenversion.mock_calls) == 7
         called_version_numbers = [
             [v.id for v in call.args[0]]
@@ -3661,8 +3661,101 @@ class TestFormPackExport(unittest.TestCase):
             ['v1'],
             ['v2'],
             ['v3'],
-            ['v3', 'v1'],
-            ['v3', 'v2'],
-            ['v2', 'v1'],
-            ['v3', 'v2', 'v1'],
+            ['v1', 'v3'],
+            ['v2', 'v3'],
+            ['v1', 'v2'],
+            ['v1', 'v2', 'v3'],
         ]
+
+    def test_submission_edited_with_multiple_versions(self):
+        form = {
+            'title': 'Many versions',
+            'id_string': 'many_versions',
+            'versions': [
+                {
+                    'id_string': 'many_versions',
+                    'version': 'v1',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {'type': 'text', 'name': 'qv1', 'label': 'q'}
+                        ]
+                    },
+                },
+                {
+                    'id_string': 'many_versions',
+                    'version': 'v2',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {'type': 'text', 'name': 'qv2', 'label': 'q'}
+                        ]
+                    },
+                },
+            ],
+        }
+        submission = {
+            '_uuid': str(uuid.uuid4()),
+            'qv1': 'answer1',
+            'qv2': 'answer2',
+            '__version__': 'v1',
+            'meta/formVersions': 'v1 v2',
+        }
+
+        fp = FormPack(form['versions'], form['title'])
+        export = fp.export(versions=fp.versions.keys())
+        result = export.to_dict([submission])
+        assert result == {
+            'Many versions': {
+                'fields': ['qv2', 'qv1'],
+                'data': [['answer2', 'answer1']],
+            }
+        }
+
+    def test_submission_edited_with_multiple_versions_prefers_most_recent_version(self):
+        form = {
+            'title': 'Many versions',
+            'id_string': 'many_versions',
+            'versions': [
+                {
+                    'id_string': 'many_versions',
+                    'version': 'v1',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {'type': 'text', 'name': 'q1', 'label': 'q'},
+                        ]
+                    },
+                },
+                {
+                    'id_string': 'many_versions',
+                    'version': 'v2',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {'name': 'group1', 'type': 'begin_group'},
+                            {'type': 'text', 'name': 'q1', 'label': 'q'},
+                            {'type': 'end_group'}
+                        ]
+                    },
+                },
+            ],
+        }
+        submission = {
+            # original version was v1, edited with v2
+            '_uuid': str(uuid.uuid4()),
+            'q1': 'answer1',
+            'group1/q1': 'newer answer1',
+            '__version__': 'v1',
+            'meta/formVersions': 'v1 v2',
+        }
+
+        fp = FormPack(form['versions'], form['title'])
+        export = fp.export(versions=fp.versions.keys())
+        result = export.to_dict([submission])
+        assert result == {
+            'Many versions': {
+                'fields': ['q1'],
+                'data': [['newer answer1']],
+            }
+        }

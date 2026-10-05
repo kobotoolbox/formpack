@@ -168,24 +168,33 @@ class Export:
         Returns all versions under which the submission has been edited, from
         meta/formVersions
 
-        The assumption is that meta/formVersions will always be in descending order
+        The assumption is that meta/formVersions will always be in ascending order
         by recency
         """
 
         version_id_list = submission.get('meta/formVersions','').split(' ')
         versions = [
-                v for version_id in version_id_list
-                                      if (v := self.versions.get(version_id)) is not None
-                                     ]
+            v for version_id in version_id_list
+            if (v := self.versions.get(version_id)) is not None
+        ]
 
         return versions
 
     def create_synthetic_frankenversion(self, versions):
+        # assumes 'versions' comes in ascending order
         version_keys = [version.id for version in versions]
         # this method already handles getting the latest version of fields and
         # storing all old xpaths
         all_sections = OrderedDict({})
         child_names_by_parent = defaultdict(set)
+        for version in reversed(versions):
+            for section_name, section_obj in version.sections.items():
+                existing_child_names = child_names_by_parent[section_name]
+                for child in section_obj.children:
+                    if child.name not in existing_child_names:
+                        existing_child_names.add(child.name)
+                if not all_sections.get(section_name):
+                    all_sections[section_name] = copy.copy(section_obj)
         fields = self.formpack.get_fields_for_versions(version_keys)
         for section in all_sections.values():
             # replace all hierarchy pointers with the new copies
