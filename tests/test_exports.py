@@ -3647,15 +3647,15 @@ class TestFormPackExport(unittest.TestCase):
         export = fp.export(versions=fp.versions.keys())
         with patch.object(
             export,
-            'create_synthetic_frankenversion',
+            'create_synthetic_version',
             return_value=FormSection(name='Many versions')
-        ) as mock_frankenversion:
+        ) as mock_synthetic_version:
             export.to_dict(submissions)
         # only called once per version combination
-        assert len(mock_frankenversion.mock_calls) == 7
+        assert len(mock_synthetic_version.mock_calls) == 7
         called_version_numbers = [
             [v.id for v in call.args[0]]
-            for call in mock_frankenversion.mock_calls
+            for call in mock_synthetic_version.mock_calls
         ]
         assert called_version_numbers == [
             ['v1'],

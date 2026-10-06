@@ -180,11 +180,15 @@ class Export:
 
         return versions
 
-    def create_synthetic_frankenversion(self, versions):
+    def create_synthetic_version(self, versions):
+        """
+        Create a section tree representing the merging of several different versions.
+
+        Returns the top section of the tree.
+        """
         # assumes 'versions' comes in ascending order
         version_keys = [version.id for version in versions]
-        # this method already handles getting the latest version of fields and
-        # storing all old xpaths
+
         all_sections = OrderedDict({})
         child_names_by_parent = defaultdict(set)
         for version in reversed(versions):
@@ -195,6 +199,8 @@ class Export:
                         existing_child_names.add(child.name)
                 if not all_sections.get(section_name):
                     all_sections[section_name] = copy.copy(section_obj)
+        # this method already handles getting the latest version of fields and
+        # storing all old xpaths
         fields = self.formpack.get_fields_for_versions(version_keys)
         for section in all_sections.values():
             # replace all hierarchy pointers with the new copies
@@ -211,6 +217,7 @@ class Export:
                     section.parent.name, section.parent
                 )
 
+        # assign all fields to the correct sections
         for field in fields:
             section_name = field.section.name
             section = all_sections.get(section_name)
@@ -242,11 +249,10 @@ class Export:
         version_ids = tuple(v.id for v in versions)
         if existing_section := self.top_section_by_version_combination.get(version_ids):
             return self.format_one_submission([form_submission.data],existing_section)
-        synthetic_frankensection = self.create_synthetic_frankenversion(versions)
+        merged_section_tree = self.create_synthetic_version(versions)
 
-        self.top_section_by_version_combination[version_ids] = synthetic_frankensection
-        fmo = self.format_one_submission([form_submission.data], synthetic_frankensection)
-        return fmo
+        self.top_section_by_version_combination[version_ids] = merged_section_tree
+        return self.format_one_submission([form_submission.data], merged_section_tree)
 
     def parse_submissions(self, submissions):
         """
