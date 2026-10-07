@@ -61,6 +61,9 @@ class FormField(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
+    def add_previous_xpath(self, xpath):
+        self._previous_xpaths[xpath] = ''
+
     def get_labels(
         self,
         lang=UNSPECIFIED_TRANSLATION,
@@ -83,7 +86,7 @@ class FormField(FormDataDef):
     def get_value_from_entry(self, entry):
         if (value := entry.get(self.path)) is not None:
             return value
-        for path in self._previous_xpaths.keys():
+        for path in self.previous_xpaths:
             if (value := entry.get(path)) is not None:
                 return value
         return None
