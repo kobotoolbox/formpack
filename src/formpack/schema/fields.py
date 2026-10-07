@@ -38,7 +38,7 @@ class FormField(FormDataDef):
         self.tags = kwargs.get('tags', [])
         self.analysis_question = False
         # actually an ordered set
-        self.previous_xpaths = OrderedDict({})
+        self._previous_xpaths = OrderedDict({})
 
         source = kwargs.get('source')
         if source is not None:
@@ -83,7 +83,7 @@ class FormField(FormDataDef):
     def get_value_from_entry(self, entry):
         if (value := entry.get(self.path)) is not None:
             return value
-        for path in self.previous_xpaths.keys():
+        for path in self._previous_xpaths.keys():
             if (value := entry.get(path)) is not None:
                 return value
         return None
@@ -332,6 +332,10 @@ class FormField(FormDataDef):
 
     def parse_values(self, raw_values):
         yield raw_values
+
+    @property
+    def previous_xpaths(self):
+        return self._previous_xpaths.keys()
 
     @staticmethod
     def try_get_number(val):

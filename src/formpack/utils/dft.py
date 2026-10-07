@@ -14,6 +14,9 @@ def dft_recurse(
     seen.add(root.path)
     for child in tree[root.path]:
         dft_recurse_inner(child, tree, process_field, result, seen)
+    for previous_xpath in root.previous_xpaths:
+        for child in tree[previous_xpath]:
+            dft_recurse_inner(child, tree, process_field, result, seen)
     return result
 
 

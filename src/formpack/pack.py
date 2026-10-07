@@ -297,7 +297,7 @@ class FormPack:
                                 field_object, latest_field_object
                             )
                             if field_object.path != latest_field_object.path:
-                                new_object.previous_xpaths[field_object.path] = ''
+                                new_object._previous_xpaths[field_object.path] = ''
                             tmp2d[position[0]][position[1]] = new_object
                         else:
                             try:

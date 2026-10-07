@@ -139,7 +139,11 @@ class AnalysisForm(BaseForm):
         self, survey_fields: List[FormField]
     ) -> List[FormField]:
         all_fields = [*survey_fields, *self.fields]
-        survey_fields_by_path = {field.path: field for field in all_fields}
+        survey_fields_by_path = {}
+        for field in all_fields:
+            survey_fields_by_path[field.path] = field
+            for xpath in field.previous_xpaths:
+                survey_fields_by_path[xpath] = field
         _fields = []
         for field in survey_fields:
             _fields.extend(

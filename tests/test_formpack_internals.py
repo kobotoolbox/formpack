@@ -621,7 +621,7 @@ def test_move_field_between_repeating_groups():
     ]
     grouped_field = fields[0]
     assert grouped_field.path == 'group1/inner_group/q1'
-    assert list(grouped_field.previous_xpaths.keys()) == ['group1/q1']
+    assert list(grouped_field.previous_xpaths) == ['group1/q1']
     top_level_field = fields[1]
     assert top_level_field.path == 'q1'
-    assert list(top_level_field.previous_xpaths.keys()) == []
+    assert list(top_level_field.previous_xpaths) == []
