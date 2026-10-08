@@ -190,22 +190,29 @@ class Export:
         version_keys = [version.id for version in versions]
 
         all_sections = OrderedDict({})
-        child_names_by_parent = defaultdict(set)
+        # using OrderedDict for an ordered set
+        child_names_by_parent = defaultdict(OrderedDict)
         for version in reversed(versions):
             for section_name, section_obj in version.sections.items():
                 existing_child_names = child_names_by_parent[section_name]
                 for child in section_obj.children:
                     if child.name not in existing_child_names:
-                        existing_child_names.add(child.name)
-                if not all_sections.get(section_name):
+                        existing_child_names[child.name] = ''
+                if existing_section := all_sections.get(section_name):
+                    if section_obj.path != existing_section.path:
+                        existing_section.add_previous_xpath(section_obj.path)
+                else:
+                    # no need to use deepcopy since we'll be clearing out the
+                    # hierarchy-related fields that link to other objects
                     all_sections[section_name] = copy.copy(section_obj)
+
         # this method already handles getting the latest version of fields and
         # storing all old xpaths
         fields = self.formpack.get_fields_for_versions(version_keys)
         for section in all_sections.values():
             # replace all hierarchy pointers with the new copies
             section.fields = {}
-            child_names = child_names_by_parent[section.name]
+            child_names = child_names_by_parent[section.name].keys()
             section.children = [all_sections[name] for name in child_names]
             section.hierarchy = [
                 all_sections.get(s.name, s)
@@ -218,10 +225,11 @@ class Export:
                 )
 
         # assign all fields to the correct sections
+        breakpoint()
         for field in fields:
             section_name = field.section.name
             section = all_sections.get(section_name)
-            section.fields[field.name]=field
+            section.fields[field.name] = field
 
         return get_first_occurrence(all_sections.values())
 
@@ -582,9 +590,15 @@ class Export:
                 # the whole submission tree recursively, formatting the entries,
                 # and adding the results to the list of rows for this section.
                 nested_data = entry.get(child_section.path)
+                if nested_data is None:
+                    for old_xpath in child_section.previous_xpaths:
+                        nested_data = entry.get(old_xpath)
+                        if nested_data is not None:
+                            break
+
                 if nested_data:
                     chunk = self.format_one_submission(
-                        entry[child_section.path],
+                        nested_data,
                         child_section,
                         attachments=attachments,
                     )

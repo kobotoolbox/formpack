@@ -10,6 +10,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 from dateutil import parser
+from ddt import ddt, data
 from io import BytesIO, TextIOWrapper
 from unittest.mock import patch
 from textwrap import dedent
@@ -3712,7 +3713,7 @@ class TestFormPackExport(unittest.TestCase):
             }
         }
 
-    def test_submission_edited_with_multiple_versions_prefers_most_recent_version(self):
+    def test_submission_edited_with_non_repeating_groups(self):
         form = {
             'title': 'Many versions',
             'id_string': 'many_versions',
@@ -3727,6 +3728,7 @@ class TestFormPackExport(unittest.TestCase):
                         ]
                     },
                 },
+                # move question into non-repeating group
                 {
                     'id_string': 'many_versions',
                     'version': 'v2',
@@ -3759,3 +3761,252 @@ class TestFormPackExport(unittest.TestCase):
                 'data': [['newer answer1']],
             }
         }
+
+    def test_submission_edited_with_repeating_groups(self):
+        form = {
+            'title': 'Many versions',
+            'id_string': 'many_versions',
+            'versions': [
+                {
+                    'id_string': 'many_versions',
+                    'version': 'v1',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {'type': 'text', 'name': 'q1', 'label': 'q1'},
+                            {'name': 'rg', 'type': 'begin_repeat'},
+                            {'type': 'text', 'name': 'rq1', 'label': 'rq1'},
+                            {'type': 'end_repeat'},
+                        ]
+                    },
+                },
+                # add question, move repeating group into non-repeating group
+                {
+                    'id_string': 'many_versions',
+                    'version': 'v2',
+                    'version_id_key': '__version__',
+                    'content': {
+                        'survey': [
+                            {'type': 'text', 'name': 'q2', 'label': 'q2'},
+                            {'name': 'nrg', 'type': 'begin_group'},
+                            {'name': 'rg', 'type': 'begin_repeat'},
+                            {'type': 'text', 'name': 'rq1', 'label': 'rq1'},
+                            {'type': 'end_repeat'},
+                            {'type': 'end_group'},
+                        ]
+                    },
+                },
+            ],
+        }
+        submission = {
+            # original version was v1, edited with v2 but groups remained the same
+            # (only answer to new question was added)
+            '_uuid': str(uuid.uuid4()),
+            'q1': 'answer1',
+            'q2': 'answer2',
+            'rg': [
+                {'rg/rq1': 'old repeating answer 1'},
+                {'rg/rq1': 'old repeating answer 2'},
+            ],
+            '__version__': 'v1',
+            'meta/formVersions': 'v1 v2',
+        }
+
+        fp = FormPack(form['versions'], form['title'])
+        export = fp.export(versions=fp.versions.keys())
+        result = export.to_dict([submission])
+        assert dict(result) == {
+            'Many versions': {
+                'fields': ['q2', 'q1', '_index'],
+                'data': [['answer2', 'answer1', 1]],
+            },
+            'rg': {
+                'fields': ['rq1', '_parent_table_name', '_parent_index'],
+                'data': [
+                    ['old repeating answer 1', 'Many versions', 1],
+                    ['old repeating answer 2', 'Many versions', 1]
+                ]
+            }
+        }
+
+@ddt
+class TestCreateSyntheticVersion(unittest.TestCase):
+    def _flatten_result(self, result_node):
+        # whoo dft
+        def dft(root_node, result):
+            result.append(root_node)
+            for child_section in root_node.children:
+                result.extend(dft(child_section, []))
+            for field in root_node.fields.values():
+                result.append(field)
+            return result
+
+        return dft(result_node, [])
+
+    def test_synthetic_version(self):
+        fp = FormPack(
+            [
+                # 1 top-level question, 1 non-repeating group, 1 repeating group
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'top_level_q1', 'type': 'text'},
+                            {'name': 'non_repeating_g1', 'type': 'begin_group'},
+                            {'name': 'non_repeating_q1', 'type': 'text'},
+                            {'type': 'end_group'},
+                            {'name': 'repeating_g1', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q1', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                        ]
+                    },
+                    'version': 'v1',
+                },
+                # replace text questions (ie remove previous question and add another)
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'top_level_q2', 'type': 'text'},
+                            {'name': 'non_repeating_g1', 'type': 'begin_group'},
+                            {'name': 'non_repeating_q2', 'type': 'text'},
+                            {'type': 'end_group'},
+                            {'name': 'repeating_g1', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q2', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                        ]
+                    },
+                    'version': 'v2',
+                },
+                # replace entire groups
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'top_level_q2', 'type': 'text'},
+                            {'name': 'non_repeating_g2', 'type': 'begin_group'},
+                            {'name': 'non_repeating_q3', 'type': 'text'},
+                            {'type': 'end_group'},
+                            {'name': 'repeating_g2', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q3', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                        ]
+                    },
+                    'version': 'v3',
+                },
+            ]
+        )
+        export_obj = fp.export(versions=fp.versions.keys())
+        new_version_root = export_obj.create_synthetic_version(
+            export_obj.versions.values()
+        )
+        result = self._flatten_result(new_version_root)
+        result = [{'name': node.name, 'path': node.path} for node in result]
+        assert result == [
+            {'name': 'Submissions', 'path': 'Submissions'},
+            # newest repeating group
+            {'name': 'repeating_g2', 'path': 'repeating_g2'},
+            {'name': 'repeating_q3', 'path': 'repeating_g2/repeating_q3'},
+            # older repeating group
+            {'name': 'repeating_g1', 'path': 'repeating_g1'},
+            # newer repeating question
+            {'name': 'repeating_q2', 'path': 'repeating_g1/repeating_q2'},
+            # older repeating question
+            {'name': 'repeating_q1', 'path': 'repeating_g1/repeating_q1'},
+            # newest top-level question
+            {'name': 'top_level_q2', 'path': 'top_level_q2'},
+            # newest non-repeating group (fields only, no group node)
+            {
+                'name': 'non_repeating_q3',
+                'path': 'non_repeating_g2/non_repeating_q3',
+            },
+            # older top-level question
+            {'name': 'top_level_q1', 'path': 'top_level_q1'},
+            # newer non-repeating question
+            {
+                'name': 'non_repeating_q2',
+                'path': 'non_repeating_g1/non_repeating_q2',
+            },
+            # older non-repeating question
+            {
+                'name': 'non_repeating_q1',
+                'path': 'non_repeating_g1/non_repeating_q1',
+            },
+        ]
+
+    # True = moving into non_repeating, False=moving out of non_repeating
+    @data(True, False)
+    def test_move_repeating_group(self, moving_into_non_repeating):
+        out_of_non_repeating_group = [
+            {'name': 'repeating_g1', 'type': 'begin_repeat'},
+            {'name': 'repeating_q1', 'type': 'text'},
+            {'type': 'end_repeat'},
+        ]
+        in_non_repeating_group = [
+            {'name': 'non_repeating_g1', 'type': 'begin_group'},
+            {'name': 'repeating_g1', 'type': 'begin_repeat'},
+            {'name': 'repeating_q1', 'type': 'text'},
+            {'type': 'end_repeat'},
+            {'type': 'end_group'},
+        ]
+        in_group_path = 'non_repeating_g1/repeating_g1'
+        out_group_path = 'repeating_g1'
+        v1_survey = (
+            out_of_non_repeating_group
+            if moving_into_non_repeating
+            else in_non_repeating_group
+        )
+        v2_survey = (
+            in_non_repeating_group
+            if moving_into_non_repeating
+            else out_of_non_repeating_group
+        )
+
+        fp = FormPack(
+            [
+                # single top-level repeating group
+                {
+                    'content': {'survey': v1_survey},
+                    'version': 'v1',
+                },
+                {
+                    'content': {'survey': v2_survey},
+                    'version': 'v2',
+                },
+            ]
+        )
+        export_obj = fp.export(versions=fp.versions.keys())
+        new_version_root = export_obj.create_synthetic_version(
+            export_obj.versions.values()
+        )
+        result = self._flatten_result(new_version_root)
+        result = [
+            {
+                'name': node.name,
+                'path': node.path,
+                'previous_xpaths': list(node.previous_xpaths),
+            }
+            for node in result
+        ]
+
+        expected_new_path = (
+            in_group_path if moving_into_non_repeating else out_group_path
+        )
+        expected_old_path = (
+            out_group_path if moving_into_non_repeating else in_group_path
+        )
+
+        assert result == [
+            {
+                'name': 'Submissions',
+                'path': 'Submissions',
+                'previous_xpaths': [],
+            },
+            {
+                'name': 'repeating_g1',
+                'path': expected_new_path,
+                'previous_xpaths': [expected_old_path],
+            },
+            {
+                'name': 'repeating_q1',
+                'path': f'{expected_new_path}/repeating_q1',
+                'previous_xpaths': [f'{expected_old_path}/repeating_q1'],
+            },
+        ]

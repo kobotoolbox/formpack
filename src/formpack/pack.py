@@ -217,6 +217,7 @@ class FormPack:
         try:
             old_choice = old_field.choice
             new_choice = new_field.choice
+            new_field = deepcopy(new_field)
             new_field.merge_choice(old_choice)
         except AttributeError:
             pass
