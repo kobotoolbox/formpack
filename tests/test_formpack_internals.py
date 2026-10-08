@@ -579,6 +579,7 @@ def test_move_field_between_non_repeating_groups():
     assert field.path == 'group2/q1'
     assert list(field.previous_xpaths) == ['q1', 'group1/q1']
 
+
 def test_move_field_between_repeating_groups():
     """
     Ensure a field that get moved in and out of repeating groups at the same level

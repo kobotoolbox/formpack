@@ -3577,13 +3577,9 @@ class TestFormPackExport(unittest.TestCase):
                     'version_id_key': '__version__',
                     'content': {
                         'survey': [
-                            {
-                                'type': 'text',
-                                'name': 'qv1',
-                                'label': 'q'
-                            }
+                            {'type': 'text', 'name': 'qv1', 'label': 'q'}
                         ]
-                    }
+                    },
                 },
                 {
                     'id_string': 'many_versions',
@@ -3591,13 +3587,9 @@ class TestFormPackExport(unittest.TestCase):
                     'version_id_key': '__version__',
                     'content': {
                         'survey': [
-                            {
-                                'type': 'text',
-                                'name': 'qv2',
-                                'label': 'q'
-                            }
+                            {'type': 'text', 'name': 'qv2', 'label': 'q'}
                         ]
-                    }
+                    },
                 },
                 {
                     'id_string': 'many_versions',
@@ -3605,19 +3597,15 @@ class TestFormPackExport(unittest.TestCase):
                     'version_id_key': '__version__',
                     'content': {
                         'survey': [
-                            {
-                                'type': 'text',
-                                'name': 'qv3',
-                                'label': 'q'
-                            }
+                            {'type': 'text', 'name': 'qv3', 'label': 'q'}
                         ]
-                    }
-                }
-            ]
+                    },
+                },
+            ],
         }
 
         def create_submission_from_versions(version_ids):
-            submission = { '_uuid': str(uuid.uuid4()) }
+            submission = {'_uuid': str(uuid.uuid4())}
             if 'v1' in version_ids:
                 submission['qv1'] = 'answer1'
                 submission['version'] = 'v1'
@@ -3635,10 +3623,10 @@ class TestFormPackExport(unittest.TestCase):
             ['v1'],
             ['v2'],
             ['v3'],
-            ['v1','v3'],
-            ['v2','v3'],
+            ['v1', 'v3'],
+            ['v2', 'v3'],
             ['v1', 'v2'],
-            ['v1', 'v2', 'v3']
+            ['v1', 'v2', 'v3'],
         ]:
             # 2 submissions per version combination
             submissions.append(create_submission_from_versions(versions_set))
@@ -3649,7 +3637,7 @@ class TestFormPackExport(unittest.TestCase):
         with patch.object(
             export,
             'create_synthetic_version',
-            return_value=FormSection(name='Many versions')
+            return_value=FormSection(name='Many versions'),
         ) as mock_synthetic_version:
             export.to_dict(submissions)
         # only called once per version combination
@@ -3737,7 +3725,7 @@ class TestFormPackExport(unittest.TestCase):
                         'survey': [
                             {'name': 'group1', 'type': 'begin_group'},
                             {'type': 'text', 'name': 'q1', 'label': 'q'},
-                            {'type': 'end_group'}
+                            {'type': 'end_group'},
                         ]
                     },
                 },
@@ -3824,10 +3812,11 @@ class TestFormPackExport(unittest.TestCase):
                 'fields': ['rq1', '_parent_table_name', '_parent_index'],
                 'data': [
                     ['old repeating answer 1', 'Many versions', 1],
-                    ['old repeating answer 2', 'Many versions', 1]
-                ]
-            }
+                    ['old repeating answer 2', 'Many versions', 1],
+                ],
+            },
         }
+
 
 @ddt
 class TestCreateSyntheticVersion(unittest.TestCase):

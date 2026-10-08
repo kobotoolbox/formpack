@@ -162,7 +162,6 @@ class Export:
         except KeyError:
             return None
 
-
     def get_versions_for_submission(self, submission):
         """
         Returns all versions under which the submission has been edited, from
@@ -172,9 +171,10 @@ class Export:
         by recency
         """
 
-        version_id_list = submission.get('meta/formVersions','').split(' ')
+        version_id_list = submission.get('meta/formVersions', '').split(' ')
         versions = [
-            v for version_id in version_id_list
+            v
+            for version_id in version_id_list
             if (v := self.versions.get(version_id)) is not None
         ]
 
@@ -255,15 +255,25 @@ class Export:
             version = self.get_version_for_submission(submission)
             if version:
                 section = get_first_occurrence(version.sections.values())
-                return self.format_one_submission([form_submission.data], section)
+                return self.format_one_submission(
+                    [form_submission.data], section
+                )
             return None
         version_ids = tuple(v.id for v in versions)
-        if existing_section := self.top_section_by_version_combination.get(version_ids):
-            return self.format_one_submission([form_submission.data],existing_section)
+        if existing_section := self.top_section_by_version_combination.get(
+            version_ids
+        ):
+            return self.format_one_submission(
+                [form_submission.data], existing_section
+            )
         merged_section_tree = self.create_synthetic_version(versions)
 
-        self.top_section_by_version_combination[version_ids] = merged_section_tree
-        return self.format_one_submission([form_submission.data], merged_section_tree)
+        self.top_section_by_version_combination[version_ids] = (
+            merged_section_tree
+        )
+        return self.format_one_submission(
+            [form_submission.data], merged_section_tree
+        )
 
     def parse_submissions(self, submissions):
         """

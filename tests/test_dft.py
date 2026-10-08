@@ -95,6 +95,7 @@ def test_depth_first_traversal_handles_cycles():
         'q1/uuid-analysis-q2/verification',
     ]
 
+
 def test_dft_with_older_xpaths():
     survey_field = FormField.from_json_definition(
         definition={
@@ -118,7 +119,7 @@ def test_dft_with_older_xpaths():
             'required': False,
             'name': 'q1',
         },
-        translations = [None],
+        translations=[None],
     )
     new_survey_field.add_previous_xpath('q1')
     all_nodes = dft_recurse(
