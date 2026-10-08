@@ -6,7 +6,6 @@ import pytest
 import pyxform
 
 from formpack import FormPack, constants
-from formpack.utils.iterator import get_first_occurrence
 from .fixtures import build_fixture
 
 
@@ -430,10 +429,20 @@ def test_get_fields_for_versions_returns_newest_of_fields_with_same_name():
     ]
     fp = FormPack(schemas)
     fields = fp.get_fields_for_versions(fp.versions)
-    # The first and only field returned should be the first field of the first
-    # section of the last version
-    section_value = get_first_occurrence(fp[-1].sections.values())
-    assert fields[0] == get_first_occurrence(section_value.fields.values())
+    # The first and only field returned should be a copy of the first
+    # field of the first section of the last version
+    assert len(fields) == 1
+    field = fields[0]
+    assert field.tags == ['hxl:#second_version_hxl']
+    assert len(field.choice.options.keys()) == 1
+    assert (
+        field.choice.options['constant_choice_name']['labels'][None]
+        == 'second version choice label'
+    )
+    assert (
+        field.choice.options['constant_choice_name']['name']
+        == 'constant_choice_name'
+    )
 
 
 def test_get_fields_for_versions_returns_all_choices():

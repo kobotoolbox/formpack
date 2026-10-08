@@ -202,9 +202,13 @@ class Export:
                     if section_obj.path != existing_section.path:
                         existing_section.add_previous_xpath(section_obj.path)
                 else:
-                    # no need to use deepcopy since we'll be clearing out the
-                    # hierarchy-related fields that link to other objects
+                    # no need to use deepcopy most things since we'll be clearing
+                    # out the hierarchy-related fields that link to other objects,
+                    # but we do need to make sure we don't mutate previous xpaths
                     all_sections[section_name] = copy.copy(section_obj)
+                    all_sections[section_name]._previous_xpaths = copy.copy(
+                        section_obj._previous_xpaths
+                    )
 
         # this method already handles getting the latest version of fields and
         # storing all old xpaths

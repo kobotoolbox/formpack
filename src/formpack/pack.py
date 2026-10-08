@@ -300,8 +300,11 @@ class FormPack:
                             # hack: we rely on _combine_field_choices mutating the
                             # 'choices' fields on existing fields, but we need it to
                             # not mutate the xpaths, so we make a copy after we've
-                            # mutate the original field
-                            new_object = copy.deepcopy(new_object)
+                            # mutated the original field
+                            new_object = copy.copy(new_object)
+                            new_object._previous_xpaths = copy.copy(
+                                new_object._previous_xpaths
+                            )
                             if field_object.path != latest_field_object.path:
                                 new_object.add_previous_xpath(field_object.path)
                             tmp2d[position[0]][position[1]] = new_object
