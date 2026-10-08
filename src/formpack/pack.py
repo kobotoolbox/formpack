@@ -1,4 +1,5 @@
 # coding: utf-8
+import copy
 import difflib
 import json
 from collections import OrderedDict
@@ -217,7 +218,6 @@ class FormPack:
         try:
             old_choice = old_field.choice
             new_choice = new_field.choice
-            new_field = deepcopy(new_field)
             new_field.merge_choice(old_choice)
         except AttributeError:
             pass
@@ -297,6 +297,11 @@ class FormPack:
                             new_object = self._combine_field_choices(
                                 field_object, latest_field_object
                             )
+                            # hack: we rely on _combine_field_choices mutating the
+                            # 'choices' fields on existing fields, but we need it to
+                            # not mutate the xpaths, so we make a copy after we've
+                            # mutate the original field
+                            new_object = copy.deepcopy(new_object)
                             if field_object.path != latest_field_object.path:
                                 new_object.add_previous_xpath(field_object.path)
                             tmp2d[position[0]][position[1]] = new_object

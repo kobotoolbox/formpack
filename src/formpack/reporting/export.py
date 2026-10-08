@@ -225,7 +225,6 @@ class Export:
                 )
 
         # assign all fields to the correct sections
-        breakpoint()
         for field in fields:
             section_name = field.section.name
             section = all_sections.get(section_name)
