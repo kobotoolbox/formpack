@@ -3,6 +3,7 @@ from collections import defaultdict
 from formpack.schema import FormField
 from formpack.utils.dft import dft_recurse
 
+
 def _create_analysis_fields_tree(survey_field):
     uuids = ['uuid-analysis-q1', 'uuid-analysis-q2']
     xpath = survey_field.path
@@ -42,6 +43,7 @@ def _create_analysis_fields_tree(survey_field):
         tree[field.source].append(field)
     return tree
 
+
 def test_depth_first_traversal():
     uuids = ['uuid-analysis-q1', 'uuid-analysis-q2']
     survey_field = FormField.from_json_definition(
@@ -67,6 +69,7 @@ def test_depth_first_traversal():
         'q1/uuid-analysis-q2',
         'q1/uuid-analysis-q2/verification',
     ]
+
 
 def test_depth_first_traversal_handles_cycles():
     survey_field = FormField.from_json_definition(
