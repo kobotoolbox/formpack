@@ -1,4 +1,5 @@
 # coding: utf-8
+import copy
 import json
 import re
 import tempfile
@@ -22,7 +23,7 @@ from ..constants import (
     TAG_COLUMNS_AND_SEPARATORS,
     UNSPECIFIED_TRANSLATION,
 )
-from ..schema import CopyField, FormField
+from ..schema import CopyField, FormField, FormSection
 from ..submission import FormSubmission
 from ..utils.exceptions import FormPackExcelError, FormPackGeoJsonError
 from ..utils.flatten_content import flatten_tag_list
@@ -143,6 +144,7 @@ class Export:
         for section_name, fields in self.sections.items():
             self._row_cache[section_name] = OrderedDict.fromkeys(fields, '')
             self._empty_row[section_name] = dict(self._row_cache[section_name])
+        self.top_section_by_version_combination = {}
 
     def get_version_for_submission(self, submission):
         """
@@ -160,6 +162,80 @@ class Export:
         except KeyError:
             return None
 
+    def get_versions_for_submission(self, submission):
+        """
+        Returns all versions under which the submission has been edited, from
+        meta/formVersions
+
+        The assumption is that meta/formVersions will always be in ascending order
+        by recency
+        """
+
+        version_id_list = submission.get('meta/formVersions', '').split(' ')
+        versions = [
+            v
+            for version_id in version_id_list
+            if (v := self.versions.get(version_id)) is not None
+        ]
+
+        return versions
+
+    def create_synthetic_version(self, versions):
+        """
+        Create a section tree representing the merging of several different versions.
+
+        Returns the top section of the tree.
+        """
+        # assumes 'versions' comes in ascending order
+        version_keys = [version.id for version in versions]
+
+        all_sections = OrderedDict({})
+        # using OrderedDict for an ordered set
+        child_names_by_parent = defaultdict(OrderedDict)
+        for version in reversed(versions):
+            for section_name, section_obj in version.sections.items():
+                existing_child_names = child_names_by_parent[section_name]
+                for child in section_obj.children:
+                    if child.name not in existing_child_names:
+                        existing_child_names[child.name] = ''
+                if existing_section := all_sections.get(section_name):
+                    if section_obj.path != existing_section.path:
+                        existing_section.add_previous_xpath(section_obj.path)
+                else:
+                    # no need to use deepcopy since we'll be clearing
+                    # out the hierarchy-related fields that link to other objects,
+                    # but we do need to make sure we don't mutate previous xpaths
+                    all_sections[section_name] = copy.copy(section_obj)
+                    all_sections[section_name]._previous_xpaths = copy.copy(
+                        section_obj._previous_xpaths
+                    )
+
+        # this method already handles getting the latest version of fields and
+        # storing all old xpaths
+        fields = self.formpack.get_fields_for_versions(version_keys)
+        for section in all_sections.values():
+            # replace all hierarchy pointers with the new copies
+            section.fields = {}
+            child_names = child_names_by_parent[section.name].keys()
+            section.children = [all_sections[name] for name in child_names]
+            section.hierarchy = [
+                all_sections.get(s.name, s)
+                for s in section.hierarchy[:-1]
+                if s is not None
+            ] + [section]
+            if section.parent:
+                section.parent = all_sections.get(
+                    section.parent.name, section.parent
+                )
+
+        # assign all fields to the correct sections
+        for field in fields:
+            section_name = field.section.name
+            section = all_sections.get(section_name)
+            section.fields[field.name] = field
+
+        return get_first_occurrence(all_sections.values())
+
     def parse_one_submission(self, submission, version=None):
         """
         Parse a single submission and return a formatted 'chunks' structure;
@@ -170,17 +246,34 @@ class Export:
                 submission instead of inferring the version from the submission
                 itself
         """
-        if not version:
+        form_submission = FormSubmission(submission)
+        if version:
+            section = get_first_occurrence(version.sections.values())
+            return self.format_one_submission([form_submission.data], section)
+        versions = self.get_versions_for_submission(submission)
+        if not versions:
             version = self.get_version_for_submission(submission)
-        if not version:
-            # TODO: somehow include this submission anyway; see
-            # https://github.com/kobotoolbox/formpack/issues/164
+            if version:
+                section = get_first_occurrence(version.sections.values())
+                return self.format_one_submission(
+                    [form_submission.data], section
+                )
             return None
-        # `format_one_submission()` will recurse through all the sections; get
-        # the first one to start
-        section = get_first_occurrence(version.sections.values())
-        submission = FormSubmission(submission)
-        return self.format_one_submission([submission.data], section)
+        version_ids = tuple(v.id for v in versions)
+        if existing_section := self.top_section_by_version_combination.get(
+            version_ids
+        ):
+            return self.format_one_submission(
+                [form_submission.data], existing_section
+            )
+        merged_section_tree = self.create_synthetic_version(versions)
+
+        self.top_section_by_version_combination[version_ids] = (
+            merged_section_tree
+        )
+        return self.format_one_submission(
+            [form_submission.data], merged_section_tree
+        )
 
     def parse_submissions(self, submissions):
         """
@@ -284,7 +377,6 @@ class Export:
                     include_media_url=self.include_media_url,
                 )
             )
-
         for section_name, section in all_sections.items():
             # Append optional additional fields
             auto_field_names = auto_fields[section_name] = []
@@ -511,9 +603,15 @@ class Export:
                 # the whole submission tree recursively, formatting the entries,
                 # and adding the results to the list of rows for this section.
                 nested_data = entry.get(child_section.path)
+                if nested_data is None:
+                    for old_xpath in child_section.previous_xpaths:
+                        nested_data = entry.get(old_xpath)
+                        if nested_data is not None:
+                            break
+
                 if nested_data:
                     chunk = self.format_one_submission(
-                        entry[child_section.path],
+                        nested_data,
                         child_section,
                         attachments=attachments,
                     )
@@ -524,7 +622,6 @@ class Export:
                             chunks[key] = value
 
             _indexes[_section_name] += 1
-
         return chunks
 
     def get_header_rows_for_tag_cols(self, section_name):
