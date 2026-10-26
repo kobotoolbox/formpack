@@ -3629,13 +3629,13 @@ class TestFormPackExport(unittest.TestCase):
             submission = {'_uuid': str(uuid.uuid4())}
             if 'v1' in version_ids:
                 submission['qv1'] = 'answer1'
-                submission['version'] = 'v1'
+                submission['__version__'] = 'v1'
             if 'v2' in version_ids:
                 submission['qv2'] = 'answer2'
-                submission['version'] = 'v2'
+                submission['__version__'] = 'v2'
             if 'v3' in version_ids:
                 submission['qv3'] = 'answer3'
-                submission['version'] = 'v3'
+                submission['__version__'] = 'v3'
             submission['meta/formVersions'] = ' '.join(version_ids)
             return submission
 
