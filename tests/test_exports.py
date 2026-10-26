@@ -3838,6 +3838,50 @@ class TestFormPackExport(unittest.TestCase):
             },
         }
 
+    def test_older_version_rows_use_choices_from_all_versions(self):
+        def version(version_id, option_names):
+            return {
+                'version': version_id,
+                'content': {
+                    'survey': [
+                        {'type': 'select_one l', 'name': 'so', 'label': 'SO'},
+                        {
+                            'type': 'select_multiple l',
+                            'name': 'sm',
+                            'label': 'SM',
+                        },
+                    ],
+                    'choices': [
+                        {'list_name': 'l', 'name': name, 'label': name.upper()}
+                        for name in option_names
+                    ],
+                },
+            }
+
+        fp = FormPack(
+            [
+                version('v1', ['a', 'b', 'z']),
+                # remove `z`
+                version('v2', ['a', 'b']),
+                # add `c`
+                version('v3', ['a', 'b', 'c']),
+            ]
+        )
+        submissions = [
+            # a newer option, e.g. set by a bulk edit, which leaves
+            # `__version__` alone
+            {'so': 'c', 'sm': 'a c', '__version__': 'v1'},
+            # an option the version it renders against no longer has
+            {'so': 'z', 'sm': 'z', '__version__': 'v2'},
+        ]
+        export = fp.export(versions=fp.versions.keys(), lang=UNTRANSLATED)
+        result = export.to_dict(submissions)['Submissions']
+        rows = [dict(zip(result['fields'], row)) for row in result['data']]
+        assert [(row['SO'], row['SM']) for row in rows] == [
+            ('C', 'A C'),
+            ('Z', 'Z'),
+        ]
+
 
 @ddt
 class TestCreateSyntheticVersion(unittest.TestCase):
