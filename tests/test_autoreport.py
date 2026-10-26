@@ -701,3 +701,72 @@ class TestAutoReport(unittest.TestCase):
         ]
         for i, stat in enumerate(stats):
             assert stat == expected[i]
+
+    def test_stats_for_questions_moved_into_a_group(self):
+        """
+        Answers stored under a question's path from an older version should
+        still be counted
+        """
+
+        def version(version_id, survey):
+            return {
+                'version': version_id,
+                'content': {
+                    'survey': survey,
+                    'choices': [
+                        {'list_name': 'coffee', 'name': name, 'label': label}
+                        for name, label in [
+                            ('french', 'French'),
+                            ('british', 'British'),
+                        ]
+                    ],
+                },
+            }
+
+        questions = [
+            {'type': 'integer', 'name': 'cups', 'label': 'Cups per day'},
+            {
+                'type': 'select_one coffee',
+                'name': 'favorite_coffee',
+                'label': 'Favorite coffee',
+            },
+        ]
+        fp = FormPack(
+            [
+                version('v1', questions),
+                version(
+                    'v2',
+                    [
+                        {'type': 'begin_group', 'name': 'habits'},
+                        *questions,
+                        {'type': 'end_group'},
+                    ],
+                ),
+            ],
+            'Coffee habits',
+        )
+        submissions = [
+            {'cups': '1', 'favorite_coffee': 'french', '__version__': 'v1'},
+            {
+                'habits/cups': '3',
+                'habits/favorite_coffee': 'british',
+                '__version__': 'v2',
+            },
+        ]
+        report = fp.autoreport(versions=fp.versions.keys())
+
+        stats = report.get_stats(submissions, lang=None)
+        assert [
+            (name, d['provided'], d['not_provided']) for _, name, d in stats
+        ] == [
+            ('Cups per day', 2, 0),
+            ('Favorite coffee', 2, 0),
+        ]
+
+        stats = report.get_stats(
+            submissions, split_by='favorite_coffee', lang=None
+        )
+        assert [
+            (name, [(splitter, d['mean']) for splitter, d in stats_['values']])
+            for _, name, stats_ in stats
+        ] == [('Cups per day', [('french', 1), ('british', 3)])]
