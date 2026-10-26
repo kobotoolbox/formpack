@@ -232,6 +232,12 @@ class Export:
         # assign all fields to the correct sections
         for field in fields:
             section_name = field.section.name
+            # give every row the options merged across all exported versions,
+            # whichever version it is rendered against
+            choice = self._choices_by_field.get((section_name, field.name))
+            if choice is not None and hasattr(field, 'choice'):
+                field = copy.copy(field)
+                field.choice = choice
             section = all_sections.get(section_name)
             section.fields[field.name] = field
 
@@ -254,12 +260,11 @@ class Export:
         versions = self.get_versions_for_submission(submission)
         if not versions:
             version = self.get_version_for_submission(submission)
-            if version:
-                section = get_first_occurrence(version.sections.values())
-                return self.format_one_submission(
-                    [form_submission.data], section
-                )
-            return None
+            if not version:
+                # TODO: somehow include this submission anyway; see
+                # https://github.com/kobotoolbox/formpack/issues/164
+                return None
+            versions = [version]
         version_ids = tuple(v.id for v in versions)
         if existing_section := self.top_section_by_version_combination.get(
             version_ids
@@ -338,6 +343,13 @@ class Export:
             )
 
         all_fields = self.formpack.get_fields_for_versions(self.versions)
+        # the newest version of each field carries the options of every
+        # version; keep them so rows from older versions can use them too
+        self._choices_by_field = {
+            (field.section.name, field.name): field.choice
+            for field in all_fields
+            if getattr(field, 'choice', None) is not None
+        }
 
         # Ensure that fields are filtered if they've been specified, otherwise
         # carry on as usual
