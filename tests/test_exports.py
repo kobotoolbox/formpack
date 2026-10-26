@@ -3839,47 +3839,68 @@ class TestFormPackExport(unittest.TestCase):
         }
 
     def test_older_version_rows_use_choices_from_all_versions(self):
-        def version(version_id, option_names):
+        def version(version_id, coffees):
             return {
                 'version': version_id,
                 'content': {
                     'survey': [
-                        {'type': 'select_one l', 'name': 'so', 'label': 'SO'},
                         {
-                            'type': 'select_multiple l',
-                            'name': 'sm',
-                            'label': 'SM',
+                            'type': 'select_one coffee',
+                            'name': 'favorite_coffee',
+                            'label': 'Favorite coffee',
+                        },
+                        {
+                            'type': 'select_multiple coffee',
+                            'name': 'coffees_tried',
+                            'label': 'Coffees tried',
                         },
                     ],
                     'choices': [
-                        {'list_name': 'l', 'name': name, 'label': name.upper()}
-                        for name in option_names
+                        {'list_name': 'coffee', 'name': name, 'label': label}
+                        for name, label in coffees
                     ],
                 },
             }
 
+        french = ('french', 'French')
+        italian = ('italian', 'Italian')
+        british = ('british', 'British')
         fp = FormPack(
             [
-                version('v1', ['a', 'b', 'z']),
-                # remove `z`
-                version('v2', ['a', 'b']),
-                # add `c`
-                version('v3', ['a', 'b', 'c']),
+                version('v1', [french, italian]),
+                version('v2', [french]),
+                version('v3', [french, british]),
             ]
         )
         submissions = [
-            # a newer option, e.g. set by a bulk edit, which leaves
-            # `__version__` alone
-            {'so': 'c', 'sm': 'a c', '__version__': 'v1'},
-            # an option the version it renders against no longer has
-            {'so': 'z', 'sm': 'z', '__version__': 'v2'},
+            # `british` was only added in v3, e.g. by a bulk edit, which
+            # leaves `__version__` alone
+            {
+                'favorite_coffee': 'british',
+                'coffees_tried': 'french british',
+                '__version__': 'v1',
+            },
+            # `italian` was removed in v2
+            {
+                'favorite_coffee': 'italian',
+                'coffees_tried': 'italian',
+                '__version__': 'v2',
+            },
         ]
         export = fp.export(versions=fp.versions.keys(), lang=UNTRANSLATED)
         result = export.to_dict(submissions)['Submissions']
         rows = [dict(zip(result['fields'], row)) for row in result['data']]
-        assert [(row['SO'], row['SM']) for row in rows] == [
-            ('C', 'A C'),
-            ('Z', 'Z'),
+        assert [
+            (
+                row['Favorite coffee'],
+                row['Coffees tried'],
+                row['Coffees tried/British'],
+                row['Coffees tried/Italian'],
+            )
+            for row in rows
+        ] == [
+            ('British', 'French British', '1', '0'),
+            ('Italian', 'Italian', '0', '1'),
         ]
 
 
