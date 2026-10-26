@@ -71,7 +71,7 @@ class AutoReport:
             for field in fields:
                 if field.has_stats:
                     counter = metrics[field.name]
-                    raw_value = entry.get(field.path)
+                    raw_value = field.get_value_from_entry(entry)
                     if raw_value is not None:
                         try:
                             values = list(field.parse_values(raw_value))
@@ -146,16 +146,14 @@ class AutoReport:
 
             # TODO: do we really need FormSubmission ?
 
-            # since we are going to pop one entry, we make a copy
-            # of it to avoid side effect
-            entry = dict(FormSubmission(sbmssn).data)
-            splitter = entry.pop(split_by_field.path, None)
+            entry = FormSubmission(sbmssn).data
+            splitter = split_by_field.get_value_from_entry(entry)
 
             for field in fields:
 
                 if field.has_stats:
 
-                    raw_value = entry.get(field.path)
+                    raw_value = field.get_value_from_entry(entry)
 
                     if raw_value is not None:
                         values = field.parse_values(raw_value)
