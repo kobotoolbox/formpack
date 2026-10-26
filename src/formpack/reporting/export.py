@@ -219,9 +219,8 @@ class Export:
             child_names = child_names_by_parent[section.name].keys()
             section.children = [all_sections[name] for name in child_names]
             section.hierarchy = [
-                all_sections.get(s.name, s)
+                all_sections.get(s.name, s) if isinstance(s, FormSection) else s
                 for s in section.hierarchy[:-1]
-                if s is not None
             ] + [section]
             if section.parent:
                 section.parent = all_sections.get(
