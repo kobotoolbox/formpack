@@ -37,6 +37,8 @@ class FormField(FormDataDef):
         self.can_format = can_format
         self.tags = kwargs.get('tags', [])
         self.analysis_question = False
+        # actually an ordered set
+        self._previous_xpaths = OrderedDict({})
 
         source = kwargs.get('source')
         if source is not None:
@@ -59,6 +61,9 @@ class FormField(FormDataDef):
         # do not include the root section in the path
         self.path = '/'.join(info.name for info in self.hierarchy[1:])
 
+    def add_previous_xpath(self, xpath):
+        self._previous_xpaths[xpath] = ''
+
     def get_labels(
         self,
         lang=UNSPECIFIED_TRANSLATION,
@@ -79,7 +84,12 @@ class FormField(FormDataDef):
         return [self._get_label(*args)]
 
     def get_value_from_entry(self, entry):
-        return entry.get(self.path)
+        if (value := entry.get(self.path)) is not None:
+            return value
+        for path in self.previous_xpaths:
+            if (value := entry.get(path)) is not None:
+                return value
+        return None
 
     def get_value_names(self, multiple_select='both', *args, **kwargs):
         return super().get_value_names()
@@ -325,6 +335,10 @@ class FormField(FormDataDef):
 
     def parse_values(self, raw_values):
         yield raw_values
+
+    @property
+    def previous_xpaths(self):
+        return self._previous_xpaths.keys()
 
     @staticmethod
     def try_get_number(val):
