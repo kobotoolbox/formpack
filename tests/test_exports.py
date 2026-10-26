@@ -4020,3 +4020,104 @@ class TestCreateSyntheticVersion(unittest.TestCase):
                 'previous_xpaths': [f'{expected_old_path}/repeating_q1'],
             },
         ]
+
+    def _assert_sections_point_into_synthetic_tree(self, fp):
+        export_obj = fp.export(versions=fp.versions.keys())
+        new_version_root = export_obj.create_synthetic_version(
+            list(export_obj.versions.values())
+        )
+
+        def walk(section):
+            yield section
+            for child in section.children:
+                yield from walk(child)
+
+        def shape(hierarchy):
+            return [
+                None if node is None else (type(node).__name__, node.name)
+                for node in hierarchy
+            ]
+
+        synthetic_sections = list(walk(new_version_root))
+        for section in synthetic_sections:
+            # the section copied is from the newest version that defines it
+            original = next(
+                version.sections[section.name]
+                for version in reversed(fp.versions.values())
+                if section.name in version.sections
+            )
+            # same shape as the original, including the root's leading None
+            assert shape(section.hierarchy) == shape(original.hierarchy)
+            assert section.hierarchy[-1] is section
+            # every section pointer stays inside the synthetic tree
+            ancestors = [
+                node
+                for node in section.hierarchy[:-1]
+                if isinstance(node, FormSection)
+            ]
+            for ancestor in ancestors:
+                assert any(ancestor is s for s in synthetic_sections)
+            assert section.parent is (ancestors[-1] if ancestors else None)
+
+    def test_synthetic_hierarchy_with_moved_and_old_only_repeats(self):
+        fp = FormPack(
+            [
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'old_repeating_g', 'type': 'begin_repeat'},
+                            {'name': 'old_repeating_q', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                            {'name': 'repeating_g1', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q1', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                        ]
+                    },
+                    'version': 'v1',
+                },
+                # drop one repeating group, move the other into a group
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'non_repeating_g1', 'type': 'begin_group'},
+                            {'name': 'repeating_g1', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q1', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                            {'type': 'end_group'},
+                        ]
+                    },
+                    'version': 'v2',
+                },
+            ]
+        )
+        self._assert_sections_point_into_synthetic_tree(fp)
+
+    def test_synthetic_hierarchy_keeps_group_named_like_old_repeat(self):
+        fp = FormPack(
+            [
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'g1', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q1', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                        ]
+                    },
+                    'version': 'v1',
+                },
+                # `g1` is now a non-repeating group around a repeating group
+                {
+                    'content': {
+                        'survey': [
+                            {'name': 'g1', 'type': 'begin_group'},
+                            {'name': 'repeating_g2', 'type': 'begin_repeat'},
+                            {'name': 'repeating_q2', 'type': 'text'},
+                            {'type': 'end_repeat'},
+                            {'type': 'end_group'},
+                        ]
+                    },
+                    'version': 'v2',
+                },
+            ]
+        )
+        self._assert_sections_point_into_synthetic_tree(fp)
