@@ -167,8 +167,10 @@ class Export:
         Returns all versions under which the submission has been edited, from
         meta/formVersions
 
-        The assumption is that meta/formVersions will always be in ascending order
-        by recency
+        Versions are returned in the order recorded in `meta/formVersions`,
+        which is assumed to be oldest first, newest last. That order is
+        authoritative for this submission, even where it disagrees with the
+        order of `FormPack` versions.
         """
 
         version_id_list = submission.get('meta/formVersions', '').split(' ')
