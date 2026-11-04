@@ -130,6 +130,9 @@ class SharedChoiceOptions:
         """
 
         latest = self._latest_lists.get(list_name)
+        # `is_` rather than `==`, because `1 == 1.0` would merge two options
+        # that an export shows differently. `get_option()` already returns the
+        # same object for the same values
         if (
             latest is not None
             and len(latest) == len(options)
@@ -194,6 +197,8 @@ class FormChoice(FormDataDef):
                 choice_name, _label, translations
             )
 
+        # A list that holds the same options as in the previous version reuses
+        # that list, so that only one copy of it stays in memory
         for choices in all_choices.values():
             choices.options = shared_options.get_list(
                 choices.name, choices.options
