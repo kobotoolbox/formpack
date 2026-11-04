@@ -1,4 +1,3 @@
-# coding: utf-8
 import json
 from copy import deepcopy
 
@@ -81,32 +80,41 @@ def test_other_translations_do_not_share_an_option():
 
 
 @pytest.mark.parametrize(
-    'first_label, second_label',
+    'label, equal_label',
     [(1, 1.0), (1, True), (1.0, True), (0, False)],
 )
-def test_labels_that_python_treats_as_equal_stay_distinct(
-    first_label, second_label
-):
-    pack = _pack(
-        _schema('v1', [('one', [first_label])]),
-        _schema('v2', [('one', [second_label])]),
-    )
-    first, second = _options(pack, 'v1'), _options(pack, 'v2')
+def test_labels_that_python_treats_as_equal_stay_distinct(label, equal_label):
+    """
+    Python treats `1`, `1.0` and `True` as equal, so they would get the same key
+    in the cache. Sharing them would make the second version show the label of
+    the first one, for example `1` instead of `1.0`.
+    """
 
-    assert first is not second
-    assert first['one'] is not second['one']
-    assert repr(_labels(first['one'])) == repr([first_label])
-    assert repr(_labels(second['one'])) == repr([second_label])
+    pack = _pack(
+        _schema('v1', [('one', [label])]),
+        _schema('v2', [('one', [equal_label])]),
+    )
+    first_option = _options(pack, 'v1')['one']
+    second_option = _options(pack, 'v2')['one']
+
+    # `==` cannot tell these labels apart, unlike `is` and `repr()`
+    assert _labels(first_option) == _labels(second_option)
+    assert first_option is not second_option
+    assert repr(_labels(first_option)) == repr([label])
+    assert repr(_labels(second_option)) == repr([equal_label])
 
 
 def test_names_that_python_treats_as_equal_stay_distinct():
     shared_options = SharedChoiceOptions()
 
-    first = shared_options.get_option(1, ['One'], (None,))
-    second = shared_options.get_option(1.0, ['One'], (None,))
+    first_option = shared_options.get_option(1, ['One'], (None,))
+    second_option = shared_options.get_option(1.0, ['One'], (None,))
 
-    assert first is not second
-    assert repr(second['name']) == '1.0'
+    # `==` cannot tell these names apart, unlike `is` and `repr()`
+    assert first_option['name'] == second_option['name']
+    assert first_option is not second_option
+    assert repr(first_option['name']) == '1'
+    assert repr(second_option['name']) == '1.0'
 
 
 def test_label_that_cannot_be_hashed_keeps_its_own_option():
@@ -314,18 +322,10 @@ def test_exports_stay_the_same_as_without_sharing(monkeypatch):
         for version in ('v1', 'v2', 'v3', 'v4', 'v5', 'v6')
     ]
     shared_pack = _pack(*deepcopy(schemas))
-
     monkeypatch.setattr(
         SharedChoiceOptions,
-        'get_option',
-        lambda self, name, labels, translations: self._build_option(
-            name, labels, translations
-        ),
-    )
-    monkeypatch.setattr(
-        SharedChoiceOptions,
-        'get_list',
-        lambda self, list_name, options: options,
+        '_can_share',
+        staticmethod(lambda name, labels: False),
     )
     plain_pack = _pack(*deepcopy(schemas))
     assert _options(shared_pack, 'v2')['red'] is (
