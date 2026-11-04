@@ -5,6 +5,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Dict
 
+from formpack.schema.datadef import SharedChoiceOptions
 from formpack.schema.fields import CopyField
 from .version import FormVersion, AnalysisForm
 from .reporting import Export, AutoReport
@@ -57,6 +58,8 @@ class FormPack:
         self.asset_type = asset_type
 
         self.analysis_form = None
+
+        self.shared_choice_options = SharedChoiceOptions()
 
         self.load_all_versions(versions)
 

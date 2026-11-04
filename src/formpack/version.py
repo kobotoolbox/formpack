@@ -227,7 +227,9 @@ class FormVersion(BaseForm):
         # specific question. They can have translatable labels.
         choices_definition = content.get('choices', ())
         field_choices = FormChoice.all_from_json_definition(
-            choices_definition, self.translations
+            choices_definition,
+            self.translations,
+            form_pack.shared_choice_options,
         )
 
         # Extract fields data
