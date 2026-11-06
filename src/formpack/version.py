@@ -1,4 +1,3 @@
-# coding: utf-8
 from collections import OrderedDict, defaultdict
 from typing import Dict, List, Union
 
@@ -225,9 +224,13 @@ class FormVersion(BaseForm):
         # Extract choices data.
         # Choices are the list of values you can choose from to answer a
         # specific question. They can have translatable labels.
-        choices_definition = content.get('choices', ())
+        choices_definition = self._get_used_choices(
+            content.get('choices', ()), survey
+        )
         field_choices = FormChoice.all_from_json_definition(
-            choices_definition, self.translations
+            choices_definition,
+            self.translations,
+            form_pack.shared_choice_options,
         )
 
         # Extract fields data
@@ -342,6 +345,28 @@ class FormVersion(BaseForm):
                     }
                 )
         return _survey
+
+    @staticmethod
+    def _get_used_choices(choices, survey):
+        """
+        Return the choices of the lists that an enabled question uses.
+
+        Fields only look up the list of their own question, and a list that no
+        field uses would stay in `FormPack.shared_choice_options` for nothing.
+        """
+
+        used_lists = {
+            row['select_from_list_name']
+            for row in survey
+            if isinstance(row.get('select_from_list_name'), str)
+            and not YES_NO.get(str(row.get('disabled')), False)
+        }
+        return [
+            choice
+            for choice in choices
+            if isinstance(choice.get('list_name'), str)
+            and choice['list_name'] in used_lists
+        ]
 
     def _stats(self):
         _stats = OrderedDict()
